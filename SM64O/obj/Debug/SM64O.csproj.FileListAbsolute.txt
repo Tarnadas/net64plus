@@ -1,0 +1,12 @@
+c:\users\olili\documents\visual studio 2015\Projects\SM64O\SM64O\bin\Debug\SM64O.exe.config
+c:\users\olili\documents\visual studio 2015\Projects\SM64O\SM64O\bin\Debug\SM64O.exe
+c:\users\olili\documents\visual studio 2015\Projects\SM64O\SM64O\bin\Debug\SM64O.pdb
+c:\users\olili\documents\visual studio 2015\Projects\SM64O\SM64O\obj\Debug\SM64O.csprojResolveAssemblyReference.cache
+c:\users\olili\documents\visual studio 2015\Projects\SM64O\SM64O\obj\Debug\SM64O.Form1.resources
+c:\users\olili\documents\visual studio 2015\Projects\SM64O\SM64O\obj\Debug\SM64O.Properties.Resources.resources
+c:\users\olili\documents\visual studio 2015\Projects\SM64O\SM64O\obj\Debug\SM64O.csproj.GenerateResource.Cache
+c:\users\olili\documents\visual studio 2015\Projects\SM64O\SM64O\obj\Debug\SM64O.exe
+c:\users\olili\documents\visual studio 2015\Projects\SM64O\SM64O\obj\Debug\SM64O.pdb
+C:\Users\olili\Documents\Visual Studio 2015\Projects\SM64O\SM64O\bin\Debug\Hazel.dll
+C:\Users\olili\Documents\Visual Studio 2015\Projects\SM64O\SM64O\bin\Debug\Hazel.pdb
+C:\Users\olili\Documents\Visual Studio 2015\Projects\SM64O\SM64O\bin\Debug\Hazel.xml
