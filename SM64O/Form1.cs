@@ -9,6 +9,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -39,6 +40,8 @@ namespace SM64O
         public static Connection connection = null;
         public static Connection[] playerClient = new Connection[23];
         public static int connectedPlayers = 0;
+
+        private const int VERSION = 3;
 
         public Form1()
         {
@@ -132,10 +135,41 @@ namespace SM64O
                 }
                 else
                 {
-                    NetworkEndPoint endPoint = new NetworkEndPoint(textBox5.Text, (int) numericUpDown2.Value);
+                    byte[] payload = new byte[2];
+                    payload[0] = VERSION;
+                    payload[1] = (byte)this.comboBox2.SelectedIndex;
+
+                    IPAddress target = null;
+                    bool isIp6 = false;
+
+                    string text = textBox5.Text.Trim();
+
+                    if (!IPAddress.TryParse(text, out target))
+                    {
+                        // Maybe DNS?
+                        try
+                        {
+                            var dns = Dns.GetHostEntry(text);
+                            if (dns.AddressList.Length > 0)
+                                target = dns.AddressList[0];
+                            else throw new SocketException();
+                        }
+                        catch (SocketException ex)
+                        {
+                            MessageBox.Show(this,
+                                "Could not connect to server:\n" + ex.Message);
+                            Application.Exit();
+                            return;
+                        }
+                    }
+
+                    isIp6 = target.AddressFamily == AddressFamily.InterNetworkV6;
+
+                    NetworkEndPoint endPoint = new NetworkEndPoint(target, (int) numericUpDown2.Value, isIp6 ? IPMode.IPv6 : IPMode.IPv4);
                     connection = new TcpConnection(endPoint);
                     connection.DataReceived += DataReceived;
-                    connection.Connect();
+                    connection.Connect(payload, 3000);
+                    connection.Disconnected += ConnectionOnDisconnected;
                 }
             }
             catch (HazelException ex)
@@ -182,6 +216,11 @@ namespace SM64O
             {
                 writeValue(new byte[] { 0x00, 0x00, 0x00, 0x01 }, 0x365FFC);
             }
+        }
+
+        private void ConnectionOnDisconnected(object sender, DisconnectedEventArgs disconnectedEventArgs)
+        {
+            die("You have been disconnected!");
         }
 
         private void NewConnectionHandler(object sender, NewConnectionEventArgs e)
@@ -599,6 +638,15 @@ namespace SM64O
             setGamemode();
         }
 
+        private void numericUpDown3_ValueChanged(object sender, EventArgs e)
+        {
+            Form1.playerClient = new Connection[(int)numericUpDown3.Value];
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            // TODO: chat
+        }
     }
 }
  
