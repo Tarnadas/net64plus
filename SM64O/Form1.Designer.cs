@@ -58,7 +58,7 @@
             this.label7 = new System.Windows.Forms.Label();
             this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
             this.playersOnline = new System.Windows.Forms.Label();
-            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.chatBox = new System.Windows.Forms.TextBox();
             this.button3 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
@@ -367,12 +367,12 @@
             this.playersOnline.TabIndex = 32;
             this.playersOnline.Text = "Players Online:";
             // 
-            // textBox2
+            // chatBox
             // 
-            this.textBox2.Location = new System.Drawing.Point(15, 501);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(269, 20);
-            this.textBox2.TabIndex = 33;
+            this.chatBox.Location = new System.Drawing.Point(15, 501);
+            this.chatBox.Name = "chatBox";
+            this.chatBox.Size = new System.Drawing.Size(269, 20);
+            this.chatBox.TabIndex = 33;
             // 
             // button3
             // 
@@ -390,7 +390,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(295, 565);
             this.Controls.Add(this.button3);
-            this.Controls.Add(this.textBox2);
+            this.Controls.Add(this.chatBox);
             this.Controls.Add(this.playersOnline);
             this.Controls.Add(this.numericUpDown3);
             this.Controls.Add(this.label7);
@@ -460,7 +460,7 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.NumericUpDown numericUpDown3;
         private System.Windows.Forms.Label playersOnline;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox chatBox;
         private System.Windows.Forms.Button button3;
     }
 }
