@@ -39,7 +39,8 @@ namespace SM64O
         public static ConnectionListener listener;
         public static Connection connection = null;
         public static Connection[] playerClient = new Connection[23];
-        public static int connectedPlayers = 0;
+
+        private List<string> _bands = new List<string>();
 
         private const int VERSION = 3;
 
@@ -70,6 +71,14 @@ namespace SM64O
                     {
                         fs.Seek(i, SeekOrigin.Current);
                         fs.Write(newBuffer, 0, newBuffer.Length);
+                    }
+                }
+
+                if (File.Exists("bans.txt"))
+                {
+                    foreach (var line in File.ReadAllLines("bans.txt"))
+                    {
+                        _bands.Add(line);
                     }
                 }
             }
@@ -285,7 +294,6 @@ namespace SM64O
             comboBox1.Enabled = false;
             comboBox2.Enabled = false;
 
-            Characters.setUsername(processHandle, baseAddress);
             Characters.setCharacter(comboBox2.SelectedItem.ToString(), processHandle, baseAddress);
 
             string[] fileEntries = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/Ressources/");
@@ -304,6 +312,8 @@ namespace SM64O
             {
                 writeValue(new byte[] { 0x00, 0x00, 0x00, 0x01 }, 0x365FFC);
             }
+
+            sendAllChat(usernameBox.Text + " has joined");
         }
 
         private void ConnectionOnDisconnected(object sender, DisconnectedEventArgs disconnectedEventArgs)
@@ -315,7 +325,12 @@ namespace SM64O
         {
             try
             {
-                // TODO: bans
+                if (_bands.Contains(e.Connection.EndPoint.ToString()))
+                {
+                    sendChatTo("banned", e.Connection);
+                    e.Connection.Close();
+                    return;
+                }
 
                 for (int i = 0; i < playerClient.Length; i++)
                 {
@@ -367,8 +382,7 @@ namespace SM64O
 
                         }
 
-                        listBox1.Items.Add(string.Format("[{0}] {1} | {2}", e.Connection.EndPoint.ToString(),
-                            character, vers));
+                        listBox1.Items.Add(string.Format("[{0}] {1} | {2}", e.Connection.EndPoint.ToString(), character, vers));
                         return;
                     }
                 }
@@ -476,8 +490,6 @@ namespace SM64O
         // not touching this
         public void sendAllBytes(Connection conn)
         {
-            listBox1.Items.Clear();
-
             int freeRamLength = getRamLength(0x367400);
 
             int[] offsetsToReadFrom = new int[freeRamLength];
@@ -509,8 +521,6 @@ namespace SM64O
                 offsetsToWriteTo[i + 8] = (int)wholeAddress2;
 
                 buffer = originalBuffer;
-
-                listBox1.Items.Add(offsetsToReadFrom[i].ToString("X") + " | " + offsetsToWriteToLength[i + 4].ToString("X") + " | " + offsetsToWriteTo[i + 8].ToString("X"));
 
                 if (playerClient != null)
                 {
@@ -567,7 +577,7 @@ namespace SM64O
 
         private void textBox5_TextChanged(object sender, EventArgs e)
         {
-            if (textBox5.Text != "")
+            if (textBox5.Text != "" && usernameBox.Text != "")
             {
                 button1.Enabled = true;
             }
@@ -678,6 +688,9 @@ namespace SM64O
         private void button2_Click(object sender, EventArgs e)
         {
             MessageBox.Show("Super Mario 64 Online made by Kaze Emanuar and MelonSpeedruns!"
+                + Environment.NewLine
+                + Environment.NewLine
+                + "Thanks to Guad for the bug fixes!"
                 + Environment.NewLine
                 + Environment.NewLine
                 + "Luigi 3D Model created by: "
@@ -801,6 +814,80 @@ namespace SM64O
             if (string.IsNullOrWhiteSpace(chatBox.Text)) return;
             sendAllChat(chatBox.Text);
             chatBox.Text = "";
+        }
+
+        private void listBox1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            int index = listBox1.IndexFromPoint(e.Location);
+            if (index != ListBox.NoMatches)
+            {
+                // Who did we click on
+                Connection conn =
+                    Form1.playerClient.FirstOrDefault(c =>
+                    {
+                        if (c == null || c.EndPoint == null) return false;
+                        return listBox1.Items[index].ToString().Contains(c.EndPoint.ToString());
+                    });
+
+                if (conn == null) return;
+
+                // That player is long gone, how did this happen? I blame hazel
+                if (conn.State == Hazel.ConnectionState.Disconnecting ||
+                    conn.State == Hazel.ConnectionState.NotConnected)
+                {
+                    int indx = Array.IndexOf(playerClient, conn);
+                    conn.DataReceived -= DataReceivedHandler;
+                    if (indx != -1)
+                        playerClient[indx] = null;
+                    listBox1.Items.RemoveAt(index);
+                    return;
+                }
+
+                // really ghetto
+                var resp = MessageBox.Show(this,
+                    "Player Information:\n" + listBox1.Items[index].ToString() +
+                    "\n\nKick this player?\nYes = Kick, No = Ban",
+                    "Client", MessageBoxButtons.YesNoCancel);
+                if (resp == DialogResult.Yes)
+                {
+                    sendChatTo("kicked", conn);
+                    conn.Close();
+
+                    int indx = Array.IndexOf(playerClient, conn);
+                    conn.DataReceived -= DataReceivedHandler;
+                    if (indx != -1)
+                        playerClient[indx] = null;
+                    listBox1.Items.RemoveAt(index);
+                }
+                else if (resp == DialogResult.No)
+                {
+                    sendChatTo("banned", conn);
+                    _bands.Add(conn.EndPoint.ToString());
+                    File.AppendAllText("bans.txt", conn.EndPoint.ToString() + "\n");
+                    conn.Close();
+
+                    int indx = Array.IndexOf(playerClient, conn);
+                    conn.DataReceived -= DataReceivedHandler;
+                    if (indx != -1)
+                        playerClient[indx] = null;
+                    listBox1.Items.RemoveAt(index);
+                }
+
+                playersOnline.Text = "Players Online: " + playerClient.Count(c => c != null) + "/" +
+                                     playerClient.Length;
+            }
+        }
+
+        private void usernameBox_TextChanged(object sender, EventArgs e)
+        {
+            if (textBox5.Text != "" && usernameBox.Text != "")
+            {
+                button1.Enabled = true;
+            }
+            else
+            {
+                button1.Enabled = false;
+            }
         }
     }
 }
