@@ -55,8 +55,14 @@
             this.miniGame5 = new System.Windows.Forms.RadioButton();
             this.miniGame6 = new System.Windows.Forms.RadioButton();
             this.miniGame2 = new System.Windows.Forms.RadioButton();
+            this.label7 = new System.Windows.Forms.Label();
+            this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
+            this.playersOnline = new System.Windows.Forms.Label();
+            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.button3 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
             this.SuspendLayout();
             // 
             // button1
@@ -123,12 +129,12 @@
             // numericUpDown1
             // 
             this.numericUpDown1.Enabled = false;
-            this.numericUpDown1.Location = new System.Drawing.Point(16, 301);
+            this.numericUpDown1.Location = new System.Drawing.Point(212, 283);
             this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(268, 20);
+            this.numericUpDown1.Size = new System.Drawing.Size(72, 20);
             this.numericUpDown1.TabIndex = 14;
             this.numericUpDown1.Value = new decimal(new int[] {
-            5,
+            33,
             0,
             0,
             0});
@@ -168,18 +174,18 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(13, 285);
+            this.label5.Location = new System.Drawing.Point(86, 285);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(272, 13);
+            this.label5.Size = new System.Drawing.Size(120, 13);
             this.label5.TabIndex = 18;
-            this.label5.Text = "Reduce this number to improve the network connection.";
+            this.label5.Text = "Network update interval";
             // 
             // listBox1
             // 
             this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(16, 327);
+            this.listBox1.Location = new System.Drawing.Point(16, 366);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(268, 160);
+            this.listBox1.Size = new System.Drawing.Size(268, 121);
             this.listBox1.TabIndex = 13;
             // 
             // toadTimer
@@ -189,9 +195,9 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(16, 493);
+            this.button2.Location = new System.Drawing.Point(17, 309);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(267, 31);
+            this.button2.Size = new System.Drawing.Size(267, 27);
             this.button2.TabIndex = 19;
             this.button2.Text = "Credits";
             this.button2.UseVisualStyleBackColor = true;
@@ -320,11 +326,74 @@
             this.miniGame2.UseVisualStyleBackColor = true;
             this.miniGame2.CheckedChanged += new System.EventHandler(this.miniGame2_CheckedChanged);
             // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(12, 64);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(67, 13);
+            this.label7.TabIndex = 30;
+            this.label7.Text = "Max Players:";
+            // 
+            // numericUpDown3
+            // 
+            this.numericUpDown3.Location = new System.Drawing.Point(79, 62);
+            this.numericUpDown3.Maximum = new decimal(new int[] {
+            23,
+            0,
+            0,
+            0});
+            this.numericUpDown3.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDown3.Name = "numericUpDown3";
+            this.numericUpDown3.Size = new System.Drawing.Size(62, 20);
+            this.numericUpDown3.TabIndex = 31;
+            this.numericUpDown3.Value = new decimal(new int[] {
+            23,
+            0,
+            0,
+            0});
+            this.numericUpDown3.ValueChanged += new System.EventHandler(this.numericUpDown3_ValueChanged);
+            // 
+            // playersOnline
+            // 
+            this.playersOnline.AutoSize = true;
+            this.playersOnline.Location = new System.Drawing.Point(15, 347);
+            this.playersOnline.Name = "playersOnline";
+            this.playersOnline.Size = new System.Drawing.Size(77, 13);
+            this.playersOnline.TabIndex = 32;
+            this.playersOnline.Text = "Players Online:";
+            // 
+            // textBox2
+            // 
+            this.textBox2.Location = new System.Drawing.Point(15, 501);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(269, 20);
+            this.textBox2.TabIndex = 33;
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(15, 527);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(269, 26);
+            this.button3.TabIndex = 34;
+            this.button3.Text = "Chat";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(295, 533);
+            this.ClientSize = new System.Drawing.Size(295, 565);
+            this.Controls.Add(this.button3);
+            this.Controls.Add(this.textBox2);
+            this.Controls.Add(this.playersOnline);
+            this.Controls.Add(this.numericUpDown3);
+            this.Controls.Add(this.label7);
             this.Controls.Add(this.miniGame6);
             this.Controls.Add(this.miniGame5);
             this.Controls.Add(this.miniGame2);
@@ -355,6 +424,7 @@
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -387,6 +457,11 @@
         private System.Windows.Forms.RadioButton miniGame5;
         private System.Windows.Forms.RadioButton miniGame6;
         private System.Windows.Forms.RadioButton miniGame2;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.NumericUpDown numericUpDown3;
+        private System.Windows.Forms.Label playersOnline;
+        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.Button button3;
     }
 }
 
