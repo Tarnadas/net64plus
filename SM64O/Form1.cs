@@ -294,7 +294,6 @@ namespace SM64O
             comboBox1.Enabled = false;
             comboBox2.Enabled = false;
 
-            Characters.setUsername(processHandle, baseAddress);
             Characters.setCharacter(comboBox2.SelectedItem.ToString(), processHandle, baseAddress);
 
             string[] fileEntries = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/Ressources/");
@@ -313,6 +312,8 @@ namespace SM64O
             {
                 writeValue(new byte[] { 0x00, 0x00, 0x00, 0x01 }, 0x365FFC);
             }
+
+            sendAllChat(usernameBox.Text + " has joined");
         }
 
         private void ConnectionOnDisconnected(object sender, DisconnectedEventArgs disconnectedEventArgs)
@@ -381,8 +382,7 @@ namespace SM64O
 
                         }
 
-                        listBox1.Items.Add(string.Format("[{0}] {1} | {2}", e.Connection.EndPoint.ToString(),
-                            character, vers));
+                        listBox1.Items.Add(string.Format("[{0}] {1} | {2}", e.Connection.EndPoint.ToString(), character, vers));
                         return;
                     }
                 }
@@ -577,7 +577,7 @@ namespace SM64O
 
         private void textBox5_TextChanged(object sender, EventArgs e)
         {
-            if (textBox5.Text != "")
+            if (textBox5.Text != "" && usernameBox.Text != "")
             {
                 button1.Enabled = true;
             }
@@ -688,6 +688,9 @@ namespace SM64O
         private void button2_Click(object sender, EventArgs e)
         {
             MessageBox.Show("Super Mario 64 Online made by Kaze Emanuar and MelonSpeedruns!"
+                + Environment.NewLine
+                + Environment.NewLine
+                + "Thanks to Guad for the bug fixes!"
                 + Environment.NewLine
                 + Environment.NewLine
                 + "Luigi 3D Model created by: "
@@ -803,12 +806,7 @@ namespace SM64O
 
         private void numericUpDown3_ValueChanged(object sender, EventArgs e)
         {
-            int newCount = (int) numericUpDown3.Value;
-
-            // Maybe add an option to remove the player cap?
-            if (newCount > 23)
-                newCount = 23;
-            Form1.playerClient = new Connection[newCount];
+            playerClient = new Connection[(int)numericUpDown3.Value - 1];
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -877,6 +875,18 @@ namespace SM64O
 
                 playersOnline.Text = "Players Online: " + playerClient.Count(c => c != null) + "/" +
                                      playerClient.Length;
+            }
+        }
+
+        private void usernameBox_TextChanged(object sender, EventArgs e)
+        {
+            if (textBox5.Text != "" && usernameBox.Text != "")
+            {
+                button1.Enabled = true;
+            }
+            else
+            {
+                button1.Enabled = false;
             }
         }
     }
