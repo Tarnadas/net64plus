@@ -33,6 +33,26 @@ namespace SM64O
             WriteProcessMemory((int)processHandle, baseAddress + 0x367680, overWriteBuffer, overWriteBuffer.Length, ref bytesWritten);
         }
 
+        public static void setMessage(string msg, IntPtr processHandle, int baseAddress)
+        {
+            int bytesWritten = 0;
+            byte[] buffer = Encoding.ASCII.GetBytes(msg);
+
+            byte[] newArray = new byte[buffer.Length + 4];
+            buffer.CopyTo(newArray, 0);
+
+            for (int i = 0; i < newArray.Length; i += 4)
+            {
+                byte[] newBuffer = newArray.Skip(i).Take(4).ToArray();
+                newBuffer = newBuffer.Reverse().ToArray();
+                WriteProcessMemory((int)processHandle, baseAddress + 0x367684 + i, newBuffer, newBuffer.Length, ref bytesWritten);
+            }
+
+            byte[] overWriteBuffer = new byte[] { 0x00, 0x00, 0x00, 0x00 };
+            overWriteBuffer = overWriteBuffer.Reverse().ToArray();
+            WriteProcessMemory((int)processHandle, baseAddress + 0x367680, overWriteBuffer, overWriteBuffer.Length, ref bytesWritten);
+        }
+
         public static void setCharacter(string character, IntPtr processHandle, int baseAddress)
         {
             if (character == "Mario")

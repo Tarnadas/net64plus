@@ -73,53 +73,84 @@ namespace SM64O
 
         }
 
+        private void die(string msg)
+        {
+            MessageBox.Show(this, msg, "Critical Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            Application.Exit();
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
-            if (comboBox1.Text == "Project64")
+            try
             {
-                Process process = Process.GetProcessesByName("Project64")[0];
+                if (comboBox1.Text == "Project64")
+                {
+                    Process process = Process.GetProcessesByName("Project64")[0];
 
-                baseAddress = ReadWritingMemory.GetBaseAddress("Project64", 4096, 4);
-                textBox1.Text = baseAddress.ToString("X");
+                    baseAddress = ReadWritingMemory.GetBaseAddress("Project64", 4096, 4);
+                    textBox1.Text = baseAddress.ToString("X");
 
-                processHandle = OpenProcess(0x1F0FFF, true, process.Id);
+                    processHandle = OpenProcess(0x1F0FFF, true, process.Id);
+                }
+
+                if (comboBox1.Text == "Nemu64")
+                {
+                    Process process = Process.GetProcessesByName("Nemu64")[0];
+
+                    baseAddress = ReadWritingMemory.GetBaseAddress("Nemu64", 4096, 4);
+                    textBox1.Text = baseAddress.ToString("X");
+
+                    processHandle = OpenProcess(0x1F0FFF, true, process.Id);
+                }
+
+                if (comboBox1.Text == "Mupen64")
+                {
+                    Process process = Process.GetProcessesByName("Mupen64")[0];
+
+                    baseAddress = ReadWritingMemory.GetBaseAddress("Mupen64", 4096, 4);
+                    textBox1.Text = baseAddress.ToString("X");
+
+                    processHandle = OpenProcess(0x1F0FFF, true, process.Id);
+                }
+            }
+            catch (IndexOutOfRangeException)
+            {
+                die("Your emulator is not running!");
+                return;
             }
 
-            if (comboBox1.Text == "Nemu64")
+            try
             {
-                Process process = Process.GetProcessesByName("Nemu64")[0];
+                if (checkBox1.Checked)
+                {
+                    listener = new TcpConnectionListener(IPAddress.Any, (int) numericUpDown2.Value);
+                    listener.NewConnection += NewConnectionHandler;
+                    listener.Start();
 
-                baseAddress = ReadWritingMemory.GetBaseAddress("Nemu64", 4096, 4);
-                textBox1.Text = baseAddress.ToString("X");
-
-                processHandle = OpenProcess(0x1F0FFF, true, process.Id);
+                    miniGame1.Enabled = true;
+                    miniGame3.Enabled = true;
+                }
+                else
+                {
+                    NetworkEndPoint endPoint = new NetworkEndPoint(textBox5.Text, (int) numericUpDown2.Value);
+                    connection = new TcpConnection(endPoint);
+                    connection.DataReceived += DataReceived;
+                    connection.Connect();
+                }
             }
-
-            if (comboBox1.Text == "Mupen64")
+            catch (HazelException ex)
             {
-                Process process = Process.GetProcessesByName("Mupen64")[0];
-
-                baseAddress = ReadWritingMemory.GetBaseAddress("Mupen64", 4096, 4);
-                textBox1.Text = baseAddress.ToString("X");
-
-                processHandle = OpenProcess(0x1F0FFF, true, process.Id);
+                string msg = "Could not connect/start server!";
+                if (ex.InnerException != null)
+                    msg = "Could not connect/start server:\n" + ex.InnerException.Message;
+                die(msg);
+                return;
             }
-
-            if (checkBox1.Checked)
+            catch (Exception ex)
             {
-                listener = new TcpConnectionListener(IPAddress.Any, (int)numericUpDown2.Value);
-                listener.NewConnection += NewConnectionHandler;
-                listener.Start();
-
-                miniGame1.Enabled = true;
-                miniGame3.Enabled = true;
-            }
-            else
-            {
-                NetworkEndPoint endPoint = new NetworkEndPoint(textBox5.Text, (int)numericUpDown2.Value);
-                connection = new TcpConnection(endPoint);
-                connection.DataReceived += DataReceived;
-                connection.Connect();
+                // TODO: add logging 
+                die("Could not connect/start server:\n" + ex.Message + "\n\nMore info:\n" + ex);
+                return;
             }
 
             checkBox1.Enabled = false;
@@ -155,25 +186,31 @@ namespace SM64O
 
         private void NewConnectionHandler(object sender, NewConnectionEventArgs e)
         {
-            for (int i = 0; i < playerClient.Length; i++) {
-                if (i > 23)
+            try
+            {
+                for (int i = 0; i < playerClient.Length; i++)
                 {
-                    e.Connection.Close();
-                    break;
-                }
-                if (playerClient[i] == null)
-                {
-                    Console.WriteLine("player connected!");
-                    playerClient[i] = e.Connection;
-                    e.Connection.DataReceived += DataReceivedHandler;
-                    e.Connection.Disconnected += client_Disconnected;
+                    if (playerClient[i] == null)
+                    {
+                        playerClient[i] = e.Connection;
+                        e.Connection.DataReceived += DataReceivedHandler;
+                        e.Connection.Disconnected += client_Disconnected;
 
-                    int playerIDB = i + 2;
-                    byte[] playerID = new byte[] { (byte)playerIDB };
-                    Thread.Sleep(500);
-                    playerClient[i].SendBytes(playerID);
-                    break;
+                        int playerIDB = i + 2;
+                        byte[] playerID = new byte[] {(byte) playerIDB};
+                        Thread.Sleep(500);
+                        playerClient[i].SendBytes(playerID);
+                        return;
+                    }
                 }
+
+                // Server is full
+                // TODO: sendChatTo("server is full", e.Connection);
+                e.Connection.Close();
+            }
+            finally
+            {
+                // TODO: add playercount here
             }
         }
 
