@@ -227,6 +227,8 @@ namespace SM64O
         {
             try
             {
+                // TODO: bans
+
                 for (int i = 0; i < playerClient.Length; i++)
                 {
                     if (playerClient[i] == null)
@@ -239,6 +241,46 @@ namespace SM64O
                         byte[] playerID = new byte[] {(byte) playerIDB};
                         Thread.Sleep(500);
                         playerClient[i].SendBytes(playerID);
+                        string character = "Unk Char";
+                        string vers = "Default Client";
+
+                        if (e.HandshakeData != null && e.HandshakeData.Length >= 2)
+                        {
+                            byte verIndex = e.HandshakeData[0];
+                            byte charIndex = e.HandshakeData[1];
+                            vers = "v" + verIndex;
+                            switch (charIndex)
+                            {
+                                case 0:
+                                    character = "Mario";
+                                    break;
+                                case 1:
+                                    character = "Luigi";
+                                    break;
+                                case 2:
+                                    character = "Yoshi";
+                                    break;
+                                case 3:
+                                    character = "Wario";
+                                    break;
+                                case 4:
+                                    character = "Peach";
+                                    break;
+                                case 5:
+                                    character = "Toad";
+                                    break;
+                                case 6:
+                                    character = "Waluigi";
+                                    break;
+                                case 7:
+                                    character = "Rosalina";
+                                    break;
+                            }
+
+                        }
+
+                        listBox1.Items.Add(string.Format("[{0}] {1} | {2}", e.Connection.EndPoint.ToString(),
+                            character, vers));
                         return;
                     }
                 }
@@ -249,7 +291,7 @@ namespace SM64O
             }
             finally
             {
-                // TODO: add playercount here
+                playersOnline.Text = "Players Online: " + playerClient.Count(c => c != null) + "/" + playerClient.Length;
             }
         }
 
@@ -263,9 +305,19 @@ namespace SM64O
                     Console.WriteLine("player disconnected!");
                     playerClient[i] = null;
                     conn.DataReceived -= DataReceivedHandler;
+                    for (int index = 0; index < listBox1.Items.Count; index++)
+                    {
+                        if (listBox1.Items[index].ToString().Contains(connection.EndPoint.ToString()))
+                        {
+                            listBox1.Items.RemoveAt(index);
+                            break;
+                        }
+                    }
                     break;
                 }
             }
+
+            playersOnline.Text = "Players Online: " + playerClient.Count(c => c != null) + "/" + playerClient.Length;
         }
 
         private void DataReceivedHandler(object sender, Hazel.DataReceivedEventArgs e)
@@ -321,6 +373,7 @@ namespace SM64O
             }
         }
 
+        // not touching this
         public void sendAllBytes(Connection conn)
         {
             listBox1.Items.Clear();
@@ -414,7 +467,7 @@ namespace SM64O
 
         private void textBox5_TextChanged(object sender, EventArgs e)
         {
-            if (textBox5.Text != "" && !textBox5.Text.Contains(" "))
+            if (textBox5.Text != "")
             {
                 button1.Enabled = true;
             }
