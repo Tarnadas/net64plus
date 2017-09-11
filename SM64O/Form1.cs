@@ -112,11 +112,7 @@ namespace SM64O
                 listener.Start();
 
                 miniGame1.Enabled = true;
-                miniGame2.Enabled = true;
                 miniGame3.Enabled = true;
-                miniGame4.Enabled = true;
-                miniGame5.Enabled = true;
-                miniGame6.Enabled = true;
             }
             else
             {
@@ -131,13 +127,12 @@ namespace SM64O
             timer1.Enabled = true;
             button1.Enabled = false;
             textBox5.Enabled = false;
-            usernameBox.Enabled = false;
             numericUpDown1.Enabled = true;
 
             comboBox1.Enabled = false;
             comboBox2.Enabled = false;
 
-            Characters.setUsername(usernameBox.Text, processHandle, baseAddress);
+            Characters.setUsername(processHandle, baseAddress);
             Characters.setCharacter(comboBox2.SelectedItem.ToString(), processHandle, baseAddress);
 
             string[] fileEntries = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/Ressources/");
@@ -350,7 +345,7 @@ namespace SM64O
 
         private void textBox5_TextChanged(object sender, EventArgs e)
         {
-            if (textBox5.Text != "" && !textBox5.Text.Contains(" ") && usernameBox.Text != "" && !usernameBox.Text.Contains(" "))
+            if (textBox5.Text != "" && !textBox5.Text.Contains(" "))
             {
                 button1.Enabled = true;
             }
@@ -470,6 +465,11 @@ namespace SM64O
                 + "GeoshiTheRed"
                 + Environment.NewLine
                 + Environment.NewLine
+                + "Rosalina and Peach 3D Models created by: "
+                + Environment.NewLine
+                + "AnkleD"
+                + Environment.NewLine
+                + Environment.NewLine
                 + "New Character 3D Models created by: "
                 + Environment.NewLine
                 + "Marshivolt"
@@ -478,21 +478,6 @@ namespace SM64O
                 + "Character Head Icons created by: "
                 + Environment.NewLine
                 + "Quasmok"
-                + Environment.NewLine
-                + Environment.NewLine
-                + "Special Thanks: "
-                + Environment.NewLine
-                + "Psi-Hate"
-                + Environment.NewLine
-                + "Foxen"
-                + Environment.NewLine
-                + "TomatoBird8"
-                + Environment.NewLine
-                + "SimpleFlips"
-                + Environment.NewLine
-                + "Fuzzyness"
-                + Environment.NewLine
-                + "Marionova"
                 + Environment.NewLine
                 + Environment.NewLine
                 + "Try finding the secret Easter Egg!");
@@ -584,18 +569,6 @@ namespace SM64O
             setGamemode();
         }
 
-        private void textBox2_TextChanged(object sender, EventArgs e)
-        {
-            usernameBox.Text = string.Concat(usernameBox.Text.Where(char.IsLetterOrDigit));
-            if (textBox5.Text != "" && !textBox5.Text.Contains(" ") && usernameBox.Text != "" && !usernameBox.Text.Contains(" "))
-            {
-                button1.Enabled = true;
-            }
-            else
-            {
-                button1.Enabled = false;
-            }
-        }
     }
 }
  
