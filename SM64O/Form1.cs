@@ -194,18 +194,7 @@ namespace SM64O
 
         private void DataReceivedHandler(object sender, Hazel.DataReceivedEventArgs e)
         {
-            Connection conn = (Connection)sender;
-
-            byte[] offsetByte = e.Bytes.Take(4).ToArray();
-            int offset = BitConverter.ToInt32(e.Bytes, 0);
-
-            int bytesWritten = 0;
-            byte[] buffer = new byte[e.Bytes.Length - 4];
-            e.Bytes.Skip(4).ToArray().CopyTo(buffer, 0);
-
-            buffer.Reverse().ToArray();
-
-            WriteProcessMemory((int)processHandle, baseAddress + offset, buffer, buffer.Length, ref bytesWritten);
+            ReceiveRawMemory(e.Bytes);
 
             e.Recycle();
         }
@@ -219,18 +208,22 @@ namespace SM64O
             }
             else
             {
-                byte[] offsetByte = e.Bytes.Take(4).ToArray();
-                int offset = BitConverter.ToInt32(e.Bytes, 0);
-
-                int bytesWritten = 0;
-                byte[] buffer = new byte[e.Bytes.Length - 4];
-                e.Bytes.Skip(4).ToArray().CopyTo(buffer, 0);
-
-                buffer.Reverse().ToArray();
-                WriteProcessMemory((int)processHandle, baseAddress + offset, buffer, buffer.Length, ref bytesWritten);
-
+                ReceiveRawMemory(e.Bytes);
                 e.Recycle();
             }
+        }
+
+        private void ReceiveRawMemory(byte[] data)
+        {
+            int offset = BitConverter.ToInt32(data, 0);
+            if (offset < 0x365000 || offset > 0x365000 + 8388608) // Only allow 8 MB N64 RAM addresses
+                return;
+
+            int bytesWritten = 0;
+            byte[] buffer = new byte[data.Length - 4];
+            data.Skip(4).ToArray().CopyTo(buffer, 0);
+
+            WriteProcessMemory((int)processHandle, baseAddress + offset, buffer, buffer.Length, ref bytesWritten);
         }
 
         public void writeValue(byte[] buffer, int offset)
