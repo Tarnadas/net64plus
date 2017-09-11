@@ -409,7 +409,7 @@ namespace SM64O
                     conn.DataReceived -= DataReceivedHandler;
                     for (int index = 0; index < listBox1.Items.Count; index++)
                     {
-                        if (listBox1.Items[index].ToString().Contains(connection.EndPoint.ToString()))
+                        if (listBox1.Items[index].ToString().Contains(conn.EndPoint.ToString()))
                         {
                             listBox1.Items.RemoveAt(index);
                             break;
@@ -490,8 +490,6 @@ namespace SM64O
         // not touching this
         public void sendAllBytes(Connection conn)
         {
-            listBox1.Items.Clear();
-
             int freeRamLength = getRamLength(0x367400);
 
             int[] offsetsToReadFrom = new int[freeRamLength];
@@ -523,8 +521,6 @@ namespace SM64O
                 offsetsToWriteTo[i + 8] = (int)wholeAddress2;
 
                 buffer = originalBuffer;
-
-                listBox1.Items.Add(offsetsToReadFrom[i].ToString("X") + " | " + offsetsToWriteToLength[i + 4].ToString("X") + " | " + offsetsToWriteTo[i + 8].ToString("X"));
 
                 if (playerClient != null)
                 {
