@@ -101,7 +101,7 @@
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(187, 63);
+            this.checkBox1.Location = new System.Drawing.Point(190, 64);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(97, 17);
             this.checkBox1.TabIndex = 10;
@@ -174,11 +174,11 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(86, 285);
+            this.label5.Location = new System.Drawing.Point(80, 285);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(120, 13);
+            this.label5.Size = new System.Drawing.Size(126, 13);
             this.label5.TabIndex = 18;
-            this.label5.Text = "Network update interval";
+            this.label5.Text = "Network Update Interval:";
             // 
             // listBox1
             // 
@@ -339,12 +339,12 @@
             // 
             this.numericUpDown3.Location = new System.Drawing.Point(79, 62);
             this.numericUpDown3.Maximum = new decimal(new int[] {
-            23,
+            24,
             0,
             0,
             0});
             this.numericUpDown3.Minimum = new decimal(new int[] {
-            1,
+            2,
             0,
             0,
             0});
@@ -352,7 +352,7 @@
             this.numericUpDown3.Size = new System.Drawing.Size(62, 20);
             this.numericUpDown3.TabIndex = 31;
             this.numericUpDown3.Value = new decimal(new int[] {
-            23,
+            24,
             0,
             0,
             0});

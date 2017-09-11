@@ -693,7 +693,7 @@ namespace SM64O
 
         private void numericUpDown3_ValueChanged(object sender, EventArgs e)
         {
-            Form1.playerClient = new Connection[(int)numericUpDown3.Value];
+            playerClient = new Connection[(int)numericUpDown3.Value - 1];
         }
 
         private void button3_Click(object sender, EventArgs e)
