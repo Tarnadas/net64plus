@@ -9,6 +9,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -39,6 +40,8 @@ namespace SM64O
         public static Connection connection = null;
         public static Connection[] playerClient = new Connection[23];
         public static int connectedPlayers = 0;
+
+        private const int VERSION = 3;
 
         public Form1()
         {
@@ -132,10 +135,41 @@ namespace SM64O
                 }
                 else
                 {
-                    NetworkEndPoint endPoint = new NetworkEndPoint(textBox5.Text, (int) numericUpDown2.Value);
+                    byte[] payload = new byte[2];
+                    payload[0] = VERSION;
+                    payload[1] = (byte)this.comboBox2.SelectedIndex;
+
+                    IPAddress target = null;
+                    bool isIp6 = false;
+
+                    string text = textBox5.Text.Trim();
+
+                    if (!IPAddress.TryParse(text, out target))
+                    {
+                        // Maybe DNS?
+                        try
+                        {
+                            var dns = Dns.GetHostEntry(text);
+                            if (dns.AddressList.Length > 0)
+                                target = dns.AddressList[0];
+                            else throw new SocketException();
+                        }
+                        catch (SocketException ex)
+                        {
+                            MessageBox.Show(this,
+                                "Could not connect to server:\n" + ex.Message);
+                            Application.Exit();
+                            return;
+                        }
+                    }
+
+                    isIp6 = target.AddressFamily == AddressFamily.InterNetworkV6;
+
+                    NetworkEndPoint endPoint = new NetworkEndPoint(target, (int) numericUpDown2.Value, isIp6 ? IPMode.IPv6 : IPMode.IPv4);
                     connection = new TcpConnection(endPoint);
                     connection.DataReceived += DataReceived;
-                    connection.Connect();
+                    connection.Connect(payload, 3000);
+                    connection.Disconnected += ConnectionOnDisconnected;
                 }
             }
             catch (HazelException ex)
@@ -184,10 +218,17 @@ namespace SM64O
             }
         }
 
+        private void ConnectionOnDisconnected(object sender, DisconnectedEventArgs disconnectedEventArgs)
+        {
+            die("You have been disconnected!");
+        }
+
         private void NewConnectionHandler(object sender, NewConnectionEventArgs e)
         {
             try
             {
+                // TODO: bans
+
                 for (int i = 0; i < playerClient.Length; i++)
                 {
                     if (playerClient[i] == null)
@@ -200,6 +241,46 @@ namespace SM64O
                         byte[] playerID = new byte[] {(byte) playerIDB};
                         Thread.Sleep(500);
                         playerClient[i].SendBytes(playerID);
+                        string character = "Unk Char";
+                        string vers = "Default Client";
+
+                        if (e.HandshakeData != null && e.HandshakeData.Length >= 2)
+                        {
+                            byte verIndex = e.HandshakeData[0];
+                            byte charIndex = e.HandshakeData[1];
+                            vers = "v" + verIndex;
+                            switch (charIndex)
+                            {
+                                case 0:
+                                    character = "Mario";
+                                    break;
+                                case 1:
+                                    character = "Luigi";
+                                    break;
+                                case 2:
+                                    character = "Yoshi";
+                                    break;
+                                case 3:
+                                    character = "Wario";
+                                    break;
+                                case 4:
+                                    character = "Peach";
+                                    break;
+                                case 5:
+                                    character = "Toad";
+                                    break;
+                                case 6:
+                                    character = "Waluigi";
+                                    break;
+                                case 7:
+                                    character = "Rosalina";
+                                    break;
+                            }
+
+                        }
+
+                        listBox1.Items.Add(string.Format("[{0}] {1} | {2}", e.Connection.EndPoint.ToString(),
+                            character, vers));
                         return;
                     }
                 }
@@ -210,7 +291,7 @@ namespace SM64O
             }
             finally
             {
-                // TODO: add playercount here
+                playersOnline.Text = "Players Online: " + playerClient.Count(c => c != null) + "/" + playerClient.Length;
             }
         }
 
@@ -224,9 +305,19 @@ namespace SM64O
                     Console.WriteLine("player disconnected!");
                     playerClient[i] = null;
                     conn.DataReceived -= DataReceivedHandler;
+                    for (int index = 0; index < listBox1.Items.Count; index++)
+                    {
+                        if (listBox1.Items[index].ToString().Contains(connection.EndPoint.ToString()))
+                        {
+                            listBox1.Items.RemoveAt(index);
+                            break;
+                        }
+                    }
                     break;
                 }
             }
+
+            playersOnline.Text = "Players Online: " + playerClient.Count(c => c != null) + "/" + playerClient.Length;
         }
 
         private void DataReceivedHandler(object sender, Hazel.DataReceivedEventArgs e)
@@ -282,6 +373,7 @@ namespace SM64O
             }
         }
 
+        // not touching this
         public void sendAllBytes(Connection conn)
         {
             listBox1.Items.Clear();
@@ -375,7 +467,7 @@ namespace SM64O
 
         private void textBox5_TextChanged(object sender, EventArgs e)
         {
-            if (textBox5.Text != "" && !textBox5.Text.Contains(" "))
+            if (textBox5.Text != "")
             {
                 button1.Enabled = true;
             }
@@ -599,6 +691,15 @@ namespace SM64O
             setGamemode();
         }
 
+        private void numericUpDown3_ValueChanged(object sender, EventArgs e)
+        {
+            Form1.playerClient = new Connection[(int)numericUpDown3.Value];
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            // TODO: chat
+        }
     }
 }
  
