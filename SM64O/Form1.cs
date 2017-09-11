@@ -82,6 +82,94 @@ namespace SM64O
             Application.Exit();
         }
 
+
+        private void sendAllChat(string message)
+        {
+            byte[] bytes = Encoding.ASCII.GetBytes(message);
+            byte[] mainArray = new byte[bytes.Length + 4];
+            byte[] outputArray = new byte[bytes.Length + 4];
+
+            bytes.CopyTo(mainArray, 0);
+            int count = 0;
+            while (count < mainArray.Length)
+            {
+                byte[] array = mainArray.Skip<byte>(count).Take<byte>(4).Reverse<byte>().ToArray<byte>();
+                Array.Copy(array, 0, outputArray, count, Math.Min(4, array.Length));
+                count += 4;
+            }
+
+            byte[] payload = new byte[outputArray.Length + 4];
+            Array.Copy(BitConverter.GetBytes(3569284), 0, payload, 0, 4);
+            Array.Copy(outputArray, 0, payload, 4, outputArray.Length);
+
+            byte[] aux = new byte[8];
+
+            Array.Copy(BitConverter.GetBytes(3569280), 0, aux, 0, 4);
+
+            if (connection == null)
+            {
+                for (int i = 0; i < Form1.playerClient.Length; i++)
+                {
+                    if (Form1.playerClient[i] != null)
+                    {
+                        Form1.playerClient[i].SendBytes(payload);
+                    }
+                }
+            }
+            else
+            {
+                connection.SendBytes(payload);
+            }
+
+            Thread.Sleep(100);
+
+            if (connection == null)
+            {
+                for (int i = 0; i < Form1.playerClient.Length; i++)
+                {
+                    if (Form1.playerClient[i] != null)
+                    {
+                        Form1.playerClient[i].SendBytes(aux);
+                    }
+                }
+            }
+            else
+            {
+                connection.SendBytes(aux);
+            }
+
+            Characters.setMessage(message, processHandle, baseAddress);
+        }
+
+        private void sendChatTo(string message, Connection conn)
+        {
+            byte[] bytes = Encoding.ASCII.GetBytes(message);
+            byte[] mainArray = new byte[bytes.Length + 4];
+            byte[] outputArray = new byte[bytes.Length + 4];
+
+            bytes.CopyTo(mainArray, 0);
+            int count = 0;
+            while (count < mainArray.Length)
+            {
+                byte[] array = mainArray.Skip<byte>(count).Take<byte>(4).Reverse<byte>().ToArray<byte>();
+                Array.Copy(array, 0, outputArray, count, Math.Min(4, array.Length));
+                count += 4;
+            }
+
+            byte[] payload = new byte[outputArray.Length + 4];
+            Array.Copy(BitConverter.GetBytes(3569284), 0, payload, 0, 4);
+            Array.Copy(outputArray, 0, payload, 4, outputArray.Length);
+
+            byte[] aux = new byte[8];
+
+            Array.Copy(BitConverter.GetBytes(3569280), 0, aux, 0, 4);
+
+            conn.SendBytes(payload);
+            Thread.Sleep(100);
+            conn.SendBytes(aux);
+        }
+
+
         private void button1_Click(object sender, EventArgs e)
         {
             try
@@ -286,7 +374,7 @@ namespace SM64O
                 }
 
                 // Server is full
-                // TODO: sendChatTo("server is full", e.Connection);
+                sendChatTo("server is full", e.Connection);
                 e.Connection.Close();
             }
             finally
@@ -352,6 +440,18 @@ namespace SM64O
             data.Skip(4).ToArray().CopyTo(buffer, 0);
 
             WriteProcessMemory((int)processHandle, baseAddress + offset, buffer, buffer.Length, ref bytesWritten);
+
+            if (connection != null) return; // We aren't the host
+            if (offset == 3569284 || offset == 3569280) // It's a chat message
+            {
+                for (int i = 0; i < Form1.playerClient.Length; i++)
+                {
+                    if (Form1.playerClient[i] != null)
+                    {
+                        Form1.playerClient[i].SendBytes(data);
+                    }
+                }
+            }
         }
 
         public void writeValue(byte[] buffer, int offset)
@@ -693,12 +793,19 @@ namespace SM64O
 
         private void numericUpDown3_ValueChanged(object sender, EventArgs e)
         {
-            Form1.playerClient = new Connection[(int)numericUpDown3.Value];
+            int newCount = (int) numericUpDown3.Value;
+
+            // Maybe add an option to remove the player cap?
+            if (newCount > 23)
+                newCount = 23;
+            Form1.playerClient = new Connection[newCount];
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            // TODO: chat
+            if (string.IsNullOrWhiteSpace(chatBox.Text)) return;
+            sendAllChat(chatBox.Text);
+            chatBox.Text = "";
         }
     }
 }
