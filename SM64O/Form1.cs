@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-#pragma warning disable CS0618 // Type or member is obsolete
+//#pragma warning disable CS0618 // Type or member is obsolete
 namespace SM64O
 {
     public partial class Form1 : Form
@@ -43,6 +43,7 @@ namespace SM64O
         private List<string> _bands = new List<string>();
 
         private const int VERSION = 3;
+        private bool _chatEnabled = true;
 
         public Form1()
         {
@@ -447,25 +448,48 @@ namespace SM64O
         {
             int offset = BitConverter.ToInt32(data, 0);
             if (offset < 0x365000 || offset > 0x365000 + 8388608) // Only allow 8 MB N64 RAM addresses
-                return;
+                return; // TODO: Ask Kaze for real offsets
 
             int bytesWritten = 0;
             byte[] buffer = new byte[data.Length - 4];
             data.Skip(4).ToArray().CopyTo(buffer, 0);
 
-            WriteProcessMemory((int)processHandle, baseAddress + offset, buffer, buffer.Length, ref bytesWritten);
-
-            if (connection != null) return; // We aren't the host
             if (offset == 3569284 || offset == 3569280) // It's a chat message
             {
-                for (int i = 0; i < Form1.playerClient.Length; i++)
-                {
-                    if (Form1.playerClient[i] != null)
+                if (!_chatEnabled) return;
+                // TODO: Add chat enable/disable checkbox
+
+                ReceiveChatMessage(offset, data);
+
+                if (connection == null) // We are the host
+                    for (int i = 0; i < Form1.playerClient.Length; i++)
                     {
-                        Form1.playerClient[i].SendBytes(data);
+                        if (Form1.playerClient[i] != null)
+                            Form1.playerClient[i].SendBytes(data);
                     }
-                }
             }
+
+            WriteProcessMemory((int)processHandle, baseAddress + offset, buffer, buffer.Length, ref bytesWritten);
+        }
+
+        private void ReceiveChatMessage(int offset, byte[] data)
+        {
+            if (offset != 3569284) return; // Only need the char array;
+
+            string message = "";
+
+            for (int i = 4; i < data.Length; i += 4)
+            {
+                byte[] lilEndian = new byte[4];
+                lilEndian[3] = data[i];
+                lilEndian[2] = data[i + 1];
+                lilEndian[1] = data[i + 2];
+                lilEndian[0] = data[i + 3];
+
+                message += System.Text.Encoding.ASCII.GetString(lilEndian);
+            }
+
+            // TODO: add external chat window and handle it here
         }
 
         public void writeValue(byte[] buffer, int offset)
