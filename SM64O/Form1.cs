@@ -86,6 +86,7 @@ namespace SM64O
                 }
             }
 
+            this.Text = string.Format("SM64 Online Tool v{0}.{1}", MAJOR_VERSION, MINOR_VERSION);
         }
 
         private void die(string msg)
@@ -94,9 +95,11 @@ namespace SM64O
             Application.Exit();
         }
 
-
         private void sendAllChat(string message)
         {
+            if (message.Length > MaxChatLength)
+                message = message.Substring(0, 24);
+
             byte[] bytes = Encoding.ASCII.GetBytes(message);
             byte[] mainArray = new byte[bytes.Length + 4];
             byte[] outputArray = new byte[bytes.Length + 4];
@@ -155,6 +158,9 @@ namespace SM64O
 
         private void sendChatTo(string message, Connection conn)
         {
+            if (message.Length > MaxChatLength)
+                message = message.Substring(0, 24);
+
             byte[] bytes = Encoding.ASCII.GetBytes(message);
             byte[] mainArray = new byte[bytes.Length + 4];
             byte[] outputArray = new byte[bytes.Length + 4];
@@ -180,8 +186,7 @@ namespace SM64O
             Thread.Sleep(100);
             conn.SendBytes(aux);
         }
-
-
+        
         private void button1_Click(object sender, EventArgs e)
         {
             try
@@ -191,7 +196,6 @@ namespace SM64O
                     Process process = Process.GetProcessesByName("Project64")[0];
 
                     baseAddress = ReadWritingMemory.GetBaseAddress("Project64", 4096, 4);
-                    textBox1.Text = baseAddress.ToString("X");
 
                     processHandle = OpenProcess(0x1F0FFF, true, process.Id);
                 }
@@ -201,7 +205,6 @@ namespace SM64O
                     Process process = Process.GetProcessesByName("Nemu64")[0];
 
                     baseAddress = ReadWritingMemory.GetBaseAddress("Nemu64", 4096, 4);
-                    textBox1.Text = baseAddress.ToString("X");
 
                     processHandle = OpenProcess(0x1F0FFF, true, process.Id);
                 }
@@ -211,7 +214,6 @@ namespace SM64O
                     Process process = Process.GetProcessesByName("Mupen64")[0];
 
                     baseAddress = ReadWritingMemory.GetBaseAddress("Mupen64", 4096, 4);
-                    textBox1.Text = baseAddress.ToString("X");
 
                     processHandle = OpenProcess(0x1F0FFF, true, process.Id);
                 }
@@ -239,8 +241,18 @@ namespace SM64O
                     payload[0] = MINOR_VERSION;
                     payload[1] = (byte)this.comboBox2.SelectedIndex;
                     payload[2] = MAJOR_VERSION;
+
+                    string username = usernameBox.Text;
+
+                    if (string.IsNullOrWhiteSpace(username))
+                    {
+                        username = getRandomUsername();
+                        usernameBox.Text = username;
+                    }
+
+                    usernameBox.Enabled = false;
                     
-                    byte[] usernameBytes = Encoding.ASCII.GetBytes(usernameBox.Text);
+                    byte[] usernameBytes = Encoding.ASCII.GetBytes(username);
                     int len = usernameBytes.Length;
                     if (len > 24) // Arbitrary max length
                         len = 24;
@@ -348,6 +360,7 @@ namespace SM64O
                     {
                         playerClient[i] = new Client(e.Connection);
                         playerClient[i].Id = i;
+                        playerClient[i].Name = "anon";
 
                         e.Connection.DataReceived += DataReceivedHandler;
                         e.Connection.Disconnected += client_Disconnected;
@@ -359,48 +372,55 @@ namespace SM64O
                         string character = "Unk Char";
                         string vers = "Default Client";
 
-                        if (e.HandshakeData != null && e.HandshakeData.Length >= 2)
+                        if (e.HandshakeData != null)
                         {
-                            byte verIndex = e.HandshakeData[0];
-                            byte charIndex = e.HandshakeData[1];
-                            byte usernameLen = e.HandshakeData[3];
-                            string name = Encoding.ASCII.GetString(e.HandshakeData, 4, usernameLen);
-
-                            playerClient[i].MinorVersion = verIndex;
-                            playerClient[i].MajorVersion = e.HandshakeData[2];
-                            playerClient[i].CharacterId = charIndex;
-                            playerClient[i].Name = name;
-
-                            switch (charIndex)
+                            if (e.HandshakeData.Length >= 2)
                             {
-                                case 0:
-                                    character = "Mario";
-                                    break;
-                                case 1:
-                                    character = "Luigi";
-                                    break;
-                                case 2:
-                                    character = "Yoshi";
-                                    break;
-                                case 3:
-                                    character = "Wario";
-                                    break;
-                                case 4:
-                                    character = "Peach";
-                                    break;
-                                case 5:
-                                    character = "Toad";
-                                    break;
-                                case 6:
-                                    character = "Waluigi";
-                                    break;
-                                case 7:
-                                    character = "Rosalina";
-                                    break;
+                                byte verIndex = e.HandshakeData[0];
+                                byte charIndex = e.HandshakeData[1];
+                                playerClient[i].MinorVersion = verIndex;
+                                playerClient[i].CharacterId = charIndex;
+
+                                switch (charIndex)
+                                {
+                                    case 0:
+                                        character = "Mario";
+                                        break;
+                                    case 1:
+                                        character = "Luigi";
+                                        break;
+                                    case 2:
+                                        character = "Yoshi";
+                                        break;
+                                    case 3:
+                                        character = "Wario";
+                                        break;
+                                    case 4:
+                                        character = "Peach";
+                                        break;
+                                    case 5:
+                                        character = "Toad";
+                                        break;
+                                    case 6:
+                                        character = "Waluigi";
+                                        break;
+                                    case 7:
+                                        character = "Rosalina";
+                                        break;
+                                }
+                            }
+                            if (e.HandshakeData.Length >= 3)
+                            {
+                                playerClient[i].MajorVersion = e.HandshakeData[2];
+                            }
+                            if (e.HandshakeData.Length >= 4)
+                            {
+                                byte usernameLen = e.HandshakeData[3];
+                                string name = Encoding.ASCII.GetString(e.HandshakeData, 4, usernameLen);
+                                playerClient[i].Name = name;
                             }
 
                             playerClient[i].CharacterName = character;
-
                         }
 
                         listBox1.Items.Add(playerClient[i]);
@@ -431,7 +451,11 @@ namespace SM64O
             {
                 if (playerClient[i] != null && playerClient[i].Connection == conn)
                 {
-                    Console.WriteLine("player disconnected!");
+                    string msg = string.Format("{0} quit", playerClient[i].Name);
+                    if (msg.Length > MaxChatLength)
+                        msg = msg.Substring(0, 24);
+                    sendAllChat(msg);
+
                     playerClient[i] = null;
                     conn.DataReceived -= DataReceivedHandler;
                     for (int index = 0; index < listBox1.Items.Count; index++)
@@ -911,6 +935,24 @@ namespace SM64O
             {
                 button1.Enabled = false;
             }
+        }
+
+        private Random _r = new Random();
+        private string getRandomUsername()
+        {
+            string[] usernames = new[]
+            {
+                "Bambooccaneer",
+                "Grapeshifter666",
+                "Fellama",
+                "Rerunt987",
+                "IllegalBlizzard123",
+                "ActiveMonkey",
+                "ThunderBerry",
+                "BananaMan",
+            };
+
+            return usernames[_r.Next(usernames.Length)];
         }
     }
 }
