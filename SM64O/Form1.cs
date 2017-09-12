@@ -30,9 +30,10 @@ namespace SM64O
         private bool _chatEnabled = true;
 
         private IEmulatorAccessor _memory;
-        private const int MINOR_VERSION = 3;
-        private const int MAJOR_VERSION = 1;
+        private const int MinorVersion = 3;
+        private const int MajorVersion = 1;
 
+        private const int HandshakeDataLen = 28;
         private const int MaxChatLength = 24;
 
         public Form1()
@@ -78,7 +79,7 @@ namespace SM64O
             // TODO: Change this according to OS
             _memory = new WindowsEmulatorAccessor();
 
-            this.Text = string.Format("SM64 Online Tool v{0}.{1}", MAJOR_VERSION, MINOR_VERSION);
+            this.Text = string.Format("SM64 Online Tool v{0}.{1}", MajorVersion, MinorVersion);
         }
 
         private void die(string msg)
@@ -219,14 +220,16 @@ namespace SM64O
                     miniGame1.Enabled = true;
                     miniGame3.Enabled = true;
 
+                    playerCheckTimer.Start();
+
                     Characters.setMessage("logged in", _memory);
                 }
                 else
                 {
-                    byte[] payload = new byte[28];
-                    payload[0] = MINOR_VERSION;
+                    byte[] payload = new byte[HandshakeDataLen];
+                    payload[0] = (byte)MinorVersion;
                     payload[1] = (byte)this.comboBox2.SelectedIndex;
-                    payload[2] = MAJOR_VERSION;
+                    payload[2] = (byte) MajorVersion;
 
                     string username = usernameBox.Text;
 
@@ -358,12 +361,16 @@ namespace SM64O
                         string character = "Unk Char";
                         string vers = "Default Client";
 
-                        if (e.HandshakeData != null)
+                        if (e.HandshakeData != null && e.HandshakeData.Length > 3)
                         {
-                            if (e.HandshakeData.Length >= 2)
+                            byte[] handshakeData = new byte[HandshakeDataLen];
+
+                            Array.Copy(e.HandshakeData, 3, handshakeData, 0, Math.Min(e.HandshakeData.Length - 3, HandshakeDataLen));
+
+                            if (handshakeData.Length >= 2)
                             {
-                                byte verIndex = e.HandshakeData[0];
-                                byte charIndex = e.HandshakeData[1];
+                                byte verIndex = handshakeData[0];
+                                byte charIndex = handshakeData[1];
                                 playerClient[i].MinorVersion = verIndex;
                                 playerClient[i].CharacterId = charIndex;
 
@@ -397,12 +404,12 @@ namespace SM64O
                             }
                             if (e.HandshakeData.Length >= 3)
                             {
-                                playerClient[i].MajorVersion = e.HandshakeData[2];
+                                playerClient[i].MajorVersion = handshakeData[2];
                             }
                             if (e.HandshakeData.Length >= 4)
                             {
-                                byte usernameLen = e.HandshakeData[3];
-                                string name = Encoding.ASCII.GetString(e.HandshakeData, 4, usernameLen);
+                                byte usernameLen = handshakeData[3];
+                                string name = Encoding.ASCII.GetString(handshakeData, 4, usernameLen);
                                 playerClient[i].Name = name;
                             }
 
@@ -519,9 +526,9 @@ namespace SM64O
             {
                 byte[] lilEndian = new byte[4];
                 lilEndian[3] = data[i];
-                lilEndian[2] = data[i + 1];
-                lilEndian[1] = data[i + 2];
-                lilEndian[0] = data[i + 3];
+                if (i + 1 < data.Length) lilEndian[2] = data[i + 1];
+                if (i + 2 < data.Length) lilEndian[1] = data[i + 2];
+                if (i + 3 < data.Length) lilEndian[0] = data[i + 3];
 
                 message += System.Text.Encoding.ASCII.GetString(lilEndian);
             }
@@ -684,9 +691,12 @@ namespace SM64O
             if (checkBox1.Checked)
             {
                 button1.Text = "Create Server!";
-            } else
+                usernameBox.Enabled = false;
+            }
+            else
             {
                 button1.Text = "Connect to server!";
+                usernameBox.Enabled = true;
             }
         }
 
@@ -909,7 +919,7 @@ namespace SM64O
                     sendChatTo("kicked", conn);
                     conn.Close();
 
-                    int indx = Array.IndexOf(playerClient, conn);
+                    int indx = Array.IndexOf(playerClient, client);
                     conn.DataReceived -= DataReceivedHandler;
                     if (indx != -1)
                         playerClient[indx] = null;
@@ -922,7 +932,7 @@ namespace SM64O
                     File.AppendAllText("bans.txt", conn.EndPoint.ToString() + "\n");
                     conn.Close();
 
-                    int indx = Array.IndexOf(playerClient, conn);
+                    int indx = Array.IndexOf(playerClient, client);
                     conn.DataReceived -= DataReceivedHandler;
                     if (indx != -1)
                         playerClient[indx] = null;
@@ -962,6 +972,24 @@ namespace SM64O
             };
 
             return usernames[_r.Next(usernames.Length)];
+        }
+
+        private void playerCheckTimer_Tick(object sender, EventArgs e)
+        {
+            // We aren't host
+            if (listener == null) return;
+
+            for (int i = 0; i < playerClient.Length; i++)
+            {
+                Client cl = playerClient[i];
+                if (cl.Connection.State == Hazel.ConnectionState.Disconnecting ||
+                    cl.Connection.State == Hazel.ConnectionState.NotConnected)
+                {
+                    cl.Connection.DataReceived -= DataReceivedHandler;
+                    listBox1.Items.Remove(cl);
+                    playerClient[i] = null;
+                }
+            }
         }
     }
 }

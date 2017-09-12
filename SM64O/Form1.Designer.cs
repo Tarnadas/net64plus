@@ -60,6 +60,7 @@
             this.button3 = new System.Windows.Forms.Button();
             this.usernameBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.playerCheckTimer = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
@@ -385,6 +386,11 @@
             this.label1.TabIndex = 36;
             this.label1.Text = "Username:";
             // 
+            // playerCheckTimer
+            // 
+            this.playerCheckTimer.Interval = 1000;
+            this.playerCheckTimer.Tick += new System.EventHandler(this.playerCheckTimer_Tick);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -463,6 +469,7 @@
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.TextBox usernameBox;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Timer playerCheckTimer;
     }
 }
 
