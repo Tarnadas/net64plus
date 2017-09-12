@@ -21,21 +21,6 @@ namespace SM64O
 {
     public partial class Form1 : Form
     {
-
-        [DllImport("kernel32.dll")]
-        public static extern IntPtr OpenProcess(int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
-
-        [DllImport("kernel32.dll")]
-        public static extern bool ReadProcessMemory(int hProcess, int lpBaseAddress, byte[] lpBuffer, int dwSize, ref int lpNumberOfBytesRead);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        static extern bool WriteProcessMemory(int hProcess, int lpBaseAddress, byte[] lpBuffer, int dwSize, ref int lpNumberOfBytesWritten);
-
-        const int PROCESS_WM_READ = 0x0010;
-
-        public IntPtr processHandle;
-        public int baseAddress = 0;
-
         public static ConnectionListener listener;
         public static Connection connection = null;
         public static Connection[] playerClient = new Connection[23];
@@ -44,6 +29,8 @@ namespace SM64O
 
         private const int VERSION = 3;
         private bool _chatEnabled = true;
+
+        private IEmulatorAccessor _memory;
 
         public Form1()
         {
@@ -82,6 +69,9 @@ namespace SM64O
                         _bands.Add(line);
                     }
                 }
+
+                // TODO: Change this according to OS
+                _memory = new WindowsEmulatorAccessor();
             }
 
         }
@@ -186,32 +176,16 @@ namespace SM64O
             {
                 if (comboBox1.Text == "Project64")
                 {
-                    Process process = Process.GetProcessesByName("Project64")[0];
-
-                    baseAddress = ReadWritingMemory.GetBaseAddress("Project64", 4096, 4);
-                    textBox1.Text = baseAddress.ToString("X");
-
-                    processHandle = OpenProcess(0x1F0FFF, true, process.Id);
+                    _memory.Open("Project64");                    
                 }
 
                 if (comboBox1.Text == "Nemu64")
                 {
-                    Process process = Process.GetProcessesByName("Nemu64")[0];
-
-                    baseAddress = ReadWritingMemory.GetBaseAddress("Nemu64", 4096, 4);
-                    textBox1.Text = baseAddress.ToString("X");
-
-                    processHandle = OpenProcess(0x1F0FFF, true, process.Id);
+                    _memory.Open("Nemu64");
                 }
-
                 if (comboBox1.Text == "Mupen64")
                 {
-                    Process process = Process.GetProcessesByName("Mupen64")[0];
-
-                    baseAddress = ReadWritingMemory.GetBaseAddress("Mupen64", 4096, 4);
-                    textBox1.Text = baseAddress.ToString("X");
-
-                    processHandle = OpenProcess(0x1F0FFF, true, process.Id);
+                    _memory.Open("Mupen64");
                 }
             }
             catch (IndexOutOfRangeException)
@@ -306,7 +280,7 @@ namespace SM64O
                 int bytesWritten = 0;
 
                 byte[] buffer = File.ReadAllBytes(file);
-                WriteProcessMemory((int)processHandle, baseAddress + offset, buffer, buffer.Length, ref bytesWritten);
+                _memory.WriteMemory(offset, buffer, buffer.Length);
             }
 
             if (checkBox1.Checked)
@@ -435,7 +409,7 @@ namespace SM64O
             if (e.Bytes.Length == 1)
             {
                 int bytesWritten = 0;
-                WriteProcessMemory((int)processHandle, baseAddress + 0x367703, e.Bytes, e.Bytes.Length, ref bytesWritten);
+                _memory.WriteMemory(0x367703, e.Bytes, e.Bytes.Length);
             }
             else
             {
@@ -469,7 +443,7 @@ namespace SM64O
                     }
             }
 
-            WriteProcessMemory((int)processHandle, baseAddress + offset, buffer, buffer.Length, ref bytesWritten);
+            _memory.WriteMemory(offset, buffer, buffer.Length);
         }
 
         private void ReceiveChatMessage(int offset, byte[] data)
@@ -496,7 +470,7 @@ namespace SM64O
         {
             buffer = buffer.Reverse().ToArray();
             int bytesWritten = 0;
-            WriteProcessMemory((int)processHandle, baseAddress + offset, buffer, buffer.Length, ref bytesWritten);
+            _memory.WriteMemory(offset, buffer, buffer.Length);
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -522,7 +496,7 @@ namespace SM64O
 
             int bytesRead = 0;
             byte[] originalBuffer = new byte[freeRamLength];
-            ReadProcessMemory((int)processHandle, baseAddress + 0x367400, originalBuffer, originalBuffer.Length, ref bytesRead);
+            _memory.ReadMemory(0x367400, origin, originalBuffer.Length);
 
             byte[] buffer = originalBuffer;
 
@@ -574,7 +548,7 @@ namespace SM64O
                 int bytesRead = 0;
                 byte[] buffer = new byte[4];
 
-                ReadProcessMemory((int)processHandle, baseAddress + offset + i, buffer, buffer.Length, ref bytesRead);
+                _memory.ReadMemory(offset + i, buffer, buffer.Length);
                 buffer = buffer.Reverse().ToArray();
 
                 if (BitConverter.ToString(buffer) == "00-00-00-00")
@@ -591,7 +565,7 @@ namespace SM64O
             byte[] buffer = new byte[howMany];
             byte[] writeOffset = BitConverter.GetBytes(offsetToWrite);
 
-            ReadProcessMemory((int)processHandle, baseAddress + offsetToRead, buffer, buffer.Length, ref bytesRead);
+            _memory.ReadMemory(offsetToRead, buffer, buffer.Length)
 
             byte[] finalOffset = new byte[howMany + 4];
             writeOffset.CopyTo(finalOffset, 0);
@@ -782,8 +756,7 @@ namespace SM64O
                 buffer = new byte[] { 0x06 };
             }
 
-            int bytesWritten = 0;
-            WriteProcessMemory((int)processHandle, baseAddress + 0x365FF7, buffer, buffer.Length, ref bytesWritten);
+            _memory.WriteMemory(0x365FF7, buffer, buffer.Length);
 
             if (playerClient != null)
             {
