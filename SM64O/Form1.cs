@@ -27,17 +27,13 @@ namespace SM64O
 
         private List<string> _bands = new List<string>();
 
-<<<<<<< HEAD
-        private const int VERSION = 3;
         private bool _chatEnabled = true;
 
         private IEmulatorAccessor _memory;
-=======
         private const int MINOR_VERSION = 3;
         private const int MAJOR_VERSION = 1;
 
         private const int MaxChatLength = 24;
->>>>>>> usernames
 
         public Form1()
         {
@@ -188,40 +184,16 @@ namespace SM64O
             {
                 if (comboBox1.Text == "Project64")
                 {
-<<<<<<< HEAD
                     _memory.Open("Project64");                    
-=======
-                    Process process = Process.GetProcessesByName("Project64")[0];
-
-                    baseAddress = ReadWritingMemory.GetBaseAddress("Project64", 4096, 4);
-
-                    processHandle = OpenProcess(0x1F0FFF, true, process.Id);
->>>>>>> usernames
                 }
 
                 if (comboBox1.Text == "Nemu64")
                 {
-<<<<<<< HEAD
                     _memory.Open("Nemu64");
-=======
-                    Process process = Process.GetProcessesByName("Nemu64")[0];
-
-                    baseAddress = ReadWritingMemory.GetBaseAddress("Nemu64", 4096, 4);
-
-                    processHandle = OpenProcess(0x1F0FFF, true, process.Id);
->>>>>>> usernames
                 }
                 if (comboBox1.Text == "Mupen64")
                 {
-<<<<<<< HEAD
                     _memory.Open("Mupen64");
-=======
-                    Process process = Process.GetProcessesByName("Mupen64")[0];
-
-                    baseAddress = ReadWritingMemory.GetBaseAddress("Mupen64", 4096, 4);
-
-                    processHandle = OpenProcess(0x1F0FFF, true, process.Id);
->>>>>>> usernames
                 }
             }
             catch (IndexOutOfRangeException)
