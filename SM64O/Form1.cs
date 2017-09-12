@@ -312,8 +312,6 @@ namespace SM64O
             {
                 writeValue(new byte[] { 0x00, 0x00, 0x00, 0x01 }, 0x365FFC);
             }
-
-            sendAllChat(usernameBox.Text + " has joined");
         }
 
         private void ConnectionOnDisconnected(object sender, DisconnectedEventArgs disconnectedEventArgs)
@@ -382,7 +380,7 @@ namespace SM64O
 
                         }
 
-                        listBox1.Items.Add(string.Format("[{0}] {1} | {2}", e.Connection.EndPoint.ToString(), character, vers));
+                        listBox1.Items.Add(string.Format("{1} | {2}", e.Connection.EndPoint.ToString(), character, vers));
                         return;
                     }
                 }
@@ -409,7 +407,7 @@ namespace SM64O
                     conn.DataReceived -= DataReceivedHandler;
                     for (int index = 0; index < listBox1.Items.Count; index++)
                     {
-                        if (listBox1.Items[index].ToString().Contains(connection.EndPoint.ToString()))
+                        if (listBox1.Items[index].ToString().Contains(conn.EndPoint.ToString()))
                         {
                             listBox1.Items.RemoveAt(index);
                             break;
@@ -443,6 +441,7 @@ namespace SM64O
             }
         }
 
+        private DateTime _lastChatMsg = DateTime.Now;
         private void ReceiveRawMemory(byte[] data)
         {
             int offset = BitConverter.ToInt32(data, 0);
@@ -452,20 +451,28 @@ namespace SM64O
             int bytesWritten = 0;
             byte[] buffer = new byte[data.Length - 4];
             data.Skip(4).ToArray().CopyTo(buffer, 0);
-
-            WriteProcessMemory((int)processHandle, baseAddress + offset, buffer, buffer.Length, ref bytesWritten);
-
-            if (connection != null) return; // We aren't the host
+            
             if (offset == 3569284 || offset == 3569280) // It's a chat message
             {
-                for (int i = 0; i < Form1.playerClient.Length; i++)
-                {
-                    if (Form1.playerClient[i] != null)
+                if (connection == null) // We are the host
+                    for (int i = 0; i < Form1.playerClient.Length; i++)
                     {
-                        Form1.playerClient[i].SendBytes(data);
+                        if (Form1.playerClient[i] != null)
+                            Form1.playerClient[i].SendBytes(data);
                     }
+
+                // WARNING: Hot hacky shit ahead
+                if (DateTime.Now.Subtract(_lastChatMsg).TotalMilliseconds < 200)
+                {
+                    // Drop the packet if some chucklefuck is spamming, might crash
+                    // emu
+                    return;
                 }
+                _lastChatMsg = DateTime.Now;
             }
+
+            WriteProcessMemory((int)processHandle, baseAddress + offset, buffer, buffer.Length, ref bytesWritten);
+            
         }
 
         public void writeValue(byte[] buffer, int offset)
@@ -577,7 +584,7 @@ namespace SM64O
 
         private void textBox5_TextChanged(object sender, EventArgs e)
         {
-            if (textBox5.Text != "" && usernameBox.Text != "")
+            if (textBox5.Text != "")
             {
                 button1.Enabled = true;
             }
@@ -880,7 +887,7 @@ namespace SM64O
 
         private void usernameBox_TextChanged(object sender, EventArgs e)
         {
-            if (textBox5.Text != "" && usernameBox.Text != "")
+            if (textBox5.Text != "")
             {
                 button1.Enabled = true;
             }
