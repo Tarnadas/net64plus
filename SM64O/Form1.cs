@@ -217,9 +217,6 @@ namespace SM64O
                     listener.NewConnection += NewConnectionHandler;
                     listener.Start();
 
-                    miniGame1.Enabled = true;
-                    miniGame3.Enabled = true;
-
                     playerCheckTimer.Start();
 
                     Characters.setMessage("server created", _memory);
@@ -280,6 +277,8 @@ namespace SM64O
                     connection.DataReceived += DataReceived;
                     connection.Connect(payload, 3000);
                     connection.Disconnected += ConnectionOnDisconnected;
+
+                    playersOnline.Text = "Chat Log:";
                 }
             }
             catch (HazelException ex)
@@ -692,11 +691,13 @@ namespace SM64O
             {
                 button1.Text = "Create Server!";
                 usernameBox.Enabled = false;
+                panel2.Enabled = true;
             }
             else
             {
                 button1.Text = "Connect to server!";
                 usernameBox.Enabled = true;
+                panel2.Enabled = false;
             }
         }
 
@@ -797,36 +798,16 @@ namespace SM64O
 
         public void setGamemode()
         {
-            byte[] buffer = new byte[0];
+            byte[] buffer = new byte[1];
 
-            if (miniGame1.Checked)
+            switch (gamemodeBox.SelectedIndex)
             {
-                buffer = new byte[] { 0x01 };
-            }
-
-            if (miniGame2.Checked)
-            {
-                buffer = new byte[] { 0x02 };
-            }
-
-            if (miniGame3.Checked)
-            {
-                buffer = new byte[] { 0x03 };
-            }
-
-            if (miniGame4.Checked)
-            {
-                buffer = new byte[] { 0x04 };
-            }
-
-            if (miniGame5.Checked)
-            {
-                buffer = new byte[] { 0x05 };
-            }
-
-            if (miniGame6.Checked)
-            {
-                buffer = new byte[] { 0x06 };
+                case 0:
+                    buffer[0] = 1;
+                    break;
+                case 1:
+                    buffer[0] = 3;
+                    break;
             }
 
             _memory.WriteMemory(0x365FF7, buffer, buffer.Length);
@@ -991,6 +972,16 @@ namespace SM64O
                     playerClient[i] = null;
                 }
             }
+        }
+
+        private void gamemodeBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            setGamemode();
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            _chatEnabled = !checkBox2.Checked;
         }
     }
 }

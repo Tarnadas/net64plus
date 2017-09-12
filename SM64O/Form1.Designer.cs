@@ -58,10 +58,10 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.label8 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.label10 = new System.Windows.Forms.Label();
+            this.gamemodeBox = new System.Windows.Forms.ComboBox();
             this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.label9 = new System.Windows.Forms.Label();
-            this.gamemodeBox = new System.Windows.Forms.ComboBox();
-            this.label10 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
@@ -243,7 +243,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(147, 17);
+            this.label7.Location = new System.Drawing.Point(10, 17);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(67, 13);
             this.label7.TabIndex = 30;
@@ -251,7 +251,7 @@
             // 
             // numericUpDown3
             // 
-            this.numericUpDown3.Location = new System.Drawing.Point(220, 15);
+            this.numericUpDown3.Location = new System.Drawing.Point(119, 14);
             this.numericUpDown3.Maximum = new decimal(new int[] {
             24,
             0,
@@ -325,6 +325,7 @@
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panel1.Controls.Add(this.label2);
             this.panel1.Controls.Add(this.label1);
+            this.panel1.Controls.Add(this.checkBox2);
             this.panel1.Controls.Add(this.button1);
             this.panel1.Controls.Add(this.usernameBox);
             this.panel1.Controls.Add(this.checkBox1);
@@ -356,7 +357,6 @@
             this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panel2.Controls.Add(this.label10);
             this.panel2.Controls.Add(this.gamemodeBox);
-            this.panel2.Controls.Add(this.checkBox2);
             this.panel2.Controls.Add(this.playersOnline);
             this.panel2.Controls.Add(this.label7);
             this.panel2.Controls.Add(this.listBox1);
@@ -367,24 +367,14 @@
             this.panel2.Size = new System.Drawing.Size(295, 297);
             this.panel2.TabIndex = 39;
             // 
-            // checkBox2
+            // label10
             // 
-            this.checkBox2.AutoSize = true;
-            this.checkBox2.Location = new System.Drawing.Point(14, 16);
-            this.checkBox2.Name = "checkBox2";
-            this.checkBox2.Size = new System.Drawing.Size(92, 17);
-            this.checkBox2.TabIndex = 33;
-            this.checkBox2.Text = "Disable Chat?";
-            this.checkBox2.UseVisualStyleBackColor = true;
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(330, 6);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(82, 13);
-            this.label9.TabIndex = 40;
-            this.label9.Text = "Server Settings:";
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(12, 43);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(101, 13);
+            this.label10.TabIndex = 35;
+            this.label10.Text = "Current Gamemode:";
             // 
             // gamemodeBox
             // 
@@ -397,15 +387,27 @@
             this.gamemodeBox.Name = "gamemodeBox";
             this.gamemodeBox.Size = new System.Drawing.Size(163, 21);
             this.gamemodeBox.TabIndex = 34;
+            this.gamemodeBox.SelectedIndexChanged += new System.EventHandler(this.gamemodeBox_SelectedIndexChanged);
             // 
-            // label10
+            // checkBox2
             // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(12, 43);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(101, 13);
-            this.label10.TabIndex = 35;
-            this.label10.Text = "Current Gamemode:";
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.Location = new System.Drawing.Point(27, 98);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(92, 17);
+            this.checkBox2.TabIndex = 33;
+            this.checkBox2.Text = "Disable Chat?";
+            this.checkBox2.UseVisualStyleBackColor = true;
+            this.checkBox2.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(330, 6);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(82, 13);
+            this.label9.TabIndex = 40;
+            this.label9.Text = "Server Settings:";
             // 
             // Form1
             // 
