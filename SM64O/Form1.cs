@@ -752,7 +752,7 @@ namespace SM64O
                 + "GeoshiTheRed"
                 + Environment.NewLine
                 + Environment.NewLine
-                + "Rosalina and Peach 3D Models created by: "
+                + "Toad, Rosalina and Peach 3D Models created by: "
                 + Environment.NewLine
                 + "AnkleD"
                 + Environment.NewLine
