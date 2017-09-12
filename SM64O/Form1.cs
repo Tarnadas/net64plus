@@ -533,7 +533,13 @@ namespace SM64O
                 message += System.Text.Encoding.ASCII.GetString(lilEndian);
             }
 
-            // TODO: add external chat window and handle it here
+            if (listener == null) // We're not the host
+            {
+                listBox1.Items.Add(message);
+                
+                if (listBox1.Items.Count > 5)
+                    listBox1.Items.RemoveAt(0);
+            }
         }
 
         public void writeValue(byte[] buffer, int offset)
