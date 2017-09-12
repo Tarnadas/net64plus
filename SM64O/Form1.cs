@@ -691,9 +691,12 @@ namespace SM64O
             if (checkBox1.Checked)
             {
                 button1.Text = "Create Server!";
-            } else
+                usernameBox.Enabled = false;
+            }
+            else
             {
                 button1.Text = "Connect to server!";
+                usernameBox.Enabled = true;
             }
         }
 
