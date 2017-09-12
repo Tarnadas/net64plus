@@ -1,5 +1,5 @@
 ﻿using Hazel;
-using Hazel.Tcp;
+using Hazel.Udp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -124,7 +124,7 @@ namespace SM64O
             }
             else
             {
-                connection.SendBytes(payload);
+                connection.SendBytes(payload, SendOption.Reliable);
             }
 
             Thread.Sleep(100);
@@ -141,7 +141,7 @@ namespace SM64O
             }
             else
             {
-                connection.SendBytes(aux);
+                connection.SendBytes(aux, SendOption.Reliable);
             }
 
             Characters.setMessage(message, _memory);
@@ -173,9 +173,9 @@ namespace SM64O
 
             Array.Copy(BitConverter.GetBytes(3569280), 0, aux, 0, 4);
 
-            conn.SendBytes(payload);
+            conn.SendBytes(payload, SendOption.Reliable);
             Thread.Sleep(100);
-            conn.SendBytes(aux);
+            conn.SendBytes(aux, SendOption.Reliable);
         }
         
         private void button1_Click(object sender, EventArgs e)
@@ -211,7 +211,7 @@ namespace SM64O
             {
                 if (checkBox1.Checked)
                 {
-                    listener = new TcpConnectionListener(IPAddress.Any, (int) numericUpDown2.Value);
+                    listener = new UdpConnectionListener(new NetworkEndPoint(IPAddress.Any, (int) numericUpDown2.Value));
                     listener.NewConnection += NewConnectionHandler;
                     listener.Start();
 
@@ -270,7 +270,7 @@ namespace SM64O
                     isIp6 = target.AddressFamily == AddressFamily.InterNetworkV6;
 
                     NetworkEndPoint endPoint = new NetworkEndPoint(target, (int) numericUpDown2.Value, isIp6 ? IPMode.IPv6 : IPMode.IPv4);
-                    connection = new TcpConnection(endPoint);
+                    connection = new UdpClientConnection(endPoint);
                     connection.DataReceived += DataReceived;
                     connection.Connect(payload, 3000);
                     connection.Disconnected += ConnectionOnDisconnected;
