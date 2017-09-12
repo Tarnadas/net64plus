@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-#pragma warning disable CS0618 // Type or member is obsolete
+//#pragma warning disable CS0618 // Type or member is obsolete
 namespace SM64O
 {
     public partial class Form1 : Form
@@ -38,7 +38,7 @@ namespace SM64O
 
         public static ConnectionListener listener;
         public static Connection connection = null;
-        public static Connection[] playerClient = new Connection[23];
+        public static Client[] playerClient = new Client[23];
 
         private List<string> _bands = new List<string>();
 
@@ -235,6 +235,15 @@ namespace SM64O
                     byte[] payload = new byte[2];
                     payload[0] = VERSION;
                     payload[1] = (byte)this.comboBox2.SelectedIndex;
+                    //payload[2] // reserved
+                    
+                    byte[] usernameBytes = Encoding.ASCII.GetBytes(usernameBox.Text);
+                    int len = usernameBytes.Length;
+                    if (len > 24) // Arbitrary max length
+                        len = 24;
+
+                    payload[3] = (bytes) len;
+                    Array.Copy(usernameBytes, 0, payload, 4, len);
 
                     IPAddress target = null;
                     bool isIp6 = false;
@@ -311,9 +320,7 @@ namespace SM64O
             if (checkBox1.Checked)
             {
                 writeValue(new byte[] { 0x00, 0x00, 0x00, 0x01 }, 0x365FFC);
-            }
-
-            sendAllChat(usernameBox.Text + " has joined");
+            }            
         }
 
         private void ConnectionOnDisconnected(object sender, DisconnectedEventArgs disconnectedEventArgs)
@@ -336,7 +343,8 @@ namespace SM64O
                 {
                     if (playerClient[i] == null)
                     {
-                        playerClient[i] = e.Connection;
+                        playerClient[i] = new Client(e.Connection);
+
                         e.Connection.DataReceived += DataReceivedHandler;
                         e.Connection.Disconnected += client_Disconnected;
 
@@ -351,6 +359,13 @@ namespace SM64O
                         {
                             byte verIndex = e.HandshakeData[0];
                             byte charIndex = e.HandshakeData[1];
+                            byte usernameLen = e.HandshakeData[3];
+                            string name = Encoding.ASCII.GetString(e.HandshakeData, 4, usernameLen);
+
+                            playerClient[i].Version = verIndex;
+                            playerClient[i].CharacterId = charIndex;
+                            playerClient[i].Name = name;
+
                             vers = "v" + verIndex;
                             switch (charIndex)
                             {
@@ -380,6 +395,8 @@ namespace SM64O
                                     break;
                             }
 
+                            playerClient[i].CharacterName = character;
+
                         }
 
                         listBox1.Items.Add(string.Format("[{0}] {1} | {2}", e.Connection.EndPoint.ToString(), character, vers));
@@ -402,7 +419,7 @@ namespace SM64O
             Connection conn = (Connection)sender;
             for (int i = 0; i < playerClient.Length; i++)
             {
-                if (playerClient[i] == conn)
+                if (playerClient[i] != null && playerClient[i].Connection == conn)
                 {
                     Console.WriteLine("player disconnected!");
                     playerClient[i] = null;
@@ -825,8 +842,8 @@ namespace SM64O
                 Connection conn =
                     Form1.playerClient.FirstOrDefault(c =>
                     {
-                        if (c == null || c.EndPoint == null) return false;
-                        return listBox1.Items[index].ToString().Contains(c.EndPoint.ToString());
+                        if (c == null || c.Connection == null || c.Connection.EndPoint == null) return false;
+                        return listBox1.Items[index].ToString().Contains(c.Connection.EndPoint.ToString());
                     });
 
                 if (conn == null) return;
