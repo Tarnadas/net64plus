@@ -26,6 +26,13 @@ namespace SM64O
         public string Name { get; set; }
         public string CharacterName { get; set; }
         public int CharacterId { get; set; }
-        public byte Version { get; set; }
+        public byte MajorVersion { get; set; }
+        public byte MinorVersion { get; set; }
+        public int Id { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format("[{0}] {1} ({2}) v{3}.{4}", Id, Name, CharacterName, MajorVersion, MinorVersion);
+        }
     }
 }

@@ -42,7 +42,10 @@ namespace SM64O
 
         private List<string> _bands = new List<string>();
 
-        private const int VERSION = 3;
+        private const int MINOR_VERSION = 3;
+        private const int MAJOR_VERSION = 1;
+
+        private const int MaxChatLength = 24;
 
         public Form1()
         {
@@ -233,9 +236,9 @@ namespace SM64O
                 else
                 {
                     byte[] payload = new byte[2];
-                    payload[0] = VERSION;
+                    payload[0] = MINOR_VERSION;
                     payload[1] = (byte)this.comboBox2.SelectedIndex;
-                    //payload[2] // reserved
+                    payload[2] = MAJOR_VERSION;
                     
                     byte[] usernameBytes = Encoding.ASCII.GetBytes(usernameBox.Text);
                     int len = usernameBytes.Length;
@@ -344,6 +347,7 @@ namespace SM64O
                     if (playerClient[i] == null)
                     {
                         playerClient[i] = new Client(e.Connection);
+                        playerClient[i].Id = i;
 
                         e.Connection.DataReceived += DataReceivedHandler;
                         e.Connection.Disconnected += client_Disconnected;
@@ -362,11 +366,11 @@ namespace SM64O
                             byte usernameLen = e.HandshakeData[3];
                             string name = Encoding.ASCII.GetString(e.HandshakeData, 4, usernameLen);
 
-                            playerClient[i].Version = verIndex;
+                            playerClient[i].MinorVersion = verIndex;
+                            playerClient[i].MajorVersion = e.HandshakeData[2];
                             playerClient[i].CharacterId = charIndex;
                             playerClient[i].Name = name;
 
-                            vers = "v" + verIndex;
                             switch (charIndex)
                             {
                                 case 0:
@@ -399,7 +403,13 @@ namespace SM64O
 
                         }
 
-                        listBox1.Items.Add(string.Format("[{0}] {1} | {2}", e.Connection.EndPoint.ToString(), character, vers));
+                        listBox1.Items.Add(playerClient[i]);
+
+                        string msg = string.Format("{0} joined", playerClient[i].Name);
+                        if (msg.Length > MaxChatLength)
+                            msg = msg.Substring(0, 24);
+
+                        sendAllChat(msg);
                         return;
                     }
                 }
@@ -426,7 +436,7 @@ namespace SM64O
                     conn.DataReceived -= DataReceivedHandler;
                     for (int index = 0; index < listBox1.Items.Count; index++)
                     {
-                        if (listBox1.Items[index].ToString().Contains(conn.EndPoint.ToString()))
+                        if (listBox1.Items[index] == playerClient[i])
                         {
                             listBox1.Items.RemoveAt(index);
                             break;
@@ -839,12 +849,8 @@ namespace SM64O
             if (index != ListBox.NoMatches)
             {
                 // Who did we click on
-                Connection conn =
-                    Form1.playerClient.FirstOrDefault(c =>
-                    {
-                        if (c == null || c.Connection == null || c.Connection.EndPoint == null) return false;
-                        return listBox1.Items[index].ToString().Contains(c.Connection.EndPoint.ToString());
-                    });
+                Client client = (Client) listBox1.Items[index];
+                Connection conn = client.Connection;
 
                 if (conn == null) return;
 
