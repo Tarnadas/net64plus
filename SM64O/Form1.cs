@@ -73,9 +73,10 @@ namespace SM64O
                     }
                 }
 
-                // TODO: Change this according to OS
-                _memory = new WindowsEmulatorAccessor();
             }
+
+            // TODO: Change this according to OS
+            _memory = new WindowsEmulatorAccessor();
 
             this.Text = string.Format("SM64 Online Tool v{0}.{1}", MAJOR_VERSION, MINOR_VERSION);
         }
@@ -217,10 +218,12 @@ namespace SM64O
 
                     miniGame1.Enabled = true;
                     miniGame3.Enabled = true;
+
+                    Characters.setMessage("logged in", _memory);
                 }
                 else
                 {
-                    byte[] payload = new byte[2];
+                    byte[] payload = new byte[28];
                     payload[0] = MINOR_VERSION;
                     payload[1] = (byte)this.comboBox2.SelectedIndex;
                     payload[2] = MAJOR_VERSION;
