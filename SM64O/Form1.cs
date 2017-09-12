@@ -184,7 +184,12 @@ namespace SM64O
             {
                 if (comboBox1.Text == "Project64")
                 {
-                    _memory.Open("Project64");                    
+                    _memory.Open("Project64");
+                    if (_memory.BaseAddress == 0)
+                    {
+                        die("Your version of Project64 is unsupported. Please use version 2.3");
+                        return;
+                    }
                 }
 
                 if (comboBox1.Text == "Nemu64")
