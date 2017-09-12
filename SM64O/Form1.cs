@@ -28,6 +28,7 @@ namespace SM64O
         private List<string> _bands = new List<string>();
 
         private bool _chatEnabled = true;
+        private string _externalAddress;
 
         private IEmulatorAccessor _memory;
         private const int MinorVersion = 3;
@@ -35,6 +36,7 @@ namespace SM64O
 
         private const int HandshakeDataLen = 28;
         private const int MaxChatLength = 24;
+
 
         public Form1()
         {
@@ -213,7 +215,20 @@ namespace SM64O
             {
                 if (checkBox1.Checked)
                 {
-                    listener = new UdpConnectionListener(new NetworkEndPoint(IPAddress.Any, (int) numericUpDown2.Value));
+                    int port = (int) numericUpDown2.Value;
+
+                    if (Program.UPnPAvailable)
+                    {
+                        try
+                        {
+                            UPnP.NAT.ForwardPort(port, ProtocolType.Udp, "SM64O");
+                            Program.UPnPPort = port;
+                        }
+                        catch {}
+                    }
+
+
+                    listener = new UdpConnectionListener(new NetworkEndPoint(IPAddress.Any, port));
                     listener.NewConnection += NewConnectionHandler;
                     listener.Start();
 
@@ -692,11 +707,21 @@ namespace SM64O
             {
                 button1.Text = "Create Server!";
                 usernameBox.Enabled = false;
+                textBox5.Enabled = false;
+                button1.Enabled = true;
+
+                if (_externalAddress == null && Program.UPnPAvailable)
+                    _externalAddress = UPnP.NAT.GetExternalIP().ToString();
+
+                textBox5.Text = _externalAddress ?? "";
             }
             else
             {
                 button1.Text = "Connect to server!";
+                textBox5.Enabled = true;
+                textBox5.Text = "";
                 usernameBox.Enabled = true;
+                button1.Enabled = false;
             }
         }
 
