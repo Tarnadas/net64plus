@@ -492,7 +492,7 @@ namespace SM64O
         {
             int offset = BitConverter.ToInt32(data, 0);
             if (offset < 0x365000 || offset > 0x365000 + 8388608) // Only allow 8 MB N64 RAM addresses
-                return; // TODO: Ask Kaze for real offsets
+                return; //  Kaze: retrict it to 80365ff0 to 80369000
 
             int bytesWritten = 0;
             byte[] buffer = new byte[data.Length - 4];
