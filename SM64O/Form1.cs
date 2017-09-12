@@ -73,9 +73,10 @@ namespace SM64O
                     }
                 }
 
-                // TODO: Change this according to OS
-                _memory = new WindowsEmulatorAccessor();
             }
+
+            // TODO: Change this according to OS
+            _memory = new WindowsEmulatorAccessor();
 
             this.Text = string.Format("SM64 Online Tool v{0}.{1}", MAJOR_VERSION, MINOR_VERSION);
         }
