@@ -222,7 +222,7 @@ namespace SM64O
 
                     playerCheckTimer.Start();
 
-                    Characters.setMessage("logged in", _memory);
+                    Characters.setMessage("server created", _memory);
                 }
                 else
                 {
