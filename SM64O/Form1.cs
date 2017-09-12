@@ -982,6 +982,7 @@ namespace SM64O
             for (int i = 0; i < playerClient.Length; i++)
             {
                 Client cl = playerClient[i];
+                if (cl == null) continue;
                 if (cl.Connection.State == Hazel.ConnectionState.Disconnecting ||
                     cl.Connection.State == Hazel.ConnectionState.NotConnected)
                 {
