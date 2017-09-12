@@ -60,8 +60,6 @@
             this.playersOnline = new System.Windows.Forms.Label();
             this.chatBox = new System.Windows.Forms.TextBox();
             this.button3 = new System.Windows.Forms.Button();
-            this.usernameBox = new System.Windows.Forms.TextBox();
-            this.label8 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
@@ -70,7 +68,7 @@
             // button1
             // 
             this.button1.Enabled = false;
-            this.button1.Location = new System.Drawing.Point(16, 209);
+            this.button1.Location = new System.Drawing.Point(16, 187);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(268, 43);
             this.button1.TabIndex = 0;
@@ -81,7 +79,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(13, 261);
+            this.label1.Location = new System.Drawing.Point(13, 239);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(75, 13);
             this.label1.TabIndex = 1;
@@ -89,7 +87,7 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(93, 258);
+            this.textBox1.Location = new System.Drawing.Point(93, 236);
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
             this.textBox1.Size = new System.Drawing.Size(190, 20);
@@ -131,7 +129,7 @@
             // numericUpDown1
             // 
             this.numericUpDown1.Enabled = false;
-            this.numericUpDown1.Location = new System.Drawing.Point(212, 295);
+            this.numericUpDown1.Location = new System.Drawing.Point(212, 273);
             this.numericUpDown1.Name = "numericUpDown1";
             this.numericUpDown1.Size = new System.Drawing.Size(72, 20);
             this.numericUpDown1.TabIndex = 14;
@@ -176,7 +174,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(80, 297);
+            this.label5.Location = new System.Drawing.Point(80, 275);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(126, 13);
             this.label5.TabIndex = 18;
@@ -185,7 +183,7 @@
             // listBox1
             // 
             this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(16, 378);
+            this.listBox1.Location = new System.Drawing.Point(16, 356);
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(268, 121);
             this.listBox1.TabIndex = 13;
@@ -198,7 +196,7 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(17, 321);
+            this.button2.Location = new System.Drawing.Point(17, 299);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(267, 27);
             this.button2.TabIndex = 19;
@@ -259,7 +257,7 @@
             // 
             this.miniGame3.AutoSize = true;
             this.miniGame3.Enabled = false;
-            this.miniGame3.Location = new System.Drawing.Point(187, 164);
+            this.miniGame3.Location = new System.Drawing.Point(187, 142);
             this.miniGame3.Name = "miniGame3";
             this.miniGame3.Size = new System.Drawing.Size(97, 17);
             this.miniGame3.TabIndex = 24;
@@ -271,7 +269,7 @@
             // 
             this.miniGame4.AutoSize = true;
             this.miniGame4.Enabled = false;
-            this.miniGame4.Location = new System.Drawing.Point(16, 186);
+            this.miniGame4.Location = new System.Drawing.Point(16, 164);
             this.miniGame4.Name = "miniGame4";
             this.miniGame4.Size = new System.Drawing.Size(73, 17);
             this.miniGame4.TabIndex = 25;
@@ -284,7 +282,7 @@
             this.miniGame1.AutoSize = true;
             this.miniGame1.Checked = true;
             this.miniGame1.Enabled = false;
-            this.miniGame1.Location = new System.Drawing.Point(16, 164);
+            this.miniGame1.Location = new System.Drawing.Point(16, 142);
             this.miniGame1.Name = "miniGame1";
             this.miniGame1.Size = new System.Drawing.Size(88, 17);
             this.miniGame1.TabIndex = 26;
@@ -297,7 +295,7 @@
             // 
             this.miniGame5.AutoSize = true;
             this.miniGame5.Enabled = false;
-            this.miniGame5.Location = new System.Drawing.Point(107, 186);
+            this.miniGame5.Location = new System.Drawing.Point(107, 164);
             this.miniGame5.Name = "miniGame5";
             this.miniGame5.Size = new System.Drawing.Size(76, 17);
             this.miniGame5.TabIndex = 28;
@@ -309,7 +307,7 @@
             // 
             this.miniGame6.AutoSize = true;
             this.miniGame6.Enabled = false;
-            this.miniGame6.Location = new System.Drawing.Point(196, 186);
+            this.miniGame6.Location = new System.Drawing.Point(196, 164);
             this.miniGame6.Name = "miniGame6";
             this.miniGame6.Size = new System.Drawing.Size(74, 17);
             this.miniGame6.TabIndex = 29;
@@ -321,7 +319,7 @@
             // 
             this.miniGame2.AutoSize = true;
             this.miniGame2.Enabled = false;
-            this.miniGame2.Location = new System.Drawing.Point(107, 164);
+            this.miniGame2.Location = new System.Drawing.Point(107, 142);
             this.miniGame2.Name = "miniGame2";
             this.miniGame2.Size = new System.Drawing.Size(76, 17);
             this.miniGame2.TabIndex = 27;
@@ -364,7 +362,7 @@
             // playersOnline
             // 
             this.playersOnline.AutoSize = true;
-            this.playersOnline.Location = new System.Drawing.Point(15, 359);
+            this.playersOnline.Location = new System.Drawing.Point(15, 337);
             this.playersOnline.Name = "playersOnline";
             this.playersOnline.Size = new System.Drawing.Size(77, 13);
             this.playersOnline.TabIndex = 32;
@@ -372,7 +370,7 @@
             // 
             // chatBox
             // 
-            this.chatBox.Location = new System.Drawing.Point(15, 513);
+            this.chatBox.Location = new System.Drawing.Point(15, 491);
             this.chatBox.MaxLength = 24;
             this.chatBox.Name = "chatBox";
             this.chatBox.Size = new System.Drawing.Size(269, 20);
@@ -380,7 +378,7 @@
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(15, 539);
+            this.button3.Location = new System.Drawing.Point(15, 517);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(269, 26);
             this.button3.TabIndex = 34;
@@ -388,31 +386,11 @@
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
-            // usernameBox
-            // 
-            this.usernameBox.Location = new System.Drawing.Point(79, 140);
-            this.usernameBox.MaxLength = 16;
-            this.usernameBox.Name = "usernameBox";
-            this.usernameBox.Size = new System.Drawing.Size(201, 20);
-            this.usernameBox.TabIndex = 35;
-            this.usernameBox.TextChanged += new System.EventHandler(this.usernameBox_TextChanged);
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(15, 143);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(58, 13);
-            this.label8.TabIndex = 36;
-            this.label8.Text = "Username:";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(295, 572);
-            this.Controls.Add(this.label8);
-            this.Controls.Add(this.usernameBox);
+            this.ClientSize = new System.Drawing.Size(295, 558);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.chatBox);
             this.Controls.Add(this.playersOnline);
@@ -486,8 +464,6 @@
         private System.Windows.Forms.Label playersOnline;
         private System.Windows.Forms.TextBox chatBox;
         private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.TextBox usernameBox;
-        private System.Windows.Forms.Label label8;
     }
 }
 
