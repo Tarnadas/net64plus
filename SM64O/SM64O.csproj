@@ -39,9 +39,8 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Hazel, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Desktop\Hazel-Networking-master\Hazel\bin\Release\Hazel.dll</HintPath>
+    <Reference Include="Hazel">
+      <HintPath>..\lib\Hazel.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
