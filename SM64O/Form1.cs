@@ -218,10 +218,12 @@ namespace SM64O
 
                     miniGame1.Enabled = true;
                     miniGame3.Enabled = true;
+
+                    Characters.setMessage("logged in", _memory);
                 }
                 else
                 {
-                    byte[] payload = new byte[2];
+                    byte[] payload = new byte[28];
                     payload[0] = MINOR_VERSION;
                     payload[1] = (byte)this.comboBox2.SelectedIndex;
                     payload[2] = MAJOR_VERSION;
