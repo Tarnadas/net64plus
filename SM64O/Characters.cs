@@ -9,10 +9,6 @@ namespace SM64O
 {
     class Characters
     {
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        static extern bool WriteProcessMemory(int hProcess, int lpBaseAddress, byte[] lpBuffer, int dwSize, ref int lpNumberOfBytesWritten);
-
         public static void setMessage(string msg, IEmulatorAccessor mem)
         {
             int bytesWritten = 0;

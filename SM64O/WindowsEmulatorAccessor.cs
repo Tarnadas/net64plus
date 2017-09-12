@@ -20,6 +20,11 @@ namespace SM64O
         private int baseAddress;
         private IntPtr processHandle;
 
+        public int BaseAddress
+        {
+            get { return baseAddress; }
+        }
+
         public void Open(string processName)
         {
             Process process = Process.GetProcessesByName("Project64")[0];
