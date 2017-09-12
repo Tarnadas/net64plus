@@ -242,7 +242,7 @@ namespace SM64O
                     if (len > 24) // Arbitrary max length
                         len = 24;
 
-                    payload[3] = (bytes) len;
+                    payload[3] = (byte) len;
                     Array.Copy(usernameBytes, 0, payload, 4, len);
 
                     IPAddress target = null;
@@ -823,7 +823,7 @@ namespace SM64O
 
         private void numericUpDown3_ValueChanged(object sender, EventArgs e)
         {
-            playerClient = new Connection[(int)numericUpDown3.Value - 1];
+            playerClient = new Client[(int)numericUpDown3.Value - 1];
         }
 
         private void button3_Click(object sender, EventArgs e)
