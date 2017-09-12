@@ -16,33 +16,24 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-#pragma warning disable CS0618 // Type or member is obsolete
+//#pragma warning disable CS0618 // Type or member is obsolete
 namespace SM64O
 {
     public partial class Form1 : Form
     {
-
-        [DllImport("kernel32.dll")]
-        public static extern IntPtr OpenProcess(int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
-
-        [DllImport("kernel32.dll")]
-        public static extern bool ReadProcessMemory(int hProcess, int lpBaseAddress, byte[] lpBuffer, int dwSize, ref int lpNumberOfBytesRead);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        static extern bool WriteProcessMemory(int hProcess, int lpBaseAddress, byte[] lpBuffer, int dwSize, ref int lpNumberOfBytesWritten);
-
-        const int PROCESS_WM_READ = 0x0010;
-
-        public IntPtr processHandle;
-        public int baseAddress = 0;
-
         public static ConnectionListener listener;
         public static Connection connection = null;
-        public static Connection[] playerClient = new Connection[23];
+        public static Client[] playerClient = new Client[23];
 
         private List<string> _bands = new List<string>();
 
-        private const int VERSION = 3;
+        private bool _chatEnabled = true;
+
+        private IEmulatorAccessor _memory;
+        private const int MINOR_VERSION = 3;
+        private const int MAJOR_VERSION = 1;
+
+        private const int MaxChatLength = 24;
 
         public Form1()
         {
@@ -81,8 +72,12 @@ namespace SM64O
                         _bands.Add(line);
                     }
                 }
+
+                // TODO: Change this according to OS
+                _memory = new WindowsEmulatorAccessor();
             }
 
+            this.Text = string.Format("SM64 Online Tool v{0}.{1}", MAJOR_VERSION, MINOR_VERSION);
         }
 
         private void die(string msg)
@@ -91,9 +86,11 @@ namespace SM64O
             Application.Exit();
         }
 
-
         private void sendAllChat(string message)
         {
+            if (message.Length > MaxChatLength)
+                message = message.Substring(0, 24);
+
             byte[] bytes = Encoding.ASCII.GetBytes(message);
             byte[] mainArray = new byte[bytes.Length + 4];
             byte[] outputArray = new byte[bytes.Length + 4];
@@ -147,11 +144,14 @@ namespace SM64O
                 connection.SendBytes(aux);
             }
 
-            Characters.setMessage(message, processHandle, baseAddress);
+            Characters.setMessage(message, _memory);
         }
 
         private void sendChatTo(string message, Connection conn)
         {
+            if (message.Length > MaxChatLength)
+                message = message.Substring(0, 24);
+
             byte[] bytes = Encoding.ASCII.GetBytes(message);
             byte[] mainArray = new byte[bytes.Length + 4];
             byte[] outputArray = new byte[bytes.Length + 4];
@@ -177,40 +177,28 @@ namespace SM64O
             Thread.Sleep(100);
             conn.SendBytes(aux);
         }
-
-
+        
         private void button1_Click(object sender, EventArgs e)
         {
             try
             {
                 if (comboBox1.Text == "Project64")
                 {
-                    Process process = Process.GetProcessesByName("Project64")[0];
-
-                    baseAddress = ReadWritingMemory.GetBaseAddress("Project64", 4096, 4);
-                    textBox1.Text = baseAddress.ToString("X");
-
-                    processHandle = OpenProcess(0x1F0FFF, true, process.Id);
+                    _memory.Open("Project64");
+                    if (_memory.BaseAddress == 0)
+                    {
+                        die("Your version of Project64 is unsupported. Please use version 2.3");
+                        return;
+                    }
                 }
 
                 if (comboBox1.Text == "Nemu64")
                 {
-                    Process process = Process.GetProcessesByName("Nemu64")[0];
-
-                    baseAddress = ReadWritingMemory.GetBaseAddress("Nemu64", 4096, 4);
-                    textBox1.Text = baseAddress.ToString("X");
-
-                    processHandle = OpenProcess(0x1F0FFF, true, process.Id);
+                    _memory.Open("Nemu64");
                 }
-
                 if (comboBox1.Text == "Mupen64")
                 {
-                    Process process = Process.GetProcessesByName("Mupen64")[0];
-
-                    baseAddress = ReadWritingMemory.GetBaseAddress("Mupen64", 4096, 4);
-                    textBox1.Text = baseAddress.ToString("X");
-
-                    processHandle = OpenProcess(0x1F0FFF, true, process.Id);
+                    _memory.Open("Mupen64");
                 }
             }
             catch (IndexOutOfRangeException)
@@ -233,8 +221,27 @@ namespace SM64O
                 else
                 {
                     byte[] payload = new byte[2];
-                    payload[0] = VERSION;
+                    payload[0] = MINOR_VERSION;
                     payload[1] = (byte)this.comboBox2.SelectedIndex;
+                    payload[2] = MAJOR_VERSION;
+
+                    string username = usernameBox.Text;
+
+                    if (string.IsNullOrWhiteSpace(username))
+                    {
+                        username = getRandomUsername();
+                        usernameBox.Text = username;
+                    }
+
+                    usernameBox.Enabled = false;
+                    
+                    byte[] usernameBytes = Encoding.ASCII.GetBytes(username);
+                    int len = usernameBytes.Length;
+                    if (len > 24) // Arbitrary max length
+                        len = 24;
+
+                    payload[3] = (byte) len;
+                    Array.Copy(usernameBytes, 0, payload, 4, len);
 
                     IPAddress target = null;
                     bool isIp6 = false;
@@ -294,7 +301,7 @@ namespace SM64O
             comboBox1.Enabled = false;
             comboBox2.Enabled = false;
 
-            Characters.setCharacter(comboBox2.SelectedItem.ToString(), processHandle, baseAddress);
+            Characters.setCharacter(comboBox2.SelectedItem.ToString(), _memory);
 
             string[] fileEntries = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/Ressources/");
 
@@ -305,13 +312,13 @@ namespace SM64O
                 int bytesWritten = 0;
 
                 byte[] buffer = File.ReadAllBytes(file);
-                WriteProcessMemory((int)processHandle, baseAddress + offset, buffer, buffer.Length, ref bytesWritten);
+                _memory.WriteMemory(offset, buffer, buffer.Length);
             }
 
             if (checkBox1.Checked)
             {
                 writeValue(new byte[] { 0x00, 0x00, 0x00, 0x01 }, 0x365FFC);
-            }
+            }            
         }
 
         private void ConnectionOnDisconnected(object sender, DisconnectedEventArgs disconnectedEventArgs)
@@ -334,7 +341,10 @@ namespace SM64O
                 {
                     if (playerClient[i] == null)
                     {
-                        playerClient[i] = e.Connection;
+                        playerClient[i] = new Client(e.Connection);
+                        playerClient[i].Id = i;
+                        playerClient[i].Name = "anon";
+
                         e.Connection.DataReceived += DataReceivedHandler;
                         e.Connection.Disconnected += client_Disconnected;
 
@@ -345,42 +355,64 @@ namespace SM64O
                         string character = "Unk Char";
                         string vers = "Default Client";
 
-                        if (e.HandshakeData != null && e.HandshakeData.Length >= 2)
+                        if (e.HandshakeData != null)
                         {
-                            byte verIndex = e.HandshakeData[0];
-                            byte charIndex = e.HandshakeData[1];
-                            vers = "v" + verIndex;
-                            switch (charIndex)
+                            if (e.HandshakeData.Length >= 2)
                             {
-                                case 0:
-                                    character = "Mario";
-                                    break;
-                                case 1:
-                                    character = "Luigi";
-                                    break;
-                                case 2:
-                                    character = "Yoshi";
-                                    break;
-                                case 3:
-                                    character = "Wario";
-                                    break;
-                                case 4:
-                                    character = "Peach";
-                                    break;
-                                case 5:
-                                    character = "Toad";
-                                    break;
-                                case 6:
-                                    character = "Waluigi";
-                                    break;
-                                case 7:
-                                    character = "Rosalina";
-                                    break;
+                                byte verIndex = e.HandshakeData[0];
+                                byte charIndex = e.HandshakeData[1];
+                                playerClient[i].MinorVersion = verIndex;
+                                playerClient[i].CharacterId = charIndex;
+
+                                switch (charIndex)
+                                {
+                                    case 0:
+                                        character = "Mario";
+                                        break;
+                                    case 1:
+                                        character = "Luigi";
+                                        break;
+                                    case 2:
+                                        character = "Yoshi";
+                                        break;
+                                    case 3:
+                                        character = "Wario";
+                                        break;
+                                    case 4:
+                                        character = "Peach";
+                                        break;
+                                    case 5:
+                                        character = "Toad";
+                                        break;
+                                    case 6:
+                                        character = "Waluigi";
+                                        break;
+                                    case 7:
+                                        character = "Rosalina";
+                                        break;
+                                }
+                            }
+                            if (e.HandshakeData.Length >= 3)
+                            {
+                                playerClient[i].MajorVersion = e.HandshakeData[2];
+                            }
+                            if (e.HandshakeData.Length >= 4)
+                            {
+                                byte usernameLen = e.HandshakeData[3];
+                                string name = Encoding.ASCII.GetString(e.HandshakeData, 4, usernameLen);
+                                playerClient[i].Name = name;
                             }
 
+                            playerClient[i].CharacterName = character;
                         }
 
-                        listBox1.Items.Add(string.Format("{1} | {2}", e.Connection.EndPoint.ToString(), character, vers));
+                        listBox1.Items.Add(playerClient[i]);
+
+                        string msg = string.Format("{0} joined", playerClient[i].Name);
+                        if (msg.Length > MaxChatLength)
+                            msg = msg.Substring(0, 24);
+
+                        sendAllChat(msg);
                         return;
                     }
                 }
@@ -400,14 +432,18 @@ namespace SM64O
             Connection conn = (Connection)sender;
             for (int i = 0; i < playerClient.Length; i++)
             {
-                if (playerClient[i] == conn)
+                if (playerClient[i] != null && playerClient[i].Connection == conn)
                 {
-                    Console.WriteLine("player disconnected!");
+                    string msg = string.Format("{0} quit", playerClient[i].Name);
+                    if (msg.Length > MaxChatLength)
+                        msg = msg.Substring(0, 24);
+                    sendAllChat(msg);
+
                     playerClient[i] = null;
                     conn.DataReceived -= DataReceivedHandler;
                     for (int index = 0; index < listBox1.Items.Count; index++)
                     {
-                        if (listBox1.Items[index].ToString().Contains(conn.EndPoint.ToString()))
+                        if (listBox1.Items[index] == playerClient[i])
                         {
                             listBox1.Items.RemoveAt(index);
                             break;
@@ -432,7 +468,7 @@ namespace SM64O
             if (e.Bytes.Length == 1)
             {
                 int bytesWritten = 0;
-                WriteProcessMemory((int)processHandle, baseAddress + 0x367703, e.Bytes, e.Bytes.Length, ref bytesWritten);
+                _memory.WriteMemory(0x367703, e.Bytes, e.Bytes.Length);
             }
             else
             {
@@ -446,40 +482,55 @@ namespace SM64O
         {
             int offset = BitConverter.ToInt32(data, 0);
             if (offset < 0x365000 || offset > 0x365000 + 8388608) // Only allow 8 MB N64 RAM addresses
-                return;
+                return; // TODO: Ask Kaze for real offsets
 
             int bytesWritten = 0;
             byte[] buffer = new byte[data.Length - 4];
             data.Skip(4).ToArray().CopyTo(buffer, 0);
-            
+
             if (offset == 3569284 || offset == 3569280) // It's a chat message
             {
+                if (!_chatEnabled) return;
+                // TODO: Add chat enable/disable checkbox
+
+                ReceiveChatMessage(offset, data);
+
                 if (connection == null) // We are the host
                     for (int i = 0; i < Form1.playerClient.Length; i++)
                     {
                         if (Form1.playerClient[i] != null)
                             Form1.playerClient[i].SendBytes(data);
                     }
-
-                // WARNING: Hot hacky shit ahead
-                if (DateTime.Now.Subtract(_lastChatMsg).TotalMilliseconds < 200)
-                {
-                    // Drop the packet if some chucklefuck is spamming, might crash
-                    // emu
-                    return;
-                }
-                _lastChatMsg = DateTime.Now;
             }
 
-            WriteProcessMemory((int)processHandle, baseAddress + offset, buffer, buffer.Length, ref bytesWritten);
-            
+            _memory.WriteMemory(offset, buffer, buffer.Length);
+        }
+
+        private void ReceiveChatMessage(int offset, byte[] data)
+        {
+            if (offset != 3569284) return; // Only need the char array;
+
+            string message = "";
+
+            for (int i = 4; i < data.Length; i += 4)
+            {
+                byte[] lilEndian = new byte[4];
+                lilEndian[3] = data[i];
+                lilEndian[2] = data[i + 1];
+                lilEndian[1] = data[i + 2];
+                lilEndian[0] = data[i + 3];
+
+                message += System.Text.Encoding.ASCII.GetString(lilEndian);
+            }
+
+            // TODO: add external chat window and handle it here
         }
 
         public void writeValue(byte[] buffer, int offset)
         {
             buffer = buffer.Reverse().ToArray();
             int bytesWritten = 0;
-            WriteProcessMemory((int)processHandle, baseAddress + offset, buffer, buffer.Length, ref bytesWritten);
+            _memory.WriteMemory(offset, buffer, buffer.Length);
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -505,7 +556,7 @@ namespace SM64O
 
             int bytesRead = 0;
             byte[] originalBuffer = new byte[freeRamLength];
-            ReadProcessMemory((int)processHandle, baseAddress + 0x367400, originalBuffer, originalBuffer.Length, ref bytesRead);
+            _memory.ReadMemory(0x367400, originalBuffer, originalBuffer.Length);
 
             byte[] buffer = originalBuffer;
 
@@ -557,7 +608,7 @@ namespace SM64O
                 int bytesRead = 0;
                 byte[] buffer = new byte[4];
 
-                ReadProcessMemory((int)processHandle, baseAddress + offset + i, buffer, buffer.Length, ref bytesRead);
+                _memory.ReadMemory(offset + i, buffer, buffer.Length);
                 buffer = buffer.Reverse().ToArray();
 
                 if (BitConverter.ToString(buffer) == "00-00-00-00")
@@ -574,7 +625,7 @@ namespace SM64O
             byte[] buffer = new byte[howMany];
             byte[] writeOffset = BitConverter.GetBytes(offsetToWrite);
 
-            ReadProcessMemory((int)processHandle, baseAddress + offsetToRead, buffer, buffer.Length, ref bytesRead);
+            _memory.ReadMemory(offsetToRead, buffer, buffer.Length);
 
             byte[] finalOffset = new byte[howMany + 4];
             writeOffset.CopyTo(finalOffset, 0);
@@ -765,8 +816,7 @@ namespace SM64O
                 buffer = new byte[] { 0x06 };
             }
 
-            int bytesWritten = 0;
-            WriteProcessMemory((int)processHandle, baseAddress + 0x365FF7, buffer, buffer.Length, ref bytesWritten);
+            _memory.WriteMemory(0x365FF7, buffer, buffer.Length);
 
             if (playerClient != null)
             {
@@ -774,7 +824,7 @@ namespace SM64O
                 {
                     if (playerClient[p] != null)
                     {
-                        readAndSend(baseAddress + 0x365FF4, baseAddress + 0x365FF4, 4, playerClient[p]);
+                        readAndSend(0x365FF4, 0x365FF4, 4, playerClient[p]);
                     }
                 }
             }
@@ -813,7 +863,7 @@ namespace SM64O
 
         private void numericUpDown3_ValueChanged(object sender, EventArgs e)
         {
-            playerClient = new Connection[(int)numericUpDown3.Value - 1];
+            playerClient = new Client[(int)numericUpDown3.Value - 1];
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -829,12 +879,8 @@ namespace SM64O
             if (index != ListBox.NoMatches)
             {
                 // Who did we click on
-                Connection conn =
-                    Form1.playerClient.FirstOrDefault(c =>
-                    {
-                        if (c == null || c.EndPoint == null) return false;
-                        return listBox1.Items[index].ToString().Contains(c.EndPoint.ToString());
-                    });
+                Client client = (Client) listBox1.Items[index];
+                Connection conn = client.Connection;
 
                 if (conn == null) return;
 
@@ -895,6 +941,24 @@ namespace SM64O
             {
                 button1.Enabled = false;
             }
+        }
+
+        private Random _r = new Random();
+        private string getRandomUsername()
+        {
+            string[] usernames = new[]
+            {
+                "Bambooccaneer",
+                "Grapeshifter666",
+                "Fellama",
+                "Rerunt987",
+                "IllegalBlizzard123",
+                "ActiveMonkey",
+                "ThunderBerry",
+                "BananaMan",
+            };
+
+            return usernames[_r.Next(usernames.Length)];
         }
     }
 }
