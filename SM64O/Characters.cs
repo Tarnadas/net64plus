@@ -13,7 +13,7 @@ namespace SM64O
         [DllImport("kernel32.dll", SetLastError = true)]
         static extern bool WriteProcessMemory(int hProcess, int lpBaseAddress, byte[] lpBuffer, int dwSize, ref int lpNumberOfBytesWritten);
 
-        public static void setMessage(string msg, IntPtr processHandle, int baseAddress)
+        public static void setMessage(string msg, IEmulatorAccessor mem)
         {
             int bytesWritten = 0;
             byte[] buffer = Encoding.ASCII.GetBytes(msg);
@@ -25,55 +25,55 @@ namespace SM64O
             {
                 byte[] newBuffer = newArray.Skip(i).Take(4).ToArray();
                 newBuffer = newBuffer.Reverse().ToArray();
-                WriteProcessMemory((int)processHandle, baseAddress + 0x367684 + i, newBuffer, newBuffer.Length, ref bytesWritten);
+                mem.WriteMemory(0x367684 + i, newBuffer, newBuffer.Length);
             }
 
             byte[] overWriteBuffer = new byte[] { 0x00, 0x00, 0x00, 0x00 };
             overWriteBuffer = overWriteBuffer.Reverse().ToArray();
-            WriteProcessMemory((int)processHandle, baseAddress + 0x367680, overWriteBuffer, overWriteBuffer.Length, ref bytesWritten);
+            mem.WriteMemory(0x367680, overWriteBuffer, overWriteBuffer.Length);
         }
 
-        public static void setCharacter(string character, IntPtr processHandle, int baseAddress)
+        public static void setCharacter(string character, IEmulatorAccessor mem)
         {
             if (character == "Mario")
             {
                 int bytesWritten = 0;
-                WriteProcessMemory((int)processHandle, baseAddress + 0x365FF3, new byte[] { 0x01 }, 1, ref bytesWritten);
+                mem.WriteMemory(0x365FF3, new byte[] { 0x01 }, 1);
             }
             if (character == "Luigi")
             {
                 int bytesWritten = 0;
-                WriteProcessMemory((int)processHandle, baseAddress + 0x365FF3, new byte[] { 0x02 }, 1, ref bytesWritten);
+                mem.WriteMemory(0x365FF3, new byte[] { 0x02 }, 1);
             }
             if (character == "Yoshi")
             {
                 int bytesWritten = 0;
-                WriteProcessMemory((int)processHandle, baseAddress + 0x365FF3, new byte[] { 0x03 }, 1, ref bytesWritten);
+                mem.WriteMemory(0x365FF3, new byte[] { 0x03 }, 1);
             }
             if (character == "Wario")
             {
                 int bytesWritten = 0;
-                WriteProcessMemory((int)processHandle, baseAddress + 0x365FF3, new byte[] { 0x04 }, 1, ref bytesWritten);
+                mem.WriteMemory(0x365FF3, new byte[] { 0x04 }, 1);
             }
             if (character == "Peach")
             {
                 int bytesWritten = 0;
-                WriteProcessMemory((int)processHandle, baseAddress + 0x365FF3, new byte[] { 0x05 }, 1, ref bytesWritten);
+                mem.WriteMemory(0x365FF3, new byte[] { 0x05 }, 1);
             }
             if (character == "Toad")
             {
                 int bytesWritten = 0;
-                WriteProcessMemory((int)processHandle, baseAddress + 0x365FF3, new byte[] { 0x06 }, 1, ref bytesWritten);
+                mem.WriteMemory(0x365FF3, new byte[] { 0x06 }, 1);
             }
             if (character == "Waluigi")
             {
                 int bytesWritten = 0;
-                WriteProcessMemory((int)processHandle, baseAddress + 0x365FF3, new byte[] { 0x07 }, 1, ref bytesWritten);
+                mem.WriteMemory(0x365FF3, new byte[] { 0x07 }, 1);
             }
             if (character == "Rosalina")
             {
                 int bytesWritten = 0;
-                WriteProcessMemory((int)processHandle, baseAddress + 0x365FF3, new byte[] { 0x08 }, 1, ref bytesWritten);
+                mem.WriteMemory(0x365FF3, new byte[] { 0x08 }, 1);
             }
         }
     }
