@@ -220,6 +220,8 @@ namespace SM64O
                     miniGame1.Enabled = true;
                     miniGame3.Enabled = true;
 
+                    playerCheckTimer.Start();
+
                     Characters.setMessage("logged in", _memory);
                 }
                 else
@@ -967,6 +969,24 @@ namespace SM64O
             };
 
             return usernames[_r.Next(usernames.Length)];
+        }
+
+        private void playerCheckTimer_Tick(object sender, EventArgs e)
+        {
+            // We aren't host
+            if (listener == null) return;
+
+            for (int i = 0; i < playerClient.Length; i++)
+            {
+                Client cl = playerClient[i];
+                if (cl.Connection.State == Hazel.ConnectionState.Disconnecting ||
+                    cl.Connection.State == Hazel.ConnectionState.NotConnected)
+                {
+                    cl.Connection.DataReceived -= DataReceivedHandler;
+                    listBox1.Items.Remove(cl);
+                    playerClient[i] = null;
+                }
+            }
         }
     }
 }
