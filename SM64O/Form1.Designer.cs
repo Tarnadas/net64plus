@@ -58,6 +58,8 @@
             this.playersOnline = new System.Windows.Forms.Label();
             this.chatBox = new System.Windows.Forms.TextBox();
             this.button3 = new System.Windows.Forms.Button();
+            this.usernameBox = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
@@ -66,7 +68,7 @@
             // button1
             // 
             this.button1.Enabled = false;
-            this.button1.Location = new System.Drawing.Point(16, 187);
+            this.button1.Location = new System.Drawing.Point(16, 214);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(268, 43);
             this.button1.TabIndex = 0;
@@ -82,7 +84,7 @@
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(190, 64);
+            this.checkBox1.Location = new System.Drawing.Point(190, 91);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(97, 17);
             this.checkBox1.TabIndex = 10;
@@ -110,7 +112,7 @@
             // numericUpDown1
             // 
             this.numericUpDown1.Enabled = false;
-            this.numericUpDown1.Location = new System.Drawing.Point(176, 253);
+            this.numericUpDown1.Location = new System.Drawing.Point(176, 267);
             this.numericUpDown1.Name = "numericUpDown1";
             this.numericUpDown1.Size = new System.Drawing.Size(72, 20);
             this.numericUpDown1.TabIndex = 14;
@@ -155,7 +157,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(44, 255);
+            this.label5.Location = new System.Drawing.Point(44, 269);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(126, 13);
             this.label5.TabIndex = 18;
@@ -164,9 +166,9 @@
             // listBox1
             // 
             this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(16, 339);
+            this.listBox1.Location = new System.Drawing.Point(16, 353);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(268, 160);
+            this.listBox1.Size = new System.Drawing.Size(268, 173);
             this.listBox1.TabIndex = 13;
             this.listBox1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listBox1_MouseDoubleClick);
             // 
@@ -177,7 +179,7 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(17, 281);
+            this.button2.Location = new System.Drawing.Point(17, 297);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(267, 27);
             this.button2.TabIndex = 19;
@@ -193,7 +195,7 @@
             "Project64",
             "Nemu64",
             "Mupen64"});
-            this.comboBox1.Location = new System.Drawing.Point(70, 86);
+            this.comboBox1.Location = new System.Drawing.Point(70, 113);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(210, 21);
             this.comboBox1.TabIndex = 20;
@@ -201,7 +203,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(13, 89);
+            this.label3.Location = new System.Drawing.Point(13, 116);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(51, 13);
             this.label3.TabIndex = 21;
@@ -220,7 +222,7 @@
             "Toad",
             "Waluigi",
             "Rosalina"});
-            this.comboBox2.Location = new System.Drawing.Point(114, 113);
+            this.comboBox2.Location = new System.Drawing.Point(114, 140);
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(166, 21);
             this.comboBox2.TabIndex = 22;
@@ -228,7 +230,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(13, 116);
+            this.label6.Location = new System.Drawing.Point(13, 143);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(95, 13);
             this.label6.TabIndex = 23;
@@ -238,7 +240,7 @@
             // 
             this.miniGame3.AutoSize = true;
             this.miniGame3.Enabled = false;
-            this.miniGame3.Location = new System.Drawing.Point(187, 142);
+            this.miniGame3.Location = new System.Drawing.Point(187, 169);
             this.miniGame3.Name = "miniGame3";
             this.miniGame3.Size = new System.Drawing.Size(97, 17);
             this.miniGame3.TabIndex = 24;
@@ -250,7 +252,7 @@
             // 
             this.miniGame4.AutoSize = true;
             this.miniGame4.Enabled = false;
-            this.miniGame4.Location = new System.Drawing.Point(16, 164);
+            this.miniGame4.Location = new System.Drawing.Point(16, 191);
             this.miniGame4.Name = "miniGame4";
             this.miniGame4.Size = new System.Drawing.Size(73, 17);
             this.miniGame4.TabIndex = 25;
@@ -263,7 +265,7 @@
             this.miniGame1.AutoSize = true;
             this.miniGame1.Checked = true;
             this.miniGame1.Enabled = false;
-            this.miniGame1.Location = new System.Drawing.Point(16, 142);
+            this.miniGame1.Location = new System.Drawing.Point(16, 169);
             this.miniGame1.Name = "miniGame1";
             this.miniGame1.Size = new System.Drawing.Size(88, 17);
             this.miniGame1.TabIndex = 26;
@@ -276,7 +278,7 @@
             // 
             this.miniGame5.AutoSize = true;
             this.miniGame5.Enabled = false;
-            this.miniGame5.Location = new System.Drawing.Point(107, 164);
+            this.miniGame5.Location = new System.Drawing.Point(107, 191);
             this.miniGame5.Name = "miniGame5";
             this.miniGame5.Size = new System.Drawing.Size(76, 17);
             this.miniGame5.TabIndex = 28;
@@ -288,7 +290,7 @@
             // 
             this.miniGame6.AutoSize = true;
             this.miniGame6.Enabled = false;
-            this.miniGame6.Location = new System.Drawing.Point(196, 164);
+            this.miniGame6.Location = new System.Drawing.Point(196, 191);
             this.miniGame6.Name = "miniGame6";
             this.miniGame6.Size = new System.Drawing.Size(74, 17);
             this.miniGame6.TabIndex = 29;
@@ -300,7 +302,7 @@
             // 
             this.miniGame2.AutoSize = true;
             this.miniGame2.Enabled = false;
-            this.miniGame2.Location = new System.Drawing.Point(107, 142);
+            this.miniGame2.Location = new System.Drawing.Point(107, 169);
             this.miniGame2.Name = "miniGame2";
             this.miniGame2.Size = new System.Drawing.Size(76, 17);
             this.miniGame2.TabIndex = 27;
@@ -311,7 +313,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(12, 64);
+            this.label7.Location = new System.Drawing.Point(12, 91);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(67, 13);
             this.label7.TabIndex = 30;
@@ -319,7 +321,7 @@
             // 
             // numericUpDown3
             // 
-            this.numericUpDown3.Location = new System.Drawing.Point(79, 62);
+            this.numericUpDown3.Location = new System.Drawing.Point(79, 89);
             this.numericUpDown3.Maximum = new decimal(new int[] {
             24,
             0,
@@ -343,7 +345,7 @@
             // playersOnline
             // 
             this.playersOnline.AutoSize = true;
-            this.playersOnline.Location = new System.Drawing.Point(15, 317);
+            this.playersOnline.Location = new System.Drawing.Point(15, 333);
             this.playersOnline.Name = "playersOnline";
             this.playersOnline.Size = new System.Drawing.Size(77, 13);
             this.playersOnline.TabIndex = 32;
@@ -351,7 +353,7 @@
             // 
             // chatBox
             // 
-            this.chatBox.Location = new System.Drawing.Point(15, 491);
+            this.chatBox.Location = new System.Drawing.Point(15, 529);
             this.chatBox.MaxLength = 24;
             this.chatBox.Name = "chatBox";
             this.chatBox.Size = new System.Drawing.Size(269, 20);
@@ -359,7 +361,7 @@
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(15, 517);
+            this.button3.Location = new System.Drawing.Point(15, 551);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(269, 26);
             this.button3.TabIndex = 34;
@@ -367,11 +369,29 @@
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
+            // usernameBox
+            // 
+            this.usernameBox.Location = new System.Drawing.Point(79, 63);
+            this.usernameBox.Name = "usernameBox";
+            this.usernameBox.Size = new System.Drawing.Size(201, 20);
+            this.usernameBox.TabIndex = 35;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(15, 66);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(58, 13);
+            this.label1.TabIndex = 36;
+            this.label1.Text = "Username:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(295, 558);
+            this.ClientSize = new System.Drawing.Size(295, 583);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.usernameBox);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.chatBox);
             this.Controls.Add(this.playersOnline);
@@ -441,6 +461,8 @@
         private System.Windows.Forms.Label playersOnline;
         private System.Windows.Forms.TextBox chatBox;
         private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.TextBox usernameBox;
+        private System.Windows.Forms.Label label1;
     }
 }
 
