@@ -138,7 +138,7 @@ namespace SM64O
                 connection.SendBytes(aux);
             }
 
-            Characters.setMessage(message, processHandle, baseAddress);
+            Characters.setMessage(message, _memory);
         }
 
         private void sendChatTo(string message, Connection conn)
@@ -269,7 +269,7 @@ namespace SM64O
             comboBox1.Enabled = false;
             comboBox2.Enabled = false;
 
-            Characters.setCharacter(comboBox2.SelectedItem.ToString(), processHandle, baseAddress);
+            Characters.setCharacter(comboBox2.SelectedItem.ToString(), _memory);
 
             string[] fileEntries = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/Ressources/");
 
@@ -496,7 +496,7 @@ namespace SM64O
 
             int bytesRead = 0;
             byte[] originalBuffer = new byte[freeRamLength];
-            _memory.ReadMemory(0x367400, origin, originalBuffer.Length);
+            _memory.ReadMemory(0x367400, originalBuffer, originalBuffer.Length);
 
             byte[] buffer = originalBuffer;
 
@@ -565,7 +565,7 @@ namespace SM64O
             byte[] buffer = new byte[howMany];
             byte[] writeOffset = BitConverter.GetBytes(offsetToWrite);
 
-            _memory.ReadMemory(offsetToRead, buffer, buffer.Length)
+            _memory.ReadMemory(offsetToRead, buffer, buffer.Length);
 
             byte[] finalOffset = new byte[howMany + 4];
             writeOffset.CopyTo(finalOffset, 0);
@@ -764,7 +764,7 @@ namespace SM64O
                 {
                     if (playerClient[p] != null)
                     {
-                        readAndSend(baseAddress + 0x365FF4, baseAddress + 0x365FF4, 4, playerClient[p]);
+                        readAndSend(0x365FF4, 0x365FF4, 4, playerClient[p]);
                     }
                 }
             }
