@@ -477,6 +477,7 @@ namespace SM64O
             }
         }
 
+        private DateTime _lastChatMsg = DateTime.Now;
         private void ReceiveRawMemory(byte[] data)
         {
             int offset = BitConverter.ToInt32(data, 0);
@@ -634,7 +635,7 @@ namespace SM64O
 
         private void textBox5_TextChanged(object sender, EventArgs e)
         {
-            if (textBox5.Text != "" && usernameBox.Text != "")
+            if (textBox5.Text != "")
             {
                 button1.Enabled = true;
             }
@@ -932,7 +933,7 @@ namespace SM64O
 
         private void usernameBox_TextChanged(object sender, EventArgs e)
         {
-            if (textBox5.Text != "" && usernameBox.Text != "")
+            if (textBox5.Text != "")
             {
                 button1.Enabled = true;
             }
