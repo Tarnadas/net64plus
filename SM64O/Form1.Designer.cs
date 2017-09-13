@@ -184,9 +184,9 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(313, 315);
+            this.button2.Location = new System.Drawing.Point(421, 315);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(210, 37);
+            this.button2.Size = new System.Drawing.Size(187, 37);
             this.button2.TabIndex = 19;
             this.button2.Text = "Credits";
             this.button2.UseVisualStyleBackColor = true;
@@ -417,11 +417,12 @@
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(529, 315);
+            this.button4.Enabled = false;
+            this.button4.Location = new System.Drawing.Point(313, 315);
             this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(74, 37);
+            this.button4.Size = new System.Drawing.Size(102, 37);
             this.button4.TabIndex = 41;
-            this.button4.Text = "Quit";
+            this.button4.Text = "Reset Game";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
@@ -442,7 +443,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "Form1";
-            this.Text = "SM64 Online Tool v1.1";
+            this.Text = "SM64 Online Tool v1.3";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
