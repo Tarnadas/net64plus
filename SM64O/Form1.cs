@@ -955,7 +955,7 @@ namespace SM64O
         {
             if (e.KeyCode == Keys.Enter)
             {
-                if (!checkBox2.Enabled)
+                if (_chatEnabled)
                 {
                     if (string.IsNullOrWhiteSpace(chatBox.Text)) return;
                     sendAllChat(chatBox.Text);
