@@ -90,59 +90,33 @@ namespace SM64O
 
         private void sendAllChat(string message)
         {
+            string name = "HOST";
+
+            if (!string.IsNullOrWhiteSpace(usernameBox.Text))
+                name = usernameBox.Text;
+
             if (message.Length > MaxChatLength)
-                message = message.Substring(0, 24);
+                message = message.Substring(0, MaxChatLength);
 
-            byte[] bytes = Encoding.ASCII.GetBytes(message);
-            byte[] mainArray = new byte[bytes.Length + 4];
-            byte[] outputArray = new byte[bytes.Length + 4];
+            if (name.Length > MaxChatLength)
+                name = name.Substring(0, MaxChatLength);
 
-            bytes.CopyTo(mainArray, 0);
-            int count = 0;
-            while (count < mainArray.Length)
-            {
-                byte[] array = mainArray.Skip<byte>(count).Take<byte>(4).Reverse<byte>().ToArray<byte>();
-                Array.Copy(array, 0, outputArray, count, Math.Min(4, array.Length));
-                count += 4;
-            }
+            byte[] messageBytes = Encoding.ASCII.GetBytes(message);
+            byte[] usernameBytes = Encoding.ASCII.GetBytes(name);
 
-            byte[] payload = new byte[outputArray.Length + 4];
-            Array.Copy(BitConverter.GetBytes(3569284), 0, payload, 0, 4);
-            Array.Copy(outputArray, 0, payload, 4, outputArray.Length);
 
-            byte[] aux = new byte[8];
+            byte[] payload = new byte[1 + messageBytes.Length + 1 + usernameBytes.Length];
 
-            Array.Copy(BitConverter.GetBytes(3569280), 0, aux, 0, 4);
+            payload[0] = (byte)messageBytes.Length;
 
-            if (connection == null)
-            {
-                for (int i = 0; i < Form1.playerClient.Length; i++)
-                {
-                    if (Form1.playerClient[i] != null)
-                        Form1.playerClient[i].SendBytes(PacketType.MemoryWrite, payload);
-                }
-            }
-            else
-            {
-                connection.SendBytes(PacketType.MemoryWrite, payload, SendOption.Reliable);
-            }
+            Array.Copy(messageBytes, 0, payload, 1, messageBytes.Length);
 
-            Thread.Sleep(100);
+            payload[messageBytes.Length + 1] = (byte)usernameBytes.Length;
 
-            if (connection == null)
-            {
-                for (int i = 0; i < Form1.playerClient.Length; i++)
-                {
-                    if (Form1.playerClient[i] != null)
-                    {
-                        Form1.playerClient[i].SendBytes(PacketType.MemoryWrite, aux);
-                    }
-                }
-            }
-            else
-            {
-                connection.SendBytes(PacketType.MemoryWrite, aux, SendOption.Reliable);
-            }
+            Array.Copy(usernameBytes, 0, payload, 1 + messageBytes.Length + 1, usernameBytes.Length);
+
+            for (int i = 0; i < playerClient.Length; i++)
+                playerClient[i].SendBytes(PacketType.ChatMessage, payload, SendOption.Reliable);
 
             if (_chatEnabled)
                 Characters.setMessage(message, _memory);
@@ -150,33 +124,32 @@ namespace SM64O
 
         private void sendChatTo(string message, Connection conn)
         {
+            string name = "HOST";
+
+            if (!string.IsNullOrWhiteSpace(usernameBox.Text))
+                name = usernameBox.Text;
+
             if (message.Length > MaxChatLength)
-                message = message.Substring(0, 24);
+                message = message.Substring(0, MaxChatLength);
 
-            byte[] bytes = Encoding.ASCII.GetBytes(message);
-            byte[] mainArray = new byte[bytes.Length + 4];
-            byte[] outputArray = new byte[bytes.Length + 4];
+            if (name.Length > MaxChatLength)
+                name = name.Substring(0, MaxChatLength);
 
-            bytes.CopyTo(mainArray, 0);
-            int count = 0;
-            while (count < mainArray.Length)
-            {
-                byte[] array = mainArray.Skip<byte>(count).Take<byte>(4).Reverse<byte>().ToArray<byte>();
-                Array.Copy(array, 0, outputArray, count, Math.Min(4, array.Length));
-                count += 4;
-            }
+            byte[] messageBytes = Encoding.ASCII.GetBytes(message);
+            byte[] usernameBytes = Encoding.ASCII.GetBytes(name);
 
-            byte[] payload = new byte[outputArray.Length + 4];
-            Array.Copy(BitConverter.GetBytes(3569284), 0, payload, 0, 4);
-            Array.Copy(outputArray, 0, payload, 4, outputArray.Length);
 
-            byte[] aux = new byte[8];
+            byte[] payload = new byte[1 + messageBytes.Length + 1 + usernameBytes.Length];
 
-            Array.Copy(BitConverter.GetBytes(3569280), 0, aux, 0, 4);
+            payload[0] = (byte) messageBytes.Length;
+            
+            Array.Copy(messageBytes, 0, payload, 1, messageBytes.Length);
 
-            conn.SendBytes(PacketType.MemoryWrite, payload, SendOption.Reliable);
-            Thread.Sleep(100);
-            conn.SendBytes(PacketType.MemoryWrite, aux, SendOption.Reliable);
+            payload[messageBytes.Length + 1] = (byte) usernameBytes.Length;
+
+            Array.Copy(usernameBytes, 0, payload, 1 + messageBytes.Length + 1, usernameBytes.Length);
+
+            conn.SendBytes(PacketType.ChatMessage, payload, SendOption.Reliable);
         }
         
         private void button1_Click(object sender, EventArgs e)
@@ -502,6 +475,9 @@ namespace SM64O
                 case PacketType.MemoryWrite:
                     ReceiveRawMemory(payload);
                     break;
+                case PacketType.ChatMessage:
+                    ReceiveChatMessage(payload);
+                    break;
             }
         }
 
@@ -513,45 +489,34 @@ namespace SM64O
 
             byte[] buffer = new byte[data.Length - 4];
             data.Skip(4).ToArray().CopyTo(buffer, 0);
-
-            if (offset == 3569284 || offset == 3569280) // It's a chat message
-            {
-                if (!_chatEnabled) return;
-                // TODO: Add chat enable/disable checkbox
-
-                ReceiveChatMessage(offset, data);
-
-                if (connection == null) // We are the host
-                    for (int i = 0; i < Form1.playerClient.Length; i++)
-                    {
-                        if (Form1.playerClient[i] != null)
-                            Form1.playerClient[i].SendBytes(PacketType.MemoryWrite, data);
-                    }
-            }
-
+            
             _memory.WriteMemory(offset, buffer, buffer.Length);
         }
 
-        private void ReceiveChatMessage(int offset, byte[] data)
+        private void ReceiveChatMessage(byte[] data)
         {
-            if (offset != 3569284) return; // Only need the char array;
+            if (connection == null) // We are the host
+                for (int i = 0; i < Form1.playerClient.Length; i++)
+                {
+                    if (Form1.playerClient[i] != null)
+                        Form1.playerClient[i].SendBytes(PacketType.ChatMessage, data);
+                }
+
+            if (!_chatEnabled) return;
 
             string message = "";
+            string sender = "";
 
-            for (int i = 4; i < data.Length; i += 4)
-            {
-                byte[] lilEndian = new byte[4];
-                lilEndian[3] = data[i];
-                if (i + 1 < data.Length) lilEndian[2] = data[i + 1];
-                if (i + 2 < data.Length) lilEndian[1] = data[i + 2];
-                if (i + 3 < data.Length) lilEndian[0] = data[i + 3];
+            int msgLen = data[0];
+            message = Encoding.ASCII.GetString(data, 1, msgLen);
+            int nameLen = data[msgLen + 1];
+            sender = Encoding.ASCII.GetString(data, msgLen + 2, nameLen);
 
-                message += System.Text.Encoding.ASCII.GetString(lilEndian);
-            }
+            Characters.setMessage(message, _memory);
 
             if (listener == null) // We're not the host
             {
-                listBox1.Items.Add(message);
+                listBox1.Items.Add(string.Format("{0}: {1}", sender, message));
                 
                 if (listBox1.Items.Count > 5)
                     listBox1.Items.RemoveAt(0);
