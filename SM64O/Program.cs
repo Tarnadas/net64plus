@@ -28,7 +28,7 @@ namespace SM64O
             Exception e = (Exception) args.ExceptionObject;
 
             // TODO: Either use logging library or write our own
-            System.IO.File.AppendAllText("errors.log", e.ToString());
+            System.IO.File.AppendAllText("errors.log", string.Format("[{0}] {1}", DateTime.Now, e));
         }
     }
 }

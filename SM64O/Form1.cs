@@ -115,8 +115,17 @@ namespace SM64O
 
             Array.Copy(usernameBytes, 0, payload, 1 + messageBytes.Length + 1, usernameBytes.Length);
 
-            for (int i = 0; i < playerClient.Length; i++)
-                playerClient[i].SendBytes(PacketType.ChatMessage, payload, SendOption.Reliable);
+            if (listener != null)
+            {
+                for (int i = 0; i < playerClient.Length; i++)
+                    if (playerClient[i] != null)
+                        playerClient[i].SendBytes(PacketType.ChatMessage, payload, SendOption.Reliable);
+            }
+            else
+            {
+                connection.SendBytes(PacketType.ChatMessage, payload, SendOption.Reliable);
+            }
+
 
             if (_chatEnabled)
                 Characters.setMessage(message, _memory);
@@ -282,7 +291,7 @@ namespace SM64O
             textBox5.Enabled = false;
 
             comboBox1.Enabled = false;
-            comboBox2.Enabled = false;
+            //comboBox2.Enabled = false;
 
             checkBox2.Enabled = true;
 
@@ -454,15 +463,8 @@ namespace SM64O
             if (e.Bytes.Length == 0)
                 return;
 
-            if (e.Bytes.Length == 1)
-            {
-                _memory.WriteMemory(0x367703, e.Bytes, e.Bytes.Length);
-            }
-            else
-            {
-                ReceivePacket(e.Bytes);
-                e.Recycle();
-            }
+            ReceivePacket(e.Bytes);
+            e.Recycle();
         }
 
         private void ReceivePacket(byte[] data)
@@ -483,6 +485,12 @@ namespace SM64O
 
         private void ReceiveRawMemory(byte[] data)
         {
+            if (data.Length == 1)
+            {
+                _memory.WriteMemory(0x367703, data, data.Length);
+                return;
+            }
+
             int offset = BitConverter.ToInt32(data, 0);
             if (offset < 0x365000 || offset > 0x365000 + 8388608) // Only allow 8 MB N64 RAM addresses
                 return; //  Kaze: retrict it to 80365ff0 to 80369000
@@ -964,6 +972,14 @@ namespace SM64O
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
         {
             _chatEnabled = !checkBox2.Checked;
+        }
+
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (connection == null && listener == null)
+                return; // We are not in a server yet
+
+            Characters.setCharacterAll(comboBox2.SelectedIndex + 1, _memory);
         }
     }
 }

@@ -56,11 +56,11 @@
             this.label1 = new System.Windows.Forms.Label();
             this.playerCheckTimer = new System.Windows.Forms.Timer(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
+            this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.label8 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
             this.label10 = new System.Windows.Forms.Label();
             this.gamemodeBox = new System.Windows.Forms.ComboBox();
-            this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.label9 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
@@ -230,6 +230,7 @@
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(166, 21);
             this.comboBox2.TabIndex = 22;
+            this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
             // 
             // label6
             // 
@@ -346,6 +347,18 @@
             this.panel1.Size = new System.Drawing.Size(295, 271);
             this.panel1.TabIndex = 37;
             // 
+            // checkBox2
+            // 
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.Enabled = false;
+            this.checkBox2.Location = new System.Drawing.Point(13, 98);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(92, 17);
+            this.checkBox2.TabIndex = 33;
+            this.checkBox2.Text = "Disable Chat?";
+            this.checkBox2.UseVisualStyleBackColor = true;
+            this.checkBox2.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
+            // 
             // label8
             // 
             this.label8.AutoSize = true;
@@ -390,19 +403,7 @@
             this.gamemodeBox.Name = "gamemodeBox";
             this.gamemodeBox.Size = new System.Drawing.Size(163, 21);
             this.gamemodeBox.TabIndex = 34;
-            // 
             this.gamemodeBox.SelectedIndexChanged += new System.EventHandler(this.gamemodeBox_SelectedIndexChanged);
-            // checkBox2
-            // 
-            this.checkBox2.AutoSize = true;
-            this.checkBox2.Enabled = false;
-            this.checkBox2.Location = new System.Drawing.Point(13, 98);
-            this.checkBox2.Name = "checkBox2";
-            this.checkBox2.Size = new System.Drawing.Size(92, 17);
-            this.checkBox2.TabIndex = 33;
-            this.checkBox2.Text = "Disable Chat?";
-            this.checkBox2.UseVisualStyleBackColor = true;
-            this.checkBox2.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
             // 
             // label9
             // 
