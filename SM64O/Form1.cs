@@ -452,10 +452,10 @@ namespace SM64O
 
             playersOnline.Text = "Players Online: " + playerClient.Count(c => c != null) + "/" + playerClient.Length;
 
-            const int playersPositionsStart = 0x367904;
+            const int playersPositionsStart = 0x36790C;
             const int playerPositionsSize = 0x100;
             // 0xc800
-            byte[] buffer = new byte[2] { 0x00, 0xc8 };
+            byte[] buffer = new byte[] { 0x00, 0x00, 0x00, 0xFD };
             _memory.WriteMemory(playersPositionsStart + playerPositionsSize * player, buffer, buffer.Length);
 
             sendAllChat(msg);
