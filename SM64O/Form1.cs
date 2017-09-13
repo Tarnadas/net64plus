@@ -296,6 +296,8 @@ namespace SM64O
 
             checkBox2.Enabled = true;
 
+            button4.Enabled = true;
+
             Characters.setCharacter(comboBox2.SelectedItem.ToString(), _memory);
 
             string[] fileEntries = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/Ressources/");
@@ -1003,12 +1005,12 @@ namespace SM64O
             const int maxPlayers = 27;
             for (int i = 0; i < maxPlayers; i++)
             {
-                const int playersPositionsStart = 0x367904;
+                const int playersPositionsStart = 0x36790C;
                 const int playerPositionsSize = 0x100;
 
                 // 0xc800
-                byte[] buffer = new byte[2] { 0x00, 0xc8 };
-                _memory.WriteMemory(playersPositionsStart + playerPositionsSize * i, buffer, buffer.Length);
+                byte[] buffer = new byte[] { 0x00, 0x00, 0x00, 0xFD };
+                _memory.WriteMemory(playersPositionsStart + (playerPositionsSize * i), buffer, buffer.Length);
             }
         }
 
@@ -1049,26 +1051,6 @@ namespace SM64O
         private void button4_Click(object sender, EventArgs e)
         {
             resetGame();
-
-            if (listener != null)
-            {
-                for (int i = 0; i < playerClient.Length; i++)
-                {
-                    if (playerClient[i] != null)
-                        playerClient[i].Connection.Close();
-                }
-
-                listener.Close();
-                listener.Dispose();
-            }
-            else if (connection != null)
-            {
-                connection.Close();
-                connection.Dispose();
-            }
-
-            Program.ResetMe = true;
-            Close();
         }
     }
 }
