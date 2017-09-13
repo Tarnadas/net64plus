@@ -144,7 +144,8 @@ namespace SM64O
                 connection.SendBytes(PacketType.MemoryWrite, aux, SendOption.Reliable);
             }
 
-            Characters.setMessage(message, _memory, checkBox2.Checked);
+            if (_chatEnabled)
+                Characters.setMessage(message, _memory);
         }
 
         private void sendChatTo(string message, Connection conn)
@@ -969,14 +970,9 @@ namespace SM64O
                 if (cl.Connection.State == Hazel.ConnectionState.Disconnecting ||
                     cl.Connection.State == Hazel.ConnectionState.NotConnected)
                 {
-                    Client cl = playerClient[i];
-                    if (cl.Connection.State == Hazel.ConnectionState.Disconnecting ||
-                        cl.Connection.State == Hazel.ConnectionState.NotConnected)
-                    {
-                        cl.Connection.DataReceived -= DataReceivedHandler;
-                        listBox1.Items.Remove(cl);
-                        playerClient[i] = null;
-                    }
+                    cl.Connection.DataReceived -= DataReceivedHandler;
+                    listBox1.Items.Remove(cl);
+                    playerClient[i] = null;
                 }
             }
         }
