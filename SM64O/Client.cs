@@ -1,3 +1,4 @@
+using System;
 using Hazel;
 
 namespace SM64O
@@ -17,9 +18,13 @@ namespace SM64O
             return c.Connection;
         }
 
-        public void SendBytes(byte[] data, SendOption sendOption = SendOption.None)
+        public void SendBytes(PacketType type, byte[] data, SendOption sendOption = SendOption.None)
         {
-            Connection.SendBytes(data, sendOption);
+            byte[] buffer = new byte[data.Length + 1];
+            buffer[0] = (byte) type;
+            Array.Copy(data, 0, buffer, 1, data.Length);
+
+            Connection.SendBytes(buffer, sendOption);
         }
 
         public Connection Connection { get; private set; }

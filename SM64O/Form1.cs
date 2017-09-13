@@ -35,7 +35,7 @@ namespace SM64O
 
         private const int HandshakeDataLen = 28;
         private const int MaxChatLength = 24;
-
+        
         public Form1()
         {
             InitializeComponent();
@@ -119,14 +119,12 @@ namespace SM64O
                 for (int i = 0; i < Form1.playerClient.Length; i++)
                 {
                     if (Form1.playerClient[i] != null)
-                    {
-                        Form1.playerClient[i].SendBytes(payload);
-                    }
+                        Form1.playerClient[i].SendBytes(PacketType.MemoryWrite, payload);
                 }
             }
             else
             {
-                connection.SendBytes(payload, SendOption.Reliable);
+                connection.SendBytes(PacketType.MemoryWrite, payload, SendOption.Reliable);
             }
 
             Thread.Sleep(100);
@@ -137,13 +135,13 @@ namespace SM64O
                 {
                     if (Form1.playerClient[i] != null)
                     {
-                        Form1.playerClient[i].SendBytes(aux);
+                        Form1.playerClient[i].SendBytes(PacketType.MemoryWrite, aux);
                     }
                 }
             }
             else
             {
-                connection.SendBytes(aux, SendOption.Reliable);
+                connection.SendBytes(PacketType.MemoryWrite, aux, SendOption.Reliable);
             }
 
             Characters.setMessage(message, _memory);
@@ -175,9 +173,9 @@ namespace SM64O
 
             Array.Copy(BitConverter.GetBytes(3569280), 0, aux, 0, 4);
 
-            conn.SendBytes(payload, SendOption.Reliable);
+            conn.SendBytes(PacketType.MemoryWrite, payload, SendOption.Reliable);
             Thread.Sleep(100);
-            conn.SendBytes(aux, SendOption.Reliable);
+            conn.SendBytes(PacketType.MemoryWrite, aux, SendOption.Reliable);
         }
         
         private void button1_Click(object sender, EventArgs e)
@@ -356,7 +354,7 @@ namespace SM64O
                         int playerIDB = i + 2;
                         byte[] playerID = new byte[] {(byte) playerIDB};
                         Thread.Sleep(500);
-                        playerClient[i].SendBytes(playerID);
+                        playerClient[i].SendBytes(PacketType.MemoryWrite, playerID);
                         string character = "Unk Char";
                         string vers = "Default Client";
 
@@ -467,13 +465,16 @@ namespace SM64O
 
         private void DataReceivedHandler(object sender, Hazel.DataReceivedEventArgs e)
         {
-            ReceiveRawMemory(e.Bytes);
+            ReceivePacket(e.Bytes);
 
             e.Recycle();
         }
 
         private void DataReceived(object sender, Hazel.DataReceivedEventArgs e)
         {
+            if (e.Bytes.Length == 0)
+                return;
+
             if (e.Bytes.Length == 1)
             {
                 int bytesWritten = 0;
@@ -481,12 +482,24 @@ namespace SM64O
             }
             else
             {
-                ReceiveRawMemory(e.Bytes);
+                ReceivePacket(e.Bytes);
                 e.Recycle();
             }
         }
 
-        private DateTime _lastChatMsg = DateTime.Now;
+        private void ReceivePacket(byte[] data)
+        {
+            PacketType type = (PacketType) data[0];
+            byte[] payload = data.Skip(1).ToArray();
+
+            switch (type)
+            {
+                case PacketType.MemoryWrite:
+                    ReceiveRawMemory(payload);
+                    break;
+            }
+        }
+
         private void ReceiveRawMemory(byte[] data)
         {
             int offset = BitConverter.ToInt32(data, 0);
@@ -508,7 +521,7 @@ namespace SM64O
                     for (int i = 0; i < Form1.playerClient.Length; i++)
                     {
                         if (Form1.playerClient[i] != null)
-                            Form1.playerClient[i].SendBytes(data);
+                            Form1.playerClient[i].SendBytes(PacketType.MemoryWrite, data);
                     }
             }
 
@@ -645,7 +658,7 @@ namespace SM64O
             byte[] finalOffset = new byte[howMany + 4];
             writeOffset.CopyTo(finalOffset, 0);
             buffer.CopyTo(finalOffset, 4);
-            conn.SendBytes(finalOffset);
+            conn.SendBytes(PacketType.MemoryWrite, finalOffset);
         }
 
         private void textBox5_TextChanged(object sender, EventArgs e)
