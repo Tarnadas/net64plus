@@ -652,6 +652,8 @@ namespace SM64O
             writeOffset.CopyTo(finalOffset, 0);
             buffer.CopyTo(finalOffset, 4);
             conn.SendBytes(PacketType.MemoryWrite, finalOffset);
+
+            Debug.WriteLine("Sending packet of length " + howMany);
         }
 
         private void textBox5_TextChanged(object sender, EventArgs e)
@@ -1047,6 +1049,24 @@ namespace SM64O
         private void button4_Click(object sender, EventArgs e)
         {
             resetGame();
+
+            if (listener != null)
+            {
+                for (int i = 0; i < playerClient.Length; i++)
+                {
+                    if (playerClient[i] != null)
+                        playerClient[i].Connection.Close();
+                }
+
+                listener.Close();
+                listener.Dispose();
+            }
+            else if (connection != null)
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+
             Program.ResetMe = true;
             Close();
         }
