@@ -243,7 +243,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(10, 17);
+            this.label7.Location = new System.Drawing.Point(46, 17);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(67, 13);
             this.label7.TabIndex = 30;
@@ -251,22 +251,22 @@
             // 
             // numericUpDown3
             // 
-            this.numericUpDown3.Location = new System.Drawing.Point(119, 14);
+            this.numericUpDown3.Location = new System.Drawing.Point(119, 15);
             this.numericUpDown3.Maximum = new decimal(new int[] {
-            24,
+            23,
             0,
             0,
             0});
             this.numericUpDown3.Minimum = new decimal(new int[] {
-            2,
+            1,
             0,
             0,
             0});
             this.numericUpDown3.Name = "numericUpDown3";
-            this.numericUpDown3.Size = new System.Drawing.Size(62, 20);
+            this.numericUpDown3.Size = new System.Drawing.Size(163, 20);
             this.numericUpDown3.TabIndex = 31;
             this.numericUpDown3.Value = new decimal(new int[] {
-            24,
+            23,
             0,
             0,
             0});
@@ -283,14 +283,17 @@
             // 
             // chatBox
             // 
+            this.chatBox.Enabled = false;
             this.chatBox.Location = new System.Drawing.Point(12, 289);
             this.chatBox.MaxLength = 24;
             this.chatBox.Name = "chatBox";
             this.chatBox.Size = new System.Drawing.Size(295, 20);
             this.chatBox.TabIndex = 33;
+            this.chatBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.chatBox_KeyDown);
             // 
             // button3
             // 
+            this.button3.Enabled = false;
             this.button3.Location = new System.Drawing.Point(12, 315);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(295, 37);
@@ -387,12 +390,13 @@
             this.gamemodeBox.Name = "gamemodeBox";
             this.gamemodeBox.Size = new System.Drawing.Size(163, 21);
             this.gamemodeBox.TabIndex = 34;
-            this.gamemodeBox.SelectedIndexChanged += new System.EventHandler(this.gamemodeBox_SelectedIndexChanged);
             // 
+            this.gamemodeBox.SelectedIndexChanged += new System.EventHandler(this.gamemodeBox_SelectedIndexChanged);
             // checkBox2
             // 
             this.checkBox2.AutoSize = true;
-            this.checkBox2.Location = new System.Drawing.Point(27, 98);
+            this.checkBox2.Enabled = false;
+            this.checkBox2.Location = new System.Drawing.Point(13, 98);
             this.checkBox2.Name = "checkBox2";
             this.checkBox2.Size = new System.Drawing.Size(92, 17);
             this.checkBox2.TabIndex = 33;
