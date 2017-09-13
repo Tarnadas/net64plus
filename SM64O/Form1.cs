@@ -862,7 +862,7 @@ namespace SM64O
 
         private void button3_Click(object sender, EventArgs e)
         {
-            if (!checkBox2.Enabled)
+            if (_chatEnabled)
             {
                 if (string.IsNullOrWhiteSpace(chatBox.Text)) return;
                 sendAllChat(chatBox.Text);
