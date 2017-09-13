@@ -178,7 +178,7 @@ namespace SM64O
             conn.SendBytes(PacketType.MemoryWrite, aux, SendOption.Reliable);
         }
         
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
             try
             {
@@ -211,9 +211,34 @@ namespace SM64O
             {
                 if (checkBox1.Checked)
                 {
-                    listener = new UdpConnectionListener(new NetworkEndPoint(IPAddress.Any, (int) numericUpDown2.Value));
+                    int port = (int) numericUpDown2.Value;
+                    listener = new UdpConnectionListener(new NetworkEndPoint(IPAddress.Any, port));
                     listener.NewConnection += NewConnectionHandler;
                     listener.Start();
+
+                    button1.Enabled = false;
+                    button1.Text = "Working...";
+
+                    bool success = await NetworkHelper.RequestAssistance(port);
+
+                    if (success && NetworkHelper.ConfirmedOpenPort == port)
+                    {
+                        button1.Text = "Create server!";
+                        textBox5.Text = NetworkHelper.ExternalIp;
+                    }
+                    else
+                    {
+                        var result = MessageBox.Show(this,
+                            "Your ports do not seem to be forwarded! " +
+                            "Nobody outside of your local network will be able to connect. " +
+                            "Would you like to continue?", "Attention", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
+                        if (result == DialogResult.No)
+                        {
+                            Application.Exit();
+                            return;
+                        }
+                    }
 
                     playerCheckTimer.Start();
 
