@@ -9,6 +9,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -16,7 +17,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-//#pragma warning disable CS0618 // Type or member is obsolete
 namespace SM64O
 {
     public partial class Form1 : Form
@@ -146,7 +146,7 @@ namespace SM64O
                 connection.SendBytes(aux, SendOption.Reliable);
             }
 
-            Characters.setMessage(message, _memory);
+            Characters.setMessage(message, _memory, checkBox2.Checked);
         }
 
         private void sendChatTo(string message, Connection conn)
@@ -213,16 +213,14 @@ namespace SM64O
             {
                 if (checkBox1.Checked)
                 {
+                    panel2.Enabled = true;
                     listener = new UdpConnectionListener(new NetworkEndPoint(IPAddress.Any, (int) numericUpDown2.Value));
                     listener.NewConnection += NewConnectionHandler;
                     listener.Start();
 
-                    miniGame1.Enabled = true;
-                    miniGame3.Enabled = true;
-
                     playerCheckTimer.Start();
 
-                    Characters.setMessage("logged in", _memory);
+                    Characters.setMessage("server created", _memory, checkBox2.Checked);
                 }
                 else
                 {
@@ -301,11 +299,18 @@ namespace SM64O
 
             timer1.Enabled = true;
             button1.Enabled = false;
-            textBox5.Enabled = false;
+
             numericUpDown1.Enabled = true;
+
+            chatBox.Enabled = true;
+            button3.Enabled = true;
+
+            textBox5.Enabled = false;
 
             comboBox1.Enabled = false;
             comboBox2.Enabled = false;
+
+            checkBox2.Enabled = true;
 
             Characters.setCharacter(comboBox2.SelectedItem.ToString(), _memory);
 
@@ -314,8 +319,6 @@ namespace SM64O
             foreach (var file in fileEntries)
             {
                 int offset = Convert.ToInt32(Path.GetFileName(file), 16);
-
-                int bytesWritten = 0;
 
                 byte[] buffer = File.ReadAllBytes(file);
                 _memory.WriteMemory(offset, buffer, buffer.Length);
@@ -359,7 +362,6 @@ namespace SM64O
                         Thread.Sleep(500);
                         playerClient[i].SendBytes(playerID);
                         string character = "Unk Char";
-                        string vers = "Default Client";
 
                         if (e.HandshakeData != null && e.HandshakeData.Length > 3)
                         {
@@ -444,7 +446,7 @@ namespace SM64O
             {
                 if (playerClient[i] != null && playerClient[i].Connection == conn)
                 {
-                    string msg = string.Format("{0} quit", playerClient[i].Name);
+                    string msg = string.Format("{0} left", playerClient[i].Name);
                     if (msg.Length > MaxChatLength)
                         msg = msg.Substring(0, 24);
                     sendAllChat(msg);
@@ -477,7 +479,6 @@ namespace SM64O
         {
             if (e.Bytes.Length == 1)
             {
-                int bytesWritten = 0;
                 _memory.WriteMemory(0x367703, e.Bytes, e.Bytes.Length);
             }
             else
@@ -494,7 +495,6 @@ namespace SM64O
             if (offset < 0x365000 || offset > 0x365000 + 8388608) // Only allow 8 MB N64 RAM addresses
                 return; // TODO: Ask Kaze for real offsets
 
-            int bytesWritten = 0;
             byte[] buffer = new byte[data.Length - 4];
             data.Skip(4).ToArray().CopyTo(buffer, 0);
 
@@ -539,7 +539,6 @@ namespace SM64O
         public void writeValue(byte[] buffer, int offset)
         {
             buffer = buffer.Reverse().ToArray();
-            int bytesWritten = 0;
             _memory.WriteMemory(offset, buffer, buffer.Length);
         }
 
@@ -547,6 +546,7 @@ namespace SM64O
         {
             try
             {
+                setGamemode();
                 sendAllBytes(null);
             }
             catch
@@ -564,7 +564,6 @@ namespace SM64O
             int[] offsetsToWriteToLength = new int[freeRamLength];
             int[] offsetsToWriteTo = new int[freeRamLength];
 
-            int bytesRead = 0;
             byte[] originalBuffer = new byte[freeRamLength];
             _memory.ReadMemory(0x367400, originalBuffer, originalBuffer.Length);
 
@@ -615,7 +614,6 @@ namespace SM64O
         {
             for (int i = 0; i < 0x1024; i += 4)
             {
-                int bytesRead = 0;
                 byte[] buffer = new byte[4];
 
                 _memory.ReadMemory(offset + i, buffer, buffer.Length);
@@ -631,7 +629,6 @@ namespace SM64O
 
         public void readAndSend(int offsetToRead, int offsetToWrite, int howMany, Connection conn)
         {
-            int bytesRead = 0;
             byte[] buffer = new byte[howMany];
             byte[] writeOffset = BitConverter.GetBytes(offsetToWrite);
 
@@ -690,11 +687,21 @@ namespace SM64O
         {
             if (checkBox1.Checked)
             {
+                textBox5.Text = "";
+                textBox5.Enabled = false;
+                usernameBox.Text = "";
+                usernameBox.Enabled = false;
+
+                button1.Enabled = true;
+
                 button1.Text = "Create Server!";
                 usernameBox.Enabled = false;
             }
             else
             {
+                textBox5.Enabled = true;
+                usernameBox.Enabled = true;
+
                 button1.Text = "Connect to server!";
                 usernameBox.Enabled = true;
             }
@@ -799,34 +806,14 @@ namespace SM64O
         {
             byte[] buffer = new byte[0];
 
-            if (miniGame1.Checked)
+            if (gamemodeBox.SelectedIndex == 0)
             {
                 buffer = new byte[] { 0x01 };
             }
 
-            if (miniGame2.Checked)
-            {
-                buffer = new byte[] { 0x02 };
-            }
-
-            if (miniGame3.Checked)
+            if (gamemodeBox.SelectedIndex == 1)
             {
                 buffer = new byte[] { 0x03 };
-            }
-
-            if (miniGame4.Checked)
-            {
-                buffer = new byte[] { 0x04 };
-            }
-
-            if (miniGame5.Checked)
-            {
-                buffer = new byte[] { 0x05 };
-            }
-
-            if (miniGame6.Checked)
-            {
-                buffer = new byte[] { 0x06 };
             }
 
             _memory.WriteMemory(0x365FF7, buffer, buffer.Length);
@@ -844,36 +831,6 @@ namespace SM64O
 
         }
 
-        private void miniGame1_CheckedChanged(object sender, EventArgs e)
-        {
-            setGamemode();
-        }
-
-        private void miniGame2_CheckedChanged(object sender, EventArgs e)
-        {
-            setGamemode();
-        }
-
-        private void miniGame3_CheckedChanged(object sender, EventArgs e)
-        {
-            setGamemode();
-        }
-
-        private void miniGame4_CheckedChanged(object sender, EventArgs e)
-        {
-            setGamemode();
-        }
-
-        private void miniGame5_CheckedChanged(object sender, EventArgs e)
-        {
-            setGamemode();
-        }
-
-        private void miniGame6_CheckedChanged(object sender, EventArgs e)
-        {
-            setGamemode();
-        }
-
         private void numericUpDown3_ValueChanged(object sender, EventArgs e)
         {
             playerClient = new Client[(int)numericUpDown3.Value - 1];
@@ -881,9 +838,12 @@ namespace SM64O
 
         private void button3_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(chatBox.Text)) return;
-            sendAllChat(chatBox.Text);
-            chatBox.Text = "";
+            if (!checkBox2.Enabled)
+            {
+                if (string.IsNullOrWhiteSpace(chatBox.Text)) return;
+                sendAllChat(chatBox.Text);
+                chatBox.Text = "";
+            }
         }
 
         private void listBox1_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -981,16 +941,33 @@ namespace SM64O
 
             for (int i = 0; i < playerClient.Length; i++)
             {
-                Client cl = playerClient[i];
-                if (cl.Connection.State == Hazel.ConnectionState.Disconnecting ||
-                    cl.Connection.State == Hazel.ConnectionState.NotConnected)
+                if (playerClient[i] != null)
                 {
-                    cl.Connection.DataReceived -= DataReceivedHandler;
-                    listBox1.Items.Remove(cl);
-                    playerClient[i] = null;
+                    Client cl = playerClient[i];
+                    if (cl.Connection.State == Hazel.ConnectionState.Disconnecting ||
+                        cl.Connection.State == Hazel.ConnectionState.NotConnected)
+                    {
+                        cl.Connection.DataReceived -= DataReceivedHandler;
+                        listBox1.Items.Remove(cl);
+                        playerClient[i] = null;
+                    }
                 }
             }
         }
+
+        private void chatBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                if (!checkBox2.Enabled)
+                {
+                    if (string.IsNullOrWhiteSpace(chatBox.Text)) return;
+                    sendAllChat(chatBox.Text);
+                    chatBox.Text = "";
+                }
+            }
+        }
+
     }
 }
  
