@@ -14,6 +14,11 @@ namespace Hazel.Udp
     /// <inheritdoc />
     public class UdpConnectionListener : NetworkConnectionListener
     {
+        public event EventHandler<UnconnectedDataReceivedEventArgs> UnconnectedDataReceived;
+
+        // CONN
+        private readonly byte[] MagicSequence = new byte[4] { 0x43, 0x4f, 0x4e, 0x43 };
+
         /// <summary>
         ///     The socket listening for connections.
         /// </summary>
@@ -156,10 +161,15 @@ namespace Hazel.Udp
                 //If we're aware of this connection use the one already
                 if (aware)
                     connection = connections[remoteEndPoint];
-                
                 //If this is a new client then connect with them!
                 else
                 {
+                    if (ArrayCompare(buffer, 0, MagicSequence, 0, MagicSequence.Length))
+                    {
+                        InvokeUnconnectedData(remoteEndPoint, buffer);
+                        return;
+                    }
+
                     //Check for malformed connection attempts
                     if (buffer[0] != (byte)UdpSendOption.Hello)
                         return;
@@ -217,6 +227,11 @@ namespace Hazel.Udp
             }
         }
 
+        public void SendUnconnectedBytes(byte[] data, EndPoint destination)
+        {
+            SendData(data, destination);
+        }
+
         /// <summary>
         ///     Removes a virtual connection from the list.
         /// </summary>
@@ -237,6 +252,28 @@ namespace Hazel.Udp
             }
 
             base.Dispose(disposing);
+        }
+
+        private void InvokeUnconnectedData(EndPoint sender, byte[] data)
+        {
+            var args = UnconnectedDataReceivedEventArgs.GetObject();
+
+            args.Sender = sender;
+            args.Data = new byte[data.Length - MagicSequence.Length];
+            Array.Copy(data, MagicSequence.Length, args.Data, 0, args.Data.Length);
+
+            EventHandler<UnconnectedDataReceivedEventArgs> handler = UnconnectedDataReceived;
+            if (handler != null)
+                handler.Invoke(this, args);
+        }
+
+        private bool ArrayCompare<T>(T[] left, int leftStart, T[] right, int rightStart, int len)
+        {
+            for (int i = 0; i < len; i++)
+                if (!EqualityComparer<T>.Default.Equals(left[i], right[i]))
+                    return false;
+
+            return true;
         }
     }
 }
