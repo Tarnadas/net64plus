@@ -198,6 +198,7 @@ namespace SM64O
                     listener = new UdpConnectionListener(new NetworkEndPoint(IPAddress.Any, (int) numericUpDown2.Value));
                     listener.NewConnection += NewConnectionHandler;
                     listener.Start();
+                    
 
                     playerCheckTimer.Start();
 
@@ -315,6 +316,7 @@ namespace SM64O
 
         private void ConnectionOnDisconnected(object sender, DisconnectedEventArgs disconnectedEventArgs)
         {
+            removeAllPlayers();
             die("You have been disconnected!");
         }
 
@@ -429,30 +431,47 @@ namespace SM64O
             {
                 if (playerClient[i] != null && playerClient[i].Connection == conn)
                 {
-                    string msg = string.Format("{0} left", playerClient[i].Name);
-                    if (msg.Length > MaxChatLength)
-                        msg = msg.Substring(0, 24);
-                    sendAllChat(msg);
-
-                    playerClient[i] = null;
-                    conn.DataReceived -= DataReceivedHandler;
-                    for (int index = 0; index < listBox1.Items.Count; index++)
-                    {
-                        if (listBox1.Items[index] == playerClient[i])
-                        {
-                            listBox1.Items.RemoveAt(index);
-                            break;
-                        }
-                    }
+                    removePlayer(i);
                     break;
                 }
             }
+        }
+
+        private void removePlayer(int player)
+        {
+            string msg = string.Format("{0} left", playerClient[player].Name);
+            if (msg.Length > MaxChatLength)
+                msg = msg.Substring(0, 24);
+            
+            listBox1.Items.Remove(playerClient[player]);
+
+            playerClient[player].Connection.DataReceived -= DataReceivedHandler;
+            playerClient[player] = null;
 
             playersOnline.Text = "Players Online: " + playerClient.Count(c => c != null) + "/" + playerClient.Length;
+
+            const int playersPositionsStart = 0x367904;
+            const int playerPositionsSize = 0x100;
+            // 0xc800
+            byte[] buffer = new byte[2] { 0x00, 0xc8 };
+            _memory.WriteMemory(playersPositionsStart + playerPositionsSize * player, buffer, buffer.Length);
+
+            sendAllChat(msg);
         }
 
         private void DataReceivedHandler(object sender, Hazel.DataReceivedEventArgs e)
         {
+            var conn = (Connection) sender;
+
+            for (int i = 0; i < playerClient.Length; i++)
+            {
+                if (playerClient[i] != null && playerClient[i].Connection == conn)
+                {
+                    playerClient[i].LastUpdate = DateTime.Now;
+                    break;
+                }
+            }
+
             ReceivePacket(e.Bytes);
 
             e.Recycle();
@@ -526,7 +545,7 @@ namespace SM64O
             {
                 listBox1.Items.Add(string.Format("{0}: {1}", sender, message));
                 
-                if (listBox1.Items.Count > 5)
+                if (listBox1.Items.Count > 10)
                     listBox1.Items.RemoveAt(0);
             }
         }
@@ -797,6 +816,7 @@ namespace SM64O
         {
             comboBox1.SelectedIndex = 0;
             comboBox2.SelectedIndex = 0;
+            gamemodeBox.SelectedIndex = 0;
         }
 
         public void setGamemode()
@@ -850,6 +870,7 @@ namespace SM64O
             {
                 // Who did we click on
                 Client client = (Client) listBox1.Items[index];
+                int indx = Array.IndexOf(playerClient, client);
                 Connection conn = client.Connection;
 
                 if (conn == null) return;
@@ -858,11 +879,7 @@ namespace SM64O
                 if (conn.State == Hazel.ConnectionState.Disconnecting ||
                     conn.State == Hazel.ConnectionState.NotConnected)
                 {
-                    int indx = Array.IndexOf(playerClient, conn);
-                    conn.DataReceived -= DataReceivedHandler;
-                    if (indx != -1)
-                        playerClient[indx] = null;
-                    listBox1.Items.RemoveAt(index);
+                    removePlayer(indx);
                     return;
                 }
 
@@ -871,16 +888,13 @@ namespace SM64O
                     "Player Information:\n" + listBox1.Items[index].ToString() +
                     "\n\nKick this player?\nYes = Kick, No = Ban",
                     "Client", MessageBoxButtons.YesNoCancel);
+
                 if (resp == DialogResult.Yes)
                 {
                     sendChatTo("kicked", conn);
                     conn.Close();
 
-                    int indx = Array.IndexOf(playerClient, client);
-                    conn.DataReceived -= DataReceivedHandler;
-                    if (indx != -1)
-                        playerClient[indx] = null;
-                    listBox1.Items.RemoveAt(index);
+                    removePlayer(indx);
                 }
                 else if (resp == DialogResult.No)
                 {
@@ -889,11 +903,7 @@ namespace SM64O
                     File.AppendAllText("bans.txt", conn.EndPoint.ToString() + "\n");
                     conn.Close();
 
-                    int indx = Array.IndexOf(playerClient, client);
-                    conn.DataReceived -= DataReceivedHandler;
-                    if (indx != -1)
-                        playerClient[indx] = null;
-                    listBox1.Items.RemoveAt(index);
+                    removePlayer(indx);
                 }
 
                 playersOnline.Text = "Players Online: " + playerClient.Count(c => c != null) + "/" +
@@ -939,14 +949,17 @@ namespace SM64O
 
             for (int i = 0; i < playerClient.Length; i++)
             {
-                Client cl = playerClient[i];
-                if (cl == null) continue;
-                if (cl.Connection.State == Hazel.ConnectionState.Disconnecting ||
-                    cl.Connection.State == Hazel.ConnectionState.NotConnected)
+                if (playerClient[i] == null) continue;
+                if (playerClient[i].Connection.State == Hazel.ConnectionState.Disconnecting ||
+                    playerClient[i].Connection.State == Hazel.ConnectionState.NotConnected)
                 {
-                    cl.Connection.DataReceived -= DataReceivedHandler;
-                    listBox1.Items.Remove(cl);
-                    playerClient[i] = null;
+                    removePlayer(i);
+                }
+                else if (playerClient[i].LastUpdate.HasValue &&
+                         DateTime.Now.Subtract(playerClient[i].LastUpdate.Value).TotalMilliseconds > 2000)
+                {
+                    playerClient[i].Connection.Close();
+                    removePlayer(i);
                 }
             }
         }
@@ -981,6 +994,25 @@ namespace SM64O
                 return; // We are not in a server yet
 
             Characters.setCharacterAll(comboBox2.SelectedIndex + 1, _memory);
+        }
+
+        private void removeAllPlayers()
+        {
+            const int maxPlayers = 27;
+            for (int i = 0; i < maxPlayers; i++)
+            {
+                const int playersPositionsStart = 0x367904;
+                const int playerPositionsSize = 0x100;
+
+                // 0xc800
+                byte[] buffer = new byte[2] { 0x00, 0xc8 };
+                _memory.WriteMemory(playersPositionsStart + playerPositionsSize * i, buffer, buffer.Length);
+            }
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            removeAllPlayers();
         }
     }
 }

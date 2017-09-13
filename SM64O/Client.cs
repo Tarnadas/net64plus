@@ -34,6 +34,8 @@ namespace SM64O
         public byte MajorVersion { get; set; }
         public byte MinorVersion { get; set; }
         public int Id { get; set; }
+        
+        public DateTime? LastUpdate { get; set; }
 
         public override string ToString()
         {
