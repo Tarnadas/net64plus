@@ -39,9 +39,6 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Hazel">
-      <HintPath>..\lib\Hazel.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -107,6 +104,12 @@
     <None Include="Resources\aaaaah.wav" />
     <None Include="Resources\okay.wav" />
     <None Include="Resources\toad.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Hazel\Hazel.csproj">
+      <Project>{02cfbd30-d77d-400f-94b2-700f60efdd7f}</Project>
+      <Name>Hazel</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
