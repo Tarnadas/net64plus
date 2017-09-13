@@ -18,8 +18,14 @@ namespace SM64O
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            do
+            {
+                ResetMe = false;
+                Application.Run(new Form1());
+            } while (ResetMe);
         }
+
+        public static bool ResetMe = false;
 
         static void UnhandledException(object sender, UnhandledExceptionEventArgs args)
         {

@@ -1010,9 +1010,45 @@ namespace SM64O
             }
         }
 
+        private void resetGame()
+        {
+            if (!_memory.Attached) return;
+
+            byte[] buffer = new byte[4];
+
+            buffer[0] = 0x00;
+            buffer[1] = 0x00;
+            buffer[2] = 0x04;
+            buffer[3] = 0x00;
+
+            _memory.WriteMemory(0x33b238, buffer, buffer.Length);
+
+
+            buffer[0] = 0x00;
+            buffer[1] = 0x00;
+            buffer[2] = 0x01;
+            buffer[3] = 0x01;
+
+            _memory.WriteMemory(0x33b248, buffer, buffer.Length);
+
+            buffer[0] = 0x00;
+            buffer[1] = 0x00;
+            buffer[2] = 0x00;
+            buffer[3] = 0x00;
+
+            _memory.WriteMemory(0x38eee0, buffer, buffer.Length);
+        }
+
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             removeAllPlayers();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            resetGame();
+            Program.ResetMe = true;
+            Close();
         }
     }
 }

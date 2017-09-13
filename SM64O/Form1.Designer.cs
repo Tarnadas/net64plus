@@ -62,6 +62,7 @@
             this.label10 = new System.Windows.Forms.Label();
             this.gamemodeBox = new System.Windows.Forms.ComboBox();
             this.label9 = new System.Windows.Forms.Label();
+            this.button4 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
@@ -185,7 +186,7 @@
             // 
             this.button2.Location = new System.Drawing.Point(313, 315);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(295, 37);
+            this.button2.Size = new System.Drawing.Size(210, 37);
             this.button2.TabIndex = 19;
             this.button2.Text = "Credits";
             this.button2.UseVisualStyleBackColor = true;
@@ -414,11 +415,22 @@
             this.label9.TabIndex = 40;
             this.label9.Text = "Server Settings:";
             // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(529, 315);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(74, 37);
+            this.button4.TabIndex = 41;
+            this.button4.Text = "Quit";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(618, 363);
+            this.Controls.Add(this.button4);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.label8);
@@ -479,6 +491,7 @@
         private System.Windows.Forms.CheckBox checkBox2;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.ComboBox gamemodeBox;
+        private System.Windows.Forms.Button button4;
     }
 }
 

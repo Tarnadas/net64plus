@@ -25,6 +25,13 @@ namespace SM64O
             get { return baseAddress; }
         }
 
+        private bool _attached;
+        public bool Attached
+        {
+            get { return _attached; }
+            private set { _attached = value; }
+        }
+
         public void Open(string processName)
         {
             Process process = Process.GetProcessesByName(processName)[0];
@@ -32,6 +39,8 @@ namespace SM64O
             baseAddress = ReadWritingMemory.GetBaseAddress(processName, 4096, 4);
 
             processHandle = OpenProcess(0x1F0FFF, true, process.Id);
+
+            Attached = true;
         }
 
         public int WriteMemory(int offset, byte[] buffer, int bufferLength)
