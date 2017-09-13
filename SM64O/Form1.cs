@@ -918,14 +918,15 @@ namespace SM64O
         {
             string[] usernames = new[]
             {
-                "Bambooccaneer",
-                "Grapeshifter666",
-                "Fellama",
-                "Rerunt987",
-                "IllegalBlizzard123",
-                "ActiveMonkey",
-                "ThunderBerry",
-                "BananaMan",
+                "TheFloorIsLava",
+                "BonelessPizza",
+                "WOAH",
+                "MahBoi",
+                "SFShoutouts",
+                "clamav",
+                "HeHasNoGrace",
+                "Memetopia",
+                "ShrekIsLove",
             };
 
             return usernames[_r.Next(usernames.Length)];
