@@ -891,10 +891,15 @@ namespace SM64O
 
         private void button2_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Super Mario 64 Online made by Kaze Emanuar and MelonSpeedruns!"
+            MessageBox.Show("Super Mario 64 Online team"
                 + Environment.NewLine
+                + "Kaze Emanuar"
                 + Environment.NewLine
-                + "Thanks to Guad for the bug fixes!"
+                + "MelonSpeedruns"
+                + Environment.NewLine
+                + "Guad"
+                + Environment.NewLine
+                + "merlish"
                 + Environment.NewLine
                 + Environment.NewLine
                 + "Luigi 3D Model created by: "
