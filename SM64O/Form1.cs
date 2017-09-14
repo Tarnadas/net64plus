@@ -87,7 +87,7 @@ namespace SM64O
 
         private void die(string msg)
         {
-            MessageBox.Show(this, msg, "Critical Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(null, msg, "Critical Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             Application.Exit();
         }
 
