@@ -404,12 +404,21 @@ namespace SM64O
                     string romname = getRomName();
 
                     regexPattern = regexPattern.Replace("@", "\\");
+                    bool invert = false;
+
+                    if (regexPattern[0] == '!')
+                    {
+                        regexPattern = regexPattern.Substring(1);
+                        invert = true;
+                    }
 
                     if (romname == null)
                         continue;
 
-                    if (Regex.IsMatch(romname, regexPattern,
-                        RegexOptions.CultureInvariant | RegexOptions.IgnoreCase))
+                    bool isMatch = Regex.IsMatch(romname, regexPattern,
+                        RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+
+                    if ((isMatch && !invert) || (!isMatch && invert))
                     {
                         offset = int.Parse(address, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
 
