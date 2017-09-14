@@ -27,6 +27,7 @@ namespace SM64O
         public static Connection connection = null;
         public static Client[] playerClient = new Client[23];
 
+        private ListBox _dynamicChatbox;
         private List<string> _bands = new List<string>();
 
         private bool _chatEnabled = true;
@@ -162,8 +163,18 @@ namespace SM64O
             }
 
 
-            if (_chatEnabled)
+            if (_chatEnabled && listener != null)
+            {
                 Characters.setMessage(message, _memory);
+
+                if (_dynamicChatbox != null)
+                {
+                    _dynamicChatbox.Items.Insert(0, string.Format("{0}: {1}", "HOST", message));
+
+                    if (_dynamicChatbox.Items.Count > 10)
+                        _dynamicChatbox.Items.RemoveAt(10);
+                }
+            }
         }
 
         private void sendChatTo(string message, Connection conn)
@@ -234,6 +245,7 @@ namespace SM64O
                     listener.NewConnection += NewConnectionHandler;
                     listener.Start();
                     
+                    insertChatBox();
 
                     playerCheckTimer.Start();
 
@@ -598,10 +610,18 @@ namespace SM64O
 
             if (listener == null) // We're not the host
             {
-                listBox1.Items.Add(string.Format("{0}: {1}", sender, message));
+                listBox1.Items.Insert(0, string.Format("{0}: {1}", sender, message));
                 
                 if (listBox1.Items.Count > 10)
-                    listBox1.Items.RemoveAt(0);
+                    listBox1.Items.RemoveAt(10);
+            }
+
+            if (_dynamicChatbox != null)// We're the host
+            {
+                _dynamicChatbox.Items.Insert(0, string.Format("{0}: {1}", sender, message));
+
+                if (_dynamicChatbox.Items.Count > 10)
+                    _dynamicChatbox.Items.RemoveAt(10);
             }
         }
 
@@ -1172,6 +1192,20 @@ namespace SM64O
             }
 
             return -1;
+        }
+
+        private void insertChatBox()
+        {
+            // 200 / 2 + 10
+            listBox1.Size = new Size(268, 95);
+
+            _dynamicChatbox = new ListBox();
+            
+            _dynamicChatbox.Location = new Point(13, 84 + 100);
+            _dynamicChatbox.Size = new Size(268, 95);
+            _dynamicChatbox.Enabled = false;
+
+            this.panel2.Controls.Add(_dynamicChatbox);
         }
     }
 }
