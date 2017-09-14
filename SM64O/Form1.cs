@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -13,6 +14,7 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -94,14 +96,27 @@ namespace SM64O
 
             switch (comboBox1.Text)
             {
-                case "Project 64":
+                case "Project64":
                     // Super Mario 64 (u) - Project 64 v2.3.3
                     string windowName = _memory.WindowName;
 
-                    int tire = windowName.IndexOf('-');
 
-                    if (tire != -1)
-                        romname = windowName.Substring(0, tire);
+                    for (int i = windowName.Length - 1; i >= 0; i--)
+                    {
+                        if (windowName[i] == '-')
+                        {
+                            romname = windowName.Substring(0, i).Trim();
+                            break;
+                        }
+                    }
+                    break;
+                case "Mupen64":
+                    // 0079A9C0
+                    byte[] buffer = new byte[64];
+
+                    _memory.ReadMemoryAbs(0x0079A9C0, buffer, buffer.Length);
+
+                    romname = Encoding.ASCII.GetString(buffer, 0, Array.IndexOf(buffer, (byte) 0));
                     break;
             }
 
@@ -292,7 +307,7 @@ namespace SM64O
                 die(msg);
                 return;
             }
-            catccomboBox1.Texth (Exception ex)
+            catch (Exception ex)
             {
                 // TODO: add logging 
                 die("Could not connect/start server:\n" + ex.Message + "\n\nMore info:\n" + ex);
@@ -320,20 +335,51 @@ namespace SM64O
 
             Characters.setCharacter(comboBox2.SelectedItem.ToString(), _memory);
 
-            string[] fileEntries = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/Ressources/");
+            loadPatches();
 
-            foreach (var file in fileEntries)
-            {
-                int offset = Convert.ToInt32(Path.GetFileName(file), 16);
-
-                byte[] buffer = File.ReadAllBytes(file);
-                _memory.WriteMemory(offset, buffer, buffer.Length);
-            }
+            Text = "ROM: " + getRomName();
 
             if (checkBox1.Checked)
             {
                 writeValue(new byte[] { 0x00, 0x00, 0x00, 0x01 }, 0x365FFC);
             }            
+        }
+
+        private void loadPatches()
+        {
+            string[] fileEntries = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/Ressources/");
+
+            foreach (var file in fileEntries)
+            {
+                string fname = Path.GetFileName(file);
+                int offset;
+
+                if (int.TryParse(fname, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out offset))
+                {
+                    byte[] buffer = File.ReadAllBytes(file);
+                    _memory.WriteMemory(offset, buffer, buffer.Length);
+                }
+                else if (fname.Contains('.'))
+                {
+                    // Treat as Regex
+                    int separator = fname.LastIndexOf(".", StringComparison.Ordinal);
+                    string regexPattern = fname.Substring(0, separator);
+                    string address = fname.Substring(separator + 1, fname.Length - separator - 1);
+
+                    regexPattern = regexPattern.Replace("@", "\\");
+
+                    if (Regex.IsMatch(getRomName(), regexPattern,
+                        RegexOptions.CultureInvariant | RegexOptions.IgnoreCase))
+                    {
+                        offset = int.Parse(address, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+
+                        byte[] buffer = File.ReadAllBytes(file);
+                        _memory.WriteMemory(offset, buffer, buffer.Length);
+                    }
+                }
+
+                
+            }
         }
 
         private void ConnectionOnDisconnected(object sender, DisconnectedEventArgs disconnectedEventArgs)

@@ -65,5 +65,19 @@ namespace SM64O
             ReadProcessMemory((int)processHandle, baseAddress + offset, buffer, bufferLength, ref bytesRead);
             return bytesRead;
         }
+
+        public int WriteMemoryAbs(int address, byte[] buffer, int bufferLength)
+        {
+            int bytesWritten = 0;
+            WriteProcessMemory((int)processHandle, address, buffer, bufferLength, ref bytesWritten);
+            return bytesWritten;
+        }
+
+        public int ReadMemoryAbs(int address, byte[] buffer, int bufferLength)
+        {
+            int bytesRead = 0;
+            ReadProcessMemory((int)processHandle, address, buffer, bufferLength, ref bytesRead);
+            return bytesRead;
+        }
     }
 }

@@ -8,5 +8,8 @@ namespace SM64O
         void Open(string processName);
         int WriteMemory(int offset, byte[] buffer, int bufferLength);
         int ReadMemory(int offset, byte[] buffer, int bufferLength);
+
+        int WriteMemoryAbs(int address, byte[] buffer, int bufferLength);
+        int ReadMemoryAbs(int address, byte[] buffer, int bufferLength);
     }
 }
