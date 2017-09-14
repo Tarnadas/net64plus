@@ -1033,7 +1033,7 @@ namespace SM64O
                     removePlayer(i);
                 }
                 else if (playerClient[i].LastUpdate.HasValue &&
-                         DateTime.Now.Subtract(playerClient[i].LastUpdate.Value).TotalMilliseconds > 2000)
+                         DateTime.Now.Subtract(playerClient[i].LastUpdate.Value).TotalMilliseconds > 3000)
                 {
                     playerClient[i].Connection.Close();
                     removePlayer(i);
