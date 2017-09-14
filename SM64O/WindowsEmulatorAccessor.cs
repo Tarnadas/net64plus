@@ -45,7 +45,7 @@ namespace SM64O
         {
             process = Process.GetProcessesByName(processName)[0];
 
-            baseAddress = ReadWritingMemory.GetBaseAddress(processName, 4096, 4);
+            baseAddress = ReadWritingMemory.GetBaseAddress(processName, 1024, 4);
 
             processHandle = OpenProcess(0x1F0FFF, true, process.Id);
 
