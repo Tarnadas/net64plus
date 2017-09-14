@@ -31,6 +31,7 @@ namespace SM64O
         private List<string> _bands = new List<string>();
 
         private bool _chatEnabled = true;
+        private int _updateRate = 16;
 
         private IEmulatorAccessor _memory;
         private const int MinorVersion = 3;
@@ -38,7 +39,9 @@ namespace SM64O
 
         private const int HandshakeDataLen = 28;
         private const int MaxChatLength = 24;
-        
+
+
+
         public Form1()
         {
             InitializeComponent();
@@ -338,7 +341,7 @@ namespace SM64O
 
             checkBox1.Enabled = false;
 
-            timer1.Enabled = true;
+            timer1_Tick();
             button1.Enabled = false;
 
             numericUpDown1.Enabled = true;
@@ -652,21 +655,21 @@ namespace SM64O
             _memory.WriteMemory(offset, buffer, buffer.Length);
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void timer1_Tick()
         {
-            try
+            Task.Run(async () =>
             {
-                setGamemode();
-                sendAllBytes(null);
-            }
-            catch
-            {
+                while (true)
+                {
+                    sendAllBytes();
 
-            }
+                    await Task.Delay(_updateRate);
+                }
+            });
         }
 
         // not touching this
-        public void sendAllBytes(Connection conn)
+        public void sendAllBytes()
         {
             int freeRamLength = getRamLength(0x367400);
 
@@ -792,7 +795,7 @@ namespace SM64O
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-            timer1.Interval = (int)numericUpDown1.Value;
+            _updateRate = (int)numericUpDown1.Value;
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
