@@ -354,7 +354,18 @@ namespace SM64O
             if (checkBox1.Checked)
             {
                 writeValue(new byte[] { 0x00, 0x00, 0x00, 0x01 }, 0x365FFC);
-            }            
+            }
+
+            Settings sets = new Settings();
+
+            sets.LastIp = textBox5.Text;
+            sets.LastPort = (int) numericUpDown2.Value;
+            sets.Username = usernameBox.Text;
+
+            sets.LastEmulator = comboBox1.SelectedIndex;
+            sets.LastCharacter = comboBox2.SelectedIndex;
+
+            Settings.Save(sets, "settings.xml");
         }
 
         private void loadPatches()
@@ -894,6 +905,18 @@ namespace SM64O
             comboBox1.SelectedIndex = 0;
             comboBox2.SelectedIndex = 0;
             gamemodeBox.SelectedIndex = 0;
+
+            Settings sets = Settings.Load("settings.xml");
+
+            if (sets != null)
+            {
+                textBox5.Text = sets.LastIp;
+                numericUpDown2.Value = sets.LastPort;
+                usernameBox.Text = sets.Username;
+
+                comboBox1.SelectedIndex = sets.LastEmulator;
+                comboBox2.SelectedIndex = sets.LastCharacter;
+            }
         }
 
         public void setGamemode()
