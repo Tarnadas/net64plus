@@ -19,6 +19,7 @@ namespace SM64O
 
         private int baseAddress;
         private IntPtr processHandle;
+        private Process process;
 
         public int BaseAddress
         {
@@ -32,9 +33,17 @@ namespace SM64O
             private set { _attached = value; }
         }
 
+        public string WindowName
+        {
+            get
+            {
+                return process.MainWindowTitle;
+            }
+        }
+
         public void Open(string processName)
         {
-            Process process = Process.GetProcessesByName(processName)[0];
+            process = Process.GetProcessesByName(processName)[0];
 
             baseAddress = ReadWritingMemory.GetBaseAddress(processName, 4096, 4);
 

@@ -88,6 +88,26 @@ namespace SM64O
             Application.Exit();
         }
 
+        private string getRomName()
+        {
+            string romname = null;
+
+            switch (comboBox1.Text)
+            {
+                case "Project 64":
+                    // Super Mario 64 (u) - Project 64 v2.3.3
+                    string windowName = _memory.WindowName;
+
+                    int tire = windowName.IndexOf('-');
+
+                    if (tire != -1)
+                        romname = windowName.Substring(0, tire);
+                    break;
+            }
+
+            return romname;
+        }
+
         private void sendAllChat(string message)
         {
             string name = "HOST";
@@ -272,7 +292,7 @@ namespace SM64O
                 die(msg);
                 return;
             }
-            catch (Exception ex)
+            catccomboBox1.Texth (Exception ex)
             {
                 // TODO: add logging 
                 die("Could not connect/start server:\n" + ex.Message + "\n\nMore info:\n" + ex);
