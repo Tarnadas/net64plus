@@ -20,10 +20,16 @@ namespace SM64O
         private int baseAddress;
         private IntPtr processHandle;
         private Process process;
+        private int mainModuleAdd;
 
         public int BaseAddress
         {
             get { return baseAddress; }
+        }
+
+        public int MainModuleAddress
+        {
+            get { return mainModuleAdd; }
         }
 
         private bool _attached;
@@ -48,6 +54,8 @@ namespace SM64O
             baseAddress = ReadWritingMemory.GetBaseAddress(processName, 1024, 4);
 
             processHandle = OpenProcess(0x1F0FFF, true, process.Id);
+
+            mainModuleAdd = process.Modules[0].BaseAddress.ToInt32();
 
             Attached = true;
         }

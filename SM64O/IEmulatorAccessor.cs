@@ -4,6 +4,7 @@ namespace SM64O
     {
         bool Attached { get; }
         int BaseAddress { get; }
+        int MainModuleAddress { get; }
         string WindowName { get; }
         void Open(string processName);
         int WriteMemory(int offset, byte[] buffer, int bufferLength);

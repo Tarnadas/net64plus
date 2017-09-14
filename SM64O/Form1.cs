@@ -94,6 +94,7 @@ namespace SM64O
         private string getRomName()
         {
             string romname = null;
+            byte[] buffer = new byte[64];
 
             switch (comboBox1.Text)
             {
@@ -112,12 +113,21 @@ namespace SM64O
                     }
                     break;
                 case "Mupen64":
-                    // 0079A9C0
-                    byte[] buffer = new byte[64];
+                    string wndname = _memory.WindowName;
 
-                    _memory.ReadMemoryAbs(0x0079A9C0, buffer, buffer.Length);
+                    for (int i = wndname.Length - 1; i >= 0; i--)
+                    {
+                        if (wndname[i] == '-')
+                        {
+                            romname = wndname.Substring(0, i).Trim();
+                            break;
+                        }
+                    }
+                    break;
+                case "Nemu64":
+                    _memory.ReadMemoryAbs(_memory.MainModuleAddress + 0x3C8A10C, buffer, buffer.Length);
 
-                    romname = Encoding.ASCII.GetString(buffer, 0, Array.IndexOf(buffer, (byte) 0));
+                    romname = Encoding.ASCII.GetString(buffer, 0, Array.IndexOf(buffer, (byte)0));
                     break;
             }
 
