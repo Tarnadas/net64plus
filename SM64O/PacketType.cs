@@ -3,6 +3,7 @@
     public enum PacketType
     {
         MemoryWrite,
-        ChatMessage
+        ChatMessage,
+        CharacterSwitch
     }
 }

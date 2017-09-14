@@ -418,7 +418,7 @@ namespace SM64O
                         byte[] playerID = new byte[] {(byte) playerIDB};
                         Thread.Sleep(500);
                         playerClient[i].SendBytes(PacketType.MemoryWrite, playerID);
-                        string character = "Unk Char";
+                        string character = "custom ";
 
                         if (e.HandshakeData != null && e.HandshakeData.Length > 3)
                         {
@@ -432,34 +432,7 @@ namespace SM64O
                                 byte charIndex = handshakeData[1];
                                 playerClient[i].MinorVersion = verIndex;
                                 playerClient[i].CharacterId = charIndex;
-
-                                switch (charIndex)
-                                {
-                                    case 0:
-                                        character = "Mario";
-                                        break;
-                                    case 1:
-                                        character = "Luigi";
-                                        break;
-                                    case 2:
-                                        character = "Yoshi";
-                                        break;
-                                    case 3:
-                                        character = "Wario";
-                                        break;
-                                    case 4:
-                                        character = "Peach";
-                                        break;
-                                    case 5:
-                                        character = "Toad";
-                                        break;
-                                    case 6:
-                                        character = "Waluigi";
-                                        break;
-                                    case 7:
-                                        character = "Rosalina";
-                                        break;
-                                }
+                                character = getCharacterName(charIndex);
                             }
                             if (e.HandshakeData.Length >= 3)
                             {
@@ -535,16 +508,11 @@ namespace SM64O
         {
             var conn = (Connection) sender;
 
-            for (int i = 0; i < playerClient.Length; i++)
-            {
-                if (playerClient[i] != null && playerClient[i].Connection == conn)
-                {
-                    playerClient[i].LastUpdate = DateTime.Now;
-                    break;
-                }
-            }
+            int id = getClient(conn);
+            if (id != -1)
+                playerClient[id].LastUpdate = DateTime.Now;
 
-            ReceivePacket(e.Bytes);
+            ReceivePacket(conn, e.Bytes);
 
             e.Recycle();
         }
@@ -554,11 +522,11 @@ namespace SM64O
             if (e.Bytes.Length == 0)
                 return;
 
-            ReceivePacket(e.Bytes);
+            ReceivePacket((Connection) sender, e.Bytes);
             e.Recycle();
         }
 
-        private void ReceivePacket(byte[] data)
+        private void ReceivePacket(Connection sender, byte[] data)
         {
             PacketType type = (PacketType) data[0];
             byte[] payload = data.Skip(1).ToArray();
@@ -570,6 +538,21 @@ namespace SM64O
                     break;
                 case PacketType.ChatMessage:
                     ReceiveChatMessage(payload);
+                    break;
+                case PacketType.CharacterSwitch:
+                    byte newCharacter = payload[0];
+                    string newCharName = getCharacterName(newCharacter);
+                    int id = getClient(sender);
+
+                    if (id != -1)
+                    {
+                        playerClient[id].CharacterId = newCharacter;
+                        playerClient[id].CharacterName = newCharName;
+
+                        //int oldPos = listBox1.Items.IndexOf(playerClient[id]);
+                        listBox1.Refresh();
+                    }
+
                     break;
             }
         }
@@ -1068,6 +1051,9 @@ namespace SM64O
                 return; // We are not in a server yet
 
             Characters.setCharacterAll(comboBox2.SelectedIndex + 1, _memory);
+
+            if (connection != null) // we are a client, notify host to update playerlist
+                connection.SendBytes(PacketType.CharacterSwitch, new byte[]{ (byte) (comboBox2.SelectedIndex) });
         }
 
         private void removeAllPlayers()
@@ -1141,6 +1127,51 @@ namespace SM64O
         private void button4_Click(object sender, EventArgs e)
         {
             resetGame();
+        }
+
+        private string getCharacterName(int id)
+        {
+            string character = "custom";
+            switch (id)
+            {
+                case 0:
+                    character = "Mario";
+                    break;
+                case 1:
+                    character = "Luigi";
+                    break;
+                case 2:
+                    character = "Yoshi";
+                    break;
+                case 3:
+                    character = "Wario";
+                    break;
+                case 4:
+                    character = "Peach";
+                    break;
+                case 5:
+                    character = "Toad";
+                    break;
+                case 6:
+                    character = "Waluigi";
+                    break;
+                case 7:
+                    character = "Rosalina";
+                    break;
+            }
+
+            return character;
+        }
+
+        private int getClient(Connection conn)
+        {
+            for (int i = 0; i < playerClient.Length; i++)
+            {
+                if (playerClient[i] != null && playerClient[i].Connection == conn)
+                    return i;
+            }
+
+            return -1;
         }
     }
 }
