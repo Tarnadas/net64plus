@@ -1018,6 +1018,23 @@ namespace SM64O
         {
             if (!_memory.Attached) return;
 
+            if (listener != null)
+            {
+                for (int i = 0; i < playerClient.Length; i++)
+                {
+                    if (playerClient[i] != null)
+                        playerClient[i].Connection.Close();
+                }
+
+                listener.Close();
+                listener.Dispose();
+            }
+            else if (connection != null)
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+
             byte[] buffer = new byte[4];
 
             buffer[0] = 0x00;
@@ -1041,6 +1058,9 @@ namespace SM64O
             buffer[3] = 0x00;
 
             _memory.WriteMemory(0x38eee0, buffer, buffer.Length);
+
+            Program.ResetMe = true;
+            Close();
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
