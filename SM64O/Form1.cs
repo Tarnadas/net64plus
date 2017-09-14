@@ -337,7 +337,7 @@ namespace SM64O
 
             loadPatches();
 
-            Text = "ROM: " + getRomName();
+            toolStripStatusLabel1.Text = "Loaded ROM " + getRomName();
 
             if (checkBox1.Checked)
             {
@@ -365,10 +365,14 @@ namespace SM64O
                     int separator = fname.LastIndexOf(".", StringComparison.Ordinal);
                     string regexPattern = fname.Substring(0, separator);
                     string address = fname.Substring(separator + 1, fname.Length - separator - 1);
+                    string romname = getRomName();
 
                     regexPattern = regexPattern.Replace("@", "\\");
 
-                    if (Regex.IsMatch(getRomName(), regexPattern,
+                    if (romname == null)
+                        continue;
+
+                    if (Regex.IsMatch(romname, regexPattern,
                         RegexOptions.CultureInvariant | RegexOptions.IgnoreCase))
                     {
                         offset = int.Parse(address, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
