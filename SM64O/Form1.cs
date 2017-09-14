@@ -977,7 +977,7 @@ namespace SM64O
 
         private void numericUpDown3_ValueChanged(object sender, EventArgs e)
         {
-            playerClient = new Client[(int)numericUpDown3.Value - 1];
+            playerClient = new Client[(int)numericUpDown3.Value];
         }
 
         private void button3_Click(object sender, EventArgs e)

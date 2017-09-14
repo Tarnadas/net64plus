@@ -242,11 +242,11 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(46, 17);
+            this.label7.Location = new System.Drawing.Point(21, 17);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(67, 13);
+            this.label7.Size = new System.Drawing.Size(92, 13);
             this.label7.TabIndex = 30;
-            this.label7.Text = "Max Players:";
+            this.label7.Text = "Max Connections:";
             // 
             // numericUpDown3
             // 
