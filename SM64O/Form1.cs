@@ -236,8 +236,11 @@ namespace SM64O
         {
             button1.Enabled = false;
 
+             this.Enabled = false;
+
             try
             {
+
                 Task memoryRead = null;
                 switch (comboBox1.Text)
                 {
@@ -417,6 +420,8 @@ namespace SM64O
             sets.LastCharacter = comboBox2.SelectedIndex;
 
             Settings.Save(sets, "settings.xml");
+
+            this.Enabled = true;
         }
 
         private void loadPatches()
