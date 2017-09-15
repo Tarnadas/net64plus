@@ -18,6 +18,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ConnectionState = Hazel.ConnectionState;
 
 namespace SM64O
 {
@@ -48,13 +49,13 @@ namespace SM64O
             connection = null;
             playerClient = new Client[23];
 
+            InitializeComponent();
+
             _upnp = new UPnPWrapper();
             _upnp.Available += UpnpOnAvailable;
             if (_upnp.UPnPAvailable)
                 UpnpOnAvailable(_upnp, EventArgs.Empty);
             _upnp.Initialize();
-
-            InitializeComponent();
 
             string[] fileEntries = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/Patches/");
 
@@ -375,6 +376,8 @@ namespace SM64O
                     playersOnline.Text = "Chat Log:";
 
                     await Task.Run(() => connection.Connect(payload, 3000));
+
+                    pingTimer.Start();
                 }
             }
             catch (HazelException ex)
@@ -661,7 +664,23 @@ namespace SM64O
                                 listBox1.Items.Insert(oldPos, playerClient[id]);
                         }
                     }
+                    break;
+                case PacketType.RoundtripPing:
+                    if (listener != null) // We're host
+                    {
+                        // Just send it back
+                        sender.SendBytes(PacketType.RoundtripPing, payload);
+                    }
+                    else if (connection != null) // We're client
+                    {
+                        // We got our pong
+                        int sendTime = BitConverter.ToInt32(payload, 0);
+                        int currentTime = Environment.TickCount;
 
+                        int elapsed = currentTime - sendTime;
+
+                        pingLabel.Text = string.Format("Ping: {0}ms", elapsed / 2);
+                    }
                     break;
             }
         }
@@ -1133,7 +1152,7 @@ namespace SM64O
                     removePlayer(i);
                 }
                 else if (playerClient[i].LastUpdate.HasValue &&
-                         DateTime.Now.Subtract(playerClient[i].LastUpdate.Value).TotalMilliseconds > 3000)
+                         DateTime.Now.Subtract(playerClient[i].LastUpdate.Value).TotalMilliseconds > 8000)
                 {
                     playerClient[i].Connection.Close();
                     removePlayer(i);
@@ -1313,8 +1332,22 @@ namespace SM64O
         {
             if (_upnp != null)
             {
+                _upnp.Available -= UpnpOnAvailable;
+
                 _upnp.RemoveOurRules();
                 _upnp.StopDiscovery();
+            }
+        }
+
+        private void pingTimer_Tick(object sender, EventArgs e)
+        {
+            if (connection != null && connection.State == ConnectionState.Connected)
+            {
+                byte[] buffer = new byte[4];
+
+                Array.Copy(BitConverter.GetBytes(Environment.TickCount), 0, buffer, 0, 4);
+
+                connection.SendBytes(PacketType.RoundtripPing, buffer);
             }
         }
     }

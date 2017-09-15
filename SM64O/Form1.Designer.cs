@@ -64,6 +64,8 @@
             this.button4 = new System.Windows.Forms.Button();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.pingLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.pingTimer = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
@@ -426,7 +428,8 @@
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripStatusLabel1});
+            this.toolStripStatusLabel1,
+            this.pingLabel});
             this.statusStrip1.Location = new System.Drawing.Point(0, 367);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(618, 22);
@@ -438,6 +441,16 @@
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(42, 17);
             this.toolStripStatusLabel1.Text = "Ready!";
+            // 
+            // toolStripStatusLabel2
+            // 
+            this.pingLabel.Name = "pingLabel";
+            this.pingLabel.Size = new System.Drawing.Size(0, 17);
+            // 
+            // pingTimer
+            // 
+            this.pingTimer.Interval = 10000;
+            this.pingTimer.Tick += new System.EventHandler(this.pingTimer_Tick);
             // 
             // Form1
             // 
@@ -510,6 +523,8 @@
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.ToolStripStatusLabel pingLabel;
+        private System.Windows.Forms.Timer pingTimer;
     }
 }
 

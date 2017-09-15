@@ -4,6 +4,7 @@
     {
         MemoryWrite,
         ChatMessage,
-        CharacterSwitch
+        CharacterSwitch,
+        RoundtripPing
     }
 }
