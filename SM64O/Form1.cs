@@ -57,8 +57,6 @@ namespace SM64O
 
             foreach (var file in fileEntries)
             {
-                int offset = Convert.ToInt32(Path.GetFileName(file), 16);
-
                 byte[] buffer = File.ReadAllBytes(file);
 
                 //File.Copy(AppDomain.CurrentDomain.BaseDirectory + "/Patches/" + Path.GetFileName(file), AppDomain.CurrentDomain.BaseDirectory + "/Ressources/" + Path.GetFileName(file));
@@ -388,7 +386,7 @@ namespace SM64O
 
             Settings sets = new Settings();
 
-            sets.LastIp = textBox5.Text;
+            sets.LastIp = checkBox1.Checked ? "" : textBox5.Text;
             sets.LastPort = (int) numericUpDown2.Value;
             sets.Username = usernameBox.Text;
 

@@ -70,6 +70,8 @@ namespace SM64O
 
         public void RemoveOurRules()
         {
+            if (!UPnPAvailable) return;
+
             foreach (var mapping in _mappings)
             {
                 Devices[0].DeletePortMap(mapping);
@@ -83,10 +85,17 @@ namespace SM64O
             NatUtility.StopDiscovery();
         }
 
-        public async Task Initialize()
+        public void Initialize()
         {
-            Task.Run(() => NatUtility.StartDiscovery());
-            //NatUtility.StartDiscovery();
+            Task.Run(() =>
+            {
+                try
+                {
+                    NatUtility.StartDiscovery();
+                }
+                catch { }
+                // Swallow NAT exceptions
+            });
         }
 
         private void NatUtilityOnDeviceLost(object sender, DeviceEventArgs deviceEventArgs)
