@@ -1213,6 +1213,7 @@ namespace SM64O
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             removeAllPlayers();
+            closePort();
         }
 
         private void button4_Click(object sender, EventArgs e)
