@@ -28,7 +28,6 @@ namespace SM64O
         private List<string> _bands = new List<string>();
 
         private bool _chatEnabled = true;
-        private string _externalAddress;
 
         private IEmulatorAccessor _memory;
         private const int MinorVersion = 3;
@@ -37,6 +36,7 @@ namespace SM64O
         private const int HandshakeDataLen = 28;
         private const int MaxChatLength = 24;
 
+        private UPnPWrapper _upnp;
 
         public Form1()
         {
@@ -217,14 +217,11 @@ namespace SM64O
                 {
                     int port = (int) numericUpDown2.Value;
 
-                    if (Program.UPnPAvailable)
+                    if (_upnp.UPnPAvailable)
                     {
-                        try
-                        {
-                            UPnP.NAT.ForwardPort(port, ProtocolType.Udp, "SM64O");
-                            Program.UPnPPort = port;
-                        }
-                        catch {}
+                        // TODO: Add info to toolstrip
+                        _upnp.AddPortRule(port, false, "SM64O");
+                        textBox5.Text = _upnp.GetExternalIp();
                     }
 
 
@@ -707,18 +704,17 @@ namespace SM64O
             {
                 button1.Text = "Create Server!";
                 usernameBox.Enabled = false;
-                textBox5.Enabled = false;
+                textBox5.ReadOnly = true;
                 button1.Enabled = true;
 
-                if (_externalAddress == null && Program.UPnPAvailable)
-                    _externalAddress = UPnP.NAT.GetExternalIP().ToString();
-
-                textBox5.Text = _externalAddress ?? "";
+                if (_upnp.UPnPAvailable)
+                    textBox5.Text = _upnp.GetExternalIp();
+                else textBox5.Text = "";
             }
             else
             {
                 button1.Text = "Connect to server!";
-                textBox5.Enabled = true;
+                textBox5.ReadOnly = false;
                 textBox5.Text = "";
                 usernameBox.Enabled = true;
                 button1.Enabled = false;
@@ -818,6 +814,9 @@ namespace SM64O
         {
             comboBox1.SelectedIndex = 0;
             comboBox2.SelectedIndex = 0;
+
+            _upnp = new UPnPWrapper();
+            _upnp.Initialize();
         }
 
         public void setGamemode()
@@ -1016,6 +1015,12 @@ namespace SM64O
                     playerClient[i] = null;
                 }
             }
+        }
+
+        private void closePort()
+        {
+            _upnp.RemoveOurRules();
+            _upnp.StopDiscovery();
         }
     }
 }
