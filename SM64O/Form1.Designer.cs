@@ -196,7 +196,8 @@
             this.comboBox1.Items.AddRange(new object[] {
             "Project64",
             "Nemu64",
-            "Mupen64"});
+            "Mupen64",
+            "Mupen64+"});
             this.comboBox1.Location = new System.Drawing.Point(71, 152);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(210, 21);

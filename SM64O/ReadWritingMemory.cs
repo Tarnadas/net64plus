@@ -375,16 +375,7 @@ namespace SM64O
 
             int vBuffer = 0;
             int startPoint = 0x00000000;
-
-            if (scanStep < 0x1000)
-            {
-                startPoint = 0x00000000;
-            }
-            else if (scanStep < 0x100)
-            {
-                startPoint = 0;
-            }
-
+            
             for (int x = startPoint; x <= 0x72D00000; x += scanStep)
             {
                 //Label1.Text = "Currently processing address: " & x

@@ -137,6 +137,13 @@ namespace SM64O
 
                     romname = Encoding.ASCII.GetString(buffer, 0, Array.IndexOf(buffer, (byte)0));
                     break;
+                case "Mupen64+":
+                    {
+                        _memory.ReadMemoryAbs(_memory.GetModuleBaseAddress("mupen64plus.dll") + 0x1751CA0, buffer, buffer.Length);
+
+                        romname = Encoding.ASCII.GetString(buffer, 0, Array.IndexOf(buffer, (byte)0));
+                    }
+                    break;
             }
 
             return romname;
@@ -225,28 +232,35 @@ namespace SM64O
             conn.SendBytes(PacketType.ChatMessage, payload, SendOption.Reliable);
         }
         
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
+            button1.Enabled = false;
+
             try
             {
-                if (comboBox1.Text == "Project64")
+                Task memoryRead = null;
+                switch (comboBox1.Text)
                 {
-                    _memory.Open("Project64");
-                    if (_memory.BaseAddress == 0)
-                    {
-                        die("Your version of Project64 is unsupported. Please use version 2.3");
+                    case "Project64":
+                        memoryRead = Task.Run(() => _memory.Open("Project64"));
+                        break;
+                    case "Nemu64":
+                        memoryRead = Task.Run(() => _memory.Open("Nemu64"));
+                        break;
+                    case "Mupen64":
+                        memoryRead = Task.Run(() => _memory.Open("Mupen64"));
+                        break;
+                    case "Mupen64+":
+                        memoryRead = Task.Run(() => _memory.Open("mupen64plus-ui-console", 32));
+                        break;
+                    default:
+                        die("No emulator was chosen. This should never happen. Yell at Guad if you can see this");
                         return;
-                    }
                 }
 
-                if (comboBox1.Text == "Nemu64")
-                {
-                    _memory.Open("Nemu64");
-                }
-                if (comboBox1.Text == "Mupen64")
-                {
-                    _memory.Open("Mupen64");
-                }
+                toolStripStatusLabel1.Text = "Scanning emulator memory...";
+
+                await memoryRead;
             }
             catch (IndexOutOfRangeException)
             {
@@ -258,6 +272,8 @@ namespace SM64O
             {
                 if (checkBox1.Checked)
                 {
+                    toolStripStatusLabel1.Text = "Starting server...";
+                    textBox5.Text = "";
                     int port = (int) numericUpDown2.Value;
 
                     if (_upnp.UPnPAvailable)
@@ -271,8 +287,11 @@ namespace SM64O
                     panel2.Enabled = true;
                     listener = new UdpConnectionListener(new NetworkEndPoint(IPAddress.Any, port));
                     listener.NewConnection += NewConnectionHandler;
-                    listener.Start();
-                    
+
+                    await Task.Run((Action) listener.Start);
+
+                    toolStripStatusLabel1.Text = "Server started!";
+
                     insertChatBox();
 
                     playerCheckTimer.Start();
@@ -281,6 +300,8 @@ namespace SM64O
                 }
                 else
                 {
+                    toolStripStatusLabel1.Text = "Connecting to server...";
+
                     byte[] payload = new byte[HandshakeDataLen];
                     payload[0] = (byte)MinorVersion;
                     payload[1] = (byte)this.comboBox2.SelectedIndex;
@@ -333,10 +354,11 @@ namespace SM64O
                     NetworkEndPoint endPoint = new NetworkEndPoint(target, (int) numericUpDown2.Value, isIp6 ? IPMode.IPv6 : IPMode.IPv4);
                     connection = new UdpClientConnection(endPoint);
                     connection.DataReceived += DataReceived;
-                    connection.Connect(payload, 3000);
                     connection.Disconnected += ConnectionOnDisconnected;
 
                     playersOnline.Text = "Chat Log:";
+
+                    await Task.Run(() => connection.Connect(payload, 3000));
                 }
             }
             catch (HazelException ex)

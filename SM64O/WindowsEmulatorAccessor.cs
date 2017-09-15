@@ -47,15 +47,15 @@ namespace SM64O
             }
         }
 
-        public void Open(string processName)
+        public void Open(string processName, int step = 1024)
         {
             process = Process.GetProcessesByName(processName)[0];
 
-            baseAddress = ReadWritingMemory.GetBaseAddress(processName, 1024, 4);
+            baseAddress = ReadWritingMemory.GetBaseAddress(processName, step, 4);
 
             processHandle = OpenProcess(0x1F0FFF, true, process.Id);
 
-            mainModuleAdd = process.Modules[0].BaseAddress.ToInt32();
+            mainModuleAdd = process.MainModule.BaseAddress.ToInt32();
 
             Attached = true;
         }
@@ -86,6 +86,16 @@ namespace SM64O
             int bytesRead = 0;
             ReadProcessMemory((int)processHandle, address, buffer, bufferLength, ref bytesRead);
             return bytesRead;
+        }
+
+        public int GetModuleBaseAddress(string module)
+        {
+            foreach (ProcessModule processModule in process.Modules)
+            {
+                if (processModule.ModuleName == module)
+                    return processModule.BaseAddress.ToInt32();
+            }
+            return 0;
         }
     }
 }
