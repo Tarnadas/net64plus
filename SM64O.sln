@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SM64O", "SM64O\SM64O.csproj", "{F76A3BDA-82F9-44ED-9917-75929CE98CD8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Nat", "Mono.Nat\Mono.Nat.csproj", "{A0F2353D-730F-4F67-BEA3-AD5DE270C72D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{F76A3BDA-82F9-44ED-9917-75929CE98CD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F76A3BDA-82F9-44ED-9917-75929CE98CD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F76A3BDA-82F9-44ED-9917-75929CE98CD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0F2353D-730F-4F67-BEA3-AD5DE270C72D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0F2353D-730F-4F67-BEA3-AD5DE270C72D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0F2353D-730F-4F67-BEA3-AD5DE270C72D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0F2353D-730F-4F67-BEA3-AD5DE270C72D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
