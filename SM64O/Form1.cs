@@ -363,8 +363,9 @@ namespace SM64O
 
             chatBox.Enabled = true;
             button3.Enabled = true;
+            numericUpDown2.Enabled = false;
 
-            textBox5.Enabled = false;
+            textBox5.ReadOnly = true;
 
             comboBox1.Enabled = false;
             //comboBox2.Enabled = false;
