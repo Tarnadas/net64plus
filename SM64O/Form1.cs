@@ -40,7 +40,7 @@ namespace SM64O
         private const int HandshakeDataLen = 28;
         private const int MaxChatLength = 24;
 
-
+        private UPnPWrapper _upnp;
 
         public Form1()
         {
@@ -253,8 +253,18 @@ namespace SM64O
             {
                 if (checkBox1.Checked)
                 {
+                    int port = (int) numericUpDown2.Value;
+
+                    if (_upnp.UPnPAvailable)
+                    {
+                        // TODO: Add info to toolstrip
+                        _upnp.AddPortRule(port, false, "SM64O");
+                        textBox5.Text = _upnp.GetExternalIp();
+                    }
+
+
                     panel2.Enabled = true;
-                    listener = new UdpConnectionListener(new NetworkEndPoint(IPAddress.Any, (int) numericUpDown2.Value));
+                    listener = new UdpConnectionListener(new NetworkEndPoint(IPAddress.Any, port));
                     listener.NewConnection += NewConnectionHandler;
                     listener.Start();
                     
@@ -821,6 +831,12 @@ namespace SM64O
                 button1.Text = "Create Server!";
                 usernameBox.Enabled = false;
                 panel2.Enabled = true;
+                textBox5.ReadOnly = true;
+                button1.Enabled = true;
+
+                if (_upnp.UPnPAvailable)
+                    textBox5.Text = _upnp.GetExternalIp();
+                else textBox5.Text = "";
             }
             else
             {
@@ -828,8 +844,11 @@ namespace SM64O
                 usernameBox.Enabled = true;
 
                 button1.Text = "Connect to server!";
+                textBox5.ReadOnly = false;
+                textBox5.Text = "";
                 usernameBox.Enabled = true;
                 panel2.Enabled = false;
+                button1.Enabled = false;
             }
         }
 
@@ -932,6 +951,8 @@ namespace SM64O
             comboBox1.SelectedIndex = 0;
             comboBox2.SelectedIndex = 0;
             gamemodeBox.SelectedIndex = 0;
+            _upnp = new UPnPWrapper();
+            _upnp.Initialize();
 
             Settings sets = Settings.Load("settings.xml");
 
@@ -1256,6 +1277,12 @@ namespace SM64O
             _dynamicChatbox.Enabled = false;
 
             this.panel2.Controls.Add(_dynamicChatbox);
+        }
+
+        private void closePort()
+        {
+            _upnp.RemoveOurRules();
+            _upnp.StopDiscovery();
         }
     }
 }
