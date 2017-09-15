@@ -545,6 +545,8 @@ namespace SM64O
 
         private void removePlayer(int player)
         {
+            if (player == -1 || playerClient[player] == null) return;
+
             string msg = string.Format("{0} left", playerClient[player].Name);
             if (msg.Length > MaxChatLength)
                 msg = msg.Substring(0, 24);
@@ -1051,19 +1053,7 @@ namespace SM64O
                                      playerClient.Length;
             }
         }
-
-        private void usernameBox_TextChanged(object sender, EventArgs e)
-        {
-            if (textBox5.Text != "")
-            {
-                button1.Enabled = true;
-            }
-            else
-            {
-                button1.Enabled = false;
-            }
-        }
-
+        
         private Random _r = new Random();
         private string getRandomUsername()
         {
@@ -1073,8 +1063,8 @@ namespace SM64O
                 "BonelessPizza",
                 "WOAH",
                 "MahBoi",
-                "SFShoutouts",
-                "clamav",
+                "Shoutouts",
+                "Sigmario",
                 "HeHasNoGrace",
                 "Memetopia",
                 "ShrekIsLove",
