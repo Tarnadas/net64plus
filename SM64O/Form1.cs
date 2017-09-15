@@ -639,8 +639,9 @@ namespace SM64O
                         playerClient[id].CharacterId = newCharacter;
                         playerClient[id].CharacterName = newCharName;
 
-                        //int oldPos = listBox1.Items.IndexOf(playerClient[id]);
-                        listBox1.Refresh();
+                        int oldPos = listBox1.Items.IndexOf(playerClient[id]);
+                        listBox1.Items.Remove(playerClient[id]);
+                        listBox1.Items.Insert(oldPos, playerClient[id]);
                     }
 
                     break;
