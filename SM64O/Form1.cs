@@ -727,23 +727,16 @@ namespace SM64O
 
                 buffer = originalBuffer;
 
-                if (playerClient != null)
+                if (listener != null)
                 {
-                    if (checkBox1.Checked)
+                    for (int p = 0; p < playerClient.Length; p++)
                     {
-                        for (int p = 0; p < playerClient.Length; p++)
-                        {
-                            if (playerClient[p] != null)
-                            {
-                                readAndSend(offsetsToReadFrom[i], offsetsToWriteTo[i + 8], offsetsToWriteToLength[i + 4], playerClient[p]);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        readAndSend(offsetsToReadFrom[i], offsetsToWriteTo[i + 8], offsetsToWriteToLength[i + 4], connection);
+                        if (playerClient[p] != null)
+                            readAndSend(offsetsToReadFrom[i], offsetsToWriteTo[i + 8], offsetsToWriteToLength[i + 4], playerClient[p]);
                     }
                 }
+                else
+                    readAndSend(offsetsToReadFrom[i], offsetsToWriteTo[i + 8], offsetsToWriteToLength[i + 4], connection);
 
             }
         }
