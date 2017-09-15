@@ -9,7 +9,9 @@ namespace SM64O
 {
     public class UPnPWrapper
     {
-        public List<INatDevice> Devices = new List<INatDevice>();
+        public static List<INatDevice> Devices = new List<INatDevice>();
+        public event EventHandler Available;
+
         private List<Mapping> _mappings = new List<Mapping>();
         private string _cachedIp;
 
@@ -83,6 +85,9 @@ namespace SM64O
         public void StopDiscovery()
         {
             NatUtility.StopDiscovery();
+
+            NatUtility.DeviceLost -= NatUtilityOnDeviceLost;
+            NatUtility.DeviceFound -= NatUtilityOnDeviceFound;
         }
 
         public void Initialize()
@@ -106,6 +111,9 @@ namespace SM64O
         private void NatUtilityOnDeviceFound(object sender, DeviceEventArgs deviceEventArgs)
         {
             Devices.Add(deviceEventArgs.Device);
+
+            if (Devices.Count == 1)
+                Available?.Invoke(this, EventArgs.Empty);
         }
     }
 }

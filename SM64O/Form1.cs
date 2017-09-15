@@ -49,6 +49,9 @@ namespace SM64O
             playerClient = new Client[23];
 
             _upnp = new UPnPWrapper();
+            _upnp.Available += UpnpOnAvailable;
+            if (_upnp.UPnPAvailable)
+                UpnpOnAvailable(_upnp, EventArgs.Empty);
             _upnp.Initialize();
 
             InitializeComponent();
@@ -91,6 +94,16 @@ namespace SM64O
             _memory = new WindowsEmulatorAccessor();
 
             this.Text = string.Format("SM64 Online Tool v{0}.{1}", MajorVersion, MinorVersion);
+        }
+
+        private void UpnpOnAvailable(object o, EventArgs eventArgs)
+        {
+            if (checkBox1.Checked)
+            {
+                textBox5.Text = _upnp.GetExternalIp();
+            }
+
+            toolStripStatusLabel1.Text = "Universal Plug 'n' Play is available!";
         }
 
         private void die(string msg)
@@ -616,6 +629,7 @@ namespace SM64O
             e.Recycle();
         }
 
+        private object _listboxLock = new object();
         private void ReceivePacket(Connection sender, byte[] data)
         {
             PacketType type = (PacketType) data[0];
@@ -639,9 +653,13 @@ namespace SM64O
                         playerClient[id].CharacterId = newCharacter;
                         playerClient[id].CharacterName = newCharName;
 
-                        int oldPos = listBox1.Items.IndexOf(playerClient[id]);
-                        listBox1.Items.Remove(playerClient[id]);
-                        listBox1.Items.Insert(oldPos, playerClient[id]);
+                        lock (_listboxLock)
+                        {
+                            int oldPos = listBox1.Items.IndexOf(playerClient[id]);
+                            listBox1.Items.Remove(playerClient[id]);
+                            if (oldPos != -1)
+                                listBox1.Items.Insert(oldPos, playerClient[id]);
+                        }
                     }
 
                     break;
