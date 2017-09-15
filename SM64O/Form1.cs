@@ -23,7 +23,7 @@ namespace SM64O
 {
     public partial class Form1 : Form
     {
-        public static ConnectionListener listener;
+        public static ConnectionListener listener = null;
         public static Connection connection = null;
         public static Client[] playerClient = new Client[23];
 
@@ -44,6 +44,13 @@ namespace SM64O
 
         public Form1()
         {
+            listener = null;
+            connection = null;
+            playerClient = new Client[23];
+
+            _upnp = new UPnPWrapper();
+            _upnp.Initialize();
+
             InitializeComponent();
 
             string[] fileEntries = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/Patches/");
@@ -822,7 +829,6 @@ namespace SM64O
             if (checkBox1.Checked)
             {
                 textBox5.Text = "";
-                textBox5.Enabled = false;
                 usernameBox.Text = "";
                 usernameBox.Enabled = false;
 
@@ -840,7 +846,6 @@ namespace SM64O
             }
             else
             {
-                textBox5.Enabled = true;
                 usernameBox.Enabled = true;
 
                 button1.Text = "Connect to server!";
@@ -951,8 +956,6 @@ namespace SM64O
             comboBox1.SelectedIndex = 0;
             comboBox2.SelectedIndex = 0;
             gamemodeBox.SelectedIndex = 0;
-            _upnp = new UPnPWrapper();
-            _upnp.Initialize();
 
             Settings sets = Settings.Load("settings.xml");
 
@@ -984,7 +987,6 @@ namespace SM64O
             _memory.WriteMemory(0x365FF7, buffer, buffer.Length);
 
             if (playerClient != null)
-            {
                 for (int p = 0; p < playerClient.Length; p++)
                 {
                     if (playerClient[p] != null)
@@ -992,7 +994,6 @@ namespace SM64O
                         readAndSend(0x365FF4, 0x365FF4, 4, playerClient[p]);
                     }
                 }
-            }
 
         }
 
@@ -1282,8 +1283,11 @@ namespace SM64O
 
         private void closePort()
         {
-            _upnp.RemoveOurRules();
-            _upnp.StopDiscovery();
+            if (_upnp != null)
+            {
+                _upnp.RemoveOurRules();
+                _upnp.StopDiscovery();
+            }
         }
     }
 }
