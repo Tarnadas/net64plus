@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,6 +45,30 @@ namespace SM64O
         {
             // TODO: Either use logging library or write our own
             System.IO.File.AppendAllText("errors.log", string.Format("[{0}] {1}\r\n", DateTime.Now.ToString("HH:mm:ss.fff"), e));
+        }
+
+        public static IPAddress ResolveAddress(string input)
+        {
+            IPAddress target = null;
+
+            string text = input;
+
+            if (!IPAddress.TryParse(text, out target))
+            {
+                // Maybe DNS?
+                try
+                {
+                    var dns = Dns.GetHostEntry(text);
+                    if (dns.AddressList.Length > 0)
+                        target = dns.AddressList[0];
+                    else throw new SocketException();
+                }
+                catch (SocketException)
+                {
+                }
+            }
+
+            return target;
         }
     }
 }

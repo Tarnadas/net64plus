@@ -39,9 +39,6 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Hazel">
-      <HintPath>..\lib\Hazel.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -65,6 +62,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="IEmulatorAccessor.cs" />
+    <Compile Include="NetworkHelper.cs" />
     <Compile Include="PacketType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -121,6 +119,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Hazel\Hazel.csproj">
+      <Project>{02cfbd30-d77d-400f-94b2-700f60efdd7f}</Project>
+      <Name>Hazel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Mono.Nat\Mono.Nat.csproj">
       <Project>{a0f2353d-730f-4f67-bea3-ad5de270c72d}</Project>
       <Name>Mono.Nat</Name>

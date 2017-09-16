@@ -252,7 +252,7 @@ namespace SM64O
         {
             button1.Enabled = false;
 
-             this.Enabled = false;
+            backgroundPanel.Enabled = false;
 
             try
             {
@@ -291,28 +291,52 @@ namespace SM64O
             {
                 if (checkBox1.Checked)
                 {
-                    toolStripStatusLabel1.Text = "Starting server...";
                     textBox5.Text = "";
                     int port = (int) numericUpDown2.Value;
 
                     if (_upnp.UPnPAvailable && !lanCheckbox.Enabled)
                     {
-                        // TODO: Add info to toolstrip
                         _upnp.AddPortRule(port, false, "SM64O");
                         textBox5.Text = _upnp.GetExternalIp();
                     }
-
-
-                    panel2.Enabled = true;
+                    
                     listener = new UdpConnectionListener(new NetworkEndPoint(IPAddress.Any, port));
                     listener.NewConnection += NewConnectionHandler;
 
-                    await Task.Run((Action) listener.Start);
+                    toolStripStatusLabel1.Text = "Starting server...";
+
+                    await Task.Run((Action)listener.Start);
+
+                    if (!lanCheckbox.Checked)
+                    {
+                        toolStripStatusLabel1.Text = "Querying SM64O port service...";
+                        bool success = await NetworkHelper.RequestAssistance(port);
+
+                        if (success && NetworkHelper.ConfirmedOpenPort == port)
+                        {
+                            if (string.IsNullOrEmpty(textBox5.Text))
+                                textBox5.Text = NetworkHelper.ExternalIp;
+                        }
+                        else
+                        {
+                            var result = MessageBox.Show(this,
+                                "Your ports do not seem to be forwarded!\n" +
+                                "Nobody outside of your local network will be able to connect. " +
+                                "If you would like to play on LAN, tick the checkbox.\n\nWould you like to continue anyways?", "Attention",
+                                MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                            if (result == DialogResult.No)
+                            {
+                                Application.Exit();
+                                return;
+                            }
+                        }
+                    }
 
                     toolStripStatusLabel1.Text = "Server started!";
 
                     insertChatBox();
 
+                    panel2.Enabled = true;
                     playerCheckTimer.Start();
 
                     Characters.setMessage("server created", _memory);
@@ -407,7 +431,7 @@ namespace SM64O
             chatBox.Enabled = true;
             button3.Enabled = true;
             numericUpDown2.Enabled = false;
-
+            lanCheckbox.Enabled = false;
             textBox5.ReadOnly = true;
 
             comboBox1.Enabled = false;
@@ -439,7 +463,7 @@ namespace SM64O
 
             Settings.Save(sets, "settings.xml");
 
-            this.Enabled = true;
+            backgroundPanel.Enabled = true;
         }
 
         private void loadPatches()
@@ -1280,6 +1304,11 @@ namespace SM64O
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             removeAllPlayers();
+            if (listener != null)
+            {
+                listener.Close();
+                listener.Dispose();
+            }
             closePort();
         }
 
