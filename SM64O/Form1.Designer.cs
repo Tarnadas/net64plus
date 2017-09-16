@@ -442,7 +442,7 @@
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(42, 17);
             this.toolStripStatusLabel1.Text = "Ready!";
             // 
-            // toolStripStatusLabel2
+            // pingLabel
             // 
             this.pingLabel.Name = "pingLabel";
             this.pingLabel.Size = new System.Drawing.Size(0, 17);
@@ -471,6 +471,7 @@
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "SM64 Online Tool v1.3";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();

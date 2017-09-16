@@ -41,7 +41,9 @@ namespace SM64O
         private const int HandshakeDataLen = 28;
         private const int MaxChatLength = 24;
 
+        private Task _mainTask;
         private UPnPWrapper _upnp;
+        private bool _closing;
 
         public Form1()
         {
@@ -749,13 +751,28 @@ namespace SM64O
 
         private void timer1_Tick()
         {
-            Task.Run(async () =>
+            _mainTask = Task.Run(async () =>
             {
-                while (true)
+                while (!_closing)
                 {
-                    sendAllBytes();
+                    try
+                    {
+                        sendAllBytes();
+                    }
+                    catch (Exception e)
+                    {
+                        Program.LogException(e);
+                    }
 
                     await Task.Delay(_updateRate);
+                }
+            });
+
+            _mainTask.ContinueWith((t) =>
+            {
+                if (t.IsFaulted || t.Exception != null)
+                {
+                    Program.LogException(t.Exception ?? new Exception("Exception in main loop!"));
                 }
             });
         }
@@ -763,19 +780,23 @@ namespace SM64O
         // not touching this
         public void sendAllBytes()
         {
-            int freeRamLength = getRamLength(0x367400);
+            //int freeRamLength = getRamLength(0x367400);
+            const int len = 0x240;
 
-            int[] offsetsToReadFrom = new int[freeRamLength];
-            int[] offsetsToWriteToLength = new int[freeRamLength];
-            int[] offsetsToWriteTo = new int[freeRamLength];
+            int[] offsetsToReadFrom = new int[len];
+            int[] offsetsToWriteToLength = new int[len];
+            int[] offsetsToWriteTo = new int[len];
 
-            byte[] originalBuffer = new byte[freeRamLength];
+            byte[] originalBuffer = new byte[len];
             _memory.ReadMemory(0x367400, originalBuffer, originalBuffer.Length);
 
             byte[] buffer = originalBuffer;
 
-            for (int i = 0; i < freeRamLength; i += 12)
+            for (int i = 0; i < len; i += 12)
             {
+                if ((buffer[i] | buffer[i + 1] | buffer[i + 2] | buffer[i + 3]) == 0)
+                    continue;
+
                 buffer = buffer.Skip(0 + i).Take(4).ToArray();
                 long wholeAddress = BitConverter.ToInt32(buffer, 0);
                 wholeAddress -= 0x80000000;
@@ -797,10 +818,8 @@ namespace SM64O
                 if (listener != null)
                 {
                     for (int p = 0; p < playerClient.Length; p++)
-                    {
                         if (playerClient[p] != null)
                             readAndSend(offsetsToReadFrom[i], offsetsToWriteTo[i + 8], offsetsToWriteToLength[i + 4], playerClient[p]);
-                    }
                 }
                 else
                     readAndSend(offsetsToReadFrom[i], offsetsToWriteTo[i + 8], offsetsToWriteToLength[i + 4], connection);
@@ -815,12 +834,8 @@ namespace SM64O
                 byte[] buffer = new byte[4];
 
                 _memory.ReadMemory(offset + i, buffer, buffer.Length);
-                buffer = buffer.Reverse().ToArray();
-
-                if (BitConverter.ToString(buffer) == "00-00-00-00")
-                {
+                if ((buffer[0] | buffer[1] | buffer[2] | buffer[3]) == 0)
                     return i;
-                }
             }
             return 0;
         }
@@ -1349,6 +1364,11 @@ namespace SM64O
 
                 connection.SendBytes(PacketType.RoundtripPing, buffer);
             }
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            _closing = true;
         }
     }
 }

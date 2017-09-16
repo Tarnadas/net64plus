@@ -36,8 +36,14 @@ namespace SM64O
             // Instead log it and display it to the user
             Exception e = (Exception) args.ExceptionObject;
 
+            
+            LogException(e);
+        }
+
+        public static void LogException(Exception e)
+        {
             // TODO: Either use logging library or write our own
-            System.IO.File.AppendAllText("errors.log", string.Format("[{0}] {1}\n", DateTime.Now, e));
+            System.IO.File.AppendAllText("errors.log", string.Format("[{0}] {1}\r\n", DateTime.Now.ToString("HH:mm:ss.fff"), e));
         }
     }
 }
