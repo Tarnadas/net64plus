@@ -66,6 +66,7 @@
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.pingLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.pingTimer = new System.Windows.Forms.Timer(this.components);
+            this.lanCheckbox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
@@ -88,7 +89,7 @@
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(184, 98);
+            this.checkBox1.Location = new System.Drawing.Point(108, 98);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(97, 17);
             this.checkBox1.TabIndex = 10;
@@ -327,6 +328,7 @@
             // panel1
             // 
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel1.Controls.Add(this.lanCheckbox);
             this.panel1.Controls.Add(this.label2);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.checkBox2);
@@ -452,6 +454,17 @@
             this.pingTimer.Interval = 10000;
             this.pingTimer.Tick += new System.EventHandler(this.pingTimer_Tick);
             // 
+            // lanCheckbox
+            // 
+            this.lanCheckbox.AutoSize = true;
+            this.lanCheckbox.Enabled = false;
+            this.lanCheckbox.Location = new System.Drawing.Point(211, 98);
+            this.lanCheckbox.Name = "lanCheckbox";
+            this.lanCheckbox.Size = new System.Drawing.Size(71, 17);
+            this.lanCheckbox.TabIndex = 37;
+            this.lanCheckbox.Text = "LAN Only";
+            this.lanCheckbox.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -526,6 +539,7 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripStatusLabel pingLabel;
         private System.Windows.Forms.Timer pingTimer;
+        private System.Windows.Forms.CheckBox lanCheckbox;
     }
 }
 

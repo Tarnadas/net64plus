@@ -295,7 +295,7 @@ namespace SM64O
                     textBox5.Text = "";
                     int port = (int) numericUpDown2.Value;
 
-                    if (_upnp.UPnPAvailable)
+                    if (_upnp.UPnPAvailable && !lanCheckbox.Enabled)
                     {
                         // TODO: Add info to toolstrip
                         _upnp.AddPortRule(port, false, "SM64O");
@@ -917,6 +917,8 @@ namespace SM64O
                 if (_upnp.UPnPAvailable)
                     textBox5.Text = _upnp.GetExternalIp();
                 else textBox5.Text = "";
+
+                lanCheckbox.Enabled = true;
             }
             else
             {
@@ -928,6 +930,8 @@ namespace SM64O
                 usernameBox.Enabled = true;
                 panel2.Enabled = false;
                 button1.Enabled = false;
+
+                lanCheckbox.Enabled = false;
             }
         }
 
