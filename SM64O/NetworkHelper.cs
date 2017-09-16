@@ -13,7 +13,7 @@ namespace SM64O
         public static string ExternalIp;
         public static int ConfirmedOpenPort;
 
-        private const string ServiceAddress = "2.153.233.73";
+        private const string ServiceAddress = "api.sm64o.com";
         private const int ServicePort = 6460;
 
         private static EndPoint Service = null;
