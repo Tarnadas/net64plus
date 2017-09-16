@@ -2,6 +2,9 @@
 {
     public enum PacketType
     {
-        MemoryWrite
+        MemoryWrite,
+        ChatMessage,
+        CharacterSwitch,
+        RoundtripPing
     }
 }

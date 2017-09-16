@@ -67,6 +67,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReadWritingMemory.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="UPnPWrapper.cs" />
     <Compile Include="WindowsEmulatorAccessor.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
@@ -107,9 +109,19 @@
     <None Include="Resources\toad.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Hazel\Hazel.csproj">
-      <Project>{02cfbd30-d77d-400f-94b2-700f60efdd7f}</Project>
-      <Name>Hazel</Name>
+    <Content Include="..\Patches\**\*.*">
+      <Link>Patches\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Ressources\**\*.*">
+      <Link>Ressources\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Mono.Nat\Mono.Nat.csproj">
+      <Project>{a0f2353d-730f-4f67-bea3-ad5de270c72d}</Project>
+      <Name>Mono.Nat</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

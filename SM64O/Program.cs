@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Mono.Nat;
 
 namespace SM64O
 {
@@ -18,8 +21,14 @@ namespace SM64O
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            do
+            {
+                ResetMe = false;
+                Application.Run(new Form1());
+            } while (ResetMe);
         }
+
+        public static bool ResetMe = false;
 
         static void UnhandledException(object sender, UnhandledExceptionEventArgs args)
         {
@@ -27,8 +36,14 @@ namespace SM64O
             // Instead log it and display it to the user
             Exception e = (Exception) args.ExceptionObject;
 
+            
+            LogException(e);
+        }
+
+        public static void LogException(Exception e)
+        {
             // TODO: Either use logging library or write our own
-            System.IO.File.AppendAllText("errors.log", e.ToString());
+            System.IO.File.AppendAllText("errors.log", string.Format("[{0}] {1}\r\n", DateTime.Now.ToString("HH:mm:ss.fff"), e));
         }
     }
 }

@@ -6,28 +6,33 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ConnectionState = Hazel.ConnectionState;
 
-//#pragma warning disable CS0618 // Type or member is obsolete
 namespace SM64O
 {
     public partial class Form1 : Form
     {
-        public static ConnectionListener listener;
+        public static ConnectionListener listener = null;
         public static Connection connection = null;
         public static Client[] playerClient = new Client[23];
 
+        private ListBox _dynamicChatbox;
         private List<string> _bands = new List<string>();
 
         private bool _chatEnabled = true;
+        private int _updateRate = 16;
 
         private IEmulatorAccessor _memory;
         private const int MinorVersion = 3;
@@ -35,17 +40,29 @@ namespace SM64O
 
         private const int HandshakeDataLen = 28;
         private const int MaxChatLength = 24;
-        
+
+        private Task _mainTask;
+        private UPnPWrapper _upnp;
+        private bool _closing;
+
         public Form1()
         {
+            listener = null;
+            connection = null;
+            playerClient = new Client[23];
+
             InitializeComponent();
+
+            _upnp = new UPnPWrapper();
+            _upnp.Available += UpnpOnAvailable;
+            if (_upnp.UPnPAvailable)
+                UpnpOnAvailable(_upnp, EventArgs.Empty);
+            _upnp.Initialize();
 
             string[] fileEntries = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/Patches/");
 
             foreach (var file in fileEntries)
             {
-                int offset = Convert.ToInt32(Path.GetFileName(file), 16);
-
                 byte[] buffer = File.ReadAllBytes(file);
 
                 //File.Copy(AppDomain.CurrentDomain.BaseDirectory + "/Patches/" + Path.GetFileName(file), AppDomain.CurrentDomain.BaseDirectory + "/Ressources/" + Path.GetFileName(file));
@@ -82,124 +99,187 @@ namespace SM64O
             this.Text = string.Format("SM64 Online Tool v{0}.{1}", MajorVersion, MinorVersion);
         }
 
+        private void UpnpOnAvailable(object o, EventArgs eventArgs)
+        {
+            if (checkBox1.Checked)
+            {
+                textBox5.Text = _upnp.GetExternalIp();
+            }
+
+            toolStripStatusLabel1.Text = "Universal Plug 'n' Play is available!";
+        }
+
         private void die(string msg)
         {
-            MessageBox.Show(this, msg, "Critical Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(null, msg, "Critical Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             Application.Exit();
+        }
+
+        private string getRomName()
+        {
+            string romname = null;
+            byte[] buffer = new byte[64];
+
+            switch (comboBox1.Text)
+            {
+                case "Project64":
+                    // Super Mario 64 (u) - Project 64 v2.3.3
+                    string windowName = _memory.WindowName;
+
+
+                    for (int i = windowName.Length - 1; i >= 0; i--)
+                    {
+                        if (windowName[i] == '-')
+                        {
+                            romname = windowName.Substring(0, i).Trim();
+                            break;
+                        }
+                    }
+                    break;
+                case "Mupen64":
+                    string wndname = _memory.WindowName;
+
+                    for (int i = wndname.Length - 1; i >= 0; i--)
+                    {
+                        if (wndname[i] == '-')
+                        {
+                            romname = wndname.Substring(0, i).Trim();
+                            break;
+                        }
+                    }
+                    break;
+                case "Nemu64":
+                    _memory.ReadMemoryAbs(_memory.MainModuleAddress + 0x3C8A10C, buffer, buffer.Length);
+
+                    romname = Encoding.ASCII.GetString(buffer, 0, Array.IndexOf(buffer, (byte)0));
+                    break;
+                case "Mupen64+":
+                    {
+                        _memory.ReadMemoryAbs(_memory.GetModuleBaseAddress("mupen64plus.dll") + 0x1751CA0, buffer, buffer.Length);
+
+                        romname = Encoding.ASCII.GetString(buffer, 0, Array.IndexOf(buffer, (byte)0));
+                    }
+                    break;
+            }
+
+            return romname;
         }
 
         private void sendAllChat(string message)
         {
+            string name = "HOST";
+
+            if (!string.IsNullOrWhiteSpace(usernameBox.Text))
+                name = usernameBox.Text;
+
             if (message.Length > MaxChatLength)
-                message = message.Substring(0, 24);
+                message = message.Substring(0, MaxChatLength);
 
-            byte[] bytes = Encoding.ASCII.GetBytes(message);
-            byte[] mainArray = new byte[bytes.Length + 4];
-            byte[] outputArray = new byte[bytes.Length + 4];
+            if (name.Length > MaxChatLength)
+                name = name.Substring(0, MaxChatLength);
 
-            bytes.CopyTo(mainArray, 0);
-            int count = 0;
-            while (count < mainArray.Length)
+            byte[] messageBytes = Encoding.ASCII.GetBytes(message);
+            byte[] usernameBytes = Encoding.ASCII.GetBytes(name);
+
+
+            byte[] payload = new byte[1 + messageBytes.Length + 1 + usernameBytes.Length];
+
+            payload[0] = (byte)messageBytes.Length;
+
+            Array.Copy(messageBytes, 0, payload, 1, messageBytes.Length);
+
+            payload[messageBytes.Length + 1] = (byte)usernameBytes.Length;
+
+            Array.Copy(usernameBytes, 0, payload, 1 + messageBytes.Length + 1, usernameBytes.Length);
+
+            if (listener != null)
             {
-                byte[] array = mainArray.Skip<byte>(count).Take<byte>(4).Reverse<byte>().ToArray<byte>();
-                Array.Copy(array, 0, outputArray, count, Math.Min(4, array.Length));
-                count += 4;
-            }
-
-            byte[] payload = new byte[outputArray.Length + 4];
-            Array.Copy(BitConverter.GetBytes(3569284), 0, payload, 0, 4);
-            Array.Copy(outputArray, 0, payload, 4, outputArray.Length);
-
-            byte[] aux = new byte[8];
-
-            Array.Copy(BitConverter.GetBytes(3569280), 0, aux, 0, 4);
-
-            if (connection == null)
-            {
-                for (int i = 0; i < Form1.playerClient.Length; i++)
-                {
-                    if (Form1.playerClient[i] != null)
-                        Form1.playerClient[i].SendBytes(PacketType.MemoryWrite, payload);
-                }
+                for (int i = 0; i < playerClient.Length; i++)
+                    if (playerClient[i] != null)
+                        playerClient[i].SendBytes(PacketType.ChatMessage, payload, SendOption.Reliable);
             }
             else
             {
-                connection.SendBytes(PacketType.MemoryWrite, payload, SendOption.Reliable);
+                connection.SendBytes(PacketType.ChatMessage, payload, SendOption.Reliable);
             }
 
-            Thread.Sleep(100);
 
-            if (connection == null)
+            if (_chatEnabled && listener != null)
             {
-                for (int i = 0; i < Form1.playerClient.Length; i++)
+                Characters.setMessage(message, _memory);
+
+                if (_dynamicChatbox != null)
                 {
-                    if (Form1.playerClient[i] != null)
-                    {
-                        Form1.playerClient[i].SendBytes(PacketType.MemoryWrite, aux);
-                    }
+                    _dynamicChatbox.Items.Insert(0, string.Format("{0}: {1}", "HOST", message));
+
+                    if (_dynamicChatbox.Items.Count > 10)
+                        _dynamicChatbox.Items.RemoveAt(10);
                 }
             }
-            else
-            {
-                connection.SendBytes(PacketType.MemoryWrite, aux, SendOption.Reliable);
-            }
-
-            Characters.setMessage(message, _memory);
         }
 
         private void sendChatTo(string message, Connection conn)
         {
+            string name = "HOST";
+
+            if (!string.IsNullOrWhiteSpace(usernameBox.Text))
+                name = usernameBox.Text;
+
             if (message.Length > MaxChatLength)
-                message = message.Substring(0, 24);
+                message = message.Substring(0, MaxChatLength);
 
-            byte[] bytes = Encoding.ASCII.GetBytes(message);
-            byte[] mainArray = new byte[bytes.Length + 4];
-            byte[] outputArray = new byte[bytes.Length + 4];
+            if (name.Length > MaxChatLength)
+                name = name.Substring(0, MaxChatLength);
 
-            bytes.CopyTo(mainArray, 0);
-            int count = 0;
-            while (count < mainArray.Length)
-            {
-                byte[] array = mainArray.Skip<byte>(count).Take<byte>(4).Reverse<byte>().ToArray<byte>();
-                Array.Copy(array, 0, outputArray, count, Math.Min(4, array.Length));
-                count += 4;
-            }
+            byte[] messageBytes = Encoding.ASCII.GetBytes(message);
+            byte[] usernameBytes = Encoding.ASCII.GetBytes(name);
 
-            byte[] payload = new byte[outputArray.Length + 4];
-            Array.Copy(BitConverter.GetBytes(3569284), 0, payload, 0, 4);
-            Array.Copy(outputArray, 0, payload, 4, outputArray.Length);
 
-            byte[] aux = new byte[8];
+            byte[] payload = new byte[1 + messageBytes.Length + 1 + usernameBytes.Length];
 
-            Array.Copy(BitConverter.GetBytes(3569280), 0, aux, 0, 4);
+            payload[0] = (byte) messageBytes.Length;
+            
+            Array.Copy(messageBytes, 0, payload, 1, messageBytes.Length);
 
-            conn.SendBytes(PacketType.MemoryWrite, payload, SendOption.Reliable);
-            Thread.Sleep(100);
-            conn.SendBytes(PacketType.MemoryWrite, aux, SendOption.Reliable);
+            payload[messageBytes.Length + 1] = (byte) usernameBytes.Length;
+
+            Array.Copy(usernameBytes, 0, payload, 1 + messageBytes.Length + 1, usernameBytes.Length);
+
+            conn.SendBytes(PacketType.ChatMessage, payload, SendOption.Reliable);
         }
         
         private async void button1_Click(object sender, EventArgs e)
         {
+            button1.Enabled = false;
+
+             this.Enabled = false;
+
             try
             {
-                if (comboBox1.Text == "Project64")
+
+                Task memoryRead = null;
+                switch (comboBox1.Text)
                 {
-                    _memory.Open("Project64");
-                    if (_memory.BaseAddress == 0)
-                    {
-                        die("Your version of Project64 is unsupported. Please use version 2.3");
+                    case "Project64":
+                        memoryRead = Task.Run(() => _memory.Open("Project64"));
+                        break;
+                    case "Nemu64":
+                        memoryRead = Task.Run(() => _memory.Open("Nemu64"));
+                        break;
+                    case "Mupen64":
+                        memoryRead = Task.Run(() => _memory.Open("Mupen64"));
+                        break;
+                    case "Mupen64+":
+                        memoryRead = Task.Run(() => _memory.Open("mupen64plus-ui-console", 32));
+                        break;
+                    default:
+                        die("No emulator was chosen. This should never happen. Yell at Guad if you can see this");
                         return;
-                    }
                 }
 
-                if (comboBox1.Text == "Nemu64")
-                {
-                    _memory.Open("Nemu64");
-                }
-                if (comboBox1.Text == "Mupen64")
-                {
-                    _memory.Open("Mupen64");
-                }
+                toolStripStatusLabel1.Text = "Scanning emulator memory...";
+
+                await memoryRead;
             }
             catch (IndexOutOfRangeException)
             {
@@ -211,20 +291,28 @@ namespace SM64O
             {
                 if (checkBox1.Checked)
                 {
+                    toolStripStatusLabel1.Text = "Starting server...";
+                    textBox5.Text = "";
                     int port = (int) numericUpDown2.Value;
+
+                    if (_upnp.UPnPAvailable && !lanCheckbox.Enabled)
+                    {
+                        // TODO: Add info to toolstrip
+                        _upnp.AddPortRule(port, false, "SM64O");
+                        textBox5.Text = _upnp.GetExternalIp();
+                    }
+
+
+                    panel2.Enabled = true;
                     listener = new UdpConnectionListener(new NetworkEndPoint(IPAddress.Any, port));
                     listener.NewConnection += NewConnectionHandler;
-                    listener.Start();
-
-                    button1.Enabled = false;
-                    button1.Text = "Working...";
 
                     bool success = await NetworkHelper.RequestAssistance(port);
-
                     if (success && NetworkHelper.ConfirmedOpenPort == port)
                     {
-                        button1.Text = "Create server!";
-                        textBox5.Text = NetworkHelper.ExternalIp;
+                    await Task.Run((Action) listener.Start);
+                    toolStripStatusLabel1.Text = "Server started!";
+                    insertChatBox();
                     }
                     else
                     {
@@ -239,13 +327,14 @@ namespace SM64O
                             return;
                         }
                     }
-
                     playerCheckTimer.Start();
 
                     Characters.setMessage("server created", _memory);
                 }
                 else
                 {
+                    toolStripStatusLabel1.Text = "Connecting to server...";
+
                     byte[] payload = new byte[HandshakeDataLen];
                     payload[0] = (byte)MinorVersion;
                     payload[1] = (byte)this.comboBox2.SelectedIndex;
@@ -298,10 +387,13 @@ namespace SM64O
                     NetworkEndPoint endPoint = new NetworkEndPoint(target, (int) numericUpDown2.Value, isIp6 ? IPMode.IPv6 : IPMode.IPv4);
                     connection = new UdpClientConnection(endPoint);
                     connection.DataReceived += DataReceived;
-                    connection.Connect(payload, 3000);
                     connection.Disconnected += ConnectionOnDisconnected;
 
                     playersOnline.Text = "Chat Log:";
+
+                    await Task.Run(() => connection.Connect(payload, 3000));
+
+                    pingTimer.Start();
                 }
             }
             catch (HazelException ex)
@@ -321,36 +413,102 @@ namespace SM64O
 
             checkBox1.Enabled = false;
 
-            timer1.Enabled = true;
+            timer1_Tick();
             button1.Enabled = false;
-            textBox5.Enabled = false;
+
             numericUpDown1.Enabled = true;
 
+            chatBox.Enabled = true;
+            button3.Enabled = true;
+            numericUpDown2.Enabled = false;
+
+            textBox5.ReadOnly = true;
+
             comboBox1.Enabled = false;
-            comboBox2.Enabled = false;
+            //comboBox2.Enabled = false;
+
+            checkBox2.Enabled = true;
+
+            button4.Enabled = true;
 
             Characters.setCharacter(comboBox2.SelectedItem.ToString(), _memory);
 
-            string[] fileEntries = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/Ressources/");
+            loadPatches();
 
-            foreach (var file in fileEntries)
-            {
-                int offset = Convert.ToInt32(Path.GetFileName(file), 16);
-
-                int bytesWritten = 0;
-
-                byte[] buffer = File.ReadAllBytes(file);
-                _memory.WriteMemory(offset, buffer, buffer.Length);
-            }
+            toolStripStatusLabel1.Text = "Loaded ROM " + getRomName();
 
             if (checkBox1.Checked)
             {
                 writeValue(new byte[] { 0x00, 0x00, 0x00, 0x01 }, 0x365FFC);
-            }            
+            }
+
+            Settings sets = new Settings();
+
+            sets.LastIp = checkBox1.Checked ? "" : textBox5.Text;
+            sets.LastPort = (int) numericUpDown2.Value;
+            sets.Username = usernameBox.Text;
+
+            sets.LastEmulator = comboBox1.SelectedIndex;
+            sets.LastCharacter = comboBox2.SelectedIndex;
+
+            Settings.Save(sets, "settings.xml");
+
+            this.Enabled = true;
+        }
+
+        private void loadPatches()
+        {
+            string[] fileEntries = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/Ressources/");
+
+            foreach (var file in fileEntries)
+            {
+                string fname = Path.GetFileName(file);
+                int offset;
+
+                if (int.TryParse(fname, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out offset))
+                {
+                    byte[] buffer = File.ReadAllBytes(file);
+                    _memory.WriteMemory(offset, buffer, buffer.Length);
+                }
+                else if (fname.Contains('.'))
+                {
+                    // Treat as Regex
+                    int separator = fname.LastIndexOf(".", StringComparison.Ordinal);
+                    string regexPattern = fname.Substring(0, separator);
+                    string address = fname.Substring(separator + 1, fname.Length - separator - 1);
+                    string romname = getRomName();
+
+                    regexPattern = regexPattern.Replace("@", "\\");
+                    bool invert = false;
+
+                    if (regexPattern[0] == '!')
+                    {
+                        regexPattern = regexPattern.Substring(1);
+                        invert = true;
+                    }
+
+                    if (romname == null)
+                        continue;
+
+                    bool isMatch = Regex.IsMatch(romname, regexPattern,
+                        RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+
+                    if ((isMatch && !invert) || (!isMatch && invert))
+                    {
+                        offset = int.Parse(address, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+
+                        byte[] buffer = File.ReadAllBytes(file);
+                        _memory.WriteMemory(offset, buffer, buffer.Length);
+                    }
+                }
+
+                
+            }
         }
 
         private void ConnectionOnDisconnected(object sender, DisconnectedEventArgs disconnectedEventArgs)
         {
+            removeAllPlayers();
             die("You have been disconnected!");
         }
 
@@ -380,8 +538,7 @@ namespace SM64O
                         byte[] playerID = new byte[] {(byte) playerIDB};
                         Thread.Sleep(500);
                         playerClient[i].SendBytes(PacketType.MemoryWrite, playerID);
-                        string character = "Unk Char";
-                        string vers = "Default Client";
+                        string character = "custom ";
 
                         if (e.HandshakeData != null && e.HandshakeData.Length > 3)
                         {
@@ -395,34 +552,7 @@ namespace SM64O
                                 byte charIndex = handshakeData[1];
                                 playerClient[i].MinorVersion = verIndex;
                                 playerClient[i].CharacterId = charIndex;
-
-                                switch (charIndex)
-                                {
-                                    case 0:
-                                        character = "Mario";
-                                        break;
-                                    case 1:
-                                        character = "Luigi";
-                                        break;
-                                    case 2:
-                                        character = "Yoshi";
-                                        break;
-                                    case 3:
-                                        character = "Wario";
-                                        break;
-                                    case 4:
-                                        character = "Peach";
-                                        break;
-                                    case 5:
-                                        character = "Toad";
-                                        break;
-                                    case 6:
-                                        character = "Waluigi";
-                                        break;
-                                    case 7:
-                                        character = "Rosalina";
-                                        break;
-                                }
+                                character = getCharacterName(charIndex);
                             }
                             if (e.HandshakeData.Length >= 3)
                             {
@@ -466,31 +596,45 @@ namespace SM64O
             {
                 if (playerClient[i] != null && playerClient[i].Connection == conn)
                 {
-                    string msg = string.Format("{0} quit", playerClient[i].Name);
-                    if (msg.Length > MaxChatLength)
-                        msg = msg.Substring(0, 24);
-                    sendAllChat(msg);
-
-                    playerClient[i] = null;
-                    conn.DataReceived -= DataReceivedHandler;
-                    for (int index = 0; index < listBox1.Items.Count; index++)
-                    {
-                        if (listBox1.Items[index] == playerClient[i])
-                        {
-                            listBox1.Items.RemoveAt(index);
-                            break;
-                        }
-                    }
+                    removePlayer(i);
                     break;
                 }
             }
+        }
+
+        private void removePlayer(int player)
+        {
+            if (player == -1 || playerClient[player] == null) return;
+
+            string msg = string.Format("{0} left", playerClient[player].Name);
+            if (msg.Length > MaxChatLength)
+                msg = msg.Substring(0, 24);
+            
+            listBox1.Items.Remove(playerClient[player]);
+
+            playerClient[player].Connection.DataReceived -= DataReceivedHandler;
+            playerClient[player] = null;
 
             playersOnline.Text = "Players Online: " + playerClient.Count(c => c != null) + "/" + playerClient.Length;
+
+            const int playersPositionsStart = 0x36790C;
+            const int playerPositionsSize = 0x100;
+            // 0xc800
+            byte[] buffer = new byte[] { 0x00, 0x00, 0x00, 0xFD };
+            _memory.WriteMemory(playersPositionsStart + playerPositionsSize * player, buffer, buffer.Length);
+
+            sendAllChat(msg);
         }
 
         private void DataReceivedHandler(object sender, Hazel.DataReceivedEventArgs e)
         {
-            ReceivePacket(e.Bytes);
+            var conn = (Connection) sender;
+
+            int id = getClient(conn);
+            if (id != -1)
+                playerClient[id].LastUpdate = DateTime.Now;
+
+            ReceivePacket(conn, e.Bytes);
 
             e.Recycle();
         }
@@ -500,19 +644,12 @@ namespace SM64O
             if (e.Bytes.Length == 0)
                 return;
 
-            if (e.Bytes.Length == 1)
-            {
-                int bytesWritten = 0;
-                _memory.WriteMemory(0x367703, e.Bytes, e.Bytes.Length);
-            }
-            else
-            {
-                ReceivePacket(e.Bytes);
-                e.Recycle();
-            }
+            ReceivePacket((Connection) sender, e.Bytes);
+            e.Recycle();
         }
 
-        private void ReceivePacket(byte[] data)
+        private object _listboxLock = new object();
+        private void ReceivePacket(Connection sender, byte[] data)
         {
             PacketType type = (PacketType) data[0];
             byte[] payload = data.Skip(1).ToArray();
@@ -522,99 +659,158 @@ namespace SM64O
                 case PacketType.MemoryWrite:
                     ReceiveRawMemory(payload);
                     break;
+                case PacketType.ChatMessage:
+                    ReceiveChatMessage(payload);
+                    break;
+                case PacketType.CharacterSwitch:
+                    byte newCharacter = payload[0];
+                    string newCharName = getCharacterName(newCharacter);
+                    int id = getClient(sender);
+
+                    if (id != -1)
+                    {
+                        playerClient[id].CharacterId = newCharacter;
+                        playerClient[id].CharacterName = newCharName;
+
+                        lock (_listboxLock)
+                        {
+                            int oldPos = listBox1.Items.IndexOf(playerClient[id]);
+                            listBox1.Items.Remove(playerClient[id]);
+                            if (oldPos != -1)
+                                listBox1.Items.Insert(oldPos, playerClient[id]);
+                        }
+                    }
+                    break;
+                case PacketType.RoundtripPing:
+                    if (listener != null) // We're host
+                    {
+                        // Just send it back
+                        sender.SendBytes(PacketType.RoundtripPing, payload);
+                    }
+                    else if (connection != null) // We're client
+                    {
+                        // We got our pong
+                        int sendTime = BitConverter.ToInt32(payload, 0);
+                        int currentTime = Environment.TickCount;
+
+                        int elapsed = currentTime - sendTime;
+
+                        pingLabel.Text = string.Format("Ping: {0}ms", elapsed / 2);
+                    }
+                    break;
             }
         }
 
         private void ReceiveRawMemory(byte[] data)
         {
+            if (data.Length == 1)
+            {
+                _memory.WriteMemory(0x367703, data, data.Length);
+                return;
+            }
+
             int offset = BitConverter.ToInt32(data, 0);
             if (offset < 0x365000 || offset > 0x365000 + 8388608) // Only allow 8 MB N64 RAM addresses
                 return; //  Kaze: retrict it to 80365ff0 to 80369000
 
-            int bytesWritten = 0;
             byte[] buffer = new byte[data.Length - 4];
             data.Skip(4).ToArray().CopyTo(buffer, 0);
-
-            if (offset == 3569284 || offset == 3569280) // It's a chat message
-            {
-                if (!_chatEnabled) return;
-                // TODO: Add chat enable/disable checkbox
-
-                ReceiveChatMessage(offset, data);
-
-                if (connection == null) // We are the host
-                    for (int i = 0; i < Form1.playerClient.Length; i++)
-                    {
-                        if (Form1.playerClient[i] != null)
-                            Form1.playerClient[i].SendBytes(PacketType.MemoryWrite, data);
-                    }
-            }
-
+            
             _memory.WriteMemory(offset, buffer, buffer.Length);
         }
 
-        private void ReceiveChatMessage(int offset, byte[] data)
+        private void ReceiveChatMessage(byte[] data)
         {
-            if (offset != 3569284) return; // Only need the char array;
+            if (connection == null) // We are the host
+                for (int i = 0; i < Form1.playerClient.Length; i++)
+                {
+                    if (Form1.playerClient[i] != null)
+                        Form1.playerClient[i].SendBytes(PacketType.ChatMessage, data);
+                }
+
+            if (!_chatEnabled) return;
 
             string message = "";
+            string sender = "";
 
-            for (int i = 4; i < data.Length; i += 4)
-            {
-                byte[] lilEndian = new byte[4];
-                lilEndian[3] = data[i];
-                if (i + 1 < data.Length) lilEndian[2] = data[i + 1];
-                if (i + 2 < data.Length) lilEndian[1] = data[i + 2];
-                if (i + 3 < data.Length) lilEndian[0] = data[i + 3];
+            int msgLen = data[0];
+            message = Encoding.ASCII.GetString(data, 1, msgLen);
+            int nameLen = data[msgLen + 1];
+            sender = Encoding.ASCII.GetString(data, msgLen + 2, nameLen);
 
-                message += System.Text.Encoding.ASCII.GetString(lilEndian);
-            }
+            Characters.setMessage(message, _memory);
 
             if (listener == null) // We're not the host
             {
-                listBox1.Items.Add(message);
+                listBox1.Items.Insert(0, string.Format("{0}: {1}", sender, message));
                 
-                if (listBox1.Items.Count > 5)
-                    listBox1.Items.RemoveAt(0);
+                if (listBox1.Items.Count > 10)
+                    listBox1.Items.RemoveAt(10);
+            }
+
+            if (_dynamicChatbox != null)// We're the host
+            {
+                _dynamicChatbox.Items.Insert(0, string.Format("{0}: {1}", sender, message));
+
+                if (_dynamicChatbox.Items.Count > 10)
+                    _dynamicChatbox.Items.RemoveAt(10);
             }
         }
 
         public void writeValue(byte[] buffer, int offset)
         {
             buffer = buffer.Reverse().ToArray();
-            int bytesWritten = 0;
             _memory.WriteMemory(offset, buffer, buffer.Length);
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void timer1_Tick()
         {
-            try
+            _mainTask = Task.Run(async () =>
             {
-                sendAllBytes(null);
-            }
-            catch
-            {
+                while (!_closing)
+                {
+                    try
+                    {
+                        sendAllBytes();
+                    }
+                    catch (Exception e)
+                    {
+                        Program.LogException(e);
+                    }
 
-            }
+                    await Task.Delay(_updateRate);
+                }
+            });
+
+            _mainTask.ContinueWith((t) =>
+            {
+                if (t.IsFaulted || t.Exception != null)
+                {
+                    Program.LogException(t.Exception ?? new Exception("Exception in main loop!"));
+                }
+            });
         }
 
         // not touching this
-        public void sendAllBytes(Connection conn)
+        public void sendAllBytes()
         {
-            int freeRamLength = getRamLength(0x367400);
+            //int freeRamLength = getRamLength(0x367400);
+            const int len = 0x240;
 
-            int[] offsetsToReadFrom = new int[freeRamLength];
-            int[] offsetsToWriteToLength = new int[freeRamLength];
-            int[] offsetsToWriteTo = new int[freeRamLength];
+            int[] offsetsToReadFrom = new int[len];
+            int[] offsetsToWriteToLength = new int[len];
+            int[] offsetsToWriteTo = new int[len];
 
-            int bytesRead = 0;
-            byte[] originalBuffer = new byte[freeRamLength];
+            byte[] originalBuffer = new byte[len];
             _memory.ReadMemory(0x367400, originalBuffer, originalBuffer.Length);
 
             byte[] buffer = originalBuffer;
 
-            for (int i = 0; i < freeRamLength; i += 12)
+            for (int i = 0; i < len; i += 12)
             {
+                if ((buffer[i] | buffer[i + 1] | buffer[i + 2] | buffer[i + 3]) == 0)
+                    continue;
+
                 buffer = buffer.Skip(0 + i).Take(4).ToArray();
                 long wholeAddress = BitConverter.ToInt32(buffer, 0);
                 wholeAddress -= 0x80000000;
@@ -633,23 +829,14 @@ namespace SM64O
 
                 buffer = originalBuffer;
 
-                if (playerClient != null)
+                if (listener != null)
                 {
-                    if (checkBox1.Checked)
-                    {
-                        for (int p = 0; p < playerClient.Length; p++)
-                        {
-                            if (playerClient[p] != null)
-                            {
-                                readAndSend(offsetsToReadFrom[i], offsetsToWriteTo[i + 8], offsetsToWriteToLength[i + 4], playerClient[p]);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        readAndSend(offsetsToReadFrom[i], offsetsToWriteTo[i + 8], offsetsToWriteToLength[i + 4], connection);
-                    }
+                    for (int p = 0; p < playerClient.Length; p++)
+                        if (playerClient[p] != null)
+                            readAndSend(offsetsToReadFrom[i], offsetsToWriteTo[i + 8], offsetsToWriteToLength[i + 4], playerClient[p]);
                 }
+                else
+                    readAndSend(offsetsToReadFrom[i], offsetsToWriteTo[i + 8], offsetsToWriteToLength[i + 4], connection);
 
             }
         }
@@ -658,23 +845,17 @@ namespace SM64O
         {
             for (int i = 0; i < 0x1024; i += 4)
             {
-                int bytesRead = 0;
                 byte[] buffer = new byte[4];
 
                 _memory.ReadMemory(offset + i, buffer, buffer.Length);
-                buffer = buffer.Reverse().ToArray();
-
-                if (BitConverter.ToString(buffer) == "00-00-00-00")
-                {
+                if ((buffer[0] | buffer[1] | buffer[2] | buffer[3]) == 0)
                     return i;
-                }
             }
             return 0;
         }
 
         public void readAndSend(int offsetToRead, int offsetToWrite, int howMany, Connection conn)
         {
-            int bytesRead = 0;
             byte[] buffer = new byte[howMany];
             byte[] writeOffset = BitConverter.GetBytes(offsetToWrite);
 
@@ -684,6 +865,8 @@ namespace SM64O
             writeOffset.CopyTo(finalOffset, 0);
             buffer.CopyTo(finalOffset, 4);
             conn.SendBytes(PacketType.MemoryWrite, finalOffset);
+
+            Debug.WriteLine("Sending packet of length " + howMany);
         }
 
         private void textBox5_TextChanged(object sender, EventArgs e)
@@ -726,22 +909,43 @@ namespace SM64O
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-            timer1.Interval = (int)numericUpDown1.Value;
+            _updateRate = (int)numericUpDown1.Value;
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             if (checkBox1.Checked)
             {
+                textBox5.Text = "";
+                usernameBox.Text = "";
+                usernameBox.Enabled = false;
+
+                button1.Enabled = true;
+
                 button1.Text = "Create Server!";
                 usernameBox.Enabled = false;
                 panel2.Enabled = true;
+                textBox5.ReadOnly = true;
+                button1.Enabled = true;
+
+                if (_upnp.UPnPAvailable)
+                    textBox5.Text = _upnp.GetExternalIp();
+                else textBox5.Text = "";
+
+                lanCheckbox.Enabled = true;
             }
             else
             {
+                usernameBox.Enabled = true;
+
                 button1.Text = "Connect to server!";
+                textBox5.ReadOnly = false;
+                textBox5.Text = "";
                 usernameBox.Enabled = true;
                 panel2.Enabled = false;
+                button1.Enabled = false;
+
+                lanCheckbox.Enabled = false;
             }
         }
 
@@ -803,10 +1007,15 @@ namespace SM64O
 
         private void button2_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Super Mario 64 Online made by Kaze Emanuar and MelonSpeedruns!"
+            MessageBox.Show("Super Mario 64 Online team"
                 + Environment.NewLine
+                + "Kaze Emanuar"
                 + Environment.NewLine
-                + "Thanks to Guad for the bug fixes!"
+                + "MelonSpeedruns"
+                + Environment.NewLine
+                + "Guad"
+                + Environment.NewLine
+                + "merlish"
                 + Environment.NewLine
                 + Environment.NewLine
                 + "Luigi 3D Model created by: "
@@ -838,6 +1047,19 @@ namespace SM64O
         {
             comboBox1.SelectedIndex = 0;
             comboBox2.SelectedIndex = 0;
+            gamemodeBox.SelectedIndex = 0;
+
+            Settings sets = Settings.Load("settings.xml");
+
+            if (sets != null)
+            {
+                textBox5.Text = sets.LastIp;
+                numericUpDown2.Value = sets.LastPort;
+                usernameBox.Text = sets.Username;
+
+                comboBox1.SelectedIndex = sets.LastEmulator;
+                comboBox2.SelectedIndex = sets.LastCharacter;
+            }
         }
 
         public void setGamemode()
@@ -857,7 +1079,6 @@ namespace SM64O
             _memory.WriteMemory(0x365FF7, buffer, buffer.Length);
 
             if (playerClient != null)
-            {
                 for (int p = 0; p < playerClient.Length; p++)
                 {
                     if (playerClient[p] != null)
@@ -865,50 +1086,22 @@ namespace SM64O
                         readAndSend(0x365FF4, 0x365FF4, 4, playerClient[p]);
                     }
                 }
-            }
 
-        }
-
-        private void miniGame1_CheckedChanged(object sender, EventArgs e)
-        {
-            setGamemode();
-        }
-
-        private void miniGame2_CheckedChanged(object sender, EventArgs e)
-        {
-            setGamemode();
-        }
-
-        private void miniGame3_CheckedChanged(object sender, EventArgs e)
-        {
-            setGamemode();
-        }
-
-        private void miniGame4_CheckedChanged(object sender, EventArgs e)
-        {
-            setGamemode();
-        }
-
-        private void miniGame5_CheckedChanged(object sender, EventArgs e)
-        {
-            setGamemode();
-        }
-
-        private void miniGame6_CheckedChanged(object sender, EventArgs e)
-        {
-            setGamemode();
         }
 
         private void numericUpDown3_ValueChanged(object sender, EventArgs e)
         {
-            playerClient = new Client[(int)numericUpDown3.Value - 1];
+            playerClient = new Client[(int)numericUpDown3.Value];
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(chatBox.Text)) return;
-            sendAllChat(chatBox.Text);
-            chatBox.Text = "";
+            if (_chatEnabled)
+            {
+                if (string.IsNullOrWhiteSpace(chatBox.Text)) return;
+                sendAllChat(chatBox.Text);
+                chatBox.Text = "";
+            }
         }
 
         private void listBox1_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -918,6 +1111,7 @@ namespace SM64O
             {
                 // Who did we click on
                 Client client = (Client) listBox1.Items[index];
+                int indx = Array.IndexOf(playerClient, client);
                 Connection conn = client.Connection;
 
                 if (conn == null) return;
@@ -926,11 +1120,7 @@ namespace SM64O
                 if (conn.State == Hazel.ConnectionState.Disconnecting ||
                     conn.State == Hazel.ConnectionState.NotConnected)
                 {
-                    int indx = Array.IndexOf(playerClient, conn);
-                    conn.DataReceived -= DataReceivedHandler;
-                    if (indx != -1)
-                        playerClient[indx] = null;
-                    listBox1.Items.RemoveAt(index);
+                    removePlayer(indx);
                     return;
                 }
 
@@ -939,16 +1129,13 @@ namespace SM64O
                     "Player Information:\n" + listBox1.Items[index].ToString() +
                     "\n\nKick this player?\nYes = Kick, No = Ban",
                     "Client", MessageBoxButtons.YesNoCancel);
+
                 if (resp == DialogResult.Yes)
                 {
                     sendChatTo("kicked", conn);
                     conn.Close();
 
-                    int indx = Array.IndexOf(playerClient, client);
-                    conn.DataReceived -= DataReceivedHandler;
-                    if (indx != -1)
-                        playerClient[indx] = null;
-                    listBox1.Items.RemoveAt(index);
+                    removePlayer(indx);
                 }
                 else if (resp == DialogResult.No)
                 {
@@ -957,43 +1144,28 @@ namespace SM64O
                     File.AppendAllText("bans.txt", conn.EndPoint.ToString() + "\n");
                     conn.Close();
 
-                    int indx = Array.IndexOf(playerClient, client);
-                    conn.DataReceived -= DataReceivedHandler;
-                    if (indx != -1)
-                        playerClient[indx] = null;
-                    listBox1.Items.RemoveAt(index);
+                    removePlayer(indx);
                 }
 
                 playersOnline.Text = "Players Online: " + playerClient.Count(c => c != null) + "/" +
                                      playerClient.Length;
             }
         }
-
-        private void usernameBox_TextChanged(object sender, EventArgs e)
-        {
-            if (textBox5.Text != "")
-            {
-                button1.Enabled = true;
-            }
-            else
-            {
-                button1.Enabled = false;
-            }
-        }
-
+        
         private Random _r = new Random();
         private string getRandomUsername()
         {
             string[] usernames = new[]
             {
-                "Bambooccaneer",
-                "Grapeshifter666",
-                "Fellama",
-                "Rerunt987",
-                "IllegalBlizzard123",
-                "ActiveMonkey",
-                "ThunderBerry",
-                "BananaMan",
+                "TheFloorIsLava",
+                "BonelessPizza",
+                "WOAH",
+                "MahBoi",
+                "Shoutouts",
+                "Sigmario",
+                "HeHasNoGrace",
+                "Memetopia",
+                "ShrekIsLove",
             };
 
             return usernames[_r.Next(usernames.Length)];
@@ -1006,17 +1178,34 @@ namespace SM64O
 
             for (int i = 0; i < playerClient.Length; i++)
             {
-                Client cl = playerClient[i];
-                if (cl == null) continue;
-                if (cl.Connection.State == Hazel.ConnectionState.Disconnecting ||
-                    cl.Connection.State == Hazel.ConnectionState.NotConnected)
+                if (playerClient[i] == null) continue;
+                if (playerClient[i].Connection.State == Hazel.ConnectionState.Disconnecting ||
+                    playerClient[i].Connection.State == Hazel.ConnectionState.NotConnected)
                 {
-                    cl.Connection.DataReceived -= DataReceivedHandler;
-                    listBox1.Items.Remove(cl);
-                    playerClient[i] = null;
+                    removePlayer(i);
+                }
+                else if (playerClient[i].LastUpdate.HasValue &&
+                         DateTime.Now.Subtract(playerClient[i].LastUpdate.Value).TotalMilliseconds > 8000)
+                {
+                    playerClient[i].Connection.Close();
+                    removePlayer(i);
                 }
             }
         }
+
+        private void chatBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                if (_chatEnabled)
+                {
+                    if (string.IsNullOrWhiteSpace(chatBox.Text)) return;
+                    sendAllChat(chatBox.Text);
+                    chatBox.Text = "";
+                }
+            }
+        }
+
 
         private void gamemodeBox_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -1026,6 +1215,178 @@ namespace SM64O
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
         {
             _chatEnabled = !checkBox2.Checked;
+        }
+
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (connection == null && listener == null)
+                return; // We are not in a server yet
+
+            Characters.setCharacterAll(comboBox2.SelectedIndex + 1, _memory);
+
+            if (connection != null) // we are a client, notify host to update playerlist
+                connection.SendBytes(PacketType.CharacterSwitch, new byte[]{ (byte) (comboBox2.SelectedIndex) });
+        }
+
+        private void removeAllPlayers()
+        {
+            const int maxPlayers = 27;
+            for (int i = 0; i < maxPlayers; i++)
+            {
+                const int playersPositionsStart = 0x36790C;
+                const int playerPositionsSize = 0x100;
+
+                // 0xc800
+                byte[] buffer = new byte[] { 0x00, 0x00, 0x00, 0xFD };
+                _memory.WriteMemory(playersPositionsStart + (playerPositionsSize * i), buffer, buffer.Length);
+            }
+        }
+
+        private void resetGame()
+        {
+            if (!_memory.Attached) return;
+
+            if (listener != null)
+            {
+                for (int i = 0; i < playerClient.Length; i++)
+                {
+                    if (playerClient[i] != null)
+                        playerClient[i].Connection.Close();
+                }
+
+                listener.Close();
+                listener.Dispose();
+            }
+            else if (connection != null)
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+
+            byte[] buffer = new byte[4];
+
+            buffer[0] = 0x00;
+            buffer[1] = 0x00;
+            buffer[2] = 0x04;
+            buffer[3] = 0x00;
+
+            _memory.WriteMemory(0x33b238, buffer, buffer.Length);
+
+
+            buffer[0] = 0x00;
+            buffer[1] = 0x00;
+            buffer[2] = 0x01;
+            buffer[3] = 0x01;
+
+            _memory.WriteMemory(0x33b248, buffer, buffer.Length);
+
+            buffer[0] = 0x00;
+            buffer[1] = 0x00;
+            buffer[2] = 0x00;
+            buffer[3] = 0x00;
+
+            _memory.WriteMemory(0x38eee0, buffer, buffer.Length);
+
+            Program.ResetMe = true;
+            Close();
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            removeAllPlayers();
+            closePort();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            resetGame();
+        }
+
+        private string getCharacterName(int id)
+        {
+            string character = "custom";
+            switch (id)
+            {
+                case 0:
+                    character = "Mario";
+                    break;
+                case 1:
+                    character = "Luigi";
+                    break;
+                case 2:
+                    character = "Yoshi";
+                    break;
+                case 3:
+                    character = "Wario";
+                    break;
+                case 4:
+                    character = "Peach";
+                    break;
+                case 5:
+                    character = "Toad";
+                    break;
+                case 6:
+                    character = "Waluigi";
+                    break;
+                case 7:
+                    character = "Rosalina";
+                    break;
+            }
+
+            return character;
+        }
+
+        private int getClient(Connection conn)
+        {
+            for (int i = 0; i < playerClient.Length; i++)
+            {
+                if (playerClient[i] != null && playerClient[i].Connection == conn)
+                    return i;
+            }
+
+            return -1;
+        }
+
+        private void insertChatBox()
+        {
+            // 200 / 2 + 10
+            listBox1.Size = new Size(268, 95);
+
+            _dynamicChatbox = new ListBox();
+            
+            _dynamicChatbox.Location = new Point(13, 84 + 100);
+            _dynamicChatbox.Size = new Size(268, 95);
+            _dynamicChatbox.Enabled = false;
+
+            this.panel2.Controls.Add(_dynamicChatbox);
+        }
+
+        private void closePort()
+        {
+            if (_upnp != null)
+            {
+                _upnp.Available -= UpnpOnAvailable;
+
+                _upnp.RemoveOurRules();
+                _upnp.StopDiscovery();
+            }
+        }
+
+        private void pingTimer_Tick(object sender, EventArgs e)
+        {
+            if (connection != null && connection.State == ConnectionState.Connected)
+            {
+                byte[] buffer = new byte[4];
+
+                Array.Copy(BitConverter.GetBytes(Environment.TickCount), 0, buffer, 0, 4);
+
+                connection.SendBytes(PacketType.RoundtripPing, buffer);
+            }
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            _closing = true;
         }
     }
 }

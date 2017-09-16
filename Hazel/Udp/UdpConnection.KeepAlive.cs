@@ -66,7 +66,12 @@ namespace Hazel.Udp
                     (o) =>
                     {
                         Trace.WriteLine("Keepalive packet sent.");
-                        SendHello(null, null);
+                        try
+                        {
+                            SendHello(null, null);
+                        }
+                        catch(InvalidOperationException)
+                        { }
                     },
                     null,
                     keepAliveInterval,

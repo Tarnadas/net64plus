@@ -19,19 +19,45 @@ namespace SM64O
 
         private int baseAddress;
         private IntPtr processHandle;
+        private Process process;
+        private int mainModuleAdd;
 
         public int BaseAddress
         {
             get { return baseAddress; }
         }
 
-        public void Open(string processName)
+        public int MainModuleAddress
         {
-            Process process = Process.GetProcessesByName("Project64")[0];
+            get { return mainModuleAdd; }
+        }
 
-            baseAddress = ReadWritingMemory.GetBaseAddress("Project64", 4096, 4);
+        private bool _attached;
+        public bool Attached
+        {
+            get { return _attached; }
+            private set { _attached = value; }
+        }
+
+        public string WindowName
+        {
+            get
+            {
+                return process.MainWindowTitle;
+            }
+        }
+
+        public void Open(string processName, int step = 1024)
+        {
+            process = Process.GetProcessesByName(processName)[0];
+
+            baseAddress = ReadWritingMemory.GetBaseAddress(processName, step, 4);
 
             processHandle = OpenProcess(0x1F0FFF, true, process.Id);
+
+            mainModuleAdd = process.MainModule.BaseAddress.ToInt32();
+
+            Attached = true;
         }
 
         public int WriteMemory(int offset, byte[] buffer, int bufferLength)
@@ -46,6 +72,30 @@ namespace SM64O
             int bytesRead = 0;
             ReadProcessMemory((int)processHandle, baseAddress + offset, buffer, bufferLength, ref bytesRead);
             return bytesRead;
+        }
+
+        public int WriteMemoryAbs(int address, byte[] buffer, int bufferLength)
+        {
+            int bytesWritten = 0;
+            WriteProcessMemory((int)processHandle, address, buffer, bufferLength, ref bytesWritten);
+            return bytesWritten;
+        }
+
+        public int ReadMemoryAbs(int address, byte[] buffer, int bufferLength)
+        {
+            int bytesRead = 0;
+            ReadProcessMemory((int)processHandle, address, buffer, bufferLength, ref bytesRead);
+            return bytesRead;
+        }
+
+        public int GetModuleBaseAddress(string module)
+        {
+            foreach (ProcessModule processModule in process.Modules)
+            {
+                if (processModule.ModuleName == module)
+                    return processModule.BaseAddress.ToInt32();
+            }
+            return 0;
         }
     }
 }

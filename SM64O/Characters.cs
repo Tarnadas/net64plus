@@ -72,5 +72,10 @@ namespace SM64O
                 mem.WriteMemory(0x365FF3, new byte[] { 0x08 }, 1);
             }
         }
+
+        public static void setCharacterAll(int character, IEmulatorAccessor mem)
+        {
+            mem.WriteMemory(0x365FF3, new byte[] { (byte) character }, 1);
+        }
     }
 }
