@@ -312,9 +312,9 @@ namespace SM64O
                         toolStripStatusLabel1.Text = "Querying SM64O port service...";
                         bool success = await NetworkHelper.RequestAssistance(port);
 
-                        if (success && NetworkHelper.ConfirmedOpenPort == port)
+                        if (success)
                         {
-                            if (string.IsNullOrEmpty(textBox5.Text))
+                            if (string.IsNullOrEmpty(textBox5.Text) && !string.IsNullOrEmpty(NetworkHelper.ExternalIp))
                                 textBox5.Text = NetworkHelper.ExternalIp;
                         }
                         else

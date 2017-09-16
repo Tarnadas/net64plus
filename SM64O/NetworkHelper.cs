@@ -27,7 +27,12 @@ namespace SM64O
 
             if (Service == null)
             {
-                Service = new IPEndPoint(Program.ResolveAddress(ServiceAddress), ServicePort);
+                IPAddress address = Program.ResolveAddress(ServiceAddress);
+
+                // If api.sm64o.com closed
+                if (address == null)
+                    return true;
+                Service = new IPEndPoint(address, ServicePort);
             }
 
             var server = ((UdpConnectionListener) Form1.listener);
