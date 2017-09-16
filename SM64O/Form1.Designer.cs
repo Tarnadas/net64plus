@@ -55,6 +55,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.playerCheckTimer = new System.Windows.Forms.Timer(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
+            this.lanCheckbox = new System.Windows.Forms.CheckBox();
             this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.label8 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -66,13 +67,14 @@
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.pingLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.pingTimer = new System.Windows.Forms.Timer(this.components);
-            this.lanCheckbox = new System.Windows.Forms.CheckBox();
+            this.backgroundPanel = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.statusStrip1.SuspendLayout();
+            this.backgroundPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // button1
@@ -349,6 +351,17 @@
             this.panel1.Size = new System.Drawing.Size(295, 271);
             this.panel1.TabIndex = 37;
             // 
+            // lanCheckbox
+            // 
+            this.lanCheckbox.AutoSize = true;
+            this.lanCheckbox.Enabled = false;
+            this.lanCheckbox.Location = new System.Drawing.Point(211, 98);
+            this.lanCheckbox.Name = "lanCheckbox";
+            this.lanCheckbox.Size = new System.Drawing.Size(71, 17);
+            this.lanCheckbox.TabIndex = 37;
+            this.lanCheckbox.Text = "LAN Only";
+            this.lanCheckbox.UseVisualStyleBackColor = true;
+            // 
             // checkBox2
             // 
             this.checkBox2.AutoSize = true;
@@ -454,16 +467,19 @@
             this.pingTimer.Interval = 10000;
             this.pingTimer.Tick += new System.EventHandler(this.pingTimer_Tick);
             // 
-            // lanCheckbox
+            // backgroundPanel
             // 
-            this.lanCheckbox.AutoSize = true;
-            this.lanCheckbox.Enabled = false;
-            this.lanCheckbox.Location = new System.Drawing.Point(211, 98);
-            this.lanCheckbox.Name = "lanCheckbox";
-            this.lanCheckbox.Size = new System.Drawing.Size(71, 17);
-            this.lanCheckbox.TabIndex = 37;
-            this.lanCheckbox.Text = "LAN Only";
-            this.lanCheckbox.UseVisualStyleBackColor = true;
+            this.backgroundPanel.Controls.Add(this.panel1);
+            this.backgroundPanel.Controls.Add(this.button4);
+            this.backgroundPanel.Controls.Add(this.panel2);
+            this.backgroundPanel.Controls.Add(this.chatBox);
+            this.backgroundPanel.Controls.Add(this.button2);
+            this.backgroundPanel.Controls.Add(this.button3);
+            this.backgroundPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.backgroundPanel.Location = new System.Drawing.Point(0, 0);
+            this.backgroundPanel.Name = "backgroundPanel";
+            this.backgroundPanel.Size = new System.Drawing.Size(618, 389);
+            this.backgroundPanel.TabIndex = 43;
             // 
             // Form1
             // 
@@ -471,14 +487,9 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(618, 389);
             this.Controls.Add(this.statusStrip1);
-            this.Controls.Add(this.button4);
             this.Controls.Add(this.label9);
-            this.Controls.Add(this.panel2);
             this.Controls.Add(this.label8);
-            this.Controls.Add(this.button3);
-            this.Controls.Add(this.panel1);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.chatBox);
+            this.Controls.Add(this.backgroundPanel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
@@ -496,6 +507,8 @@
             this.panel2.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
+            this.backgroundPanel.ResumeLayout(false);
+            this.backgroundPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -540,6 +553,7 @@
         private System.Windows.Forms.ToolStripStatusLabel pingLabel;
         private System.Windows.Forms.Timer pingTimer;
         private System.Windows.Forms.CheckBox lanCheckbox;
+        private System.Windows.Forms.Panel backgroundPanel;
     }
 }
 

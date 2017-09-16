@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hazel", "Hazel\Hazel.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Nat", "Mono.Nat\Mono.Nat.csproj", "{A0F2353D-730F-4F67-BEA3-AD5DE270C72D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortcheckService", "PortcheckService\PortcheckService.csproj", "{B815002A-4FE9-48E8-8740-CD6A21387022}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{A0F2353D-730F-4F67-BEA3-AD5DE270C72D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0F2353D-730F-4F67-BEA3-AD5DE270C72D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0F2353D-730F-4F67-BEA3-AD5DE270C72D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B815002A-4FE9-48E8-8740-CD6A21387022}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B815002A-4FE9-48E8-8740-CD6A21387022}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B815002A-4FE9-48E8-8740-CD6A21387022}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B815002A-4FE9-48E8-8740-CD6A21387022}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

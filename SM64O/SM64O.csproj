@@ -119,6 +119,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Hazel\Hazel.csproj">
+      <Project>{02cfbd30-d77d-400f-94b2-700f60efdd7f}</Project>
+      <Name>Hazel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Mono.Nat\Mono.Nat.csproj">
       <Project>{a0f2353d-730f-4f67-bea3-ad5de270c72d}</Project>
       <Name>Mono.Nat</Name>
