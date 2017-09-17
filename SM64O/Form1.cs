@@ -29,7 +29,7 @@ namespace SM64O
         public static Client[] playerClient = new Client[23];
 
         private ListBox _dynamicChatbox;
-        private List<string> _bands = new List<string>();
+        private string _bands = "";
 
         private bool _chatEnabled = true;
         private int _updateRate = 16;
@@ -87,7 +87,7 @@ namespace SM64O
                 {
                     foreach (var line in File.ReadAllLines("bans.txt"))
                     {
-                        _bands.Add(line);
+                        _bands += line + " ";
                     }
                 }
 
@@ -96,7 +96,7 @@ namespace SM64O
             // TODO: Change this according to OS
             _memory = new WindowsEmulatorAccessor();
 
-            this.Text = string.Format("SM64 Online Tool v{0}.{1}", MajorVersion, MinorVersion);
+            this.Text = "SM64 Online Tool v1.3.1 Hotfix";
         }
 
         private void UpnpOnAvailable(object o, EventArgs eventArgs)
@@ -273,7 +273,7 @@ namespace SM64O
                         memoryRead = Task.Run(() => _memory.Open("mupen64plus-ui-console", 32));
                         break;
                     default:
-                        die("No emulator was chosen. This should never happen. Yell at Guad if you can see this");
+                        die("No emulator was chosen. This should never happen. Yell at Guad if you can see this!");
                         return;
                 }
 
@@ -526,7 +526,7 @@ namespace SM64O
         {
             try
             {
-                if (_bands.Contains(e.Connection.EndPoint.ToString()))
+                if (_bands.Contains(e.Connection.EndPoint.ToString().Split(':')[0]))
                 {
                     sendChatTo("banned", e.Connection);
                     e.Connection.Close();
@@ -885,32 +885,6 @@ namespace SM64O
             {
                 button1.Enabled = false;
             }
-            if (textBox5.Text == "toad")
-            {
-                toadTimer.Enabled = true;
-                PictureBox box = new PictureBox();
-                box.Image = SM64O.Properties.Resources.toad;
-                box.SizeMode = PictureBoxSizeMode.StretchImage;
-                box.Size = new Size(this.Size.Width, this.Size.Height);
-
-                foreach (Control control in this.Controls)
-                {
-                    control.Text = "toad";
-                    control.Enabled = false;
-                    control.Visible = false;
-                }
-
-                this.Controls.Add(box);
-
-                IntPtr Hicon = SM64O.Properties.Resources.toad.GetHicon();
-                Icon newIcon = Icon.FromHandle(Hicon);
-
-                this.Icon = newIcon;
-                this.Text = "toad";
-
-                System.Media.SoundPlayer player = new System.Media.SoundPlayer(SM64O.Properties.Resources.herewego);
-                player.Play();
-            }
         }
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
@@ -955,65 +929,9 @@ namespace SM64O
             }
         }
 
-        public void playRandomToadNoise(int random)
-        {
-            if (random == 1)
-            {
-                System.Media.SoundPlayer player = new System.Media.SoundPlayer(SM64O.Properties.Resources.imthebest);
-                player.Play();
-            }
-            if (random == 2)
-            {
-                System.Media.SoundPlayer player = new System.Media.SoundPlayer(SM64O.Properties.Resources.aaaaah);
-                player.Play();
-            }
-            if (random == 3)
-            {
-                System.Media.SoundPlayer player = new System.Media.SoundPlayer(SM64O.Properties.Resources.okay);
-                player.Play();
-            }
-            if (random == 4)
-            {
-                System.Media.SoundPlayer player = new System.Media.SoundPlayer(SM64O.Properties.Resources.yahoo);
-                player.Play();
-            }
-            if (random == 5)
-            {
-                System.Media.SoundPlayer player = new System.Media.SoundPlayer(SM64O.Properties.Resources.woo);
-            }
-        }
-
-        private void toadTimer_Tick(object sender, EventArgs e)
-        {
-            Random rnd = new Random();
-            int sound = rnd.Next(1, 5);
-            playRandomToadNoise(sound);
-
-            Form form = new Form();
-            PictureBox box = new PictureBox();
-
-            IntPtr Hicon = SM64O.Properties.Resources.toad.GetHicon();
-            Icon newIcon = Icon.FromHandle(Hicon);
-            form.Icon = newIcon;
-            form.Text = "toad";
-
-            box.Image = SM64O.Properties.Resources.toad;
-            box.SizeMode = PictureBoxSizeMode.StretchImage;
-            box.Size = new Size(form.Size.Width, form.Size.Height);
-
-            int randomX = rnd.Next(0, Screen.PrimaryScreen.Bounds.Size.Width - 300);
-            int randomY = rnd.Next(0, Screen.PrimaryScreen.Bounds.Size.Height - 400);
-
-            form.StartPosition = FormStartPosition.Manual;
-            form.Location = new Point(randomX, randomY);
-            form.Controls.Add(box);
-
-            form.Show();
-        }
-
         private void button2_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Super Mario 64 Online team"
+            MessageBox.Show("Super Mario 64 Online Team"
                 + Environment.NewLine
                 + "Kaze Emanuar"
                 + Environment.NewLine
@@ -1043,10 +961,7 @@ namespace SM64O
                 + Environment.NewLine
                 + "Character Head Icons created by: "
                 + Environment.NewLine
-                + "Quasmok"
-                + Environment.NewLine
-                + Environment.NewLine
-                + "Try finding the secret Easter Egg!");
+                + "Quasmok");
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -1146,8 +1061,8 @@ namespace SM64O
                 else if (resp == DialogResult.No)
                 {
                     sendChatTo("banned", conn);
-                    _bands.Add(conn.EndPoint.ToString());
-                    File.AppendAllText("bans.txt", conn.EndPoint.ToString() + "\n");
+                    _bands += conn.EndPoint.ToString().Split(':')[0] + Environment.NewLine;
+                    File.AppendAllText("bans.txt", conn.EndPoint.ToString().Split(':')[0] + Environment.NewLine);
                     conn.Close();
 
                     removePlayer(indx);
@@ -1252,23 +1167,6 @@ namespace SM64O
         {
             if (!_memory.Attached) return;
 
-            if (listener != null)
-            {
-                for (int i = 0; i < playerClient.Length; i++)
-                {
-                    if (playerClient[i] != null)
-                        playerClient[i].Connection.Close();
-                }
-
-                listener.Close();
-                listener.Dispose();
-            }
-            else if (connection != null)
-            {
-                connection.Close();
-                connection.Dispose();
-            }
-
             byte[] buffer = new byte[4];
 
             buffer[0] = 0x00;
@@ -1292,9 +1190,6 @@ namespace SM64O
             buffer[3] = 0x00;
 
             _memory.WriteMemory(0x38eee0, buffer, buffer.Length);
-
-            Program.ResetMe = true;
-            Close();
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
@@ -1401,4 +1296,3 @@ namespace SM64O
         }
     }
 }
- 
