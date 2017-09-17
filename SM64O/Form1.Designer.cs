@@ -39,7 +39,6 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.listBox1 = new System.Windows.Forms.ListBox();
-            this.toadTimer = new System.Windows.Forms.Timer(this.components);
             this.button2 = new System.Windows.Forms.Button();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
@@ -147,7 +146,7 @@
             this.numericUpDown2.Size = new System.Drawing.Size(201, 20);
             this.numericUpDown2.TabIndex = 16;
             this.numericUpDown2.Value = new decimal(new int[] {
-            8000,
+            8080,
             0,
             0,
             0});
@@ -178,11 +177,6 @@
             this.listBox1.Size = new System.Drawing.Size(268, 199);
             this.listBox1.TabIndex = 13;
             this.listBox1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listBox1_MouseDoubleClick);
-            // 
-            // toadTimer
-            // 
-            this.toadTimer.Interval = 1500;
-            this.toadTimer.Tick += new System.EventHandler(this.toadTimer_Tick);
             // 
             // button2
             // 
@@ -436,7 +430,7 @@
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(102, 37);
             this.button4.TabIndex = 41;
-            this.button4.Text = "Disconnect";
+            this.button4.Text = "Reset Game";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
@@ -494,7 +488,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "Form1";
-            this.Text = "SM64 Online Tool v1.3";
+            this.Text = "SM64 Online Tool v1.3.1 Hotfix";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -525,7 +519,6 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ListBox listBox1;
-        private System.Windows.Forms.Timer toadTimer;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.ColorDialog colorDialog1;
         private System.Windows.Forms.ComboBox comboBox1;
