@@ -179,6 +179,8 @@ namespace Hazel.Udp
                 }
             }
 
+            connection.LastMessage = DateTime.Now;
+
             //Inform the connection of the buffer (new connections need to send an ack back to client)
             connection.HandleReceive(buffer);
             

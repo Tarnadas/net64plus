@@ -11,7 +11,7 @@ namespace Hazel.Udp
     ///     Represents a servers's connection to a client that uses the UDP protocol.
     /// </summary>
     /// <inheritdoc/>
-    sealed class UdpServerConnection : UdpConnection
+    public sealed class UdpServerConnection : UdpConnection
     {
         /// <summary>
         ///     The connection listener that we use the socket of.
@@ -21,6 +21,7 @@ namespace Hazel.Udp
         ///     created this connection and is hence the listener this conenction sends and receives via.
         /// </remarks>
         public UdpConnectionListener Listener { get; private set; }
+        public DateTime LastMessage { get; set; }
 
         /// <summary>
         ///     Lock object for the writing to the state of the connection.
@@ -33,7 +34,7 @@ namespace Hazel.Udp
         /// <param name="listener">The listener that created this connection.</param>
         /// <param name="endPoint">The endpoint that we are connected to.</param>
         /// <param name="IPMode">The IPMode we are connected using.</param>
-        internal UdpServerConnection(UdpConnectionListener listener, EndPoint endPoint, IPMode IPMode)
+        public UdpServerConnection(UdpConnectionListener listener, EndPoint endPoint, IPMode IPMode)
             : base()
         {
             this.Listener = listener;

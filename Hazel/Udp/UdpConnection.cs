@@ -41,7 +41,8 @@ namespace Hazel.Udp
         {
             //Early check
             if (State != ConnectionState.Connected)
-                throw new InvalidOperationException("Could not send data as this Connection is not connected. Did you disconnect?");
+                return;
+                //throw new InvalidOperationException("Could not send data as this Connection is not connected. Did you disconnect?");
 
             //Add header information and send
             HandleSend(bytes, (byte)sendOption);

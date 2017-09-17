@@ -38,7 +38,7 @@ namespace Hazel.Udp
                 ResetKeepAliveTimer();
             }
         }
-        int keepAliveInterval = 10000;
+        int keepAliveInterval = 5000;
 
         /// <summary>
         ///     The timer creating keepalive pulses.

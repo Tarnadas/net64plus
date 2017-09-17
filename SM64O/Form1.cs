@@ -640,10 +640,6 @@ namespace SM64O
         {
             var conn = (Connection) sender;
 
-            int id = getClient(conn);
-            if (id != -1)
-                playerClient[id].LastUpdate = DateTime.Now;
-
             ReceivePacket(conn, e.Bytes);
 
             e.Recycle();
@@ -1194,9 +1190,9 @@ namespace SM64O
                 {
                     removePlayer(i);
                 }
-                else if (playerClient[i].LastUpdate.HasValue &&
-                         DateTime.Now.Subtract(playerClient[i].LastUpdate.Value).TotalMilliseconds > 8000)
+                else if (DateTime.Now.Subtract(((UdpServerConnection)playerClient[i].Connection).LastMessage).TotalMilliseconds > 10000)
                 {
+                    Program.LogException(new Exception("Player " + playerClient[i].Name + " timed out"));
                     playerClient[i].Connection.Close();
                     removePlayer(i);
                 }

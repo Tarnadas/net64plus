@@ -33,9 +33,21 @@ namespace SM64O
             
             INatDevice dev = Devices[0];
 
-            IPAddress external = dev.GetExternalIP();
+            string external = null;
 
-            return _cachedIp = external.ToString();
+            try
+            {
+                var ip = dev.GetExternalIP();
+                if (ip == null)
+                    throw new NullReferenceException();
+                external = ip.ToString();
+            }
+            catch (NullReferenceException)
+            {
+                return null;
+            }
+
+            return _cachedIp = external;
         }
 
         public bool AddPortRule(int port, bool tcp, string desc)
@@ -51,8 +63,9 @@ namespace SM64O
                 _mappings.Add(map);
                 return true;
             }
-            catch (MappingException)
+            catch (MappingException ex)
             {
+                Program.LogException(ex);
                 return false;
             }
         }
@@ -76,7 +89,14 @@ namespace SM64O
 
             foreach (var mapping in _mappings)
             {
-                Devices[0].DeletePortMap(mapping);
+                try
+                {
+                    Devices[0].DeletePortMap(mapping);
+                }
+                catch (MappingException ex)
+                {
+                    Program.LogException(ex);
+                }
             }
 
             _mappings.Clear();

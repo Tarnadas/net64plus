@@ -62,7 +62,10 @@ namespace Hazel.Udp
             lock (socketLock)
             {
                 if (State != ConnectionState.Connected && State != ConnectionState.Connecting)
-                    throw new InvalidOperationException("Could not send data as this Connection is not connected and is not connecting. Did you disconnect?");
+                {
+                    return;
+                }
+                    //throw new InvalidOperationException("Could not send data as this Connection is not connected and is not connecting. Did you disconnect?");
 
                 try
                 {
