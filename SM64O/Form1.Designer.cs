@@ -403,12 +403,7 @@
             this.gamemodeBox.FormattingEnabled = true;
             this.gamemodeBox.Items.AddRange(new object[] {
             "Normal Mode",
-            "3rd Person Shooter",
-            "No Interactions",
-            "Prop Hunt",
-            "Boss Rush",
-            "Tag Mode",
-            "Hide & Seek"});
+            "No Interactions"});
             this.gamemodeBox.Location = new System.Drawing.Point(119, 40);
             this.gamemodeBox.Name = "gamemodeBox";
             this.gamemodeBox.Size = new System.Drawing.Size(163, 21);
@@ -522,7 +517,7 @@
             // creditsToolStripMenuItem
             // 
             this.creditsToolStripMenuItem.Name = "creditsToolStripMenuItem";
-            this.creditsToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
+            this.creditsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.creditsToolStripMenuItem.Text = "Credits";
             this.creditsToolStripMenuItem.Click += new System.EventHandler(this.creditsToolStripMenuItem_Click);
             // 

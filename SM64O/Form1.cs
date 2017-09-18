@@ -1040,22 +1040,7 @@ namespace SM64O
                     buffer[0] = 1;
                     break;
                 case 1:
-                    buffer[0] = 2;
-                    break;
-                case 2:
                     buffer[0] = 3;
-                    break;
-                case 3:
-                    buffer[0] = 4;
-                    break;
-                case 4:
-                    buffer[0] = 5;
-                    break;
-                case 5:
-                    buffer[0] = 6;
-                    break;
-                case 6:
-                    buffer[0] = 7;
                     break;
             }
 
