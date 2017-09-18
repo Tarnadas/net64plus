@@ -32,7 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.buttonJoin = new System.Windows.Forms.Button();
             this.checkBoxServer = new System.Windows.Forms.CheckBox();
-            this.textBox5 = new System.Windows.Forms.TextBox();
+            this.textBoxAddress = new System.Windows.Forms.TextBox();
             this.labelAddress = new System.Windows.Forms.Label();
             this.numUpDownInterval = new System.Windows.Forms.NumericUpDown();
             this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
@@ -98,13 +98,13 @@
             this.checkBoxServer.UseVisualStyleBackColor = true;
             this.checkBoxServer.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
-            // textBox5
+            // textBoxAddress
             // 
-            this.textBox5.Location = new System.Drawing.Point(79, 20);
-            this.textBox5.Name = "textBox5";
-            this.textBox5.Size = new System.Drawing.Size(201, 20);
-            this.textBox5.TabIndex = 11;
-            this.textBox5.TextChanged += new System.EventHandler(this.textBox5_TextChanged);
+            this.textBoxAddress.Location = new System.Drawing.Point(79, 20);
+            this.textBoxAddress.Name = "textBoxAddress";
+            this.textBoxAddress.Size = new System.Drawing.Size(201, 20);
+            this.textBoxAddress.TabIndex = 11;
+            this.textBoxAddress.TextChanged += new System.EventHandler(this.textBox5_TextChanged);
             // 
             // labelAddress
             // 
@@ -331,7 +331,7 @@
             this.panel1.Controls.Add(this.buttonJoin);
             this.panel1.Controls.Add(this.usernameBox);
             this.panel1.Controls.Add(this.checkBoxServer);
-            this.panel1.Controls.Add(this.textBox5);
+            this.panel1.Controls.Add(this.textBoxAddress);
             this.panel1.Controls.Add(this.numUpDownInterval);
             this.panel1.Controls.Add(this.labelRateUpdate);
             this.panel1.Controls.Add(this.numericUpDown2);
@@ -512,7 +512,7 @@
 
         private System.Windows.Forms.Button buttonJoin;
         private System.Windows.Forms.CheckBox checkBoxServer;
-        private System.Windows.Forms.TextBox textBox5;
+        private System.Windows.Forms.TextBox textBoxAddress;
         private System.Windows.Forms.Label labelAddress;
         private System.Windows.Forms.NumericUpDown numUpDownInterval;
         private System.Windows.Forms.NumericUpDown numericUpDown2;

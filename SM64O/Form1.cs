@@ -103,7 +103,7 @@ namespace SM64O
         {
             if (checkBoxServer.Checked)
             {
-                textBox5.Text = _upnp.GetExternalIp();
+                textBoxAddress.Text = _upnp.GetExternalIp();
             }
 
             toolStripStatusLabel1.Text = "Universal Plug 'n' Play is available!";
@@ -291,13 +291,13 @@ namespace SM64O
             {
                 if (checkBoxServer.Checked)
                 {
-                    textBox5.Text = "";
+                    textBoxAddress.Text = "";
                     int port = (int) numericUpDown2.Value;
 
                     if (_upnp.UPnPAvailable && !checkBoxLAN.Enabled)
                     {
                         _upnp.AddPortRule(port, false, "SM64O");
-                        textBox5.Text = _upnp.GetExternalIp();
+                        textBoxAddress.Text = _upnp.GetExternalIp();
                     }
                     
                     listener = new UdpConnectionListener(new NetworkEndPoint(IPAddress.Any, port));
@@ -314,8 +314,8 @@ namespace SM64O
 
                         if (success)
                         {
-                            if (string.IsNullOrEmpty(textBox5.Text) && !string.IsNullOrEmpty(NetworkHelper.ExternalIp))
-                                textBox5.Text = NetworkHelper.ExternalIp;
+                            if (string.IsNullOrEmpty(textBoxAddress.Text) && !string.IsNullOrEmpty(NetworkHelper.ExternalIp))
+                                textBoxAddress.Text = NetworkHelper.ExternalIp;
                         }
                         else
                         {
@@ -371,7 +371,7 @@ namespace SM64O
                     IPAddress target = null;
                     bool isIp6 = false;
 
-                    string text = textBox5.Text.Trim();
+                    string text = textBoxAddress.Text.Trim();
 
                     if (!IPAddress.TryParse(text, out target))
                     {
@@ -432,7 +432,7 @@ namespace SM64O
             buttonChat.Enabled = true;
             numericUpDown2.Enabled = false;
             checkBoxLAN.Enabled = false;
-            textBox5.ReadOnly = true;
+            textBoxAddress.ReadOnly = true;
 
             comboBoxEmulator.Enabled = false;
             //comboBox2.Enabled = false;
@@ -454,7 +454,7 @@ namespace SM64O
 
             Settings sets = new Settings();
 
-            sets.LastIp = checkBoxServer.Checked ? "" : textBox5.Text;
+            sets.LastIp = checkBoxServer.Checked ? "" : textBoxAddress.Text;
             sets.LastPort = (int) numericUpDown2.Value;
             sets.Username = usernameBox.Text;
 
@@ -877,7 +877,7 @@ namespace SM64O
 
         private void textBox5_TextChanged(object sender, EventArgs e)
         {
-            if (textBox5.Text != "")
+            if (textBoxAddress.Text != "")
             {
                 buttonJoin.Enabled = true;
             }
@@ -896,7 +896,7 @@ namespace SM64O
         {
             if (checkBoxServer.Checked)
             {
-                textBox5.Text = "";
+                textBoxAddress.Text = "";
                 usernameBox.Text = "";
                 usernameBox.Enabled = false;
 
@@ -905,12 +905,12 @@ namespace SM64O
                 buttonJoin.Text = "Create Server!";
                 usernameBox.Enabled = false;
                 panel2.Enabled = true;
-                textBox5.ReadOnly = true;
+                textBoxAddress.ReadOnly = true;
                 buttonJoin.Enabled = true;
 
                 if (_upnp.UPnPAvailable)
-                    textBox5.Text = _upnp.GetExternalIp();
-                else textBox5.Text = "";
+                    textBoxAddress.Text = _upnp.GetExternalIp();
+                else textBoxAddress.Text = "";
 
                 checkBoxLAN.Enabled = true;
             }
@@ -919,8 +919,8 @@ namespace SM64O
                 usernameBox.Enabled = true;
 
                 buttonJoin.Text = "Connect to server!";
-                textBox5.ReadOnly = false;
-                textBox5.Text = "";
+                textBoxAddress.ReadOnly = false;
+                textBoxAddress.Text = "";
                 usernameBox.Enabled = true;
                 panel2.Enabled = false;
                 buttonJoin.Enabled = false;
@@ -974,7 +974,7 @@ namespace SM64O
 
             if (sets != null)
             {
-                textBox5.Text = sets.LastIp;
+                textBoxAddress.Text = sets.LastIp;
                 numericUpDown2.Value = sets.LastPort;
                 usernameBox.Text = sets.Username;
 
@@ -995,7 +995,7 @@ namespace SM64O
             // Set up the ToolTip text for the Buttons, Labels and Checkboxes.
             // Could probably use better names for the labels, buttons and checkboxes, to tell them apart!
             toolTip1.SetToolTip(this.labelAddress, "Input the IP Address to the host");
-            toolTip1.SetToolTip(this.textBox5, "Input the IP Address to the host");
+            toolTip1.SetToolTip(this.textBoxAddress, "Input the IP Address to the host");
 
             toolTip1.SetToolTip(this.labelPort, "Input the port to the host");
             toolTip1.SetToolTip(this.numericUpDown2, "Input the port to the host");
