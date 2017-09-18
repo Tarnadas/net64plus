@@ -151,13 +151,13 @@ namespace SM64O
                 case "Nemu64":
                     _memory.ReadMemoryAbs(_memory.MainModuleAddress + 0x3C8A10C, buffer, buffer.Length);
 
-                    romname = Encoding.ASCII.GetString(buffer, 0, Array.IndexOf(buffer, (byte)0));
+                    romname = Program.GetASCIIString(buffer, 0, Array.IndexOf(buffer, (byte)0));
                     break;
                 case "Mupen64+":
                     {
                         _memory.ReadMemoryAbs(_memory.GetModuleBaseAddress("mupen64plus.dll") + 0x1751CA0, buffer, buffer.Length);
 
-                        romname = Encoding.ASCII.GetString(buffer, 0, Array.IndexOf(buffer, (byte)0));
+                        romname = Program.GetASCIIString(buffer, 0, Array.IndexOf(buffer, (byte)0));
                     }
                     break;
             }
@@ -180,7 +180,7 @@ namespace SM64O
 
             byte[] messageBytes = Encoding.ASCII.GetBytes(message);
             byte[] usernameBytes = Encoding.ASCII.GetBytes(name);
-
+            
 
             byte[] payload = new byte[1 + messageBytes.Length + 1 + usernameBytes.Length];
 
@@ -571,7 +571,7 @@ namespace SM64O
                             if (e.HandshakeData.Length >= 4)
                             {
                                 byte usernameLen = handshakeData[3];
-                                string name = Encoding.ASCII.GetString(handshakeData, 4, usernameLen);
+                                string name = Program.GetASCIIString(handshakeData, 4, usernameLen);
                                 playerClient[i].Name = name;
                             }
 
@@ -740,9 +740,9 @@ namespace SM64O
             string sender = "";
 
             int msgLen = data[0];
-            message = Encoding.ASCII.GetString(data, 1, msgLen);
+            message = Program.GetASCIIString(data, 1, msgLen);
             int nameLen = data[msgLen + 1];
-            sender = Encoding.ASCII.GetString(data, msgLen + 2, nameLen);
+            sender = Program.GetASCIIString(data, msgLen + 2, nameLen);
 
             Characters.setMessage(message, _memory);
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -69,6 +70,23 @@ namespace SM64O
             }
 
             return target;
+        }
+
+        public static string GetASCIIString(byte[] data, int startIndex, int count)
+        {
+            try
+            {
+                return Encoding.ASCII.GetString(data, startIndex, count);
+            }
+            catch (ArgumentException)
+            {
+                return "";
+            }
+        }
+
+        public static string GetASCIIString(byte[] data)
+        {
+            return GetASCIIString(data, 0, data.Length);
         }
     }
 }
