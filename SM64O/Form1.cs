@@ -981,6 +981,55 @@ namespace SM64O
                 comboBox1.SelectedIndex = sets.LastEmulator;
                 comboBox2.SelectedIndex = sets.LastCharacter;
             }
+           
+            // Create the ToolTip and associate with the Form container.
+            ToolTip toolTip1 = new ToolTip();
+
+            // Set up the delays for the ToolTip.
+            toolTip1.AutoPopDelay = 5000;
+            toolTip1.InitialDelay = 1000;
+            toolTip1.ReshowDelay = 500;
+            // Force the ToolTip text to be displayed whether or not the form is active.
+            toolTip1.ShowAlways = true;
+
+            // Set up the ToolTip text for the Buttons, Labels and Checkboxes.
+            // Could probably use better names for the labels, buttons and checkboxes, to tell them apart!
+            toolTip1.SetToolTip(this.label2, "Input the IP Address to the host");
+            toolTip1.SetToolTip(this.textBox5, "Input the IP Address to the host");
+
+            toolTip1.SetToolTip(this.label4, "Input the port to the host");
+            toolTip1.SetToolTip(this.numericUpDown2, "Input the port to the host");
+
+            toolTip1.SetToolTip(this.label1, "Input your username");
+            toolTip1.SetToolTip(this.usernameBox, "Input your username");
+
+            toolTip1.SetToolTip(this.checkBox2, "Check this to disable the chat in your server");
+            toolTip1.SetToolTip(this.checkBox1, "Check this if you want to make your own server");
+            toolTip1.SetToolTip(this.lanCheckbox, "Check this to only allow LAN connections to your server");
+
+            toolTip1.SetToolTip(this.label5, "The lower the interval, the faster you request updates from other players");
+
+            toolTip1.SetToolTip(this.label3, "Select your emulator");
+            toolTip1.SetToolTip(this.comboBox1, "Select your emulator");
+
+            toolTip1.SetToolTip(this.label6, "Select your playable character");
+            toolTip1.SetToolTip(this.comboBox2, "Select your playable character");
+
+            toolTip1.SetToolTip(this.chatBox, "Type your chat messages here");
+            toolTip1.SetToolTip(this.button3, "Click here to send your message");
+
+            toolTip1.SetToolTip(this.label7, "Max number of allowed connections to your server");
+            toolTip1.SetToolTip(this.numericUpDown3, "Max number of allowed connections to your server");
+
+            toolTip1.SetToolTip(this.label10, "Select your gamemode");
+            toolTip1.SetToolTip(this.gamemodeBox, "Select your gamemode");
+
+            toolTip1.SetToolTip(this.playersOnline, "Lists all players who are connected and their messages");
+            toolTip1.SetToolTip(this.listBox1, "Lists all players who are connected and their messages");
+
+            toolTip1.SetToolTip(this.button4, "Click here to reset your game");
+
+            toolTip1.SetToolTip(this.button2, "Click here to see the credits");
         }
 
         public void setGamemode()
