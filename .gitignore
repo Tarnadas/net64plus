@@ -1,0 +1,23 @@
+# Visual Studio droppings
+.vs/
+
+# don't commit binaries (they change too much)
+SM64O/bin/
+SM64O/obj/
+
+# EXCEPT this file - might be important!!
+!SM64O/bin/Release/Release.zip
+
+# Xamarin Studio/MonoDevelop droppings
+*.csproj.user
+*.userprefs
+
+# Mac shit
+.DS_Store
+
+# vim shit
+*.swp
+*.swx
+*.swo
+*.swj
+

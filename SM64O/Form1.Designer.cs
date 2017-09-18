@@ -31,9 +31,6 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.button1 = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.textBox5 = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -42,66 +39,58 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.listBox1 = new System.Windows.Forms.ListBox();
-            this.toadTimer = new System.Windows.Forms.Timer(this.components);
             this.button2 = new System.Windows.Forms.Button();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
-            this.miniGame3 = new System.Windows.Forms.RadioButton();
-            this.miniGame4 = new System.Windows.Forms.RadioButton();
-            this.miniGame1 = new System.Windows.Forms.RadioButton();
-            this.miniGame5 = new System.Windows.Forms.RadioButton();
-            this.miniGame6 = new System.Windows.Forms.RadioButton();
-            this.miniGame2 = new System.Windows.Forms.RadioButton();
             this.label7 = new System.Windows.Forms.Label();
             this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
             this.playersOnline = new System.Windows.Forms.Label();
             this.chatBox = new System.Windows.Forms.TextBox();
             this.button3 = new System.Windows.Forms.Button();
+            this.usernameBox = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.playerCheckTimer = new System.Windows.Forms.Timer(this.components);
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.lanCheckbox = new System.Windows.Forms.CheckBox();
+            this.checkBox2 = new System.Windows.Forms.CheckBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.label10 = new System.Windows.Forms.Label();
+            this.gamemodeBox = new System.Windows.Forms.ComboBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.button4 = new System.Windows.Forms.Button();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.pingLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.pingTimer = new System.Windows.Forms.Timer(this.components);
+            this.backgroundPanel = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
+            this.panel1.SuspendLayout();
+            this.panel2.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
+            this.backgroundPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // button1
             // 
             this.button1.Enabled = false;
-            this.button1.Location = new System.Drawing.Point(16, 187);
+            this.button1.Location = new System.Drawing.Point(13, 212);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(268, 43);
+            this.button1.Size = new System.Drawing.Size(268, 49);
             this.button1.TabIndex = 0;
             this.button1.Text = "Connect to server!";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(13, 239);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(75, 13);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "Base Address:";
-            // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(93, 236);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(190, 20);
-            this.textBox1.TabIndex = 2;
-            // 
-            // timer1
-            // 
-            this.timer1.Interval = 5;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-            // 
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(190, 64);
+            this.checkBox1.Location = new System.Drawing.Point(108, 98);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(97, 17);
             this.checkBox1.TabIndex = 10;
@@ -111,7 +100,7 @@
             // 
             // textBox5
             // 
-            this.textBox5.Location = new System.Drawing.Point(79, 11);
+            this.textBox5.Location = new System.Drawing.Point(79, 20);
             this.textBox5.Name = "textBox5";
             this.textBox5.Size = new System.Drawing.Size(201, 20);
             this.textBox5.TabIndex = 11;
@@ -120,7 +109,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 14);
+            this.label2.Location = new System.Drawing.Point(12, 23);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(61, 13);
             this.label2.TabIndex = 12;
@@ -129,12 +118,12 @@
             // numericUpDown1
             // 
             this.numericUpDown1.Enabled = false;
-            this.numericUpDown1.Location = new System.Drawing.Point(212, 273);
+            this.numericUpDown1.Location = new System.Drawing.Point(227, 122);
             this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(72, 20);
+            this.numericUpDown1.Size = new System.Drawing.Size(53, 20);
             this.numericUpDown1.TabIndex = 14;
             this.numericUpDown1.Value = new decimal(new int[] {
-            33,
+            16,
             0,
             0,
             0});
@@ -142,7 +131,7 @@
             // 
             // numericUpDown2
             // 
-            this.numericUpDown2.Location = new System.Drawing.Point(79, 37);
+            this.numericUpDown2.Location = new System.Drawing.Point(79, 46);
             this.numericUpDown2.Maximum = new decimal(new int[] {
             65536,
             0,
@@ -157,7 +146,7 @@
             this.numericUpDown2.Size = new System.Drawing.Size(201, 20);
             this.numericUpDown2.TabIndex = 16;
             this.numericUpDown2.Value = new decimal(new int[] {
-            8000,
+            8080,
             0,
             0,
             0});
@@ -165,7 +154,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(44, 39);
+            this.label4.Location = new System.Drawing.Point(44, 48);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(29, 13);
             this.label4.TabIndex = 17;
@@ -174,7 +163,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(80, 275);
+            this.label5.Location = new System.Drawing.Point(95, 124);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(126, 13);
             this.label5.TabIndex = 18;
@@ -183,22 +172,17 @@
             // listBox1
             // 
             this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(16, 356);
+            this.listBox1.Location = new System.Drawing.Point(13, 84);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(268, 121);
+            this.listBox1.Size = new System.Drawing.Size(268, 199);
             this.listBox1.TabIndex = 13;
             this.listBox1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listBox1_MouseDoubleClick);
             // 
-            // toadTimer
-            // 
-            this.toadTimer.Interval = 1500;
-            this.toadTimer.Tick += new System.EventHandler(this.toadTimer_Tick);
-            // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(17, 299);
+            this.button2.Location = new System.Drawing.Point(421, 315);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(267, 27);
+            this.button2.Size = new System.Drawing.Size(187, 37);
             this.button2.TabIndex = 19;
             this.button2.Text = "Credits";
             this.button2.UseVisualStyleBackColor = true;
@@ -212,7 +196,7 @@
             "Project64",
             "Nemu64",
             "Mupen64"});
-            this.comboBox1.Location = new System.Drawing.Point(70, 86);
+            this.comboBox1.Location = new System.Drawing.Point(71, 152);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(210, 21);
             this.comboBox1.TabIndex = 20;
@@ -220,7 +204,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(13, 89);
+            this.label3.Location = new System.Drawing.Point(13, 155);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(51, 13);
             this.label3.TabIndex = 21;
@@ -239,121 +223,48 @@
             "Toad",
             "Waluigi",
             "Rosalina"});
-            this.comboBox2.Location = new System.Drawing.Point(114, 113);
+            this.comboBox2.Location = new System.Drawing.Point(115, 179);
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(166, 21);
             this.comboBox2.TabIndex = 22;
+            this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(13, 116);
+            this.label6.Location = new System.Drawing.Point(13, 182);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(95, 13);
             this.label6.TabIndex = 23;
             this.label6.Text = "Select your Player:";
             // 
-            // miniGame3
-            // 
-            this.miniGame3.AutoSize = true;
-            this.miniGame3.Enabled = false;
-            this.miniGame3.Location = new System.Drawing.Point(187, 142);
-            this.miniGame3.Name = "miniGame3";
-            this.miniGame3.Size = new System.Drawing.Size(97, 17);
-            this.miniGame3.TabIndex = 24;
-            this.miniGame3.Text = "No Interactions";
-            this.miniGame3.UseVisualStyleBackColor = true;
-            this.miniGame3.CheckedChanged += new System.EventHandler(this.miniGame3_CheckedChanged);
-            // 
-            // miniGame4
-            // 
-            this.miniGame4.AutoSize = true;
-            this.miniGame4.Enabled = false;
-            this.miniGame4.Location = new System.Drawing.Point(16, 164);
-            this.miniGame4.Name = "miniGame4";
-            this.miniGame4.Size = new System.Drawing.Size(73, 17);
-            this.miniGame4.TabIndex = 25;
-            this.miniGame4.Text = "Prop Hunt";
-            this.miniGame4.UseVisualStyleBackColor = true;
-            this.miniGame4.CheckedChanged += new System.EventHandler(this.miniGame4_CheckedChanged);
-            // 
-            // miniGame1
-            // 
-            this.miniGame1.AutoSize = true;
-            this.miniGame1.Checked = true;
-            this.miniGame1.Enabled = false;
-            this.miniGame1.Location = new System.Drawing.Point(16, 142);
-            this.miniGame1.Name = "miniGame1";
-            this.miniGame1.Size = new System.Drawing.Size(88, 17);
-            this.miniGame1.TabIndex = 26;
-            this.miniGame1.TabStop = true;
-            this.miniGame1.Text = "Normal Mode";
-            this.miniGame1.UseVisualStyleBackColor = true;
-            this.miniGame1.CheckedChanged += new System.EventHandler(this.miniGame1_CheckedChanged);
-            // 
-            // miniGame5
-            // 
-            this.miniGame5.AutoSize = true;
-            this.miniGame5.Enabled = false;
-            this.miniGame5.Location = new System.Drawing.Point(107, 164);
-            this.miniGame5.Name = "miniGame5";
-            this.miniGame5.Size = new System.Drawing.Size(76, 17);
-            this.miniGame5.TabIndex = 28;
-            this.miniGame5.Text = "Boss Rush";
-            this.miniGame5.UseVisualStyleBackColor = true;
-            this.miniGame5.CheckedChanged += new System.EventHandler(this.miniGame5_CheckedChanged);
-            // 
-            // miniGame6
-            // 
-            this.miniGame6.AutoSize = true;
-            this.miniGame6.Enabled = false;
-            this.miniGame6.Location = new System.Drawing.Point(196, 164);
-            this.miniGame6.Name = "miniGame6";
-            this.miniGame6.Size = new System.Drawing.Size(74, 17);
-            this.miniGame6.TabIndex = 29;
-            this.miniGame6.Text = "Tag Mode";
-            this.miniGame6.UseVisualStyleBackColor = true;
-            this.miniGame6.CheckedChanged += new System.EventHandler(this.miniGame6_CheckedChanged);
-            // 
-            // miniGame2
-            // 
-            this.miniGame2.AutoSize = true;
-            this.miniGame2.Enabled = false;
-            this.miniGame2.Location = new System.Drawing.Point(107, 142);
-            this.miniGame2.Name = "miniGame2";
-            this.miniGame2.Size = new System.Drawing.Size(76, 17);
-            this.miniGame2.TabIndex = 27;
-            this.miniGame2.Text = "TPS Mode";
-            this.miniGame2.UseVisualStyleBackColor = true;
-            this.miniGame2.CheckedChanged += new System.EventHandler(this.miniGame2_CheckedChanged);
-            // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(12, 64);
+            this.label7.Location = new System.Drawing.Point(21, 17);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(67, 13);
+            this.label7.Size = new System.Drawing.Size(92, 13);
             this.label7.TabIndex = 30;
-            this.label7.Text = "Max Players:";
+            this.label7.Text = "Max Connections:";
             // 
             // numericUpDown3
             // 
-            this.numericUpDown3.Location = new System.Drawing.Point(79, 62);
+            this.numericUpDown3.Location = new System.Drawing.Point(119, 15);
             this.numericUpDown3.Maximum = new decimal(new int[] {
-            24,
+            64,
             0,
             0,
             0});
             this.numericUpDown3.Minimum = new decimal(new int[] {
-            2,
+            1,
             0,
             0,
             0});
             this.numericUpDown3.Name = "numericUpDown3";
-            this.numericUpDown3.Size = new System.Drawing.Size(62, 20);
+            this.numericUpDown3.Size = new System.Drawing.Size(163, 20);
             this.numericUpDown3.TabIndex = 31;
             this.numericUpDown3.Value = new decimal(new int[] {
-            24,
+            23,
             0,
             0,
             0});
@@ -362,7 +273,7 @@
             // playersOnline
             // 
             this.playersOnline.AutoSize = true;
-            this.playersOnline.Location = new System.Drawing.Point(15, 337);
+            this.playersOnline.Location = new System.Drawing.Point(10, 68);
             this.playersOnline.Name = "playersOnline";
             this.playersOnline.Size = new System.Drawing.Size(77, 13);
             this.playersOnline.TabIndex = 32;
@@ -370,63 +281,228 @@
             // 
             // chatBox
             // 
-            this.chatBox.Location = new System.Drawing.Point(15, 491);
+            this.chatBox.Enabled = false;
+            this.chatBox.Location = new System.Drawing.Point(12, 289);
             this.chatBox.MaxLength = 24;
             this.chatBox.Name = "chatBox";
-            this.chatBox.Size = new System.Drawing.Size(269, 20);
+            this.chatBox.Size = new System.Drawing.Size(295, 20);
             this.chatBox.TabIndex = 33;
+            this.chatBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.chatBox_KeyDown);
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(15, 517);
+            this.button3.Enabled = false;
+            this.button3.Location = new System.Drawing.Point(12, 315);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(269, 26);
+            this.button3.Size = new System.Drawing.Size(295, 37);
             this.button3.TabIndex = 34;
             this.button3.Text = "Chat";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
+            // usernameBox
+            // 
+            this.usernameBox.Location = new System.Drawing.Point(79, 72);
+            this.usernameBox.Name = "usernameBox";
+            this.usernameBox.Size = new System.Drawing.Size(201, 20);
+            this.usernameBox.TabIndex = 35;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(15, 75);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(58, 13);
+            this.label1.TabIndex = 36;
+            this.label1.Text = "Username:";
+            // 
+            // playerCheckTimer
+            // 
+            this.playerCheckTimer.Interval = 1000;
+            this.playerCheckTimer.Tick += new System.EventHandler(this.playerCheckTimer_Tick);
+            // 
+            // panel1
+            // 
+            this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel1.Controls.Add(this.lanCheckbox);
+            this.panel1.Controls.Add(this.label2);
+            this.panel1.Controls.Add(this.label1);
+            this.panel1.Controls.Add(this.checkBox2);
+            this.panel1.Controls.Add(this.button1);
+            this.panel1.Controls.Add(this.usernameBox);
+            this.panel1.Controls.Add(this.checkBox1);
+            this.panel1.Controls.Add(this.textBox5);
+            this.panel1.Controls.Add(this.numericUpDown1);
+            this.panel1.Controls.Add(this.label5);
+            this.panel1.Controls.Add(this.numericUpDown2);
+            this.panel1.Controls.Add(this.label4);
+            this.panel1.Controls.Add(this.comboBox1);
+            this.panel1.Controls.Add(this.label3);
+            this.panel1.Controls.Add(this.comboBox2);
+            this.panel1.Controls.Add(this.label6);
+            this.panel1.Location = new System.Drawing.Point(12, 12);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(295, 271);
+            this.panel1.TabIndex = 37;
+            // 
+            // lanCheckbox
+            // 
+            this.lanCheckbox.AutoSize = true;
+            this.lanCheckbox.Enabled = false;
+            this.lanCheckbox.Location = new System.Drawing.Point(211, 98);
+            this.lanCheckbox.Name = "lanCheckbox";
+            this.lanCheckbox.Size = new System.Drawing.Size(71, 17);
+            this.lanCheckbox.TabIndex = 37;
+            this.lanCheckbox.Text = "LAN Only";
+            this.lanCheckbox.UseVisualStyleBackColor = true;
+            // 
+            // checkBox2
+            // 
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.Enabled = false;
+            this.checkBox2.Location = new System.Drawing.Point(13, 98);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(92, 17);
+            this.checkBox2.TabIndex = 33;
+            this.checkBox2.Text = "Disable Chat?";
+            this.checkBox2.UseVisualStyleBackColor = true;
+            this.checkBox2.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(27, 6);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(105, 13);
+            this.label8.TabIndex = 38;
+            this.label8.Text = "Connection Settings:";
+            // 
+            // panel2
+            // 
+            this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel2.Controls.Add(this.label10);
+            this.panel2.Controls.Add(this.gamemodeBox);
+            this.panel2.Controls.Add(this.playersOnline);
+            this.panel2.Controls.Add(this.label7);
+            this.panel2.Controls.Add(this.listBox1);
+            this.panel2.Controls.Add(this.numericUpDown3);
+            this.panel2.Enabled = false;
+            this.panel2.Location = new System.Drawing.Point(313, 12);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(295, 297);
+            this.panel2.TabIndex = 39;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(12, 43);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(101, 13);
+            this.label10.TabIndex = 35;
+            this.label10.Text = "Current Gamemode:";
+            // 
+            // gamemodeBox
+            // 
+            this.gamemodeBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.gamemodeBox.FormattingEnabled = true;
+            this.gamemodeBox.Items.AddRange(new object[] {
+            "Normal Mode",
+            "No Interactions"});
+            this.gamemodeBox.Location = new System.Drawing.Point(119, 40);
+            this.gamemodeBox.Name = "gamemodeBox";
+            this.gamemodeBox.Size = new System.Drawing.Size(163, 21);
+            this.gamemodeBox.TabIndex = 34;
+            this.gamemodeBox.SelectedIndexChanged += new System.EventHandler(this.gamemodeBox_SelectedIndexChanged);
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(330, 6);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(82, 13);
+            this.label9.TabIndex = 40;
+            this.label9.Text = "Server Settings:";
+            // 
+            // button4
+            // 
+            this.button4.Enabled = false;
+            this.button4.Location = new System.Drawing.Point(313, 315);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(102, 37);
+            this.button4.TabIndex = 41;
+            this.button4.Text = "Reset Game";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripStatusLabel1,
+            this.pingLabel});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 367);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(618, 22);
+            this.statusStrip1.TabIndex = 42;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel1
+            // 
+            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(42, 17);
+            this.toolStripStatusLabel1.Text = "Ready!";
+            // 
+            // pingLabel
+            // 
+            this.pingLabel.Name = "pingLabel";
+            this.pingLabel.Size = new System.Drawing.Size(0, 17);
+            // 
+            // pingTimer
+            // 
+            this.pingTimer.Interval = 10000;
+            this.pingTimer.Tick += new System.EventHandler(this.pingTimer_Tick);
+            // 
+            // backgroundPanel
+            // 
+            this.backgroundPanel.Controls.Add(this.panel1);
+            this.backgroundPanel.Controls.Add(this.button4);
+            this.backgroundPanel.Controls.Add(this.panel2);
+            this.backgroundPanel.Controls.Add(this.chatBox);
+            this.backgroundPanel.Controls.Add(this.button2);
+            this.backgroundPanel.Controls.Add(this.button3);
+            this.backgroundPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.backgroundPanel.Location = new System.Drawing.Point(0, 0);
+            this.backgroundPanel.Name = "backgroundPanel";
+            this.backgroundPanel.Size = new System.Drawing.Size(618, 389);
+            this.backgroundPanel.TabIndex = 43;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(295, 558);
-            this.Controls.Add(this.button3);
-            this.Controls.Add(this.chatBox);
-            this.Controls.Add(this.playersOnline);
-            this.Controls.Add(this.numericUpDown3);
-            this.Controls.Add(this.label7);
-            this.Controls.Add(this.miniGame6);
-            this.Controls.Add(this.miniGame5);
-            this.Controls.Add(this.miniGame2);
-            this.Controls.Add(this.miniGame1);
-            this.Controls.Add(this.miniGame4);
-            this.Controls.Add(this.miniGame3);
-            this.Controls.Add(this.label6);
-            this.Controls.Add(this.comboBox2);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.comboBox1);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.numericUpDown2);
-            this.Controls.Add(this.numericUpDown1);
-            this.Controls.Add(this.listBox1);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.textBox5);
-            this.Controls.Add(this.checkBox1);
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.button1);
+            this.ClientSize = new System.Drawing.Size(618, 389);
+            this.Controls.Add(this.statusStrip1);
+            this.Controls.Add(this.label9);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.backgroundPanel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "Form1";
-            this.Text = "SM64 Online Tool v1.1";
+            this.Text = "SM64 Online Tool v1.3.1 Hotfix";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).EndInit();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
+            this.backgroundPanel.ResumeLayout(false);
+            this.backgroundPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -435,9 +511,6 @@
         #endregion
 
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.TextBox textBox5;
         private System.Windows.Forms.Label label2;
@@ -446,24 +519,34 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ListBox listBox1;
-        private System.Windows.Forms.Timer toadTimer;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.ColorDialog colorDialog1;
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ComboBox comboBox2;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.RadioButton miniGame3;
-        private System.Windows.Forms.RadioButton miniGame4;
-        private System.Windows.Forms.RadioButton miniGame1;
-        private System.Windows.Forms.RadioButton miniGame5;
-        private System.Windows.Forms.RadioButton miniGame6;
-        private System.Windows.Forms.RadioButton miniGame2;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.NumericUpDown numericUpDown3;
         private System.Windows.Forms.Label playersOnline;
         private System.Windows.Forms.TextBox chatBox;
         private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.TextBox usernameBox;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Timer playerCheckTimer;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.CheckBox checkBox2;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.ComboBox gamemodeBox;
+        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.ToolStripStatusLabel pingLabel;
+        private System.Windows.Forms.Timer pingTimer;
+        private System.Windows.Forms.CheckBox lanCheckbox;
+        private System.Windows.Forms.Panel backgroundPanel;
     }
 }
 
