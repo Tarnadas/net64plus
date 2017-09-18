@@ -1030,6 +1030,8 @@ namespace SM64O
             toolTip1.SetToolTip(this.buttonReset, "Click here to reset your game");
 
             toolTip1.SetToolTip(this.buttonCredits, "Click here to see the credits");
+
+            toolTip1.SetToolTip(this.buttonHelp, "Click here to open the forum webpage where you can find tutorials");
         }
 
         public void setGamemode()
@@ -1342,6 +1344,11 @@ namespace SM64O
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             _closing = true;
+        }
+
+        private void buttonHelp_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://sm64o.com/forumdisplay.php?fid=11");
         }
     }
 }

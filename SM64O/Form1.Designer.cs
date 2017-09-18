@@ -67,6 +67,7 @@
             this.pingLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.pingTimer = new System.Windows.Forms.Timer(this.components);
             this.backgroundPanel = new System.Windows.Forms.Panel();
+            this.buttonHelp = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDownInterval)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDownClients)).BeginInit();
@@ -182,7 +183,7 @@
             // 
             this.buttonCredits.Location = new System.Drawing.Point(421, 315);
             this.buttonCredits.Name = "buttonCredits";
-            this.buttonCredits.Size = new System.Drawing.Size(187, 37);
+            this.buttonCredits.Size = new System.Drawing.Size(110, 37);
             this.buttonCredits.TabIndex = 19;
             this.buttonCredits.Text = "Credits";
             this.buttonCredits.UseVisualStyleBackColor = true;
@@ -463,6 +464,7 @@
             // 
             // backgroundPanel
             // 
+            this.backgroundPanel.Controls.Add(this.buttonHelp);
             this.backgroundPanel.Controls.Add(this.panel1);
             this.backgroundPanel.Controls.Add(this.buttonReset);
             this.backgroundPanel.Controls.Add(this.panel2);
@@ -474,6 +476,16 @@
             this.backgroundPanel.Name = "backgroundPanel";
             this.backgroundPanel.Size = new System.Drawing.Size(618, 389);
             this.backgroundPanel.TabIndex = 43;
+            // 
+            // buttonHelp
+            // 
+            this.buttonHelp.Location = new System.Drawing.Point(537, 315);
+            this.buttonHelp.Name = "buttonHelp";
+            this.buttonHelp.Size = new System.Drawing.Size(71, 37);
+            this.buttonHelp.TabIndex = 42;
+            this.buttonHelp.Text = "Help";
+            this.buttonHelp.UseVisualStyleBackColor = true;
+            this.buttonHelp.Click += new System.EventHandler(this.buttonHelp_Click);
             // 
             // Form1
             // 
@@ -547,6 +559,7 @@
         private System.Windows.Forms.Timer pingTimer;
         private System.Windows.Forms.CheckBox checkBoxLAN;
         private System.Windows.Forms.Panel backgroundPanel;
+        private System.Windows.Forms.Button buttonHelp;
     }
 }
 
