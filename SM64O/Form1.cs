@@ -101,7 +101,7 @@ namespace SM64O
 
         private void UpnpOnAvailable(object o, EventArgs eventArgs)
         {
-            if (checkBox1.Checked)
+            if (checkBoxServer.Checked)
             {
                 textBox5.Text = _upnp.GetExternalIp();
             }
@@ -120,7 +120,7 @@ namespace SM64O
             string romname = null;
             byte[] buffer = new byte[64];
 
-            switch (comboBox1.Text)
+            switch (comboBoxEmulator.Text)
             {
                 case "Project64":
                     // Super Mario 64 (u) - Project 64 v2.3.3
@@ -250,7 +250,7 @@ namespace SM64O
         
         private async void button1_Click(object sender, EventArgs e)
         {
-            button1.Enabled = false;
+            buttonJoin.Enabled = false;
 
             backgroundPanel.Enabled = false;
 
@@ -258,7 +258,7 @@ namespace SM64O
             {
 
                 Task memoryRead = null;
-                switch (comboBox1.Text)
+                switch (comboBoxEmulator.Text)
                 {
                     case "Project64":
                         memoryRead = Task.Run(() => _memory.Open("Project64"));
@@ -289,12 +289,12 @@ namespace SM64O
 
             try
             {
-                if (checkBox1.Checked)
+                if (checkBoxServer.Checked)
                 {
                     textBox5.Text = "";
                     int port = (int) numericUpDown2.Value;
 
-                    if (_upnp.UPnPAvailable && !lanCheckbox.Enabled)
+                    if (_upnp.UPnPAvailable && !checkBoxLAN.Enabled)
                     {
                         _upnp.AddPortRule(port, false, "SM64O");
                         textBox5.Text = _upnp.GetExternalIp();
@@ -307,7 +307,7 @@ namespace SM64O
 
                     await Task.Run((Action)listener.Start);
 
-                    if (!lanCheckbox.Checked)
+                    if (!checkBoxLAN.Checked)
                     {
                         toolStripStatusLabel1.Text = "Querying SM64O port service...";
                         bool success = await NetworkHelper.RequestAssistance(port);
@@ -347,7 +347,7 @@ namespace SM64O
 
                     byte[] payload = new byte[HandshakeDataLen];
                     payload[0] = (byte)MinorVersion;
-                    payload[1] = (byte)this.comboBox2.SelectedIndex;
+                    payload[1] = (byte)this.comboBoxChar.SelectedIndex;
                     payload[2] = (byte) MajorVersion;
 
                     string username = usernameBox.Text;
@@ -399,7 +399,7 @@ namespace SM64O
                     connection.DataReceived += DataReceived;
                     connection.Disconnected += ConnectionOnDisconnected;
 
-                    playersOnline.Text = "Chat Log:";
+                    labelPlayersOnline.Text = "Chat Log:";
 
                     await Task.Run(() => connection.Connect(payload, 3000));
 
@@ -421,45 +421,45 @@ namespace SM64O
                 return;
             }
 
-            checkBox1.Enabled = false;
+            checkBoxServer.Enabled = false;
 
             timer1_Tick();
-            button1.Enabled = false;
+            buttonJoin.Enabled = false;
 
-            numericUpDown1.Enabled = true;
+            numUpDownInterval.Enabled = true;
 
             chatBox.Enabled = true;
-            button3.Enabled = true;
+            buttonChat.Enabled = true;
             numericUpDown2.Enabled = false;
-            lanCheckbox.Enabled = false;
+            checkBoxLAN.Enabled = false;
             textBox5.ReadOnly = true;
 
-            comboBox1.Enabled = false;
+            comboBoxEmulator.Enabled = false;
             //comboBox2.Enabled = false;
 
-            checkBox2.Enabled = true;
+            checkBoxChat.Enabled = true;
 
-            button4.Enabled = true;
+            buttonReset.Enabled = true;
 
-            Characters.setCharacter(comboBox2.SelectedItem.ToString(), _memory);
+            Characters.setCharacter(comboBoxChar.SelectedItem.ToString(), _memory);
 
             loadPatches();
 
             toolStripStatusLabel1.Text = "Loaded ROM " + getRomName();
 
-            if (checkBox1.Checked)
+            if (checkBoxServer.Checked)
             {
                 writeValue(new byte[] { 0x00, 0x00, 0x00, 0x01 }, 0x365FFC);
             }
 
             Settings sets = new Settings();
 
-            sets.LastIp = checkBox1.Checked ? "" : textBox5.Text;
+            sets.LastIp = checkBoxServer.Checked ? "" : textBox5.Text;
             sets.LastPort = (int) numericUpDown2.Value;
             sets.Username = usernameBox.Text;
 
-            sets.LastEmulator = comboBox1.SelectedIndex;
-            sets.LastCharacter = comboBox2.SelectedIndex;
+            sets.LastEmulator = comboBoxEmulator.SelectedIndex;
+            sets.LastCharacter = comboBoxChar.SelectedIndex;
 
             Settings.Save(sets, "settings.xml");
 
@@ -578,7 +578,7 @@ namespace SM64O
                             playerClient[i].CharacterName = character;
                         }
 
-                        listBox1.Items.Add(playerClient[i]);
+                        listBoxPlayers.Items.Add(playerClient[i]);
 
                         string msg = string.Format("{0} joined", playerClient[i].Name);
                         if (msg.Length > MaxChatLength)
@@ -595,7 +595,7 @@ namespace SM64O
             }
             finally
             {
-                playersOnline.Text = "Players Online: " + playerClient.Count(c => c != null) + "/" + playerClient.Length;
+                labelPlayersOnline.Text = "Players Online: " + playerClient.Count(c => c != null) + "/" + playerClient.Length;
             }
         }
 
@@ -620,12 +620,12 @@ namespace SM64O
             if (msg.Length > MaxChatLength)
                 msg = msg.Substring(0, 24);
             
-            listBox1.Items.Remove(playerClient[player]);
+            listBoxPlayers.Items.Remove(playerClient[player]);
 
             playerClient[player].Connection.DataReceived -= DataReceivedHandler;
             playerClient[player] = null;
 
-            playersOnline.Text = "Players Online: " + playerClient.Count(c => c != null) + "/" + playerClient.Length;
+            labelPlayersOnline.Text = "Players Online: " + playerClient.Count(c => c != null) + "/" + playerClient.Length;
 
             const int playersPositionsStart = 0x36790C;
             const int playerPositionsSize = 0x100;
@@ -680,10 +680,10 @@ namespace SM64O
 
                         lock (_listboxLock)
                         {
-                            int oldPos = listBox1.Items.IndexOf(playerClient[id]);
-                            listBox1.Items.Remove(playerClient[id]);
+                            int oldPos = listBoxPlayers.Items.IndexOf(playerClient[id]);
+                            listBoxPlayers.Items.Remove(playerClient[id]);
                             if (oldPos != -1)
-                                listBox1.Items.Insert(oldPos, playerClient[id]);
+                                listBoxPlayers.Items.Insert(oldPos, playerClient[id]);
                         }
                     }
                     break;
@@ -748,10 +748,10 @@ namespace SM64O
 
             if (listener == null) // We're not the host
             {
-                listBox1.Items.Insert(0, string.Format("{0}: {1}", sender, message));
+                listBoxPlayers.Items.Insert(0, string.Format("{0}: {1}", sender, message));
                 
-                if (listBox1.Items.Count > 10)
-                    listBox1.Items.RemoveAt(10);
+                if (listBoxPlayers.Items.Count > 10)
+                    listBoxPlayers.Items.RemoveAt(10);
             }
 
             if (_dynamicChatbox != null)// We're the host
@@ -879,53 +879,53 @@ namespace SM64O
         {
             if (textBox5.Text != "")
             {
-                button1.Enabled = true;
+                buttonJoin.Enabled = true;
             }
             else
             {
-                button1.Enabled = false;
+                buttonJoin.Enabled = false;
             }
         }
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-            _updateRate = (int)numericUpDown1.Value;
+            _updateRate = (int)numUpDownInterval.Value;
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            if (checkBox1.Checked)
+            if (checkBoxServer.Checked)
             {
                 textBox5.Text = "";
                 usernameBox.Text = "";
                 usernameBox.Enabled = false;
 
-                button1.Enabled = true;
+                buttonJoin.Enabled = true;
 
-                button1.Text = "Create Server!";
+                buttonJoin.Text = "Create Server!";
                 usernameBox.Enabled = false;
                 panel2.Enabled = true;
                 textBox5.ReadOnly = true;
-                button1.Enabled = true;
+                buttonJoin.Enabled = true;
 
                 if (_upnp.UPnPAvailable)
                     textBox5.Text = _upnp.GetExternalIp();
                 else textBox5.Text = "";
 
-                lanCheckbox.Enabled = true;
+                checkBoxLAN.Enabled = true;
             }
             else
             {
                 usernameBox.Enabled = true;
 
-                button1.Text = "Connect to server!";
+                buttonJoin.Text = "Connect to server!";
                 textBox5.ReadOnly = false;
                 textBox5.Text = "";
                 usernameBox.Enabled = true;
                 panel2.Enabled = false;
-                button1.Enabled = false;
+                buttonJoin.Enabled = false;
 
-                lanCheckbox.Enabled = false;
+                checkBoxLAN.Enabled = false;
             }
         }
 
@@ -966,8 +966,8 @@ namespace SM64O
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            comboBox1.SelectedIndex = 0;
-            comboBox2.SelectedIndex = 0;
+            comboBoxEmulator.SelectedIndex = 0;
+            comboBoxChar.SelectedIndex = 0;
             gamemodeBox.SelectedIndex = 0;
 
             Settings sets = Settings.Load("settings.xml");
@@ -978,8 +978,8 @@ namespace SM64O
                 numericUpDown2.Value = sets.LastPort;
                 usernameBox.Text = sets.Username;
 
-                comboBox1.SelectedIndex = sets.LastEmulator;
-                comboBox2.SelectedIndex = sets.LastCharacter;
+                comboBoxEmulator.SelectedIndex = sets.LastEmulator;
+                comboBoxChar.SelectedIndex = sets.LastCharacter;
             }
            
             // Create the ToolTip and associate with the Form container.
@@ -994,42 +994,42 @@ namespace SM64O
 
             // Set up the ToolTip text for the Buttons, Labels and Checkboxes.
             // Could probably use better names for the labels, buttons and checkboxes, to tell them apart!
-            toolTip1.SetToolTip(this.label2, "Input the IP Address to the host");
+            toolTip1.SetToolTip(this.labelAddress, "Input the IP Address to the host");
             toolTip1.SetToolTip(this.textBox5, "Input the IP Address to the host");
 
-            toolTip1.SetToolTip(this.label4, "Input the port to the host");
+            toolTip1.SetToolTip(this.labelPort, "Input the port to the host");
             toolTip1.SetToolTip(this.numericUpDown2, "Input the port to the host");
 
-            toolTip1.SetToolTip(this.label1, "Input your username");
+            toolTip1.SetToolTip(this.labelUsername, "Input your username");
             toolTip1.SetToolTip(this.usernameBox, "Input your username");
 
-            toolTip1.SetToolTip(this.checkBox2, "Check this to disable the chat in your server");
-            toolTip1.SetToolTip(this.checkBox1, "Check this if you want to make your own server");
-            toolTip1.SetToolTip(this.lanCheckbox, "Check this to only allow LAN connections to your server");
+            toolTip1.SetToolTip(this.checkBoxChat, "Check this to disable the chat in your server");
+            toolTip1.SetToolTip(this.checkBoxServer, "Check this if you want to make your own server");
+            toolTip1.SetToolTip(this.checkBoxLAN, "Check this to only allow LAN connections to your server");
 
-            toolTip1.SetToolTip(this.label5, "The lower the interval, the faster you request updates from other players");
+            toolTip1.SetToolTip(this.labelRateUpdate, "The lower the interval, the faster you request updates from other players");
 
-            toolTip1.SetToolTip(this.label3, "Select your emulator");
-            toolTip1.SetToolTip(this.comboBox1, "Select your emulator");
+            toolTip1.SetToolTip(this.labelEmulator, "Select your emulator");
+            toolTip1.SetToolTip(this.comboBoxEmulator, "Select your emulator");
 
-            toolTip1.SetToolTip(this.label6, "Select your playable character");
-            toolTip1.SetToolTip(this.comboBox2, "Select your playable character");
+            toolTip1.SetToolTip(this.labelChar, "Select your playable character");
+            toolTip1.SetToolTip(this.comboBoxChar, "Select your playable character");
 
             toolTip1.SetToolTip(this.chatBox, "Type your chat messages here");
-            toolTip1.SetToolTip(this.button3, "Click here to send your message");
+            toolTip1.SetToolTip(this.buttonChat, "Click here to send your message");
 
-            toolTip1.SetToolTip(this.label7, "Max number of allowed connections to your server");
-            toolTip1.SetToolTip(this.numericUpDown3, "Max number of allowed connections to your server");
+            toolTip1.SetToolTip(this.labelMaxClients, "Max number of allowed connections to your server");
+            toolTip1.SetToolTip(this.numUpDownClients, "Max number of allowed connections to your server");
 
-            toolTip1.SetToolTip(this.label10, "Select your gamemode");
+            toolTip1.SetToolTip(this.labelGamemode, "Select your gamemode");
             toolTip1.SetToolTip(this.gamemodeBox, "Select your gamemode");
 
-            toolTip1.SetToolTip(this.playersOnline, "Lists all players who are connected and their messages");
-            toolTip1.SetToolTip(this.listBox1, "Lists all players who are connected and their messages");
+            toolTip1.SetToolTip(this.labelPlayersOnline, "Lists all players who are connected and their messages");
+            toolTip1.SetToolTip(this.listBoxPlayers, "Lists all players who are connected and their messages");
 
-            toolTip1.SetToolTip(this.button4, "Click here to reset your game");
+            toolTip1.SetToolTip(this.buttonReset, "Click here to reset your game");
 
-            toolTip1.SetToolTip(this.button2, "Click here to see the credits");
+            toolTip1.SetToolTip(this.buttonCredits, "Click here to see the credits");
         }
 
         public void setGamemode()
@@ -1061,7 +1061,7 @@ namespace SM64O
 
         private void numericUpDown3_ValueChanged(object sender, EventArgs e)
         {
-            playerClient = new Client[(int)numericUpDown3.Value];
+            playerClient = new Client[(int)numUpDownClients.Value];
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -1076,11 +1076,11 @@ namespace SM64O
 
         private void listBox1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            int index = listBox1.IndexFromPoint(e.Location);
+            int index = listBoxPlayers.IndexFromPoint(e.Location);
             if (index != ListBox.NoMatches)
             {
                 // Who did we click on
-                Client client = (Client) listBox1.Items[index];
+                Client client = (Client) listBoxPlayers.Items[index];
                 int indx = Array.IndexOf(playerClient, client);
                 Connection conn = client.Connection;
 
@@ -1096,7 +1096,7 @@ namespace SM64O
 
                 // really ghetto
                 var resp = MessageBox.Show(this,
-                    "Player Information:\n" + listBox1.Items[index].ToString() +
+                    "Player Information:\n" + listBoxPlayers.Items[index].ToString() +
                     "\n\nKick this player?\nYes = Kick, No = Ban",
                     "Client", MessageBoxButtons.YesNoCancel);
 
@@ -1117,7 +1117,7 @@ namespace SM64O
                     removePlayer(indx);
                 }
 
-                playersOnline.Text = "Players Online: " + playerClient.Count(c => c != null) + "/" +
+                labelPlayersOnline.Text = "Players Online: " + playerClient.Count(c => c != null) + "/" +
                                      playerClient.Length;
             }
         }
@@ -1184,7 +1184,7 @@ namespace SM64O
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
         {
-            _chatEnabled = !checkBox2.Checked;
+            _chatEnabled = !checkBoxChat.Checked;
         }
 
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
@@ -1192,10 +1192,10 @@ namespace SM64O
             if (connection == null && listener == null)
                 return; // We are not in a server yet
 
-            Characters.setCharacterAll(comboBox2.SelectedIndex + 1, _memory);
+            Characters.setCharacterAll(comboBoxChar.SelectedIndex + 1, _memory);
 
             if (connection != null) // we are a client, notify host to update playerlist
-                connection.SendBytes(PacketType.CharacterSwitch, new byte[]{ (byte) (comboBox2.SelectedIndex) });
+                connection.SendBytes(PacketType.CharacterSwitch, new byte[]{ (byte) (comboBoxChar.SelectedIndex) });
         }
 
         private void removeAllPlayers()
@@ -1305,7 +1305,7 @@ namespace SM64O
         private void insertChatBox()
         {
             // 200 / 2 + 10
-            listBox1.Size = new Size(268, 95);
+            listBoxPlayers.Size = new Size(268, 95);
 
             _dynamicChatbox = new ListBox();
             
