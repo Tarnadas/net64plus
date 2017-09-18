@@ -39,7 +39,6 @@
             this.labelPort = new System.Windows.Forms.Label();
             this.labelRateUpdate = new System.Windows.Forms.Label();
             this.listBoxPlayers = new System.Windows.Forms.ListBox();
-            this.buttonCredits = new System.Windows.Forms.Button();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.comboBoxEmulator = new System.Windows.Forms.ComboBox();
             this.labelEmulator = new System.Windows.Forms.Label();
@@ -67,7 +66,12 @@
             this.pingLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.pingTimer = new System.Windows.Forms.Timer(this.components);
             this.backgroundPanel = new System.Windows.Forms.Panel();
-            this.buttonHelp = new System.Windows.Forms.Button();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.forumToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.creditsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.discordToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDownInterval)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDownClients)).BeginInit();
@@ -75,6 +79,7 @@
             this.panel2.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.backgroundPanel.SuspendLayout();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonJoin
@@ -179,16 +184,6 @@
             this.listBoxPlayers.TabIndex = 13;
             this.listBoxPlayers.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listBox1_MouseDoubleClick);
             // 
-            // buttonCredits
-            // 
-            this.buttonCredits.Location = new System.Drawing.Point(421, 315);
-            this.buttonCredits.Name = "buttonCredits";
-            this.buttonCredits.Size = new System.Drawing.Size(110, 37);
-            this.buttonCredits.TabIndex = 19;
-            this.buttonCredits.Text = "Credits";
-            this.buttonCredits.UseVisualStyleBackColor = true;
-            this.buttonCredits.Click += new System.EventHandler(this.button2_Click);
-            // 
             // comboBoxEmulator
             // 
             this.comboBoxEmulator.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -283,7 +278,7 @@
             // chatBox
             // 
             this.chatBox.Enabled = false;
-            this.chatBox.Location = new System.Drawing.Point(12, 289);
+            this.chatBox.Location = new System.Drawing.Point(12, 314);
             this.chatBox.MaxLength = 24;
             this.chatBox.Name = "chatBox";
             this.chatBox.Size = new System.Drawing.Size(295, 20);
@@ -293,7 +288,7 @@
             // buttonChat
             // 
             this.buttonChat.Enabled = false;
-            this.buttonChat.Location = new System.Drawing.Point(12, 315);
+            this.buttonChat.Location = new System.Drawing.Point(12, 340);
             this.buttonChat.Name = "buttonChat";
             this.buttonChat.Size = new System.Drawing.Size(295, 37);
             this.buttonChat.TabIndex = 34;
@@ -341,7 +336,7 @@
             this.panel1.Controls.Add(this.labelEmulator);
             this.panel1.Controls.Add(this.comboBoxChar);
             this.panel1.Controls.Add(this.labelChar);
-            this.panel1.Location = new System.Drawing.Point(12, 12);
+            this.panel1.Location = new System.Drawing.Point(12, 37);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(295, 271);
             this.panel1.TabIndex = 37;
@@ -372,7 +367,7 @@
             // labelConnectionConf
             // 
             this.labelConnectionConf.AutoSize = true;
-            this.labelConnectionConf.Location = new System.Drawing.Point(27, 6);
+            this.labelConnectionConf.Location = new System.Drawing.Point(27, 31);
             this.labelConnectionConf.Name = "labelConnectionConf";
             this.labelConnectionConf.Size = new System.Drawing.Size(105, 13);
             this.labelConnectionConf.TabIndex = 38;
@@ -388,7 +383,7 @@
             this.panel2.Controls.Add(this.listBoxPlayers);
             this.panel2.Controls.Add(this.numUpDownClients);
             this.panel2.Enabled = false;
-            this.panel2.Location = new System.Drawing.Point(313, 12);
+            this.panel2.Location = new System.Drawing.Point(313, 37);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(295, 297);
             this.panel2.TabIndex = 39;
@@ -418,7 +413,7 @@
             // labelServerConf
             // 
             this.labelServerConf.AutoSize = true;
-            this.labelServerConf.Location = new System.Drawing.Point(330, 6);
+            this.labelServerConf.Location = new System.Drawing.Point(330, 31);
             this.labelServerConf.Name = "labelServerConf";
             this.labelServerConf.Size = new System.Drawing.Size(82, 13);
             this.labelServerConf.TabIndex = 40;
@@ -427,7 +422,7 @@
             // buttonReset
             // 
             this.buttonReset.Enabled = false;
-            this.buttonReset.Location = new System.Drawing.Point(313, 315);
+            this.buttonReset.Location = new System.Drawing.Point(506, 340);
             this.buttonReset.Name = "buttonReset";
             this.buttonReset.Size = new System.Drawing.Size(102, 37);
             this.buttonReset.TabIndex = 41;
@@ -440,7 +435,7 @@
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1,
             this.pingLabel});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 367);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 387);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(618, 22);
             this.statusStrip1.TabIndex = 42;
@@ -464,40 +459,79 @@
             // 
             // backgroundPanel
             // 
-            this.backgroundPanel.Controls.Add(this.buttonHelp);
             this.backgroundPanel.Controls.Add(this.panel1);
             this.backgroundPanel.Controls.Add(this.buttonReset);
             this.backgroundPanel.Controls.Add(this.panel2);
             this.backgroundPanel.Controls.Add(this.chatBox);
-            this.backgroundPanel.Controls.Add(this.buttonCredits);
             this.backgroundPanel.Controls.Add(this.buttonChat);
+            this.backgroundPanel.Controls.Add(this.menuStrip1);
             this.backgroundPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.backgroundPanel.Location = new System.Drawing.Point(0, 0);
             this.backgroundPanel.Name = "backgroundPanel";
-            this.backgroundPanel.Size = new System.Drawing.Size(618, 389);
+            this.backgroundPanel.Size = new System.Drawing.Size(618, 409);
             this.backgroundPanel.TabIndex = 43;
             // 
-            // buttonHelp
+            // menuStrip1
             // 
-            this.buttonHelp.Location = new System.Drawing.Point(537, 315);
-            this.buttonHelp.Name = "buttonHelp";
-            this.buttonHelp.Size = new System.Drawing.Size(71, 37);
-            this.buttonHelp.TabIndex = 42;
-            this.buttonHelp.Text = "Help";
-            this.buttonHelp.UseVisualStyleBackColor = true;
-            this.buttonHelp.Click += new System.EventHandler(this.buttonHelp_Click);
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.helpToolStripMenuItem,
+            this.aboutToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(618, 24);
+            this.menuStrip1.TabIndex = 43;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // helpToolStripMenuItem
+            // 
+            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.forumToolStripMenuItem,
+            this.discordToolStripMenuItem});
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.helpToolStripMenuItem.Text = "Help";
+            // 
+            // forumToolStripMenuItem
+            // 
+            this.forumToolStripMenuItem.Name = "forumToolStripMenuItem";
+            this.forumToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.forumToolStripMenuItem.Text = "SM64O Forum";
+            this.forumToolStripMenuItem.Click += new System.EventHandler(this.forumToolStripMenuItem_Click);
+            // 
+            // aboutToolStripMenuItem
+            // 
+            this.aboutToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.creditsToolStripMenuItem});
+            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
+            this.aboutToolStripMenuItem.Text = "About";
+            // 
+            // creditsToolStripMenuItem
+            // 
+            this.creditsToolStripMenuItem.Name = "creditsToolStripMenuItem";
+            this.creditsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.creditsToolStripMenuItem.Text = "Credits";
+            this.creditsToolStripMenuItem.Click += new System.EventHandler(this.creditsToolStripMenuItem_Click);
+            // 
+            // discordToolStripMenuItem
+            // 
+            this.discordToolStripMenuItem.Name = "discordToolStripMenuItem";
+            this.discordToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.discordToolStripMenuItem.Text = "Discord";
+            this.discordToolStripMenuItem.Click += new System.EventHandler(this.discordToolStripMenuItem_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(618, 389);
+            this.ClientSize = new System.Drawing.Size(618, 409);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.labelServerConf);
             this.Controls.Add(this.labelConnectionConf);
             this.Controls.Add(this.backgroundPanel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MainMenuStrip = this.menuStrip1;
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "SM64 Online Tool v1.3.1 Hotfix";
@@ -515,6 +549,8 @@
             this.statusStrip1.PerformLayout();
             this.backgroundPanel.ResumeLayout(false);
             this.backgroundPanel.PerformLayout();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -531,7 +567,6 @@
         private System.Windows.Forms.Label labelPort;
         private System.Windows.Forms.Label labelRateUpdate;
         private System.Windows.Forms.ListBox listBoxPlayers;
-        private System.Windows.Forms.Button buttonCredits;
         private System.Windows.Forms.ColorDialog colorDialog1;
         private System.Windows.Forms.ComboBox comboBoxEmulator;
         private System.Windows.Forms.Label labelEmulator;
@@ -559,7 +594,12 @@
         private System.Windows.Forms.Timer pingTimer;
         private System.Windows.Forms.CheckBox checkBoxLAN;
         private System.Windows.Forms.Panel backgroundPanel;
-        private System.Windows.Forms.Button buttonHelp;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem forumToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem creditsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem discordToolStripMenuItem;
     }
 }
 

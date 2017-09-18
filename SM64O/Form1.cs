@@ -1028,10 +1028,6 @@ namespace SM64O
             toolTip1.SetToolTip(this.listBoxPlayers, "Lists all players who are connected and their messages");
 
             toolTip1.SetToolTip(this.buttonReset, "Click here to reset your game");
-
-            toolTip1.SetToolTip(this.buttonCredits, "Click here to see the credits");
-
-            toolTip1.SetToolTip(this.buttonHelp, "Click here to open the forum webpage where you can find tutorials");
         }
 
         public void setGamemode()
@@ -1349,6 +1345,57 @@ namespace SM64O
         private void buttonHelp_Click(object sender, EventArgs e)
         {
             System.Diagnostics.Process.Start("https://sm64o.com/forumdisplay.php?fid=11");
+        }
+
+        private void forumToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://sm64o.com/forumdisplay.php?fid=11");
+        }
+
+        private void discordToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://discordapp.com/invite/k9QMFaB");
+        }
+
+        private void creditsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string message = ("Super Mario 64 Online Team"
+                + Environment.NewLine
+                + "Kaze Emanuar"
+                + Environment.NewLine
+                + "MelonSpeedruns"
+                + Environment.NewLine
+                + "Guad"
+                + Environment.NewLine
+                + "merlish"
+                + Environment.NewLine
+                + Environment.NewLine
+                + "Luigi 3D Model created by: "
+                + Environment.NewLine
+                + "Cjes"
+                + Environment.NewLine
+                + "GeoshiTheRed"
+                + Environment.NewLine
+                + Environment.NewLine
+                + "Toad, Rosalina and Peach 3D Models created by: "
+                + Environment.NewLine
+                + "AnkleD"
+                + Environment.NewLine
+                + Environment.NewLine
+                + "New Character 3D Models created by: "
+                + Environment.NewLine
+                + "Marshivolt"
+                + Environment.NewLine
+                + Environment.NewLine
+                + "Character Head Icons created by: "
+                + Environment.NewLine
+                + "Quasmok");
+
+            string caption = "Credits";
+            MessageBoxButtons buttons = MessageBoxButtons.OK;
+            DialogResult result;
+
+            result = MessageBox.Show(message, caption, buttons);
         }
     }
 }
