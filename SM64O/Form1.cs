@@ -1093,19 +1093,17 @@ namespace SM64O
                 }
 
                 // really ghetto
-                var resp = MessageBox.Show(this,
-                    "Player Information:\n" + listBoxPlayers.Items[index].ToString() +
-                    "\n\nKick this player?\nYes = Kick, No = Ban",
-                    "Client", MessageBoxButtons.YesNoCancel);
+                KickBanForm form = new KickBanForm();
+                form.username = listBoxPlayers.Items[index].ToString();
 
-                if (resp == DialogResult.Yes)
+                if (form.ShowDialog() == DialogResult.Yes)
                 {
                     sendChatTo("kicked", conn);
                     conn.Close();
 
                     removePlayer(indx);
                 }
-                else if (resp == DialogResult.No)
+                else if (form.ShowDialog() == DialogResult.No)
                 {
                     sendChatTo("banned", conn);
                     _bands += conn.EndPoint.ToString().Split(':')[0] + Environment.NewLine;

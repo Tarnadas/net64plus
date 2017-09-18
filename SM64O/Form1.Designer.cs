@@ -69,9 +69,9 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.forumToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.discordToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.creditsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.discordToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDownInterval)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDownClients)).BeginInit();
@@ -180,7 +180,7 @@
             this.listBoxPlayers.FormattingEnabled = true;
             this.listBoxPlayers.Location = new System.Drawing.Point(13, 84);
             this.listBoxPlayers.Name = "listBoxPlayers";
-            this.listBoxPlayers.Size = new System.Drawing.Size(268, 199);
+            this.listBoxPlayers.Size = new System.Drawing.Size(268, 238);
             this.listBoxPlayers.TabIndex = 13;
             this.listBoxPlayers.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listBox1_MouseDoubleClick);
             // 
@@ -281,7 +281,7 @@
             this.chatBox.Location = new System.Drawing.Point(12, 314);
             this.chatBox.MaxLength = 24;
             this.chatBox.Name = "chatBox";
-            this.chatBox.Size = new System.Drawing.Size(295, 20);
+            this.chatBox.Size = new System.Drawing.Size(206, 20);
             this.chatBox.TabIndex = 33;
             this.chatBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.chatBox_KeyDown);
             // 
@@ -290,7 +290,7 @@
             this.buttonChat.Enabled = false;
             this.buttonChat.Location = new System.Drawing.Point(12, 340);
             this.buttonChat.Name = "buttonChat";
-            this.buttonChat.Size = new System.Drawing.Size(295, 37);
+            this.buttonChat.Size = new System.Drawing.Size(206, 37);
             this.buttonChat.TabIndex = 34;
             this.buttonChat.Text = "Chat";
             this.buttonChat.UseVisualStyleBackColor = true;
@@ -385,7 +385,7 @@
             this.panel2.Enabled = false;
             this.panel2.Location = new System.Drawing.Point(313, 37);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(295, 297);
+            this.panel2.Size = new System.Drawing.Size(295, 340);
             this.panel2.TabIndex = 39;
             // 
             // labelGamemode
@@ -422,9 +422,9 @@
             // buttonReset
             // 
             this.buttonReset.Enabled = false;
-            this.buttonReset.Location = new System.Drawing.Point(506, 340);
+            this.buttonReset.Location = new System.Drawing.Point(224, 314);
             this.buttonReset.Name = "buttonReset";
-            this.buttonReset.Size = new System.Drawing.Size(102, 37);
+            this.buttonReset.Size = new System.Drawing.Size(83, 63);
             this.buttonReset.TabIndex = 41;
             this.buttonReset.Text = "Reset Game";
             this.buttonReset.UseVisualStyleBackColor = true;
@@ -494,9 +494,16 @@
             // forumToolStripMenuItem
             // 
             this.forumToolStripMenuItem.Name = "forumToolStripMenuItem";
-            this.forumToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.forumToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
             this.forumToolStripMenuItem.Text = "SM64O Forum";
             this.forumToolStripMenuItem.Click += new System.EventHandler(this.forumToolStripMenuItem_Click);
+            // 
+            // discordToolStripMenuItem
+            // 
+            this.discordToolStripMenuItem.Name = "discordToolStripMenuItem";
+            this.discordToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.discordToolStripMenuItem.Text = "Official Discord Server";
+            this.discordToolStripMenuItem.Click += new System.EventHandler(this.discordToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem
             // 
@@ -512,13 +519,6 @@
             this.creditsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.creditsToolStripMenuItem.Text = "Credits";
             this.creditsToolStripMenuItem.Click += new System.EventHandler(this.creditsToolStripMenuItem_Click);
-            // 
-            // discordToolStripMenuItem
-            // 
-            this.discordToolStripMenuItem.Name = "discordToolStripMenuItem";
-            this.discordToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.discordToolStripMenuItem.Text = "Discord";
-            this.discordToolStripMenuItem.Click += new System.EventHandler(this.discordToolStripMenuItem_Click);
             // 
             // Form1
             // 
