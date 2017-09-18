@@ -1005,7 +1005,7 @@ namespace SM64O
 
             toolTip1.SetToolTip(this.checkBoxChat, "Check this to disable the chat in your server");
             toolTip1.SetToolTip(this.checkBoxServer, "Check this if you want to make your own server");
-            toolTip1.SetToolTip(this.checkBoxLAN, "Check this to only allow LAN connections to your server");
+            toolTip1.SetToolTip(this.checkBoxLAN, "Check this to disable UPnP and port checking service");
 
             toolTip1.SetToolTip(this.labelRateUpdate, "The lower the interval, the faster you request updates from other players");
 
@@ -1340,11 +1340,6 @@ namespace SM64O
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             _closing = true;
-        }
-
-        private void buttonHelp_Click(object sender, EventArgs e)
-        {
-            System.Diagnostics.Process.Start("https://sm64o.com/forumdisplay.php?fid=11");
         }
 
         private void forumToolStripMenuItem_Click(object sender, EventArgs e)
