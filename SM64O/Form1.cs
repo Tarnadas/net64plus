@@ -24,6 +24,17 @@ namespace SM64O
 {
     public partial class Form1 : Form
     {
+        /*
+         * important strings can be stored to save processing time having to build them over and over from methods
+         * current implementations will not be bothered; however, switching them over in time would do well
+         * also makes changing a file/folder name EZ
+         */
+        public static readonly string BASE_DIR = AppDomain.CurrentDomain.BaseDirectory;
+        public static readonly string PATCHES_DIR = BASE_DIR + "/Patches/";
+        public static readonly string RESSOURCES_DIR = BASE_DIR + "/Ressources/";
+        //your bannde
+        public const string BANDS_FILE = "bans.txt";
+
         public static ConnectionListener listener = null;
         public static Connection connection = null;
         public static Client[] playerClient = new Client[23];
@@ -59,38 +70,43 @@ namespace SM64O
                 UpnpOnAvailable(_upnp, EventArgs.Empty);
             _upnp.Initialize();
 
-            string[] fileEntries = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/Patches/");
+            //if Patches does not exist, make it!
+            Directory.CreateDirectory(PATCHES_DIR);
+            string[] fileEntries = Directory.GetFiles(PATCHES_DIR);
 
             foreach (var file in fileEntries)
             {
+                string fileName = Path.GetFileName(file); //file is the full path of the file, fileName is only the file's name (with extension)
+                string ressourcesParallel = RESSOURCES_DIR + fileName;
                 byte[] buffer = File.ReadAllBytes(file);
 
-                //File.Copy(AppDomain.CurrentDomain.BaseDirectory + "/Patches/" + Path.GetFileName(file), AppDomain.CurrentDomain.BaseDirectory + "/Ressources/" + Path.GetFileName(file));
+                //this version allows overwriting existing files in Ressources. Not uncommenting just in case this method is unfavored.
+                //File.Copy(file, ressourcesParallel, true);
 
-                if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + "/Ressources/" + Path.GetFileName(file)))
+                if (File.Exists(ressourcesParallel))
                 {
-                    File.Delete(AppDomain.CurrentDomain.BaseDirectory + "/Ressources/" + Path.GetFileName(file));
+                    File.Delete(ressourcesParallel);
                 }
 
                 for (int i = 0; i < buffer.Length; i += 4)
                 {
                     byte[] newBuffer = buffer.Skip(i).Take(4).ToArray();
                     newBuffer = newBuffer.Reverse().ToArray();
-                    using (var fs = new FileStream(AppDomain.CurrentDomain.BaseDirectory + "/Ressources/" + Path.GetFileName(file), FileMode.OpenOrCreate, FileAccess.Write))
+                    using (var fs = new FileStream(ressourcesParallel, FileMode.OpenOrCreate, FileAccess.Write))
                     {
                         fs.Seek(i, SeekOrigin.Current);
                         fs.Write(newBuffer, 0, newBuffer.Length);
                     }
                 }
+            }
 
-                if (File.Exists("bans.txt"))
+            //moving this outside so we don't read the bans file for every file in the patches directory!
+            if (File.Exists(BANDS_FILE))
+            {
+                foreach (var line in File.ReadAllLines(BANDS_FILE))
                 {
-                    foreach (var line in File.ReadAllLines("bans.txt"))
-                    {
-                        _bands += line + " ";
-                    }
+                    _bands += line + " ";
                 }
-
             }
 
             // TODO: Change this according to OS
@@ -180,7 +196,7 @@ namespace SM64O
 
             byte[] messageBytes = Encoding.ASCII.GetBytes(message);
             byte[] usernameBytes = Encoding.ASCII.GetBytes(name);
-            
+
 
             byte[] payload = new byte[1 + messageBytes.Length + 1 + usernameBytes.Length];
 
@@ -237,17 +253,17 @@ namespace SM64O
 
             byte[] payload = new byte[1 + messageBytes.Length + 1 + usernameBytes.Length];
 
-            payload[0] = (byte) messageBytes.Length;
-            
+            payload[0] = (byte)messageBytes.Length;
+
             Array.Copy(messageBytes, 0, payload, 1, messageBytes.Length);
 
-            payload[messageBytes.Length + 1] = (byte) usernameBytes.Length;
+            payload[messageBytes.Length + 1] = (byte)usernameBytes.Length;
 
             Array.Copy(usernameBytes, 0, payload, 1 + messageBytes.Length + 1, usernameBytes.Length);
 
             conn.SendBytes(PacketType.ChatMessage, payload, SendOption.Reliable);
         }
-        
+
         private async void button1_Click(object sender, EventArgs e)
         {
             buttonJoin.Enabled = false;
@@ -292,14 +308,14 @@ namespace SM64O
                 if (checkBoxServer.Checked)
                 {
                     textBoxAddress.Text = "";
-                    int port = (int) numericUpDown2.Value;
+                    int port = (int)numericUpDown2.Value;
 
                     if (_upnp.UPnPAvailable && !checkBoxLAN.Enabled)
                     {
                         _upnp.AddPortRule(port, false, "SM64O");
                         textBoxAddress.Text = _upnp.GetExternalIp();
                     }
-                    
+
                     listener = new UdpConnectionListener(new NetworkEndPoint(IPAddress.Any, port));
                     listener.NewConnection += NewConnectionHandler;
 
@@ -348,7 +364,7 @@ namespace SM64O
                     byte[] payload = new byte[HandshakeDataLen];
                     payload[0] = (byte)MinorVersion;
                     payload[1] = (byte)this.comboBoxChar.SelectedIndex;
-                    payload[2] = (byte) MajorVersion;
+                    payload[2] = (byte)MajorVersion;
 
                     string username = usernameBox.Text;
 
@@ -359,13 +375,13 @@ namespace SM64O
                     }
 
                     usernameBox.Enabled = false;
-                    
+
                     byte[] usernameBytes = Encoding.ASCII.GetBytes(username);
                     int len = usernameBytes.Length;
                     if (len > 24) // Arbitrary max length
                         len = 24;
 
-                    payload[3] = (byte) len;
+                    payload[3] = (byte)len;
                     Array.Copy(usernameBytes, 0, payload, 4, len);
 
                     IPAddress target = null;
@@ -394,7 +410,7 @@ namespace SM64O
 
                     isIp6 = target.AddressFamily == AddressFamily.InterNetworkV6;
 
-                    NetworkEndPoint endPoint = new NetworkEndPoint(target, (int) numericUpDown2.Value, isIp6 ? IPMode.IPv6 : IPMode.IPv4);
+                    NetworkEndPoint endPoint = new NetworkEndPoint(target, (int)numericUpDown2.Value, isIp6 ? IPMode.IPv6 : IPMode.IPv4);
                     connection = new UdpClientConnection(endPoint);
                     connection.DataReceived += DataReceived;
                     connection.Disconnected += ConnectionOnDisconnected;
@@ -455,7 +471,7 @@ namespace SM64O
             Settings sets = new Settings();
 
             sets.LastIp = checkBoxServer.Checked ? "" : textBoxAddress.Text;
-            sets.LastPort = (int) numericUpDown2.Value;
+            sets.LastPort = (int)numericUpDown2.Value;
             sets.Username = usernameBox.Text;
 
             sets.LastEmulator = comboBoxEmulator.SelectedIndex;
@@ -512,7 +528,7 @@ namespace SM64O
                     }
                 }
 
-                
+
             }
         }
 
@@ -545,7 +561,7 @@ namespace SM64O
                         e.Connection.Disconnected += client_Disconnected;
 
                         int playerIDB = i + 2;
-                        byte[] playerID = new byte[] {(byte) playerIDB};
+                        byte[] playerID = new byte[] { (byte)playerIDB };
                         Thread.Sleep(500);
                         playerClient[i].SendBytes(PacketType.MemoryWrite, playerID);
                         string character = "custom ";
@@ -619,7 +635,7 @@ namespace SM64O
             string msg = string.Format("{0} left", playerClient[player].Name);
             if (msg.Length > MaxChatLength)
                 msg = msg.Substring(0, 24);
-            
+
             listBoxPlayers.Items.Remove(playerClient[player]);
 
             playerClient[player].Connection.DataReceived -= DataReceivedHandler;
@@ -638,7 +654,7 @@ namespace SM64O
 
         private void DataReceivedHandler(object sender, Hazel.DataReceivedEventArgs e)
         {
-            var conn = (Connection) sender;
+            var conn = (Connection)sender;
 
             ReceivePacket(conn, e.Bytes);
 
@@ -650,14 +666,14 @@ namespace SM64O
             if (e.Bytes.Length == 0)
                 return;
 
-            ReceivePacket((Connection) sender, e.Bytes);
+            ReceivePacket((Connection)sender, e.Bytes);
             e.Recycle();
         }
 
         private object _listboxLock = new object();
         private void ReceivePacket(Connection sender, byte[] data)
         {
-            PacketType type = (PacketType) data[0];
+            PacketType type = (PacketType)data[0];
             byte[] payload = data.Skip(1).ToArray();
 
             switch (type)
@@ -721,7 +737,7 @@ namespace SM64O
 
             byte[] buffer = new byte[data.Length - 4];
             data.Skip(4).ToArray().CopyTo(buffer, 0);
-            
+
             _memory.WriteMemory(offset, buffer, buffer.Length);
         }
 
@@ -749,7 +765,7 @@ namespace SM64O
             if (listener == null) // We're not the host
             {
                 listBoxPlayers.Items.Insert(0, string.Format("{0}: {1}", sender, message));
-                
+
                 if (listBoxPlayers.Items.Count > 10)
                     listBoxPlayers.Items.RemoveAt(10);
             }
@@ -981,7 +997,7 @@ namespace SM64O
                 comboBoxEmulator.SelectedIndex = sets.LastEmulator;
                 comboBoxChar.SelectedIndex = sets.LastCharacter;
             }
-           
+
             // Create the ToolTip and associate with the Form container.
             ToolTip toolTip1 = new ToolTip();
 
@@ -1093,7 +1109,7 @@ namespace SM64O
             if (index != ListBox.NoMatches)
             {
                 // Who did we click on
-                Client client = (Client) listBoxPlayers.Items[index];
+                Client client = (Client)listBoxPlayers.Items[index];
                 int indx = Array.IndexOf(playerClient, client);
                 Connection conn = client.Connection;
 
@@ -1132,7 +1148,7 @@ namespace SM64O
                                      playerClient.Length;
             }
         }
-        
+
         private Random _r = new Random();
         private string getRandomUsername()
         {
@@ -1147,6 +1163,8 @@ namespace SM64O
                 "HeHasNoGrace",
                 "Memetopia",
                 "ShrekIsLove",
+                //mind if I...?
+                "CoconutCreamPie", //is this too long?
             };
 
             return usernames[_r.Next(usernames.Length)];
@@ -1206,7 +1224,7 @@ namespace SM64O
             Characters.setCharacterAll(comboBoxChar.SelectedIndex + 1, _memory);
 
             if (connection != null) // we are a client, notify host to update playerlist
-                connection.SendBytes(PacketType.CharacterSwitch, new byte[]{ (byte) (comboBoxChar.SelectedIndex) });
+                connection.SendBytes(PacketType.CharacterSwitch, new byte[] { (byte)(comboBoxChar.SelectedIndex) });
         }
 
         private void removeAllPlayers()
@@ -1319,7 +1337,7 @@ namespace SM64O
             listBoxPlayers.Size = new Size(268, 95);
 
             _dynamicChatbox = new ListBox();
-            
+
             _dynamicChatbox.Location = new Point(13, 84 + 100);
             _dynamicChatbox.Size = new Size(268, 95);
             _dynamicChatbox.Enabled = false;
