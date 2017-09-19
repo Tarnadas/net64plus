@@ -66,6 +66,7 @@
             this.pingLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.pingTimer = new System.Windows.Forms.Timer(this.components);
             this.backgroundPanel = new System.Windows.Forms.Panel();
+            this.labelChat = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.forumToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -278,21 +279,21 @@
             // chatBox
             // 
             this.chatBox.Enabled = false;
-            this.chatBox.Location = new System.Drawing.Point(12, 314);
+            this.chatBox.Location = new System.Drawing.Point(45, 314);
             this.chatBox.MaxLength = 24;
             this.chatBox.Name = "chatBox";
-            this.chatBox.Size = new System.Drawing.Size(206, 20);
+            this.chatBox.Size = new System.Drawing.Size(173, 20);
             this.chatBox.TabIndex = 33;
             this.chatBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.chatBox_KeyDown);
             // 
             // buttonChat
             // 
             this.buttonChat.Enabled = false;
-            this.buttonChat.Location = new System.Drawing.Point(12, 340);
+            this.buttonChat.Location = new System.Drawing.Point(45, 340);
             this.buttonChat.Name = "buttonChat";
-            this.buttonChat.Size = new System.Drawing.Size(206, 37);
+            this.buttonChat.Size = new System.Drawing.Size(173, 37);
             this.buttonChat.TabIndex = 34;
-            this.buttonChat.Text = "Chat";
+            this.buttonChat.Text = "Send Message";
             this.buttonChat.UseVisualStyleBackColor = true;
             this.buttonChat.Click += new System.EventHandler(this.button3_Click);
             // 
@@ -465,6 +466,7 @@
             // 
             // backgroundPanel
             // 
+            this.backgroundPanel.Controls.Add(this.labelChat);
             this.backgroundPanel.Controls.Add(this.panel1);
             this.backgroundPanel.Controls.Add(this.buttonReset);
             this.backgroundPanel.Controls.Add(this.panel2);
@@ -476,6 +478,15 @@
             this.backgroundPanel.Name = "backgroundPanel";
             this.backgroundPanel.Size = new System.Drawing.Size(618, 409);
             this.backgroundPanel.TabIndex = 43;
+            // 
+            // labelChat
+            // 
+            this.labelChat.AutoSize = true;
+            this.labelChat.Location = new System.Drawing.Point(12, 317);
+            this.labelChat.Name = "labelChat";
+            this.labelChat.Size = new System.Drawing.Size(32, 13);
+            this.labelChat.TabIndex = 38;
+            this.labelChat.Text = "Chat:";
             // 
             // menuStrip1
             // 
@@ -522,7 +533,7 @@
             // creditsToolStripMenuItem
             // 
             this.creditsToolStripMenuItem.Name = "creditsToolStripMenuItem";
-            this.creditsToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
+            this.creditsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.creditsToolStripMenuItem.Text = "Credits";
             this.creditsToolStripMenuItem.Click += new System.EventHandler(this.creditsToolStripMenuItem_Click);
             // 
@@ -606,6 +617,7 @@
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem creditsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem discordToolStripMenuItem;
+        private System.Windows.Forms.Label labelChat;
     }
 }
 
