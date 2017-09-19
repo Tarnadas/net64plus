@@ -945,41 +945,6 @@ namespace SM64O
             }
         }
 
-        private void button2_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("Super Mario 64 Online Team"
-                + Environment.NewLine
-                + "Kaze Emanuar"
-                + Environment.NewLine
-                + "MelonSpeedruns"
-                + Environment.NewLine
-                + "Guad"
-                + Environment.NewLine
-                + "merlish"
-                + Environment.NewLine
-                + Environment.NewLine
-                + "Luigi 3D Model created by: "
-                + Environment.NewLine
-                + "Cjes"
-                + Environment.NewLine
-                + "GeoshiTheRed"
-                + Environment.NewLine
-                + Environment.NewLine
-                + "Toad, Rosalina and Peach 3D Models created by: "
-                + Environment.NewLine
-                + "AnkleD"
-                + Environment.NewLine
-                + Environment.NewLine
-                + "New Character 3D Models created by: "
-                + Environment.NewLine
-                + "Marshivolt"
-                + Environment.NewLine
-                + Environment.NewLine
-                + "Character Head Icons created by: "
-                + Environment.NewLine
-                + "Quasmok");
-        }
-
         private void Form1_Load(object sender, EventArgs e)
         {
             comboBoxEmulator.SelectedIndex = 0;
@@ -1002,14 +967,13 @@ namespace SM64O
             ToolTip toolTip1 = new ToolTip();
 
             // Set up the delays for the ToolTip.
-            toolTip1.AutoPopDelay = 5000;
-            toolTip1.InitialDelay = 1000;
+            toolTip1.AutoPopDelay = 2500;
+            toolTip1.InitialDelay = 500;
             toolTip1.ReshowDelay = 500;
             // Force the ToolTip text to be displayed whether or not the form is active.
             toolTip1.ShowAlways = true;
 
-            // Set up the ToolTip text for the Buttons, Labels and Checkboxes.
-            // Could probably use better names for the labels, buttons and checkboxes, to tell them apart!
+            // Set up the ToolTip text for the Buttons, Labels, Checkboxes, Lists.
             toolTip1.SetToolTip(this.labelAddress, "Input the IP Address to the host");
             toolTip1.SetToolTip(this.textBoxAddress, "Input the IP Address to the host");
 
