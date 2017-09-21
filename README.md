@@ -1,11 +1,12 @@
-# Super Mario 64 Online
+# Net64 Client (unofficial)
 
-This is a tool to add a multiplayer component to Super Mario 64 emulated via the most popular emulators.
+This is a modified client for Net64 aka Sm64O, that uses the Websocket protocol.
 
-Any pull requests are welcome.
+## Why?
 
-## Builds
+Because the official client uses the [Hazel protocol](https://github.com/DarkRiftNetworking/Hazel-Networking) and I want to make a dedicated server with Node.js.
+The Hazel protocol is only implemented in C# and honestly, noone uses it (sorry).
 
-`master` and `dev` branches are automatically built every commit, you can download the latest one by clicking on the next image and then clicking on `ARTIFACTS`
+With this client you won't be able to connect to any official server. You can only connect to servers, that use my dedicated server software (WIP). You also won't be able to create a server with this client.
 
-[![Build status](https://ci.appveyor.com/api/projects/status/jbdwexl4xwijd73v/branch/master?svg=true)](https://ci.appveyor.com/project/Guad/sm64o/branch/master)
+If you want to get the original client, please go [here](https://github.com/Guad/sm64o). If you only want to play with friends, the official client is a better choice.
