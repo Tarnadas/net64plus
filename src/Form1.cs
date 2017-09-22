@@ -24,7 +24,7 @@ namespace SM64O
     {
         private const int MAJOR_VERSION = 1;
         private const int MINOR_VERSION = 3;
-        private const int UPDATE_RATE = 16;
+        private const int UPDATE_RATE = 32;
         public  const int MAX_CHAT_LENGTH = 24;
         private const int HANDSHAKE_LENGTH = MAX_CHAT_LENGTH + 5;
 
