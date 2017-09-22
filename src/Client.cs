@@ -11,6 +11,8 @@ namespace SM64O
     public class Client
     {
 
+        public int PlayerID = -1;
+
         private Form1 _gui;
         private WebSocketConnection _connection;
         private IEmulatorAccessor _memory;
@@ -59,6 +61,7 @@ namespace SM64O
                 case PacketType.Handshake:
                     _memory.WriteMemory(0x365FFC, new byte[1]{ 2 }, 1);
                     _memory.WriteMemory(0x367703, payload, 1);
+                    PlayerID = (int)payload[0];
                     break;
                 case PacketType.PlayerData:
                     ReceivePlayerData(payload);
@@ -107,6 +110,7 @@ namespace SM64O
         {
             byte[] payload = new byte[0x18];
             _memory.ReadMemory(0x367700, payload, 0x18);
+            _memory.WriteMemory(0x367700 + 0x100 * PlayerID, payload, 0x18);
 
             _connection.SendPacket(PacketType.PlayerData, payload);
         }

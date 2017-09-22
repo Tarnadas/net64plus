@@ -360,7 +360,7 @@ namespace SM64O
         {
             _mainTask = Task.Run(async () =>
             {
-                while (!_closing)
+                while (!_closing && _client.PlayerID != -1)
                 {
                     try
                     {
