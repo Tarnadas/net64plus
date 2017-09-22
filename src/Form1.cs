@@ -26,7 +26,7 @@ namespace SM64O
         private const int MINOR_VERSION = 3;
         private const int UPDATE_RATE = 128;
         public  const int MAX_CHAT_LENGTH = 24;
-        private const int HANDSHAKE_LENGTH = MAX_CHAT_LENGTH + 4;
+        private const int HANDSHAKE_LENGTH = MAX_CHAT_LENGTH + 5;
 
         public static readonly string BASE_DIR = AppDomain.CurrentDomain.BaseDirectory;
         public static readonly string PATCHES_DIR = BASE_DIR + "/Patches/";
@@ -186,9 +186,10 @@ namespace SM64O
                 toolStripStatusLabel1.Text = "Connecting to server...";
 
                 byte[] payload = new byte[HANDSHAKE_LENGTH];
-                payload[0] = (byte)MAJOR_VERSION;
-                payload[1] = (byte)MINOR_VERSION;
-                payload[2] = (byte)comboBoxChar.SelectedIndex;
+                payload[0] = (byte)PacketType.Handshake;
+                payload[1] = (byte)MAJOR_VERSION;
+                payload[2] = (byte)MINOR_VERSION;
+                payload[3] = (byte)comboBoxChar.SelectedIndex;
 
                 string username = usernameBox.Text;
 
@@ -205,8 +206,9 @@ namespace SM64O
                 if (len > 24) // Arbitrary max length
                     len = 24;
 
-                payload[3] = (byte)len;
-                Array.Copy(usernameBytes, 0, payload, 4, len);
+                payload[4] = (byte)len;
+                Console.WriteLine(len);
+                Array.Copy(usernameBytes, 0, payload, 5, len);
 
                 IPAddress target = null;
                 bool isIp6 = false;
@@ -233,7 +235,7 @@ namespace SM64O
 
                 try
                 {
-                    _client = new Client(this, _memory, target);
+                    _client = new Client(this, _memory, target, payload);
                 }
                 catch (WebSocketException ex) {
                     MessageBox.Show(this, "Could not connect to server:\n" + ex.Message);

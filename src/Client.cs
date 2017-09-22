@@ -15,7 +15,7 @@ namespace SM64O
         private IEmulatorAccessor _memory;
         private bool _connected;
 
-        public Client(Form1 gui, IEmulatorAccessor memory, IPAddress target)
+        public Client(Form1 gui, IEmulatorAccessor memory, IPAddress target, byte[] payload)
         {
             _connected = false;
             _gui = gui;
@@ -29,6 +29,8 @@ namespace SM64O
             {
                 _connected = true;
                 Console.WriteLine("connected");
+                Console.WriteLine(PrintBytes(payload));
+                _connection.Send(payload);
             };
             _connection.OnError += (sender, e) =>
             {
@@ -120,7 +122,7 @@ namespace SM64O
             _memory.ReadMemory(0x367400, originalBuffer, originalBuffer.Length);
 
             byte[] buffer = originalBuffer;
-            Console.WriteLine(PrintBytes(buffer));
+            //  Console.WriteLine(PrintBytes(buffer));
 
             for (int i = 0; i < len; i += 12)
             {
