@@ -234,7 +234,7 @@ namespace SM64O
 
                 try
                 {
-                    _client = new Client(this, _memory, target, payload);
+                    _client = new Client(this, (int)numericUpDown2.Value, _memory, target, payload);
                 }
                 catch (WebSocketException ex) {
                     MessageBox.Show(this, "Could not connect to server:\n" + ex.Message);

@@ -3,6 +3,7 @@ using System.Net;
 using System.Diagnostics;
 using System.Text;
 using System.Linq;
+using System.Windows.Forms;
 using WebSocketSharp;
 
 namespace SM64O
@@ -15,12 +16,12 @@ namespace SM64O
         private IEmulatorAccessor _memory;
         private bool _connected;
 
-        public Client(Form1 gui, IEmulatorAccessor memory, IPAddress target, byte[] payload)
+        public Client(Form1 gui, int port, IEmulatorAccessor memory, IPAddress target, byte[] payload)
         {
             _connected = false;
             _gui = gui;
             _memory = memory;
-            _connection = new WebSocketConnection("ws://" + target + ":8080");
+            _connection = new WebSocketConnection("ws://" + target + ":" + port);
             _connection.OnMessage += (sender, e) =>
             {
                 OnMessage(e);
@@ -33,8 +34,8 @@ namespace SM64O
             };
             _connection.OnError += (sender, e) =>
             {
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.Exception);
+                MessageBox.Show(null, e.Message + "\n\n" + e.Exception, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Application.Exit();
             };
             _connection.OnClose += (sender, e) =>
             {
@@ -82,7 +83,7 @@ namespace SM64O
 
         private void ReceivePlayerData(byte[] data)
         {
-            int playerId = (int)data[3] + 3;
+            int playerId = (int)data[3];
             _memory.WriteMemory(0x367700 + 0x100 * playerId, data, 0x18);
         }
 
