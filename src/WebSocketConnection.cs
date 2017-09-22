@@ -15,9 +15,6 @@ namespace SM64O
             byte[] buffer = new byte[payload.Length + 1];
             buffer[0] = (byte)type;
             Array.Copy(payload, 0, buffer, 1, payload.Length);
-
-            Console.WriteLine("send packet: " + buffer.ToString());
-            Console.WriteLine(PrintBytes(buffer));
             Send(buffer);
         }
 

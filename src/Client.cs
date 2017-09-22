@@ -29,7 +29,6 @@ namespace SM64O
             {
                 _connected = true;
                 Console.WriteLine("connected");
-                Console.WriteLine(PrintBytes(payload));
                 _connection.Send(payload);
             };
             _connection.OnError += (sender, e) =>
@@ -41,6 +40,7 @@ namespace SM64O
             {
                 _connected = false;
                 Console.WriteLine("disconnected");
+                _memory.WriteMemory(0x365FFC, new byte[1]{ 0 }, 1);
             };
             _connection.Connect();
         }
@@ -50,15 +50,20 @@ namespace SM64O
             byte[] data = e.RawData;
             if (data.Length == 0) return;
 
-            Console.WriteLine("receive packet: " + data.ToString());
-            Console.WriteLine(PrintBytes(data));
             PacketType type = (PacketType)data[0];
             byte[] payload = data.Skip(1).ToArray();
 
             switch (type)
             {
-                case PacketType.MemoryWrite:
-                    ReceiveRawMemory(payload);
+                case PacketType.Handshake:
+                    _memory.WriteMemory(0x365FFC, new byte[1]{ 2 }, 1);
+                    _memory.WriteMemory(0x367703, payload, 1);
+                    break;
+                case PacketType.PlayerData:
+                    ReceivePlayerData(payload);
+                    break;
+                case PacketType.GameMode:
+                    _memory.WriteMemory(0x365FF7, payload, 1);
                     break;
                 case PacketType.ChatMessage:
                     ReceiveChatMessage(payload);
@@ -75,22 +80,10 @@ namespace SM64O
             }
         }
 
-        private void ReceiveRawMemory(byte[] data)
+        private void ReceivePlayerData(byte[] data)
         {
-            if (data.Length == 1)
-            {
-                _memory.WriteMemory(0x367703, data, data.Length);
-                return;
-            }
-
-            int offset = BitConverter.ToInt32(data, 0);
-            if (offset < 0x365ff0 || offset > 0x369000) // Only allow 8 MB N64 RAM addresses
-                return; //  Kaze: retrict it to 365ff0 to 369000
-
-            byte[] buffer = new byte[data.Length - 4];
-            data.Skip(4).ToArray().CopyTo(buffer, 0);
-
-            _memory.WriteMemory(offset, buffer, buffer.Length);
+            int playerId = (int)data[3] + 3;
+            _memory.WriteMemory(0x367700 + 0x100 * playerId, data, 0x18);
         }
 
         private void ReceiveChatMessage(byte[] data)
@@ -109,61 +102,12 @@ namespace SM64O
             _gui.addChatMessage(sender, message);
         }
 
-        public void sendAllBytes()
+        public void sendPlayerData()
         {
-            //int freeRamLength = getRamLength(0x367400);
-            const int len = 0x240;
+            byte[] payload = new byte[0x18];
+            _memory.ReadMemory(0x367700, payload, 0x18);
 
-            int[] offsetsToReadFrom = new int[len];
-            int[] offsetsToWriteToLength = new int[len];
-            int[] offsetsToWriteTo = new int[len];
-
-            byte[] originalBuffer = new byte[len];
-            _memory.ReadMemory(0x367400, originalBuffer, originalBuffer.Length);
-
-            byte[] buffer = originalBuffer;
-            //  Console.WriteLine(PrintBytes(buffer));
-
-            for (int i = 0; i < len; i += 12)
-            {
-                if ((buffer[i] | buffer[i + 1] | buffer[i + 2] | buffer[i + 3]) == 0) continue;
-
-                buffer = buffer.Skip(0 + i).Take(4).ToArray();
-                long wholeAddress = BitConverter.ToInt32(buffer, 0);
-                wholeAddress -= 0x80000000;
-                offsetsToReadFrom[i + 0] = (int)wholeAddress;
-                buffer = originalBuffer;
-
-                buffer = buffer.Skip(4 + i).Take(4).ToArray();
-                int wholeAddress1 = BitConverter.ToInt32(buffer, 0);
-                offsetsToWriteToLength[i + 4] = (int)wholeAddress1;
-                buffer = originalBuffer;
-
-                buffer = buffer.Skip(8 + i).Take(4).ToArray();
-                long wholeAddress2 = BitConverter.ToInt32(buffer, 0);
-                wholeAddress2 -= 0x80000000;
-                offsetsToWriteTo[i + 8] = (int)wholeAddress2;
-
-                buffer = originalBuffer;
-
-                readAndSend(offsetsToReadFrom[i], offsetsToWriteTo[i + 8], offsetsToWriteToLength[i + 4]);
-
-            }
-        }
-
-        private void readAndSend(int offsetToRead, int offsetToWrite, int howMany)
-        {
-            byte[] buffer = new byte[howMany];
-            byte[] writeOffset = BitConverter.GetBytes(offsetToWrite);
-
-            _memory.ReadMemory(offsetToRead, buffer, buffer.Length);
-
-            byte[] finalOffset = new byte[howMany + 4];
-            writeOffset.CopyTo(finalOffset, 0);
-            buffer.CopyTo(finalOffset, 4);
-            
-            Console.WriteLine("readAndSend");
-            _connection.SendPacket(PacketType.MemoryWrite, finalOffset);
+            _connection.SendPacket(PacketType.PlayerData, payload);
         }
 
         public void sendAllChat(string username, string message)
@@ -193,7 +137,6 @@ namespace SM64O
 
             Array.Copy(usernameBytes, 0, payload, 1 + messageBytes.Length + 1, usernameBytes.Length);
 
-            Console.WriteLine("sendAllChat");
             _connection.SendPacket(PacketType.ChatMessage, payload);
 
         }
@@ -225,13 +168,11 @@ namespace SM64O
 
             Array.Copy(usernameBytes, 0, payload, 1 + messageBytes.Length + 1, usernameBytes.Length);
 
-            Console.WriteLine("sendChatTo");
             _connection.SendPacket(PacketType.ChatMessage, payload);
         }
 
         public void setCharacter(int index)
         {
-            Console.WriteLine("setCharacter");
             _connection.SendPacket(PacketType.CharacterSwitch, new byte[] { (byte)(index) });
         }
 
@@ -240,7 +181,6 @@ namespace SM64O
             byte[] buffer = new byte[4];
             Array.Copy(BitConverter.GetBytes(Environment.TickCount), 0, buffer, 0, 4);
 
-            Console.WriteLine("Ping");
             _connection.SendPacket(PacketType.RoundtripPing, buffer);
         }
 

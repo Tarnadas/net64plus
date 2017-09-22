@@ -46,7 +46,6 @@ namespace SM64O
 
         public static void setCharacter(string character, IEmulatorAccessor mem)
         {
-            Console.WriteLine(character);
             if (character == "Mario")
             {
                 int bytesWritten = 0;

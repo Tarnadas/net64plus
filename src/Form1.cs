@@ -24,7 +24,7 @@ namespace SM64O
     {
         private const int MAJOR_VERSION = 1;
         private const int MINOR_VERSION = 3;
-        private const int UPDATE_RATE = 128;
+        private const int UPDATE_RATE = 16;
         public  const int MAX_CHAT_LENGTH = 24;
         private const int HANDSHAKE_LENGTH = MAX_CHAT_LENGTH + 5;
 
@@ -207,7 +207,6 @@ namespace SM64O
                     len = 24;
 
                 payload[4] = (byte)len;
-                Console.WriteLine(len);
                 Array.Copy(usernameBytes, 0, payload, 5, len);
 
                 IPAddress target = null;
@@ -279,9 +278,6 @@ namespace SM64O
             loadPatches();
 
             toolStripStatusLabel1.Text = "Loaded ROM " + getRomName();
-
-            // TODO this was originally used to set if you're a server or not. Idk if this has any side effects
-            writeValue(new byte[] { 0x00, 0x00, 0x00, 0x01 }, 0x365FFC);
 
             Settings sets = new Settings();
 
@@ -368,7 +364,7 @@ namespace SM64O
                 {
                     try
                     {
-                        _client.sendAllBytes();
+                        _client.sendPlayerData();
                     }
                     catch (Exception e)
                     {
