@@ -280,10 +280,8 @@ namespace SM64O
 
             toolStripStatusLabel1.Text = "Loaded ROM " + getRomName();
 
-            if (checkBoxServer.Checked)
-            {
-                writeValue(new byte[] { 0x00, 0x00, 0x00, 0x01 }, 0x365FFC);
-            }
+            // TODO this was originally used to set if you're a server or not. Idk if this has any side effects
+            writeValue(new byte[] { 0x00, 0x00, 0x00, 0x01 }, 0x365FFC);
 
             Settings sets = new Settings();
 
