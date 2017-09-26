@@ -24,7 +24,7 @@ namespace SM64O
     {
         private const int MAJOR_VERSION = 1;
         private const int MINOR_VERSION = 3;
-        private const int UPDATE_RATE = 32;
+        private const int UPDATE_RATE = 16;
         public  const int MAX_CHAT_LENGTH = 24;
         private const int HANDSHAKE_LENGTH = MAX_CHAT_LENGTH + 5;
 
@@ -360,11 +360,11 @@ namespace SM64O
         {
             _mainTask = Task.Run(async () =>
             {
-                while (!_closing && _client.PlayerID != -1)
+                while (!_closing)
                 {
                     try
                     {
-                        _client.sendPlayerData();
+                        if (_client.PlayerID != -1) _client.sendPlayerData();
                     }
                     catch (Exception e)
                     {
@@ -679,7 +679,6 @@ namespace SM64O
         public void addChatMessage(string sender, string message)
         {
             listBoxPlayers.Items.Insert(0, string.Format("{0}: {1}", sender, message));
-
             if (listBoxPlayers.Items.Count > 10)
             {
                 listBoxPlayers.Items.RemoveAt(10);
