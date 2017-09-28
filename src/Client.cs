@@ -20,25 +20,21 @@ namespace SM64O
         private Form1 _gui;
         private WebSocketConnection _connection;
         private IEmulatorAccessor _memory;
-        private bool _connected;
 
         public Client(Form1 gui, int port, IEmulatorAccessor memory, IPAddress target, byte[] payload)
         {
-            _connected = false;
             _gui = gui;
             _memory = memory;
             _connection = new WebSocketConnection("ws://" + target + ":" + port);
             _connection.OnMessage += (sender, e) =>
             {
-                OnMessage(e);
+                onMessage(e);
             };
             _connection.OnOpen += (sender, e) =>
             {
-                _connected = true;
-                Console.WriteLine("connected");
+                _gui.AddChatMessage("[SERVER]", "Connected");
                 _connection.Send(payload);
                 // SetMessage("connected");
-                _gui.addChatMessage("[SERVER]", "Connected");
             };
             _connection.OnError += (sender, e) =>
             {
@@ -47,15 +43,15 @@ namespace SM64O
             };
             _connection.OnClose += (sender, e) =>
             {
-                _connected = false;
-                Console.WriteLine("disconnected");
-                _memory.WriteMemory(0x365FFC, new byte[1]{ 0 }, 1);
-                _gui.addChatMessage("[SERVER]", "Disconnected");
+                _memory.WriteMemory(0x365FFC, new byte[1], 1);
+                _gui.AddChatMessage("[SERVER]", "Disconnected");
+                MessageBox.Show(null, "Server closed", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Application.Exit();
             };
             _connection.Connect();
         }
         
-        private void OnMessage(MessageEventArgs e)
+        private void onMessage(MessageEventArgs e)
         {
             byte[] data = e.RawData;
             if (data.Length == 0) return;
@@ -66,33 +62,33 @@ namespace SM64O
             switch (type)
             {
                 case PacketType.Handshake:
-                    _memory.WriteMemory(0x365FFC, new byte[1]{ 2 }, 1);
-                    _memory.WriteMemory(0x367703, payload, 1);
+                    _memory.WriteMemory(0x365FFC, new byte[1]{ 1 }, 1); // let client think that he is host
+                    _memory.WriteMemory(0x367703, new byte[1]{ 1 }, 1); // let client think that he has player ID 1
                     PlayerID = (int)payload[0];
-                    Console.WriteLine("player ID: " + PlayerID);
+                    _gui.AddChatMessage("[SERVER]", "Your player ID is: " + PlayerID);
                     break;
                 case PacketType.PlayerData:
-                    ReceivePlayerData(payload);
+                    receivePlayerData(payload);
                     break;
                 case PacketType.GameMode:
                     _memory.WriteMemory(0x365FF7, payload, 1);
                     break;
                 case PacketType.ChatMessage:
-                    ReceiveChatMessage(payload);
+                    receiveChatMessage(payload);
                     break;
                 case PacketType.RoundtripPing:
-                    // We got our pong
-                    int sendTime = BitConverter.ToInt32(payload, 0);
-                    int currentTime = Environment.TickCount;
-
-                    int elapsed = currentTime - sendTime;
-
-                    _gui.setPing(elapsed / 2);
+                    _gui.SetPing((Environment.TickCount - BitConverter.ToInt32(payload, 0)) / 2);
+                    break;
+                case PacketType.WrongVersion:
+                    int major = (int)payload[0];
+                    int minor = (int)payload[1];
+                    MessageBox.Show(null, "Wrong version!\n\nPlease download version " + major + "." + minor + "\nhttps://www.github.com/Tarnadas/sm64o/releases", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Application.Exit();
                     break;
             }
         }
 
-        private void ReceivePlayerData(byte[] compressed)
+        private void receivePlayerData(byte[] compressed)
         {
             using (MemoryStream ms = new MemoryStream(compressed))
             using (GZipStream gs = new GZipStream(ms, CompressionMode.Decompress))
@@ -101,11 +97,18 @@ namespace SM64O
                 gs.CopyTo(res);
                 byte[] data = res.ToArray();
                 byte[] playerData = new byte[0x18];
-                int j = 1;
-                for (int i = 0; i < data.Length; i += 0x18, j++)
+                int j = 2;
+                //Console.Write("received: ");
+                //Console.WriteLine(PrintBytes(data));
+                for (int i = 0; i < data.Length; i += 0x18)
                 {
+                    if (PlayerID == (int)data[i + 3]) continue;
                     Array.Copy(data, i, playerData, 0, 0x18);
+                    playerData[3] = (byte)j;
+                    //Console.Write("write: ");
+                    //Console.WriteLine(PrintBytes(playerData));
                     _memory.WriteMemory(0x367700 + 0x100 * j, playerData, 0x18);
+                    j++;
                 }
                 for (; j < 24; j++) {
                     _memory.WriteMemory(0x367700 + 0x100 * j, EMPTY, 0x18);
@@ -113,7 +116,7 @@ namespace SM64O
             }
         }
 
-        private void ReceiveChatMessage(byte[] data)
+        private void receiveChatMessage(byte[] data)
         {
             if (!_gui.ChatEnabled) return;
 
@@ -124,20 +127,53 @@ namespace SM64O
             message = Program.GetASCIIString(data, 1, msgLen);
             int nameLen = data[msgLen + 1];
             sender = Program.GetASCIIString(data, msgLen + 2, nameLen);
-            _gui.addChatMessage(sender, message);
+            _gui.AddChatMessage(sender, message);
         }
 
-        public void sendPlayerData()
+        public void SendPlayerData()
         {
             byte[] payload = new byte[0x18];
             _memory.ReadMemory(0x367700, payload, 0x18);
             if (payload[0xF] != 0)
             {
                 _connection.SendPacket(PacketType.PlayerData, payload);
+                _memory.WriteMemory(0x367800, payload, 0x18);
             }
 
+            /* byte[] a = new byte[4];
+            _memory.ReadMemory(0x32ddf4, a, 2);
+            int offset = BitConverter.ToInt16(a, 0) * 0x70;
+            Console.WriteLine(offset);
+            byte[] check = new byte[1];
+            _memory.ReadMemory(0x207700 + offset, check, 1);
+            Console.Write("check: ");
+            Console.WriteLine(PrintBytes(check));
+            byte[] compare = new byte[1];
+            _memory.ReadMemory(0x207738 + offset, compare, 1);
+            Console.Write("compare: ");
+            Console.WriteLine(PrintBytes(compare));
+            byte[] write = new byte[1];
+            _memory.ReadMemory(0x367710 + offset, write, 1);
+            Console.Write("write: ");
+            Console.WriteLine(PrintBytes(write)); */
             if (DEBUG)
             {
+                /* byte[] starb = new byte[4];
+                _memory.ReadMemory(0x367710, starb, 4);
+                int star = BitConverter.ToInt32(starb, 0);
+                byte[] starb1 = new byte[4];
+                _memory.ReadMemory(0x367714, starb1, 4);
+                int star1 = BitConverter.ToInt32(starb1, 0);
+                if (star != 0)
+                {
+                    Console.Write("star0: ");
+                    Console.WriteLine(PrintBytes(starb));
+                }
+                if (star1 != 0)
+                {
+                    Console.Write("star1: ");
+                    Console.WriteLine(PrintBytes(starb1));
+                } */
                 for (int i = 0; i < 24; i++)
                 {
                     _memory.ReadMemory(0x367700 + 0x100 * i, payload, 0x18);
@@ -179,7 +215,7 @@ namespace SM64O
             return false;
         }
 
-        public void sendAllChat(string username, string message)
+        public void SendAllChat(string username, string message)
         {
             string name = "HOST";
 
@@ -210,7 +246,7 @@ namespace SM64O
 
         }
 
-        public void sendChatTo(string username, string message)
+        public void SendChatTo(string username, string message)
         {
             string name = "HOST";
 
@@ -240,8 +276,9 @@ namespace SM64O
             _connection.SendPacket(PacketType.ChatMessage, payload);
         }
 
-        public void setCharacter(int index)
+        public void SetCharacter(int index)
         {
+            _memory.WriteMemory(0x365FF3, new byte[] { (byte)(index + 1) }, 1);
             _connection.SendPacket(PacketType.CharacterSwitch, new byte[] { (byte)(index) });
         }
 

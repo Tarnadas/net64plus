@@ -22,7 +22,7 @@ namespace SM64O
 {
     public partial class Form1 : Form
     {
-        private const int MAJOR_VERSION = 1;
+        private const int MAJOR_VERSION = 0;
         private const int MINOR_VERSION = 3;
         private const int UPDATE_RATE = 16;
         public  const int MAX_CHAT_LENGTH = 24;
@@ -78,7 +78,7 @@ namespace SM64O
             // TODO: Change this according to OS
             _memory = new WindowsEmulatorAccessor();
 
-            this.Text = "SM64 Online Tool v1.3.1 Hotfix";
+            this.Text = "Net64+ v" + MAJOR_VERSION + "." + MINOR_VERSION;
         }
 
         private void die(string msg)
@@ -87,7 +87,7 @@ namespace SM64O
             Application.Exit();
         }
 
-        public void setPing(int ping)
+        public void SetPing(int ping)
         {
             pingLabel.Text = string.Format("Ping: {0}ms", ping);
         }
@@ -273,7 +273,7 @@ namespace SM64O
 
             buttonReset.Enabled = true;
 
-            Characters.setCharacter(comboBoxChar.SelectedItem.ToString(), _memory);
+            _client.SetCharacter(comboBoxChar.SelectedIndex);
 
             loadPatches();
 
@@ -364,7 +364,7 @@ namespace SM64O
                 {
                     try
                     {
-                        if (_client.PlayerID != -1) _client.sendPlayerData();
+                        if (_client.PlayerID != -1) _client.SendPlayerData();
                     }
                     catch (Exception e)
                     {
@@ -531,7 +531,7 @@ namespace SM64O
             if (ChatEnabled)
             {
                 if (string.IsNullOrWhiteSpace(chatBox.Text)) return;
-                _client.sendAllChat(usernameBox.Text, chatBox.Text);
+                _client.SendAllChat(usernameBox.Text, chatBox.Text);
                 chatBox.Text = "";
             }
         }
@@ -564,7 +564,7 @@ namespace SM64O
                 if (ChatEnabled)
                 {
                     if (string.IsNullOrWhiteSpace(chatBox.Text)) return;
-                    _client.sendAllChat(usernameBox.Text, chatBox.Text);
+                    _client.SendAllChat(usernameBox.Text, chatBox.Text);
                     chatBox.Text = "";
                 }
             }
@@ -584,9 +584,7 @@ namespace SM64O
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (_client == null) return; // We are not in a server yet
-
-            Characters.setCharacterAll(comboBoxChar.SelectedIndex + 1, _memory);
-            _client.setCharacter(comboBoxChar.SelectedIndex);
+            _client.SetCharacter(comboBoxChar.SelectedIndex);
         }
 
         private void removeAllPlayers()
@@ -676,7 +674,7 @@ namespace SM64O
             return character;
         }
 
-        public void addChatMessage(string sender, string message)
+        public void AddChatMessage(string sender, string message)
         {
             listBoxPlayers.Items.Insert(0, string.Format("{0}: {1}", sender, message));
             if (listBoxPlayers.Items.Count > 10)
@@ -710,7 +708,7 @@ namespace SM64O
 
         private void creditsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string message = ("Super Mario 64 Online Team"
+            string message = ("Net64 Online Team"
                 + Environment.NewLine
                 + "Kaze Emanuar"
                 + Environment.NewLine
@@ -721,7 +719,7 @@ namespace SM64O
                 + "merlish"
                 + Environment.NewLine
                 + Environment.NewLine
-                + "Client Modification by:"
+                + "Net64+ by:"
                 + Environment.NewLine
                 + "Tarnadas"
                 + Environment.NewLine
@@ -745,7 +743,14 @@ namespace SM64O
                 + Environment.NewLine
                 + "Character Head Icons created by: "
                 + Environment.NewLine
-                + "Quasmok");
+                + "Quasmok"
+                + Environment.NewLine
+                + Environment.NewLine
+                + "Net64+ Beta Testers:"
+                + Environment.NewLine
+                + "Retrosol"
+                + "TheNawab"
+                + "Samariz");
 
             string caption = "Credits";
             MessageBoxButtons buttons = MessageBoxButtons.OK;

@@ -7,6 +7,7 @@
         GameMode = 2,
         ChatMessage = 3,
         CharacterSwitch = 4,
-        RoundtripPing = 5
+        RoundtripPing = 5,
+        WrongVersion = 6
     }
 }

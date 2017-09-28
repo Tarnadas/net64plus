@@ -29,7 +29,7 @@ Here is a table to break down Networking performance with an example:
 | --- | --- | --- |
 | # of packets to send to N clients | O(N<sup>2</sup>) | O(N) |
 | # of bytes to send to N clients (with a player data length of 24) | N<sup>2</sup> * (24 + 4 *(bytes used for memory offset)* + headers) | N * (N * 24 * *Gzip compression size* + headers) |
-| # of bytes to send for 24 clients (assume 10 bytes for all headers and an average Gzip compression size of 60%) | 24<sup>2</sup> * (24 + 4 + 10) = 21888B = **21.375KB** | 24 * (24 * 24 * 0.6 + 10 + 10 *(Gzip header)*) = 87745B = **8.57KB** |
+| # of bytes to send for 24 clients (assume 10 bytes for all headers and an average Gzip compression size of 60%) | 24<sup>2</sup> * (24 + 4 + 10) = 21888B = **21.375KB** | 24 * (24 * 24 * 0.6 + 10 + 10 *(Gzip header)*) = 8775B = **8.57KB** |
 | # of bytes/s to send for 24 clients with an update rate of 16ms | 21.375KB / 0.016s = 1335.94KB/s = **1.3MB/s** | 8.57KB / 0.016s = 535.63KB/s = **0.52MB/s**
 
 ### CPU

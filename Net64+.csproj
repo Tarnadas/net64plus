@@ -59,7 +59,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\Characters.cs"/>
     <Compile Include="src\Client.cs"/>
     <Compile Include="src\WebSocketConnection.cs"/>
     <Compile Include="src\Form1.cs">
