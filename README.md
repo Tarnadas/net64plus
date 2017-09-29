@@ -2,6 +2,10 @@
 
 This is a modified client for Net64 aka Sm64O, that uses the Websocket protocol.
 
+## Download
+
+Download the client in the [release section](https://github.com/Tarnadas/sm64o/releases).
+
 ## Why?
 
 Because the official client uses the [Hazel protocol](https://github.com/DarkRiftNetworking/Hazel-Networking) and I want to make a dedicated server with Node.js.
