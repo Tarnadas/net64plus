@@ -1,4 +1,4 @@
-# Net64+ Client (unofficial) (WIP)
+# Net64+ Client
 
 This is a modified client for Net64 aka Sm64O, that uses the Websocket protocol.
 
