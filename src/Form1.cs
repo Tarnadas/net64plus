@@ -23,7 +23,7 @@ namespace SM64O
     public partial class Form1 : Form
     {
         private const int MAJOR_VERSION = 0;
-        private const int MINOR_VERSION = 4;
+        private const int MINOR_VERSION = 5;
         private const int UPDATE_RATE = 24;
         public  const int MAX_CHAT_LENGTH = 24;
         private const int HANDSHAKE_LENGTH = MAX_CHAT_LENGTH + 5;
@@ -36,8 +36,6 @@ namespace SM64O
         private IEmulatorAccessor _memory;
         private Task _mainTask;
         private bool _closing;
-
-        public bool ChatEnabled = true;
 
         public Form1()
         {
@@ -187,8 +185,8 @@ namespace SM64O
 
                 byte[] payload = new byte[HANDSHAKE_LENGTH];
                 payload[0] = (byte)PacketType.Handshake;
-                payload[1] = (byte)MAJOR_VERSION;
-                payload[2] = (byte)MINOR_VERSION;
+                payload[1] = (byte)0; // TODO I will change this anyway
+                payload[2] = (byte)4;
                 payload[3] = (byte)comboBoxChar.SelectedIndex;
 
                 string username = usernameBox.Text;
@@ -242,8 +240,6 @@ namespace SM64O
                     return;
                 }
 
-                labelPlayersOnline.Text = "Chat Log:";
-
                 pingTimer.Start();
             }
             catch (Exception ex)
@@ -253,23 +249,15 @@ namespace SM64O
                 return;
             }
 
-            checkBoxServer.Enabled = false;
-
             timer1_Tick();
             buttonJoin.Enabled = false;
-
-            numUpDownInterval.Enabled = true;
 
             chatBox.Enabled = true;
             buttonChat.Enabled = true;
             numericUpDown2.Enabled = false;
-            checkBoxLAN.Enabled = false;
             textBoxAddress.ReadOnly = true;
 
             comboBoxEmulator.Enabled = false;
-            //comboBox2.Enabled = false;
-
-            checkBoxChat.Enabled = true;
 
             buttonReset.Enabled = true;
 
@@ -281,7 +269,7 @@ namespace SM64O
 
             Settings sets = new Settings();
 
-            sets.LastIp = checkBoxServer.Checked ? "" : textBoxAddress.Text;
+            sets.LastIp = textBoxAddress.Text;
             sets.LastPort = (int)numericUpDown2.Value;
             sets.Username = usernameBox.Text;
 
@@ -409,11 +397,6 @@ namespace SM64O
             }
         }
 
-        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
-        {
-            // _updateRate = (int)numUpDownInterval.Value;
-        }
-
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             usernameBox.Enabled = true;
@@ -422,17 +405,13 @@ namespace SM64O
             textBoxAddress.ReadOnly = false;
             textBoxAddress.Text = "";
             usernameBox.Enabled = true;
-            panel2.Enabled = false;
             buttonJoin.Enabled = false;
-
-            checkBoxLAN.Enabled = false;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             comboBoxEmulator.SelectedIndex = 0;
             comboBoxChar.SelectedIndex = 0;
-            gamemodeBox.SelectedIndex = 0;
 
             Settings sets = Settings.Load("settings.xml");
 
@@ -466,12 +445,6 @@ namespace SM64O
             toolTip1.SetToolTip(this.labelUsername, "Input your username");
             toolTip1.SetToolTip(this.usernameBox, "Input your username");
 
-            toolTip1.SetToolTip(this.checkBoxChat, "Check this to disable the chat in your server");
-            toolTip1.SetToolTip(this.checkBoxServer, "Check this if you want to make your own server");
-            toolTip1.SetToolTip(this.checkBoxLAN, "Check this to disable UPnP and port checking service");
-
-            toolTip1.SetToolTip(this.labelRateUpdate, "The lower the interval, the faster you request updates from other players");
-
             toolTip1.SetToolTip(this.labelEmulator, "Select your emulator");
             toolTip1.SetToolTip(this.comboBoxEmulator, "Select your emulator");
 
@@ -481,59 +454,17 @@ namespace SM64O
             toolTip1.SetToolTip(this.chatBox, "Type your chat messages here");
             toolTip1.SetToolTip(this.buttonChat, "Click here to send your message");
 
-            toolTip1.SetToolTip(this.labelMaxClients, "Max number of allowed connections to your server");
-            toolTip1.SetToolTip(this.numUpDownClients, "Max number of allowed connections to your server");
-
-            toolTip1.SetToolTip(this.labelGamemode, "Select your gamemode");
-            toolTip1.SetToolTip(this.gamemodeBox, "Select your gamemode");
-
-            toolTip1.SetToolTip(this.labelPlayersOnline, "Lists all players who are connected and their messages");
-            toolTip1.SetToolTip(this.listBoxPlayers, "Lists all players who are connected and their messages");
+            toolTip1.SetToolTip(this.labelChatHistory, "Lists all players who are connected and their messages");
+            toolTip1.SetToolTip(this.listBoxChat, "Lists all chat messages");
 
             toolTip1.SetToolTip(this.buttonReset, "Click here to reset your game");
         }
 
-        public void setGamemode()
-        {
-            byte[] buffer = new byte[1];
-
-            switch (gamemodeBox.SelectedIndex)
-            {
-                case 0:
-                    buffer[0] = 1;
-                    break;
-                case 1:
-                    buffer[0] = 2;
-                    break;
-                case 2:
-                    buffer[0] = 3;
-                    break;
-                case 3:
-                    buffer[0] = 4;
-                    break;
-                case 4:
-                    buffer[0] = 5;
-                    break;
-                case 5:
-                    buffer[0] = 6;
-                    break;
-                case 6:
-                    buffer[0] = 7;
-                    break;
-            }
-
-            _memory.WriteMemory(0x365FF7, buffer, buffer.Length);
-
-        }
-
         private void button3_Click(object sender, EventArgs e)
         {
-            if (ChatEnabled)
-            {
-                if (string.IsNullOrWhiteSpace(chatBox.Text)) return;
-                _client.SendAllChat(usernameBox.Text, chatBox.Text);
-                chatBox.Text = "";
-            }
+            if (string.IsNullOrWhiteSpace(chatBox.Text)) return;
+            _client.SendAllChat(usernameBox.Text, chatBox.Text);
+            chatBox.Text = "";
         }
 
         private Random _r = new Random();
@@ -561,24 +492,10 @@ namespace SM64O
         {
             if (e.KeyCode == Keys.Enter)
             {
-                if (ChatEnabled)
-                {
-                    if (string.IsNullOrWhiteSpace(chatBox.Text)) return;
-                    _client.SendAllChat(usernameBox.Text, chatBox.Text);
-                    chatBox.Text = "";
-                }
+                if (string.IsNullOrWhiteSpace(chatBox.Text)) return;
+                _client.SendAllChat(usernameBox.Text, chatBox.Text);
+                chatBox.Text = "";
             }
-        }
-
-
-        private void gamemodeBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            setGamemode();
-        }
-
-        private void checkBox2_CheckedChanged(object sender, EventArgs e)
-        {
-            ChatEnabled = !checkBoxChat.Checked;
         }
 
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
@@ -676,10 +593,11 @@ namespace SM64O
 
         public void AddChatMessage(string sender, string message)
         {
-            listBoxPlayers.Items.Insert(0, string.Format("{0}: {1}", sender, message));
-            if (listBoxPlayers.Items.Count > 10)
+            string timeStamp = DateTime.Now.ToString("HH:mm:ss");
+            listBoxChat.Items.Add(string.Format("[{0}] {1}: {2}", timeStamp, sender, message));
+            if (listBoxChat.Items.Count > 23)
             {
-                listBoxPlayers.Items.RemoveAt(10);
+                listBoxChat.Items.RemoveAt(0);
             }
         }
 
@@ -749,9 +667,13 @@ namespace SM64O
                 + "Net64+ Beta Testers:"
                 + Environment.NewLine
                 + "Retrosol"
+                + Environment.NewLine
                 + "TheNawab"
+                + Environment.NewLine
                 + "Samariz"
+                + Environment.NewLine
                 + "charju"
+                + Environment.NewLine
                 + "Metabus");
 
             string caption = "Credits";

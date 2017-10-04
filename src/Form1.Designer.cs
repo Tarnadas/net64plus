@@ -31,35 +31,28 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.buttonJoin = new System.Windows.Forms.Button();
-            this.checkBoxServer = new System.Windows.Forms.CheckBox();
             this.textBoxAddress = new System.Windows.Forms.TextBox();
             this.labelAddress = new System.Windows.Forms.Label();
-            this.numUpDownInterval = new System.Windows.Forms.NumericUpDown();
             this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
             this.labelPort = new System.Windows.Forms.Label();
-            this.labelRateUpdate = new System.Windows.Forms.Label();
-            this.listBoxPlayers = new System.Windows.Forms.ListBox();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.comboBoxEmulator = new System.Windows.Forms.ComboBox();
             this.labelEmulator = new System.Windows.Forms.Label();
             this.comboBoxChar = new System.Windows.Forms.ComboBox();
             this.labelChar = new System.Windows.Forms.Label();
-            this.labelMaxClients = new System.Windows.Forms.Label();
-            this.numUpDownClients = new System.Windows.Forms.NumericUpDown();
-            this.labelPlayersOnline = new System.Windows.Forms.Label();
+
+
+            this.labelChatHistory = new System.Windows.Forms.Label();
+            this.listBoxChat = new System.Windows.Forms.ListBox();
+            
+
             this.chatBox = new System.Windows.Forms.TextBox();
             this.buttonChat = new System.Windows.Forms.Button();
             this.usernameBox = new System.Windows.Forms.TextBox();
             this.labelUsername = new System.Windows.Forms.Label();
             this.playerCheckTimer = new System.Windows.Forms.Timer(this.components);
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.checkBoxLAN = new System.Windows.Forms.CheckBox();
-            this.checkBoxChat = new System.Windows.Forms.CheckBox();
+            this.settingsPanel = new System.Windows.Forms.Panel();
             this.labelConnectionConf = new System.Windows.Forms.Label();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.labelGamemode = new System.Windows.Forms.Label();
-            this.gamemodeBox = new System.Windows.Forms.ComboBox();
-            this.labelServerConf = new System.Windows.Forms.Label();
             this.buttonReset = new System.Windows.Forms.Button();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
@@ -73,11 +66,8 @@
             this.discordToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.creditsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            ((System.ComponentModel.ISupportInitialize)(this.numUpDownInterval)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numUpDownClients)).BeginInit();
-            this.panel1.SuspendLayout();
-            this.panel2.SuspendLayout();
+            this.settingsPanel.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.backgroundPanel.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -86,24 +76,13 @@
             // buttonJoin
             // 
             this.buttonJoin.Enabled = false;
-            this.buttonJoin.Location = new System.Drawing.Point(13, 212);
+            this.buttonJoin.Location = new System.Drawing.Point(13, 100);
             this.buttonJoin.Name = "buttonJoin";
             this.buttonJoin.Size = new System.Drawing.Size(268, 49);
             this.buttonJoin.TabIndex = 0;
             this.buttonJoin.Text = "Connect to server!";
             this.buttonJoin.UseVisualStyleBackColor = true;
             this.buttonJoin.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // checkBoxServer
-            // 
-            this.checkBoxServer.AutoSize = true;
-            this.checkBoxServer.Location = new System.Drawing.Point(108, 98);
-            this.checkBoxServer.Name = "checkBoxServer";
-            this.checkBoxServer.Size = new System.Drawing.Size(97, 17);
-            this.checkBoxServer.TabIndex = 10;
-            this.checkBoxServer.Text = "Create Server?";
-            this.checkBoxServer.UseVisualStyleBackColor = true;
-            this.checkBoxServer.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // textBoxAddress
             // 
@@ -121,20 +100,6 @@
             this.labelAddress.Size = new System.Drawing.Size(61, 13);
             this.labelAddress.TabIndex = 12;
             this.labelAddress.Text = "IP Address:";
-            // 
-            // numUpDownInterval
-            // 
-            this.numUpDownInterval.Enabled = false;
-            this.numUpDownInterval.Location = new System.Drawing.Point(227, 122);
-            this.numUpDownInterval.Name = "numUpDownInterval";
-            this.numUpDownInterval.Size = new System.Drawing.Size(53, 20);
-            this.numUpDownInterval.TabIndex = 14;
-            this.numUpDownInterval.Value = new decimal(new int[] {
-            16,
-            0,
-            0,
-            0});
-            this.numUpDownInterval.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
             // 
             // numericUpDown2
             // 
@@ -167,22 +132,23 @@
             this.labelPort.TabIndex = 17;
             this.labelPort.Text = "Port:";
             // 
-            // labelRateUpdate
+            // labelChatHistory
             // 
-            this.labelRateUpdate.AutoSize = true;
-            this.labelRateUpdate.Location = new System.Drawing.Point(95, 124);
-            this.labelRateUpdate.Name = "labelRateUpdate";
-            this.labelRateUpdate.Size = new System.Drawing.Size(126, 13);
-            this.labelRateUpdate.TabIndex = 18;
-            this.labelRateUpdate.Text = "Network Update Interval:";
+            this.labelChatHistory.AutoSize = true;
+            this.labelChatHistory.Location = new System.Drawing.Point(10, 244);
+            this.labelChatHistory.Name = "labelChatHistory";
+            this.labelChatHistory.Size = new System.Drawing.Size(77, 13);
+            this.labelChatHistory.TabIndex = 32;
+            this.labelChatHistory.Text = "Chat Log:";
             // 
-            // listBoxPlayers
+            // listBoxChat
             // 
-            this.listBoxPlayers.FormattingEnabled = true;
-            this.listBoxPlayers.Location = new System.Drawing.Point(13, 84);
-            this.listBoxPlayers.Name = "listBoxPlayers";
-            this.listBoxPlayers.Size = new System.Drawing.Size(268, 238);
-            this.listBoxPlayers.TabIndex = 13;
+            this.listBoxChat.FormattingEnabled = true;
+            this.listBoxChat.Location = new System.Drawing.Point(12, 264);
+            this.listBoxChat.Name = "listBoxChat";
+            this.listBoxChat.Size = new System.Drawing.Size(587, 432);
+            this.listBoxChat.TabIndex = 13;
+            this.listBoxChat.Font = new System.Drawing.Font("Arial", 12);
             // 
             // comboBoxEmulator
             // 
@@ -192,15 +158,15 @@
             "Project64",
             "Nemu64",
             "Mupen64"});
-            this.comboBoxEmulator.Location = new System.Drawing.Point(71, 152);
+            this.comboBoxEmulator.Location = new System.Drawing.Point(420, 21);
             this.comboBoxEmulator.Name = "comboBoxEmulator";
-            this.comboBoxEmulator.Size = new System.Drawing.Size(210, 21);
+            this.comboBoxEmulator.Size = new System.Drawing.Size(150, 21);
             this.comboBoxEmulator.TabIndex = 20;
             // 
             // labelEmulator
             // 
             this.labelEmulator.AutoSize = true;
-            this.labelEmulator.Location = new System.Drawing.Point(13, 155);
+            this.labelEmulator.Location = new System.Drawing.Point(313, 23);
             this.labelEmulator.Name = "labelEmulator";
             this.labelEmulator.Size = new System.Drawing.Size(51, 13);
             this.labelEmulator.TabIndex = 21;
@@ -219,81 +185,25 @@
             "Toad",
             "Waluigi",
             "Rosalina"});
-            this.comboBoxChar.Location = new System.Drawing.Point(115, 179);
+            this.comboBoxChar.Location = new System.Drawing.Point(420, 46);
             this.comboBoxChar.Name = "comboBoxChar";
-            this.comboBoxChar.Size = new System.Drawing.Size(166, 21);
+            this.comboBoxChar.Size = new System.Drawing.Size(150, 21);
             this.comboBoxChar.TabIndex = 22;
             this.comboBoxChar.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
             // 
             // labelChar
             // 
             this.labelChar.AutoSize = true;
-            this.labelChar.Location = new System.Drawing.Point(13, 182);
+            this.labelChar.Location = new System.Drawing.Point(313, 48);
             this.labelChar.Name = "labelChar";
             this.labelChar.Size = new System.Drawing.Size(95, 13);
             this.labelChar.TabIndex = 23;
             this.labelChar.Text = "Select your Player:";
             // 
-            // labelMaxClients
-            // 
-            this.labelMaxClients.AutoSize = true;
-            this.labelMaxClients.Location = new System.Drawing.Point(21, 17);
-            this.labelMaxClients.Name = "labelMaxClients";
-            this.labelMaxClients.Size = new System.Drawing.Size(92, 13);
-            this.labelMaxClients.TabIndex = 30;
-            this.labelMaxClients.Text = "Max Connections:";
-            // 
-            // numUpDownClients
-            // 
-            this.numUpDownClients.Location = new System.Drawing.Point(119, 15);
-            this.numUpDownClients.Maximum = new decimal(new int[] {
-            64,
-            0,
-            0,
-            0});
-            this.numUpDownClients.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.numUpDownClients.Name = "numUpDownClients";
-            this.numUpDownClients.Size = new System.Drawing.Size(163, 20);
-            this.numUpDownClients.TabIndex = 31;
-            this.numUpDownClients.Value = new decimal(new int[] { 23, 0, 0, 0 });
-            // 
-            // labelPlayersOnline
-            // 
-            this.labelPlayersOnline.AutoSize = true;
-            this.labelPlayersOnline.Location = new System.Drawing.Point(10, 68);
-            this.labelPlayersOnline.Name = "labelPlayersOnline";
-            this.labelPlayersOnline.Size = new System.Drawing.Size(77, 13);
-            this.labelPlayersOnline.TabIndex = 32;
-            this.labelPlayersOnline.Text = "Players Online:";
-            // 
-            // chatBox
-            // 
-            this.chatBox.Enabled = false;
-            this.chatBox.Location = new System.Drawing.Point(45, 314);
-            this.chatBox.MaxLength = 24;
-            this.chatBox.Name = "chatBox";
-            this.chatBox.Size = new System.Drawing.Size(173, 20);
-            this.chatBox.TabIndex = 33;
-            this.chatBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.chatBox_KeyDown);
-            // 
-            // buttonChat
-            // 
-            this.buttonChat.Enabled = false;
-            this.buttonChat.Location = new System.Drawing.Point(45, 340);
-            this.buttonChat.Name = "buttonChat";
-            this.buttonChat.Size = new System.Drawing.Size(173, 37);
-            this.buttonChat.TabIndex = 34;
-            this.buttonChat.Text = "Send Message";
-            this.buttonChat.UseVisualStyleBackColor = true;
-            this.buttonChat.Click += new System.EventHandler(this.button3_Click);
-            // 
             // usernameBox
             // 
             this.usernameBox.Location = new System.Drawing.Point(79, 72);
+            this.usernameBox.MaxLength = 24;
             this.usernameBox.Name = "usernameBox";
             this.usernameBox.Size = new System.Drawing.Size(201, 20);
             this.usernameBox.TabIndex = 35;
@@ -311,52 +221,25 @@
             // 
             this.playerCheckTimer.Interval = 1000;
             // 
-            // panel1
+            // settingsPanel
             // 
-            this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel1.Controls.Add(this.checkBoxLAN);
-            this.panel1.Controls.Add(this.labelAddress);
-            this.panel1.Controls.Add(this.labelUsername);
-            this.panel1.Controls.Add(this.checkBoxChat);
-            this.panel1.Controls.Add(this.buttonJoin);
-            this.panel1.Controls.Add(this.usernameBox);
-            this.panel1.Controls.Add(this.checkBoxServer);
-            this.panel1.Controls.Add(this.textBoxAddress);
-            this.panel1.Controls.Add(this.numUpDownInterval);
-            this.panel1.Controls.Add(this.labelRateUpdate);
-            this.panel1.Controls.Add(this.numericUpDown2);
-            this.panel1.Controls.Add(this.labelPort);
-            this.panel1.Controls.Add(this.comboBoxEmulator);
-            this.panel1.Controls.Add(this.labelEmulator);
-            this.panel1.Controls.Add(this.comboBoxChar);
-            this.panel1.Controls.Add(this.labelChar);
-            this.panel1.Location = new System.Drawing.Point(12, 37);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(295, 271);
-            this.panel1.TabIndex = 37;
-            // 
-            // checkBoxLAN
-            // 
-            this.checkBoxLAN.AutoSize = true;
-            this.checkBoxLAN.Enabled = false;
-            this.checkBoxLAN.Location = new System.Drawing.Point(211, 98);
-            this.checkBoxLAN.Name = "checkBoxLAN";
-            this.checkBoxLAN.Size = new System.Drawing.Size(71, 17);
-            this.checkBoxLAN.TabIndex = 37;
-            this.checkBoxLAN.Text = "LAN Only";
-            this.checkBoxLAN.UseVisualStyleBackColor = true;
-            // 
-            // checkBoxChat
-            // 
-            this.checkBoxChat.AutoSize = true;
-            this.checkBoxChat.Enabled = false;
-            this.checkBoxChat.Location = new System.Drawing.Point(13, 98);
-            this.checkBoxChat.Name = "checkBoxChat";
-            this.checkBoxChat.Size = new System.Drawing.Size(92, 17);
-            this.checkBoxChat.TabIndex = 33;
-            this.checkBoxChat.Text = "Disable Chat?";
-            this.checkBoxChat.UseVisualStyleBackColor = true;
-            this.checkBoxChat.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
+            this.settingsPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.settingsPanel.Controls.Add(this.labelAddress);
+            this.settingsPanel.Controls.Add(this.labelUsername);
+            this.settingsPanel.Controls.Add(this.buttonJoin);
+            this.settingsPanel.Controls.Add(this.usernameBox);
+            this.settingsPanel.Controls.Add(this.textBoxAddress);
+            this.settingsPanel.Controls.Add(this.numericUpDown2);
+            this.settingsPanel.Controls.Add(this.labelPort);
+            this.settingsPanel.Controls.Add(this.comboBoxEmulator);
+            this.settingsPanel.Controls.Add(this.labelEmulator);
+            this.settingsPanel.Controls.Add(this.comboBoxChar);
+            this.settingsPanel.Controls.Add(this.labelChar);
+            this.settingsPanel.Controls.Add(this.buttonReset);
+            this.settingsPanel.Location = new System.Drawing.Point(12, 37);
+            this.settingsPanel.Name = "settingsPanel";
+            this.settingsPanel.Size = new System.Drawing.Size(587, 160);
+            this.settingsPanel.TabIndex = 37;
             // 
             // labelConnectionConf
             // 
@@ -367,63 +250,12 @@
             this.labelConnectionConf.TabIndex = 38;
             this.labelConnectionConf.Text = "Connection Settings:";
             // 
-            // panel2
-            // 
-            this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel2.Controls.Add(this.labelGamemode);
-            this.panel2.Controls.Add(this.gamemodeBox);
-            this.panel2.Controls.Add(this.labelPlayersOnline);
-            this.panel2.Controls.Add(this.labelMaxClients);
-            this.panel2.Controls.Add(this.listBoxPlayers);
-            this.panel2.Controls.Add(this.numUpDownClients);
-            this.panel2.Enabled = false;
-            this.panel2.Location = new System.Drawing.Point(313, 37);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(295, 340);
-            this.panel2.TabIndex = 39;
-            // 
-            // labelGamemode
-            // 
-            this.labelGamemode.AutoSize = true;
-            this.labelGamemode.Location = new System.Drawing.Point(12, 43);
-            this.labelGamemode.Name = "labelGamemode";
-            this.labelGamemode.Size = new System.Drawing.Size(101, 13);
-            this.labelGamemode.TabIndex = 35;
-            this.labelGamemode.Text = "Current Gamemode:";
-            // 
-            // gamemodeBox
-            // 
-            this.gamemodeBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.gamemodeBox.FormattingEnabled = true;
-            this.gamemodeBox.Items.AddRange(new object[] {
-            "Normal Mode",
-            "3rd Person Shooter",
-            "No Interactions",
-            "Prop Hunt",
-            "Boss Rush",
-            "Tag",
-            "Hide & Seek"});
-            this.gamemodeBox.Location = new System.Drawing.Point(119, 40);
-            this.gamemodeBox.Name = "gamemodeBox";
-            this.gamemodeBox.Size = new System.Drawing.Size(163, 21);
-            this.gamemodeBox.TabIndex = 34;
-            this.gamemodeBox.SelectedIndexChanged += new System.EventHandler(this.gamemodeBox_SelectedIndexChanged);
-            // 
-            // labelServerConf
-            // 
-            this.labelServerConf.AutoSize = true;
-            this.labelServerConf.Location = new System.Drawing.Point(330, 31);
-            this.labelServerConf.Name = "labelServerConf";
-            this.labelServerConf.Size = new System.Drawing.Size(82, 13);
-            this.labelServerConf.TabIndex = 40;
-            this.labelServerConf.Text = "Server Settings:";
-            // 
             // buttonReset
             // 
             this.buttonReset.Enabled = false;
-            this.buttonReset.Location = new System.Drawing.Point(224, 314);
+            this.buttonReset.Location = new System.Drawing.Point(488, 100);
             this.buttonReset.Name = "buttonReset";
-            this.buttonReset.Size = new System.Drawing.Size(83, 63);
+            this.buttonReset.Size = new System.Drawing.Size(83, 49);
             this.buttonReset.TabIndex = 41;
             this.buttonReset.Text = "Reset Game";
             this.buttonReset.UseVisualStyleBackColor = true;
@@ -460,11 +292,11 @@
             // backgroundPanel
             // 
             this.backgroundPanel.Controls.Add(this.labelChat);
-            this.backgroundPanel.Controls.Add(this.panel1);
-            this.backgroundPanel.Controls.Add(this.buttonReset);
-            this.backgroundPanel.Controls.Add(this.panel2);
+            this.backgroundPanel.Controls.Add(this.settingsPanel);
             this.backgroundPanel.Controls.Add(this.chatBox);
             this.backgroundPanel.Controls.Add(this.buttonChat);
+            this.backgroundPanel.Controls.Add(this.labelChatHistory);
+            this.backgroundPanel.Controls.Add(this.listBoxChat);
             this.backgroundPanel.Controls.Add(this.menuStrip1);
             this.backgroundPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.backgroundPanel.Location = new System.Drawing.Point(0, 0);
@@ -475,11 +307,33 @@
             // labelChat
             // 
             this.labelChat.AutoSize = true;
-            this.labelChat.Location = new System.Drawing.Point(12, 317);
+            this.labelChat.Location = new System.Drawing.Point(12, 207);
             this.labelChat.Name = "labelChat";
             this.labelChat.Size = new System.Drawing.Size(32, 13);
             this.labelChat.TabIndex = 38;
             this.labelChat.Text = "Chat:";
+            // 
+            // chatBox
+            // 
+            this.chatBox.Enabled = false;
+            this.chatBox.Location = new System.Drawing.Point(45, 202);
+            this.chatBox.MaxLength = 24;
+            this.chatBox.Name = "chatBox";
+            this.chatBox.Size = new System.Drawing.Size(173, 20);
+            this.chatBox.TabIndex = 33;
+            this.chatBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.chatBox_KeyDown);
+            this.chatBox.Font = new System.Drawing.Font("Arial", 12);
+            // 
+            // buttonChat
+            // 
+            this.buttonChat.Enabled = false;
+            this.buttonChat.Location = new System.Drawing.Point(230, 203);
+            this.buttonChat.Name = "buttonChat";
+            this.buttonChat.Size = new System.Drawing.Size(120, 24);
+            this.buttonChat.TabIndex = 34;
+            this.buttonChat.Text = "Send Message";
+            this.buttonChat.UseVisualStyleBackColor = true;
+            this.buttonChat.Click += new System.EventHandler(this.button3_Click);
             // 
             // menuStrip1
             // 
@@ -505,7 +359,7 @@
             // 
             this.forumToolStripMenuItem.Name = "forumToolStripMenuItem";
             this.forumToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
-            this.forumToolStripMenuItem.Text = "SM64O Forum";
+            this.forumToolStripMenuItem.Text = "Net64 Forum";
             this.forumToolStripMenuItem.Click += new System.EventHandler(this.forumToolStripMenuItem_Click);
             // 
             // discordToolStripMenuItem
@@ -534,9 +388,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(618, 409);
+            this.ClientSize = new System.Drawing.Size(610, 709);
             this.Controls.Add(this.statusStrip1);
-            this.Controls.Add(this.labelServerConf);
             this.Controls.Add(this.labelConnectionConf);
             this.Controls.Add(this.backgroundPanel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -544,17 +397,12 @@
             this.MainMenuStrip = this.menuStrip1;
             this.MaximizeBox = false;
             this.Name = "Form1";
-            this.Text = "SM64 Online Tool v1.3.1 Hotfix";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.numUpDownInterval)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numUpDownClients)).EndInit();
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
+            this.settingsPanel.ResumeLayout(false);
+            this.settingsPanel.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.backgroundPanel.ResumeLayout(false);
@@ -569,40 +417,29 @@
         #endregion
 
         private System.Windows.Forms.Button buttonJoin;
-        private System.Windows.Forms.CheckBox checkBoxServer;
         private System.Windows.Forms.TextBox textBoxAddress;
         private System.Windows.Forms.Label labelAddress;
-        private System.Windows.Forms.NumericUpDown numUpDownInterval;
         private System.Windows.Forms.NumericUpDown numericUpDown2;
         private System.Windows.Forms.Label labelPort;
-        private System.Windows.Forms.Label labelRateUpdate;
-        private System.Windows.Forms.ListBox listBoxPlayers;
+        private System.Windows.Forms.ListBox listBoxChat;
         private System.Windows.Forms.ColorDialog colorDialog1;
         private System.Windows.Forms.ComboBox comboBoxEmulator;
         private System.Windows.Forms.Label labelEmulator;
         private System.Windows.Forms.ComboBox comboBoxChar;
         private System.Windows.Forms.Label labelChar;
-        private System.Windows.Forms.Label labelMaxClients;
-        private System.Windows.Forms.NumericUpDown numUpDownClients;
-        private System.Windows.Forms.Label labelPlayersOnline;
+        private System.Windows.Forms.Label labelChatHistory;
         private System.Windows.Forms.TextBox chatBox;
         private System.Windows.Forms.Button buttonChat;
         private System.Windows.Forms.TextBox usernameBox;
         private System.Windows.Forms.Label labelUsername;
         private System.Windows.Forms.Timer playerCheckTimer;
-        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Panel settingsPanel;
         private System.Windows.Forms.Label labelConnectionConf;
-        private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.Label labelServerConf;
-        private System.Windows.Forms.CheckBox checkBoxChat;
-        private System.Windows.Forms.Label labelGamemode;
-        private System.Windows.Forms.ComboBox gamemodeBox;
         private System.Windows.Forms.Button buttonReset;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripStatusLabel pingLabel;
         private System.Windows.Forms.Timer pingTimer;
-        private System.Windows.Forms.CheckBox checkBoxLAN;
         private System.Windows.Forms.Panel backgroundPanel;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;

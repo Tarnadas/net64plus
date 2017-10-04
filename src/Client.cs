@@ -118,8 +118,6 @@ namespace SM64O
 
         private void receiveChatMessage(byte[] data)
         {
-            if (!_gui.ChatEnabled) return;
-
             string message = "";
             string sender = "";
 
