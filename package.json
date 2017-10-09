@@ -1,5 +1,5 @@
 {
-  "name": "sm64o",
+  "name": "net64plus",
   "version": "1.0.0",
   "description": "Net64+ client",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Tarnadas/sm64o.git"
+    "url": "git+https://github.com/Tarnadas/net64plus.git"
   },
   "keywords": [
     "net64",
@@ -20,7 +20,7 @@
   "author": "Mario Reder",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Tarnadas/sm64o/issues"
+    "url": "https://github.com/Tarnadas/net64plus/issues"
   },
   "homepage": "http://smmdb.ddns.net/net64",
   "dependencies": {

@@ -4,7 +4,7 @@ This is a modified client for Net64 aka Sm64O, that uses the Websocket protocol.
 
 ## Download
 
-Download the client in the [release section](https://github.com/Tarnadas/sm64o/releases).
+Download the client in the [release section](https://github.com/Tarnadas/net64plus/releases).
 
 ## Why?
 
