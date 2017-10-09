@@ -17,9 +17,16 @@ If you want to get the original client, please go [here](https://github.com/Guad
 
 ## Differences
 
+### JavaScript Rewrite
+
+The client has been rewritten in JavaScript and it uses modern frameworks to make my life easier.
+It will let me develop *much* faster and it also looks a lot nicer, since now I can use HTML and CSS to make a GUI.
+
+However Electron and Chromium are not know to be cheap with RAM and the bundled program size became much larger.
+
 **__Performance__**
 
-Performance is the major goal of this. Even though it uses TCP, it will outperform the original Net64 software by far and I will explain to you why:
+Bandwidth and CPU (for the server) performance should be a lot better. Even though it uses TCP, it will outperform the original Net64 software by far and I will explain to you why:
 
 ### Networking and Bandwidth
 

@@ -18,21 +18,24 @@ export default class Net64ServerArea extends React.PureComponent {
     this.renderServers = this.renderServers.bind(this)
   }
   componentWillMount () {
+    this.mounted = true
     if (!this.props.isServer) this.updateServers()
   }
   componentWillUnmount () {
-    this.unmount = true
+    this.mounted = false
   }
   async updateServers () {
-    if (this.unmount) return
+    if (!this.mounted) return
     try {
       const servers = (await got(resolve(domain, `api/getnet64servers`), {
         json: true,
         useElectronNet: false
       })).body
-      this.setState({
-        servers
-      })
+      if (this.mounted) {
+        this.setState({
+          servers
+        })
+      }
     } catch (err) {}
     setTimeout(this.updateServers, 10000)
   }

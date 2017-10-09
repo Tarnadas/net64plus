@@ -4,14 +4,17 @@ import path from 'path'
 export default function save (state, action) {
   if (!action) return state
   switch (action.type) {
+    case 'SET_USERNAME':
+      state = state.setIn(['data', 'username'], action.username)
+      break
     case 'ADD_API_KEY':
       state = state.setIn(['data', 'apiKey'], action.apiKey)
-      saveState(state)
-      return state
+      break
     case 'DELETE_API_KEY':
       state = state.deleteIn(['data', 'apiKey'])
-      return state
+      break
   }
+  saveState(state)
   return state
 }
 

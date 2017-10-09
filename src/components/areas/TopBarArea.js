@@ -56,13 +56,6 @@ class TopBarArea extends React.PureComponent {
       showApiKey: false
     })
   }
-  onAddApiKey (account, apiKey) {
-    console.log(account)
-    console.log(apiKey)
-  }
-  onDeleteApiKey () {
-    console.log('deleted apiKey')
-  }
   render () {
     const apiKey = this.props.apiKey
     const hover = this.state.buttonHover || this.state.navHover
@@ -126,7 +119,7 @@ class TopBarArea extends React.PureComponent {
         </div>
         {
           this.state.showApiKey &&
-          <ApiKeyArea apiKey={apiKey} onAddApiKey={this.onAddApiKey} onDeleteApiKey={this.onDeleteApiKey} onClose={this.hideApiKey} />
+          <ApiKeyArea apiKey={apiKey} onClose={this.hideApiKey} />
         }
       </div>
     )

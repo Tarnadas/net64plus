@@ -13,10 +13,16 @@ import {
 
 import save from './save'
 import router from './router'
+import account from './account'
+import emulator from './emulator'
 import chat from './chat'
 
 const APP_SAVE_DATA = {
-  apiKey: ''
+  apiKey: '',
+  username: '',
+  character: 0,
+  lastIp: 'smmdb.ddns.net',
+  lastPort: 3678
 }
 
 export default function initReducer (history, electronSave) {
@@ -31,6 +37,8 @@ export default function initReducer (history, electronSave) {
     router: {
       location: null
     },
+    account: {},
+    emulator: null,
     chat: {
       global: {}
     }
@@ -38,6 +46,8 @@ export default function initReducer (history, electronSave) {
   let reducers = {
     save,
     router,
+    account,
+    emulator,
     chat
   }
   const middleware = applyMiddleware(routerMiddleware(history))

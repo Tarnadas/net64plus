@@ -41,7 +41,7 @@ export default class NavigationButton extends React.PureComponent {
         height: '40px',
         minHeight: '40px',
         lineHeight: '40px',
-        backgroundColor: hover ? '#ffd800' : 'rgba(255,229,0,0.7)',
+        backgroundColor: hover ? '#d19b05' : 'rgba(255,229,0,0.7)',
         boxShadow: '0px 0px 5px 0px rgba(0,0,0,0.75)',
         cursor: 'pointer',
         overflow: 'hidden'

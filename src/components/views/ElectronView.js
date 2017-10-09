@@ -5,12 +5,39 @@ import {
 import {
   Route
 } from 'react-router-dom'
+import {
+  push
+} from 'react-router-redux'
 
 import MainView from './MainView'
+import SettingsView from './SettingsView'
+import EmulatorView from './EmulatorView'
 import BrowseView from './BrowseView'
 import TopBarArea from '../areas/TopBarArea'
 
 class ElectronView extends React.PureComponent {
+  constructor (props) {
+    super(props)
+    this.forcePath = this.forcePath.bind(this)
+  }
+  componentWillMount () {
+    this.props.dispatch(push('/browse'))
+    this.forcePath(this.props)
+  }
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.location.pathname !== this.props.location.pathname) {
+      this.forcePath(nextProps)
+    }
+  }
+  forcePath (props) {
+    if (props.location.pathname !== '/') {
+      if (!props.username) {
+        props.dispatch(push('/settings'))
+      } else if (!props.emulator && props.location.pathname !== '/settings') {
+        props.dispatch(push('/emulator'))
+      }
+    }
+  }
   render () {
     const styles = {
       global: {
@@ -60,6 +87,8 @@ class ElectronView extends React.PureComponent {
           </div>
         </div>
         <Route exact path='/' component={MainView} />
+        <Route path='/settings' component={SettingsView} />
+        <Route path='/emulator' component={EmulatorView} />
         <Route path='/browse' component={BrowseView} />
         <div style={styles.footer}>
           <div style={styles.disclaimer}>
@@ -71,4 +100,8 @@ class ElectronView extends React.PureComponent {
     )
   }
 }
-export default connect()(ElectronView)
+export default connect(state => ({
+  username: state.getIn(['save', 'data', 'username']),
+  emulator: state.get('emulator'),
+  route: state.get('router')
+}))(ElectronView)
