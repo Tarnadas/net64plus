@@ -1,0 +1,87 @@
+const webpack = require('webpack')
+const path = require('path')
+
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+
+module.exports = [
+  {
+    target: 'electron-renderer',
+    entry: {
+      renderer: path.join(__dirname, 'src/renderer.js')
+    },
+    output: {
+      filename: 'renderer.js',
+      path: path.join(__dirname, 'build')
+    },
+    devtool: 'inline-source-map',
+    node: {
+      __dirname: true,
+      __filename: false,
+      console: true,
+      fs: 'empty',
+      net: 'empty',
+      tls: 'empty'
+    },
+    plugins: [
+      new webpack.EnvironmentPlugin({
+        NODE_ENV: 'development',
+        VERSION: process.env.npm_package_version
+      }),
+      new HtmlWebpackPlugin({
+        filename: 'index.html',
+        template: 'src/template.html'
+      })
+    ],
+    externals: {
+      winprocess: 'require(require("path").resolve(__dirname, "winprocess"))'
+    },
+    module: {
+      loaders: [
+        {
+          test: /\.js$/,
+          exclude: /node_modules/,
+          loader: 'babel-loader',
+          query: {
+            babelrc: false,
+            plugins: ['transform-react-jsx']
+          }
+        },
+        {
+          test: /\.(png|jpg)$/,
+          loader: 'url-loader',
+          options: {
+            limit: 25000,
+            prefix: path.join(__dirname, 'build')
+          }
+        },
+        {
+          test: /\.(woff|ttf)$/,
+          loader: 'url-loader',
+          options: {
+            limit: 25000,
+            prefix: path.join(__dirname, 'build')
+          }
+        }
+      ]
+    }
+  },
+  {
+    target: 'electron',
+    entry: path.join(__dirname, 'src/index.js'),
+    output: {
+      filename: 'index.js',
+      path: path.join(__dirname, 'build')
+    },
+    devtool: 'inline-source-map',
+    node: {
+      __dirname: false,
+      __filename: false
+    },
+    plugins: [
+      new webpack.EnvironmentPlugin({
+        NODE_ENV: 'development',
+        VERSION: process.env.npm_package_version
+      })
+    ]
+  }
+]
