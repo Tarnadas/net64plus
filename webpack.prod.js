@@ -25,7 +25,7 @@ module.exports = [
     },
     plugins: [
       new webpack.EnvironmentPlugin({
-        NODE_ENV: 'development',
+        NODE_ENV: 'production',
         VERSION: process.env.npm_package_version
       }),
       new HtmlWebpackPlugin({
@@ -92,7 +92,7 @@ module.exports = [
     },
     plugins: [
       new webpack.EnvironmentPlugin({
-        NODE_ENV: 'development',
+        NODE_ENV: 'production',
         VERSION: process.env.npm_package_version
       }),
       new webpack.optimize.ModuleConcatenationPlugin(),

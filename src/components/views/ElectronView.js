@@ -83,7 +83,7 @@ class ElectronView extends React.PureComponent {
         <TopBarArea />
         <div style={styles.logo}>
           <div style={styles.logoFont}>
-            Net64+ 1.0
+            Net64+ { process.env.VERSION }
           </div>
         </div>
         <Route exact path='/' component={MainView} />
