@@ -1,20 +1,13 @@
-import {
-  createStore, applyMiddleware
-} from 'redux'
-import {
-  combineReducers
-} from 'redux-immutable'
-import {
-  fromJS
-} from 'immutable'
-import {
-  routerMiddleware
-} from 'react-router-redux'
+import { createStore, applyMiddleware } from 'redux'
+import { combineReducers } from 'redux-immutable'
+import { fromJS } from 'immutable'
+import { routerMiddleware } from 'react-router-redux'
 
 import save from './save'
 import router from './router'
 import account from './account'
 import emulator from './emulator'
+import connection from './connection'
 import chat from './chat'
 
 const APP_SAVE_DATA = {
@@ -39,8 +32,9 @@ export default function initReducer (history, electronSave) {
     },
     account: {},
     emulator: null,
+    connection: null,
     chat: {
-      global: {}
+      global: []
     }
   })
   let reducers = {
@@ -48,6 +42,7 @@ export default function initReducer (history, electronSave) {
     router,
     account,
     emulator,
+    connection,
     chat
   }
   const middleware = applyMiddleware(routerMiddleware(history))

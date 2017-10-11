@@ -1,3 +1,4 @@
+import 'babel-polyfill'
 import React from 'react'
 import {
   render
@@ -23,6 +24,8 @@ import {
   setAccountData
 } from './actions/account'
 
+export let store;
+
 (async () => {
   const history = createHistory()
   const save = remote.getGlobal('save')
@@ -33,7 +36,7 @@ import {
       save.appSaveData.apiKey = ''
     }
   }
-  const store = initReducer(history, save)
+  store = initReducer(history, save)
   if (account) {
     store.dispatch(setAccountData(account))
   }

@@ -1,28 +1,30 @@
 import WS from 'ws'
 
-import {
-  gunzipSync
-} from 'zlib'
+import { gunzipSync } from 'zlib'
 
 import Packet, { PACKET_TYPE } from './Packet'
+import Chat from './Chat'
+import { store } from './renderer'
+import { disconnect } from './actions/connection'
 
 const UPDATE_INTERVAL = 24
 const EMPTY = new Uint8Array(0x18)
 
 export default class Connection {
   constructor (server, emulator, username, characterId) {
-    console.log(server)
-    try {
-      this.ws = new WS(`ws://${server.domain ? server.domain : server.ip}:${server.port}`)
-      this.ws.on('open', this.onOpen.bind(this, characterId, username))
-      this.ws.on('error', this.onError.bind(this))
-      this.ws.on('close', this.onClose.bind(this))
-      this.ws.on('message', this.onMessage.bind(this))
-      this.server = server
-      this.emulator = emulator
-    } catch (err) {
-      console.error(err)
-    }
+    this.disconnect = this.disconnect.bind(this)
+    this.ws = new WS(`ws://${server.domain ? server.domain : server.ip}:${server.port}`)
+    this.ws.on('open', this.onOpen.bind(this, characterId, username))
+    this.ws.on('error', this.onError.bind(this))
+    this.ws.on('close', this.onClose.bind(this))
+    this.ws.on('message', this.onMessage.bind(this))
+    this.username = username // TODO there is no reason to send current username
+    this.server = server
+    this.emulator = emulator
+    this.chat = new Chat()
+  }
+  disconnect () {
+    this.ws.close()
   }
   onOpen (characterId, username) {
     const handshake = new Uint8Array(29)
@@ -36,11 +38,17 @@ export default class Connection {
   }
   onError (err) {
     console.error(err)
+    if (this.loop) {
+      this.ws.close()
+    }
   }
   onClose () {
-    const b = Buffer.allocUnsafe(1)
-    b.writeUInt8(1, 0)
-    this.emulator.writeMemory(0x365FFC, b)
+    if (this.loop) {
+      clearInterval(this.loop)
+      this.loop = null
+    }
+    store.dispatch(disconnect())
+    this.chat.clear()
   }
   onMessage (data) {
     const type = data[0]
@@ -66,7 +74,10 @@ export default class Connection {
         this.emulator.writeMemory(0x365FF7, payload)
         break
       case PACKET_TYPE.CHAT_MESSAGE:
-        // TODO
+        const msgLength = payload[0]
+        const message = (new TextDecoder('utf-8')).decode(payload.slice(1, msgLength + 1))
+        const username = (new TextDecoder('utf-8')).decode(payload.slice(msgLength + 2, msgLength + 2 + payload[msgLength + 1]))
+        this.chat.addMessage(message, username)
         break
       case PACKET_TYPE.PING:
         // TODO
@@ -82,8 +93,20 @@ export default class Connection {
   sendPlayerData () {
     const playerData = this.emulator.readMemory(0x367700, 0x18)
     if (playerData[0xF] !== 0) {
-      this.ws.send(Packet.create(PACKET_TYPE.PLAYER_DATA, playerData))
-      this.emulator.writeMemory(0x367800, playerData)
+      try {
+        this.ws.send(Packet.create(PACKET_TYPE.PLAYER_DATA, playerData))
+        this.emulator.writeMemory(0x367800, playerData)
+      } catch (err) {}
     }
+  }
+  sendChatMessage (message) {
+    message = (new TextEncoder('utf-8')).encode(message)
+    const username = (new TextEncoder('utf-8')).encode(this.username)
+    const chatMessage = new Uint8Array(message.length + username.length + 2)
+    chatMessage.set(new Uint8Array([message.length]))
+    chatMessage.set(message, 1)
+    chatMessage.set(new Uint8Array([username.length]), message.length + 1)
+    chatMessage.set(username, message.length + 2)
+    this.ws.send(Packet.create(PACKET_TYPE.CHAT_MESSAGE, chatMessage))
   }
 }

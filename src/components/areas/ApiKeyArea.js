@@ -1,21 +1,11 @@
 import React from 'react'
-import {
-  connect
-} from 'react-redux'
-import {
-  shell
-} from 'electron'
+import { connect} from 'react-redux'
+import { shell } from 'electron'
 
 import SMMButton from '../buttons/SMMButton'
-import {
-  initAccount
-} from '../../Account'
-import {
-  setAccountData
-} from '../../actions/account'
-import {
-  addApiKey, deleteApiKey
-} from '../../actions/save'
+import { initAccount } from '../../Account'
+import { setAccountData } from '../../actions/account'
+import { addApiKey, deleteApiKey } from '../../actions/save'
 
 const LENGTH_API_KEY = 30
 

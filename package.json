@@ -4,7 +4,8 @@
   "description": "Net64+ client",
   "main": "index.js",
   "scripts": {
-    "start": "webpack --env=dev && cd ./build && electron ."
+    "start": "webpack --env=dev && cd ./build && electron .",
+    "build": "webpack --env=prod && node ./build-app"
   },
   "repository": {
     "type": "git",
@@ -48,9 +49,11 @@
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.0",
     "babili-webpack-plugin": "^0.1.2",
     "chai": "^4.1.2",
+    "core-js": "^2.5.1",
     "devtron": "^1.4.0",
     "electron-debug": "^1.4.0",
     "electron-packager": "^9.1.0",

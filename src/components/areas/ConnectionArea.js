@@ -4,16 +4,16 @@ import got from 'got'
 import { resolve } from 'url'
 
 import Net64ServerPanel from '../panels/Net64ServerPanel'
+import ChatArea from '../areas/ChatArea'
 import { domain } from '../../variables'
 
-export default class Net64ServerArea extends React.PureComponent {
+export default class ConnectionArea extends React.PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      servers: []
+      server: props.connection.server
     }
     this.updateServers = this.updateServers.bind(this)
-    this.renderServers = this.renderServers.bind(this)
   }
   componentWillMount () {
     this.mounted = true
@@ -25,43 +25,35 @@ export default class Net64ServerArea extends React.PureComponent {
   async updateServers () {
     if (!this.mounted) return
     try {
-      const servers = (await got(resolve(domain, `api/getnet64servers`), {
+      const server = (await got(resolve(domain, `api/getnet64servers?id=${this.state.server.id}`), {
         json: true,
         useElectronNet: false
-      })).body
+      })).body[0]
       if (this.mounted) {
         this.setState({
-          servers
+          server
         })
       }
     } catch (err) {}
     setTimeout(this.updateServers, 10000)
   }
-  renderServers (servers) {
-    return Array.from((function * () {
-      for (const server of servers) {
-        yield (
-          <Net64ServerPanel key={server.id} server={server} />
-        )
-      }
-    })())
-  }
   render () {
-    const servers = this.state.servers
+    const disconnect = this.props.connection.disconnect
+    const server = this.state.server
     const styles = {
-      list: {
+      area: {
         overflowY: 'auto',
         padding: '4px',
         display: 'flex',
         flexDirection: 'column',
-        width: '100%'
+        width: '100%',
+        flex: '1 1 auto'
       }
     }
     return (
-      <div id='scroll' style={styles.list}>
-        {
-          this.renderServers(servers)
-        }
+      <div id='scroll' style={styles.area}>
+        <Net64ServerPanel server={server} isConnected onDisconnect={disconnect} />
+        <ChatArea />
       </div>
     )
   }

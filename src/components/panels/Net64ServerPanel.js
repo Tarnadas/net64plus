@@ -1,17 +1,12 @@
 import React from 'react'
-import {
-  connect
-} from 'react-redux'
+import { connect } from 'react-redux'
+import { shell } from 'electron'
 import marked from 'marked'
 import { emojify } from 'node-emoji'
 
-import { resolve } from 'url'
-
 import SMMButton from '../buttons/SMMButton'
 import Connection from '../../Connection'
-import {
-  domain
-} from '../../variables'
+import { disconnect, setConnection } from '../../actions/connection'
 
 const CHARACTER_IMAGES = [
   'mario.png', 'luigi.png', 'yoshi.png', 'wario.png', 'peach.png', 'toad.png', 'waluigi.png', 'rosalina.png'
@@ -21,14 +16,24 @@ class Net64ServerPanel extends React.PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      display: false
+      display: !!props.isConnected
     }
     this.onToggle = this.onToggle.bind(this)
     this.onConnect = this.onConnect.bind(this)
+    this.onDisconnect = this.onDisconnect.bind(this)
     this.renderPlayers = this.renderPlayers.bind(this)
   }
   componentDidMount () {
-    if (this.props.server.description) this.description.innerHTML = emojify(marked(this.props.server.description))
+    if (this.props.server.description) {
+      this.description.innerHTML = emojify(marked(this.props.server.description))
+      this.description.querySelectorAll('.markdown a').forEach(a => {
+        const href = a.getAttribute('href')
+        a.removeAttribute('href')
+        a.onclick = () => {
+          shell.openExternal(href)
+        }
+      })
+    }
   }
   componentWillUpdate (nextProps) {
     if (nextProps.server.description !== this.props.server.description) {
@@ -36,12 +41,22 @@ class Net64ServerPanel extends React.PureComponent {
     }
   }
   onToggle () {
+    if (this.props.isConnected) return
     this.setState(prevState => ({
       display: !prevState.display
     }))
   }
   onConnect () {
-    const connection = new Connection(this.props.server, this.props.emulator, this.props.username, this.props.characterId)
+    try {
+      const connection = new Connection(this.props.server, this.props.emulator, this.props.username, this.props.characterId)
+      this.props.dispatch(setConnection(connection))
+    } catch (err) {
+      console.error(err)
+    }
+  }
+  onDisconnect () {
+    this.props.onDisconnect()
+    this.props.dispatch(disconnect())
   }
   renderPlayers (players) {
     const style = {
@@ -54,7 +69,7 @@ class Net64ServerPanel extends React.PureComponent {
         const player = players[i]
         yield (
           <div style={style} key={i}>
-            <img src={resolve(domain, `img/${CHARACTER_IMAGES[player.characterId]}`)} />
+            <img src={`img/${CHARACTER_IMAGES[player.characterId]}`} />
             <div>
               { player.username }
             </div>
@@ -65,11 +80,11 @@ class Net64ServerPanel extends React.PureComponent {
   }
   render () {
     const server = this.props.server
+    const isConnected = this.props.isConnected
     const styles = {
       panel: {
         fontSize: '18px',
-        margin: '10px 0',
-        flex: '1 0 auto'
+        margin: '10px 0'
       },
       header: {
         width: '100%',
@@ -101,7 +116,8 @@ class Net64ServerPanel extends React.PureComponent {
         flexDirection: 'column',
         width: '50%',
         flex: '1 0 auto',
-        minWidth: '300px'
+        minWidth: '300px',
+        wordWrap: 'break-word'
       },
       right: {
         display: 'flex',
@@ -134,7 +150,7 @@ class Net64ServerPanel extends React.PureComponent {
             <div style={styles.el}>
               { server.domain || server.ip }:{ server.port }
             </div>
-            <div style={styles.el} ref={x => { this.description = x }} />
+            <div className='markdown' style={styles.el} ref={x => { this.description = x }} />
           </div>
           <div style={styles.right}>
             {
@@ -142,7 +158,13 @@ class Net64ServerPanel extends React.PureComponent {
             }
           </div>
           <div style={{width: '100%'}}>
-            <SMMButton text='Connect' iconSrc='img/net64.svg' fontSize='13px' onClick={this.onConnect} />
+            {
+              isConnected ? (
+                <SMMButton text='Disconnect' iconSrc='img/net64.svg' fontSize='13px' onClick={this.onDisconnect} />
+              ) : (
+                <SMMButton text='Connect' iconSrc='img/net64.svg' fontSize='13px' onClick={this.onConnect} />
+              )
+            }
           </div>
         </div>
       </div>

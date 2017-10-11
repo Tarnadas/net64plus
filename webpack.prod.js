@@ -1,4 +1,5 @@
 const webpack = require('webpack')
+const BabiliPlugin = require('babili-webpack-plugin')
 const path = require('path')
 
 const HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -31,7 +32,10 @@ module.exports = [
         filename: 'index.html',
         template: 'src/template.html'
       }),
-      new webpack.optimize.ModuleConcatenationPlugin()
+      new webpack.optimize.ModuleConcatenationPlugin(),
+      new BabiliPlugin({
+        keepFnName: true
+      })
     ],
     externals: {
       winprocess: 'require(require("path").resolve(__dirname, "winprocess"))'
@@ -90,6 +94,10 @@ module.exports = [
       new webpack.EnvironmentPlugin({
         NODE_ENV: 'development',
         VERSION: process.env.npm_package_version
+      }),
+      new webpack.optimize.ModuleConcatenationPlugin(),
+      new BabiliPlugin({
+        keepFnName: true
       })
     ]
   }

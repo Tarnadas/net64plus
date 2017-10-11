@@ -6,7 +6,6 @@ import path from 'path'
 export default class Emulator {
   constructor (processId, characterId) {
     this.process = winProcess.Process(processId)
-    console.log(this.process)
     this.process.open()
     this.base = -1
     for (let i = 0x00000000; i <= 0x72D00000; i += 0x1000) {

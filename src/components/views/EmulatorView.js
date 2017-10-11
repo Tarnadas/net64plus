@@ -13,6 +13,8 @@ import {
   setEmulator
 } from '../../actions/emulator'
 
+const TIMEOUT = 10000
+
 class EmulatorView extends React.PureComponent {
   constructor (props) {
     super(props)
@@ -58,10 +60,14 @@ class EmulatorView extends React.PureComponent {
         this.props.dispatch(setEmulator(emulator))
         this.props.dispatch(push('/browse'))
       }
-      this.setState({
-        loading: false
-      })
     }, 0)
+    setTimeout(() => {
+      if (!this.mounted) return
+      this.setState({
+        loading: false,
+        alert: 'Could not inject emulator.\nDid you start Super Mario 64 (USA)?'
+      })
+    }, TIMEOUT)
   }
   renderEmulators (emulators) {
     const li = {

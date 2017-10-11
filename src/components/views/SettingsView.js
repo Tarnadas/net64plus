@@ -1,15 +1,9 @@
 import React from 'react'
-import {
-  connect
-} from 'react-redux'
-import {
-  push
-} from 'react-router-redux'
+import { connect } from 'react-redux'
+import { push } from 'react-router-redux'
 
 import SMMButton from '../buttons/SMMButton'
-import {
-  setUsername, setCharacter
-} from '../../actions/save'
+import { setUsername, setCharacter } from '../../actions/save'
 
 const MIN_LENGTH_USERNAME = 3
 const MAX_LENGTH_USERNAME = 24
