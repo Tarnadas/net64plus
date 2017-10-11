@@ -4,7 +4,7 @@ import fs from 'fs'
 import path from 'path'
 
 export default class Emulator {
-  constructor (processId) {
+  constructor (processId, characterId) {
     this.process = winProcess.Process(processId)
     console.log(this.process)
     this.process.open()
@@ -26,12 +26,16 @@ export default class Emulator {
       this.writeMemory(parseInt(patch, 16), fs.readFileSync(path.join(basePath, patch)))
     }
     const b = Buffer.allocUnsafe(1)
-    b.writeUInt8(1, 0)
+    b.writeUInt8(characterId + 1, 0)
     this.writeMemory(0x365FF3, b) // character ID
+    b.writeUInt8(1, 0)
     this.writeMemory(0x365FFC, b) // isServer flag
     this.writeMemory(0x367703, b) // player ID
   }
   writeMemory (offset, buffer) {
     this.process.writeMemory(this.base + offset, buffer)
+  }
+  readMemory (offset, length) {
+    return this.process.readMemory(this.base + offset, length)
   }
 }

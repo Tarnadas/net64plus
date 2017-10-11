@@ -7,6 +7,9 @@ export default function save (state, action) {
     case 'SET_USERNAME':
       state = state.setIn(['data', 'username'], action.username)
       break
+    case 'SET_CHARACTER':
+      state = state.setIn(['data', 'character'], action.character)
+      break
     case 'ADD_API_KEY':
       state = state.setIn(['data', 'apiKey'], action.apiKey)
       break

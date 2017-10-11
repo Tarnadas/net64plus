@@ -8,7 +8,7 @@ import {
 
 import SMMButton from '../buttons/SMMButton'
 import {
-  setUsername
+  setUsername, setCharacter
 } from '../../actions/save'
 
 const MIN_LENGTH_USERNAME = 3
@@ -18,21 +18,28 @@ class SettingsView extends React.PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      username: props.saveData.get('username')
+      username: props.saveData.get('username'),
+      characterId: props.saveData.get('character')
     }
     if (!this.state.username) {
       this.state.alert = 'You must set a username'
     }
-    this.handleChange = this.handleChange.bind(this)
+    this.onUsernameChange = this.onUsernameChange.bind(this)
+    this.onCharacterChange = this.onCharacterChange.bind(this)
     this.onSave = this.onSave.bind(this)
   }
-  handleChange (e) {
+  onUsernameChange (e) {
     let value = e.target.value.replace(/\W/g, '')
     if (value.length > MAX_LENGTH_USERNAME) {
       value = value.substr(0, MAX_LENGTH_USERNAME)
     }
     this.setState({
       username: value
+    })
+  }
+  onCharacterChange (e) {
+    this.setState({
+      characterId: parseInt(e.target.value)
     })
   }
   onSave () {
@@ -43,6 +50,7 @@ class SettingsView extends React.PureComponent {
       })
     } else {
       this.props.dispatch(setUsername(username))
+      this.props.dispatch(setCharacter(this.state.characterId))
       this.props.dispatch(push('/browse'))
     }
   }
@@ -93,7 +101,18 @@ class SettingsView extends React.PureComponent {
           }
         </div>
         <div style={styles.label}>Username:</div>
-        <input style={styles.input} value={this.state.username} onChange={this.handleChange} />
+        <input style={styles.input} value={this.state.username} onChange={this.onUsernameChange} />
+        <div style={styles.label}>Character:</div>
+        <select style={styles.input} value={this.state.characterId} onChange={this.onCharacterChange}>
+          <option value='0'>Mario</option>
+          <option value='1'>Luigi</option>
+          <option value='2'>Yoshi</option>
+          <option value='3'>Wario</option>
+          <option value='4'>Peach</option>
+          <option value='5'>Toad</option>
+          <option value='6'>Waluigi</option>
+          <option value='7'>Rosalina</option>
+        </select>
         <SMMButton text='Save' iconSrc='img/submit.png' fontSize='13px' padding='3px' noMargin onClick={this.onSave} />
       </div>
     )

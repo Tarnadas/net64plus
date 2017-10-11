@@ -5,6 +5,13 @@ export function setUsername (username) {
   }
 }
 
+export function setCharacter (character) {
+  return {
+    type: 'SET_CHARACTER',
+    character
+  }
+}
+
 export function addApiKey (apiKey) {
   return {
     type: 'ADD_API_KEY',

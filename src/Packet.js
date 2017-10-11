@@ -11,9 +11,11 @@ export const PACKET_TYPE = {
 }
 
 export default class Packet {
-  static create (type, payload = Buffer.alloc(0)) {
-    const typeBuffer = Buffer.allocUnsafe(1)
-    typeBuffer.writeUInt8(type, 0)
-    return Buffer.concat([typeBuffer, payload])
+  static create (type, payload = new Uint8Array(0)) {
+    const t = new Uint8Array([type])
+    const res = new Uint8Array(payload.length + 1)
+    res.set(t)
+    res.set(payload, 1)
+    return res
   }
 }

@@ -1,4 +1,7 @@
 import React from 'react'
+import {
+  connect
+} from 'react-redux'
 import marked from 'marked'
 import { emojify } from 'node-emoji'
 
@@ -14,7 +17,7 @@ const CHARACTER_IMAGES = [
   'mario.png', 'luigi.png', 'yoshi.png', 'wario.png', 'peach.png', 'toad.png', 'waluigi.png', 'rosalina.png'
 ]
 
-export default class Net64ServerPanel extends React.PureComponent {
+class Net64ServerPanel extends React.PureComponent {
   constructor (props) {
     super(props)
     this.state = {
@@ -38,7 +41,7 @@ export default class Net64ServerPanel extends React.PureComponent {
     }))
   }
   onConnect () {
-    const connection = new Connection(this.props.server)
+    const connection = new Connection(this.props.server, this.props.emulator, this.props.username, this.props.characterId)
   }
   renderPlayers (players) {
     const style = {
@@ -146,3 +149,8 @@ export default class Net64ServerPanel extends React.PureComponent {
     )
   }
 }
+export default connect(state => ({
+  emulator: state.get('emulator'),
+  username: state.getIn(['save', 'data', 'username']),
+  characterId: state.getIn(['save', 'data', 'character'])
+}))(Net64ServerPanel)

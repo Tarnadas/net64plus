@@ -53,7 +53,7 @@ class EmulatorView extends React.PureComponent {
       loading: true
     })
     setTimeout(() => {
-      const emulator = new Emulator(e.pid)
+      const emulator = new Emulator(e.pid, this.props.characterId)
       if (emulator.base !== -1) {
         this.props.dispatch(setEmulator(emulator))
         this.props.dispatch(push('/browse'))
@@ -169,5 +169,6 @@ class EmulatorView extends React.PureComponent {
   }
 }
 export default connect(state => ({
-  emulator: state.get('emulator')
+  emulator: state.get('emulator'),
+  characterId: state.getIn(['save', 'data', 'character'])
 }))(EmulatorView)
