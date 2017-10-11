@@ -27,18 +27,11 @@ export default class Emulator {
     }
     const b = Buffer.allocUnsafe(1)
     b.writeUInt8(1, 0)
-    this.writeMemory(0x365FF3, b, false) // character ID
-    this.writeMemory(0x365FFC, b, false) // isServer flag
-    this.writeMemory(0x367703, b, false) // player ID
-    this.process.close()
+    this.writeMemory(0x365FF3, b) // character ID
+    this.writeMemory(0x365FFC, b) // isServer flag
+    this.writeMemory(0x367703, b) // player ID
   }
-  writeMemory (offset, buffer, shouldOpen = true) {
-    if (shouldOpen) {
-      this.process.open()
-      this.process.writeMemory(this.base + offset, buffer)
-      this.process.close()
-    } else {
-      this.process.writeMemory(this.base + offset, buffer)
-    }
+  writeMemory (offset, buffer) {
+    this.process.writeMemory(this.base + offset, buffer)
   }
 }

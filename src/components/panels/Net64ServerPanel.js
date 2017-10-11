@@ -4,6 +4,8 @@ import { emojify } from 'node-emoji'
 
 import { resolve } from 'url'
 
+import SMMButton from '../buttons/SMMButton'
+import Connection from '../../Connection'
 import {
   domain
 } from '../../variables'
@@ -19,6 +21,7 @@ export default class Net64ServerPanel extends React.PureComponent {
       display: false
     }
     this.onToggle = this.onToggle.bind(this)
+    this.onConnect = this.onConnect.bind(this)
     this.renderPlayers = this.renderPlayers.bind(this)
   }
   componentDidMount () {
@@ -33,6 +36,9 @@ export default class Net64ServerPanel extends React.PureComponent {
     this.setState(prevState => ({
       display: !prevState.display
     }))
+  }
+  onConnect () {
+    const connection = new Connection(this.props.server)
   }
   renderPlayers (players) {
     const style = {
@@ -131,6 +137,9 @@ export default class Net64ServerPanel extends React.PureComponent {
             {
               this.renderPlayers(server.players)
             }
+          </div>
+          <div style={{width: '100%'}}>
+            <SMMButton text='Connect' iconSrc='img/net64.svg' fontSize='13px' onClick={this.onConnect} />
           </div>
         </div>
       </div>
