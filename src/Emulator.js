@@ -37,4 +37,9 @@ export default class Emulator {
   readMemory (offset, length) {
     return this.process.readMemory(this.base + offset, length)
   }
+  changeCharacter (characterId) {
+    const b = Buffer.allocUnsafe(1)
+    b.writeUInt8(characterId + 1, 0)
+    this.writeMemory(0x365FF3, b)
+  }
 }

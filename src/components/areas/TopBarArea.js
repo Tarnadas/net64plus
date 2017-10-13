@@ -114,7 +114,10 @@ class TopBarArea extends React.PureComponent {
             />
           </div>
           <div style={styles.button}>
-            <SMMButton text={`${apiKey ? 'Change' : 'Add'} API Key`} iconSrc='img/api.png' fontSize='13px' padding='3px' onClick={this.showApiKey} />
+            {
+              false &&
+              <SMMButton text={`${apiKey ? 'Change' : 'Add'} API Key`} iconSrc='img/api.png' fontSize='13px' padding='3px' onClick={this.showApiKey} />
+            }
           </div>
         </div>
         {

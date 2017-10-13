@@ -43,6 +43,9 @@ class SettingsView extends React.PureComponent {
         alert: 'Your username is too short'
       })
     } else {
+      if (this.props.emulator) {
+        this.props.emulator.changeCharacter(this.state.characterId)
+      }
       this.props.dispatch(setUsername(username))
       this.props.dispatch(setCharacter(this.state.characterId))
       this.props.dispatch(push('/browse'))
@@ -113,5 +116,6 @@ class SettingsView extends React.PureComponent {
   }
 }
 export default connect(state => ({
-  saveData: state.getIn(['save', 'data'])
+  saveData: state.getIn(['save', 'data']),
+  emulator: state.get('emulator')
 }))(SettingsView)
