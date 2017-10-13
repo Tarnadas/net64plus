@@ -60,7 +60,7 @@ class EmulatorView extends React.PureComponent {
         this.props.dispatch(setEmulator(emulator))
         this.props.dispatch(push('/browse'))
       }
-    }, 0)
+    }, 10)
     setTimeout(() => {
       if (!this.mounted) return
       this.setState({
