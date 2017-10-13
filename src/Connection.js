@@ -11,14 +11,14 @@ const UPDATE_INTERVAL = 24
 const EMPTY = new Uint8Array(0x18)
 
 export default class Connection {
-  constructor (server, emulator, username, characterId) {
+  constructor (server, emulator, username, characterId, onConnect, onError) {
     this.disconnect = this.disconnect.bind(this)
     this.ws = new WS(`ws://${server.domain ? server.domain : server.ip}:${server.port}`)
-    this.ws.on('open', this.onOpen.bind(this, characterId, username))
-    this.ws.on('error', this.onError.bind(this))
+    this.ws.on('open', this.onOpen.bind(this, characterId, username, onConnect))
+    this.ws.on('error', this.onError.bind(this, onError))
     this.ws.on('close', this.onClose.bind(this))
     this.ws.on('message', this.onMessage.bind(this))
-    this.username = username // TODO there is no reason to send current username
+    this.username = username // TODO there is no reason to send current username. This will break backwards compatibility
     this.server = server
     this.emulator = emulator
     this.chat = new Chat()
@@ -26,7 +26,8 @@ export default class Connection {
   disconnect () {
     this.ws.close()
   }
-  onOpen (characterId, username) {
+  onOpen (characterId, username, onConnect) {
+    onConnect()
     const handshake = new Uint8Array(29)
     handshake[0] = PACKET_TYPE.HANDSHAKE
     handshake[1] = 0
@@ -36,8 +37,8 @@ export default class Connection {
     handshake.set((new TextEncoder('utf-8')).encode(username), 5)
     this.ws.send(handshake)
   }
-  onError (err) {
-    console.error(err)
+  onError (onError, err) {
+    onError(err)
     if (this.loop) {
       this.ws.close()
     }

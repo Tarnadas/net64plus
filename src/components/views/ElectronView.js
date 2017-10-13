@@ -13,6 +13,7 @@ import MainView from './MainView'
 import SettingsView from './SettingsView'
 import EmulatorView from './EmulatorView'
 import BrowseView from './BrowseView'
+import ConnectView from './ConnectView'
 import TopBarArea from '../areas/TopBarArea'
 
 class ElectronView extends React.PureComponent {
@@ -90,6 +91,7 @@ class ElectronView extends React.PureComponent {
         <Route path='/settings' component={SettingsView} />
         <Route path='/emulator' component={EmulatorView} />
         <Route path='/browse' component={BrowseView} />
+        <Route path='/connect' component={ConnectView} />
         <div style={styles.footer}>
           <div style={styles.disclaimer}>
             Net64+ and SMMDB are not affiliated or associated with any other company.<br />

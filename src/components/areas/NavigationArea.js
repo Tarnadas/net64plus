@@ -9,7 +9,7 @@ export default class NavigationArea extends React.PureComponent {
       navigation: {
         display: 'flex',
         width: '200px',
-        maxHeight: display ? '170px' : '0',
+        maxHeight: display ? '200px' : '0',
         position: 'absolute',
         top: '40px',
         left: '10px',
@@ -28,6 +28,7 @@ export default class NavigationArea extends React.PureComponent {
         <NavigationButton onClick={this.props.onClick} link='/settings' text='Settings' iconSrc='img/settings.svg' iconColor='dark' />
         <NavigationButton onClick={this.props.onClick} link='/emulator' text='Change Emulator' iconSrc='img/n64.svg' iconColor='dark' />
         <NavigationButton onClick={this.props.onClick} link='/browse' text='Browse Servers' iconSrc='img/browse.svg' iconColor='dark' />
+        <NavigationButton onClick={this.props.onClick} link='/connect' text='Direct Connect' iconSrc='img/connect.svg' iconColor='dark' />
         <div style={{height: '20px', minHeight: '20px'}} />
         <div style={{height: '70px', minHeight: '70px'}} />
       </div>

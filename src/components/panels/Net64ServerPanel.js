@@ -16,7 +16,8 @@ class Net64ServerPanel extends React.PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      display: !!props.isConnected
+      display: !!props.isConnected,
+      loading: false
     }
     this.onToggle = this.onToggle.bind(this)
     this.onConnect = this.onConnect.bind(this)
@@ -48,13 +49,23 @@ class Net64ServerPanel extends React.PureComponent {
   }
   onConnect () {
     try {
-      const connection = new Connection(this.props.server, this.props.emulator, this.props.username, this.props.characterId)
-      this.props.dispatch(setConnection(connection))
+      this.setState({
+        loading: true
+      })
+      const connection = new Connection(this.props.server, this.props.emulator, this.props.username, this.props.characterId, () => {
+        this.props.dispatch(setConnection(connection))
+      })
     } catch (err) {
+      this.setState({
+        loading: false
+      })
       console.error(err)
     }
   }
   onDisconnect () {
+    this.setState({
+      loading: false
+    })
     this.props.onDisconnect()
     this.props.dispatch(disconnect())
   }
@@ -81,6 +92,7 @@ class Net64ServerPanel extends React.PureComponent {
   render () {
     const server = this.props.server
     const isConnected = this.props.isConnected
+    const loading = this.state.loading
     const styles = {
       panel: {
         fontSize: '18px',
@@ -130,43 +142,79 @@ class Net64ServerPanel extends React.PureComponent {
       },
       el: {
         margin: '6px'
+      },
+      loading: {
+        display: 'flex',
+        position: 'fixed',
+        zIndex: '100',
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        top: '0',
+        left: '0',
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+        justifyContent: 'center'
       }
     }
     return (
       <div style={styles.panel}>
-        <div style={styles.header} onClick={this.onToggle}>
-          <div>
-            { server.countryCode }
+        {
+          loading &&
+          <div style={styles.loading}>
+            <img src='img/load.gif' />
           </div>
-          <div style={styles.name}>
-            { server.name }
-          </div>
-          <div style={styles.players}>
-            { server.players.length } / 24
-          </div>
-        </div>
-        <div style={styles.details}>
-          <div style={styles.left}>
-            <div style={styles.el}>
-              { server.domain || server.ip }:{ server.port }
+        }
+        {
+          server.isDirect ? (
+            <div style={styles.header} onClick={this.onToggle}>
+              <div>
+                { server.ip }:{ server.port }
+              </div>
             </div>
-            <div className='markdown' style={styles.el} ref={x => { this.description = x }} />
-          </div>
-          <div style={styles.right}>
-            {
-              this.renderPlayers(server.players)
-            }
-          </div>
-          <div style={{width: '100%'}}>
-            {
-              isConnected ? (
-                <SMMButton text='Disconnect' iconSrc='img/net64.svg' fontSize='13px' onClick={this.onDisconnect} />
-              ) : (
-                <SMMButton text='Connect' iconSrc='img/net64.svg' fontSize='13px' onClick={this.onConnect} />
-              )
-            }
-          </div>
-        </div>
+          ) : (
+            <div style={styles.header} onClick={this.onToggle}>
+              <div>
+                { server.countryCode }
+              </div>
+              <div style={styles.name}>
+                { server.name }
+              </div>
+              <div style={styles.players}>
+                { server.players.length } / 24
+              </div>
+            </div>
+          )
+        }
+        {
+          server.isDirect ? (
+            <div style={styles.details}>
+              <SMMButton text='Disconnect' iconSrc='img/net64.svg' fontSize='13px' onClick={this.onDisconnect} />
+            </div>
+          ) : (
+            <div style={styles.details}>
+              <div style={styles.left}>
+                <div style={styles.el}>
+                  { server.domain || server.ip }:{ server.port }
+                </div>
+                <div className='markdown' style={styles.el} ref={x => { this.description = x }} />
+              </div>
+              <div style={styles.right}>
+                {
+                  this.renderPlayers(server.players)
+                }
+              </div>
+              <div style={{width: '100%'}}>
+                {
+                  isConnected ? (
+                    <SMMButton text='Disconnect' iconSrc='img/net64.svg' fontSize='13px' onClick={this.onDisconnect} />
+                  ) : (
+                    <SMMButton text='Connect' iconSrc='img/net64.svg' fontSize='13px' onClick={this.onConnect} />
+                  )
+                }
+              </div>
+            </div>
+          )
+        }
       </div>
     )
   }

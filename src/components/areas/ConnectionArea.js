@@ -17,7 +17,7 @@ export default class ConnectionArea extends React.PureComponent {
   }
   componentWillMount () {
     this.mounted = true
-    if (!this.props.isServer) this.updateServers()
+    if (!this.state.server.isDirect) this.updateServers()
   }
   componentWillUnmount () {
     this.mounted = false
@@ -52,7 +52,10 @@ export default class ConnectionArea extends React.PureComponent {
     }
     return (
       <div id='scroll' style={styles.area}>
-        <Net64ServerPanel server={server} isConnected onDisconnect={disconnect} />
+        {
+          server &&
+          <Net64ServerPanel server={server} isConnected onDisconnect={disconnect} />
+        }
         <ChatArea />
       </div>
     )
