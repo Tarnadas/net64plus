@@ -25,7 +25,7 @@ module.exports = [
     plugins: [
       new webpack.EnvironmentPlugin({
         NODE_ENV: 'development',
-        VERSION: process.env.npm_package_version
+        VERSION: process.env.npm_package_version.slice(-2) === '.0' ? process.env.npm_package_version.slice(0, process.env.npm_package_version.length - 2) : process.env.npm_package_version
       }),
       new HtmlWebpackPlugin({
         filename: 'index.html',
