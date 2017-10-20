@@ -71,6 +71,7 @@ class EmulatorView extends React.PureComponent {
   }
   renderEmulators (emulators) {
     const li = {
+      margin: '10px 0',
       lineHeight: '40px',
       width: '80%',
       padding: '8px',
