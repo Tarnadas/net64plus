@@ -17,7 +17,8 @@ class Net64ServerPanel extends React.PureComponent {
     super(props)
     this.state = {
       display: !!props.isConnected,
-      loading: false
+      loading: false,
+      alert: ''
     }
     this.onToggle = this.onToggle.bind(this)
     this.onConnect = this.onConnect.bind(this)
@@ -54,6 +55,19 @@ class Net64ServerPanel extends React.PureComponent {
       })
       const connection = new Connection(this.props.server, this.props.emulator, this.props.username, this.props.characterId, () => {
         this.props.dispatch(setConnection(connection))
+      }, err => {
+        err = String(err)
+        if (err.includes('getaddrinfo')) {
+          err = 'Could not resolve host name.\nDNS lookup failed'
+        } else if (err.includes('DTIMEDOUT')) {
+          err = 'Server timed out.\nIt might be offline or you inserted a wrong IP address'
+        } else if (err.includes('ECONNREFUSED')) {
+          err = 'Server refused connection.\nThe server might not have set up proper port forwarding or you inserted a wrong port'
+        }
+        this.setState({
+          alert: String(err),
+          loading: false
+        })
       })
     } catch (err) {
       this.setState({
@@ -77,6 +91,7 @@ class Net64ServerPanel extends React.PureComponent {
     }
     return Array.from((function * () {
       for (let i in players) {
+        if (!players.hasOwnProperty(i)) continue
         const player = players[i]
         yield (
           <div style={style} key={i}>
@@ -93,6 +108,7 @@ class Net64ServerPanel extends React.PureComponent {
     const server = this.props.server
     const isConnected = this.props.isConnected
     const loading = this.state.loading
+    const alert = this.state.alert
     const styles = {
       panel: {
         fontSize: '18px',
@@ -143,6 +159,19 @@ class Net64ServerPanel extends React.PureComponent {
       el: {
         margin: '6px'
       },
+      warningWrapper: {
+        width: '100%'
+      },
+      warning: {
+        color: '#a00003',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      },
+      warningImg: {
+        height: '30px',
+        marginRight: '20px'
+      },
       loading: {
         display: 'flex',
         position: 'fixed',
@@ -192,6 +221,15 @@ class Net64ServerPanel extends React.PureComponent {
             </div>
           ) : (
             <div style={styles.details}>
+              <div style={styles.warningWrapper}>
+                {
+                  alert &&
+                  <div style={styles.warning}>
+                    <img style={styles.warningImg} src='img/warning.svg' />
+                    <div>{alert}</div>
+                  </div>
+                }
+              </div>
               <div style={styles.left}>
                 <div style={styles.el}>
                   { server.domain || server.ip }:{ server.port }

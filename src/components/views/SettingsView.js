@@ -32,9 +32,11 @@ class SettingsView extends React.PureComponent {
     })
   }
   onCharacterChange (e) {
+    const characterId = parseInt(e.target.value)
     this.setState({
-      characterId: parseInt(e.target.value)
+      characterId
     })
+    this.props.connection.sendCharacterChange(characterId)
   }
   onSave () {
     const username = this.state.username.replace(/\W/g, '')
@@ -117,5 +119,6 @@ class SettingsView extends React.PureComponent {
 }
 export default connect(state => ({
   saveData: state.getIn(['save', 'data']),
-  emulator: state.get('emulator')
+  emulator: state.get('emulator'),
+  connection: state.get('connection')
 }))(SettingsView)

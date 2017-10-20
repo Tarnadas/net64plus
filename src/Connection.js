@@ -57,6 +57,7 @@ export default class Connection {
     switch (type) {
       case PACKET_TYPE.HANDSHAKE:
         this.playerId = payload[0]
+        this.chat.addMessage(`Your player ID is ${this.playerId}`, '[SERVER]')
         this.loop = setInterval(this.sendPlayerData.bind(this), UPDATE_INTERVAL)
         break
       case PACKET_TYPE.PLAYER_DATA:
@@ -64,6 +65,7 @@ export default class Connection {
         let j = 2
         for (let i = 0; i < payload.length; i += 0x18) {
           if (this.playerId === payload[i + 3]) continue
+          payload.writeUInt8(j, i + 3)
           this.emulator.writeMemory(0x367700 + 0x100 * j, payload.slice(i, i + 0x18))
           j++
         }
@@ -109,5 +111,10 @@ export default class Connection {
     chatMessage.set(new Uint8Array([username.length]), message.length + 1)
     chatMessage.set(username, message.length + 2)
     this.ws.send(Packet.create(PACKET_TYPE.CHAT_MESSAGE, chatMessage))
+  }
+  sendCharacterChange (characterId) {
+    const packet = new Uint8Array(1)
+    packet[0] = characterId
+    this.ws.send(Packet.create(PACKET_TYPE.CHARACTER_SWITCH, packet))
   }
 }
