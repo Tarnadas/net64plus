@@ -9,9 +9,9 @@ import { disconnect } from './actions/connection'
 
 const UPDATE_INTERVAL = 24
 const EMPTY = new Uint8Array(0x18)
-
+let chatemu = 0
 export default class Connection {
-  constructor (server, emulator, username, characterId, onConnect, onError) {
+  constructor (server, emulator, username, characterId, emuchat, onConnect, onError) {
     this.disconnect = this.disconnect.bind(this)
     this.ws = new WS(`ws://${server.domain ? server.domain : server.ip}:${server.port}`)
     this.ws.on('open', this.onOpen.bind(this, characterId, username, onConnect))
@@ -22,6 +22,8 @@ export default class Connection {
     this.server = server
     this.emulator = emulator
     this.chat = new Chat()
+    this.emuchat = emuchat
+    chatemu = emuchat
   }
   disconnect () {
     this.ws.close()
@@ -80,9 +82,22 @@ export default class Connection {
         const msgLength = payload[0]
         const message = (new TextDecoder('utf-8')).decode(payload.slice(1, msgLength + 1))
         const username = (new TextDecoder('utf-8')).decode(payload.slice(msgLength + 2, msgLength + 2 + payload[msgLength + 1]))
-        this.chat.addMessage(message, username)
-        break
-      case PACKET_TYPE.PING:
+		const messageBuffer = new Buffer.from(message)
+		const setmessage = new Buffer([0,0,0,0])
+		const chatout = new Buffer.allocUnsafe(24).fill(0)
+        try{
+		if (chatemu == 1){
+		messageBuffer.copy(chatout,0,0,msgLength)
+		chatout.swap32()
+        this.emulator.writeMemory(0x367684, chatout)
+		this.emulator.writeMemory(0x367680, setmessage)
+        	}
+        	}
+		catch(err){
+			}
+		this.chat.addMessage(message, username)
+        break      
+        case PACKET_TYPE.PING:
         // TODO
         break
       case PACKET_TYPE.WRONG_VERSION:

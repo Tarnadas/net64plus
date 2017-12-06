@@ -10,6 +10,9 @@ export default function save (state, action) {
     case 'SET_CHARACTER':
       state = state.setIn(['data', 'character'], action.character)
       break
+    case 'SET_EMUCHAT':
+      state = state.setIn(['data', 'emuchat'], action.emuchat)
+      break
     case 'ADD_API_KEY':
       state = state.setIn(['data', 'apiKey'], action.apiKey)
       break

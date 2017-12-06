@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
 
 import SMMButton from '../buttons/SMMButton'
-import { setUsername, setCharacter } from '../../actions/save'
+import { setUsername, setCharacter, setEmuChat } from '../../actions/save'
 
 const MIN_LENGTH_USERNAME = 3
 const MAX_LENGTH_USERNAME = 24
@@ -13,13 +13,15 @@ class SettingsView extends React.PureComponent {
     super(props)
     this.state = {
       username: props.saveData.get('username'),
-      characterId: props.saveData.get('character')
+      characterId: props.saveData.get('character'),
+      emuchat: props.saveData.get('emuchat')
     }
     if (!this.state.username) {
       this.state.alert = 'You must set a username'
     }
     this.onUsernameChange = this.onUsernameChange.bind(this)
     this.onCharacterChange = this.onCharacterChange.bind(this)
+    this.onEmuChatChange = this.onEmuChatChange.bind(this)
     this.onSave = this.onSave.bind(this)
   }
   onUsernameChange (e) {
@@ -38,6 +40,12 @@ class SettingsView extends React.PureComponent {
     })
     this.props.connection.sendCharacterChange(characterId)
   }
+  onEmuChatChange (e) {
+    const emuchat = parseInt(e.target.value)
+    this.setState({
+      emuchat
+    })
+  }
   onSave () {
     const username = this.state.username.replace(/\W/g, '')
     if (username.length < MIN_LENGTH_USERNAME) {
@@ -50,6 +58,7 @@ class SettingsView extends React.PureComponent {
       }
       this.props.dispatch(setUsername(username))
       this.props.dispatch(setCharacter(this.state.characterId))
+      this.props.dispatch(setEmuChat(this.state.emuchat))
       this.props.dispatch(push('/browse'))
     }
   }
@@ -101,6 +110,11 @@ class SettingsView extends React.PureComponent {
         </div>
         <div style={styles.label}>Username:</div>
         <input style={styles.input} value={this.state.username} onChange={this.onUsernameChange} />
+        <div style={styles.label}>In-Game Chat View:</div>
+        <select style={styles.input} value={this.state.emuchat} onChange={this.onEmuChatChange}>
+          <option value='0'>disable</option>
+          <option value='1'>enable</option>
+        </select>
         <div style={styles.label}>Character:</div>
         <select style={styles.input} value={this.state.characterId} onChange={this.onCharacterChange}>
           <option value='0'>Mario</option>
@@ -120,5 +134,6 @@ class SettingsView extends React.PureComponent {
 export default connect(state => ({
   saveData: state.getIn(['save', 'data']),
   emulator: state.get('emulator'),
-  connection: state.get('connection')
+  connection: state.get('connection'),
+  emuchat: state.get('emuchat')
 }))(SettingsView)
