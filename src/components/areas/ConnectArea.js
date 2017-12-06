@@ -39,7 +39,7 @@ class ConnectArea extends React.PureComponent {
       this.setState({
         loading: true
       })
-      const connection = new Connection({ ip: this.state.ip, port: this.state.port || '3678', isDirect: true }, this.props.emulator, this.props.username, this.props.characterId, () => {
+      const connection = new Connection({ ip: this.state.ip, port: this.state.port || '3678', isDirect: true }, this.props.emulator, this.props.username, this.props.characterId, this.props.emuchat, () => {
         this.props.dispatch(setConnection(connection))
       }, err => {
         err = String(err)
@@ -139,5 +139,6 @@ class ConnectArea extends React.PureComponent {
 export default connect(state => ({
   emulator: state.get('emulator'),
   username: state.getIn(['save', 'data', 'username']),
-  characterId: state.getIn(['save', 'data', 'character'])
+  characterId: state.getIn(['save', 'data', 'character']),
+  emuchat: state.getIn(['save', 'data', 'emuchat'])
 }))(ConnectArea)

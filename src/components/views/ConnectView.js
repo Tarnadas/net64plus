@@ -29,5 +29,6 @@ class ConnectView extends React.PureComponent {
   }
 }
 export default connect(state => ({
-  connection: state.get('connection')
+  connection: state.get('connection'),
+  emuchat: state.getIn(['save', 'data', 'emuchat'])
 }))(ConnectView)
