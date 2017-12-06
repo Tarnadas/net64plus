@@ -46,4 +46,5 @@ Here is a table to break down Networking performance with an example:
 ### CPU
 
 Net64+ server is written in JavaScript and runs with Node.js, which uses Google's super fast V8 engine.
-It is platform independent and you don't have to run an emulator for hosting a dedicated server. However Gzip compression requires CPU, but it should not affect gameplay that much.
+It is platform independent and you don't have to run an emulator for hosting a dedicated server. However Gzip compression requires CPU, but it should not affect gameplay that much."# net64plus" 
+"# net64plus" 
