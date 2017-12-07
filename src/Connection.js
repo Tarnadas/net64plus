@@ -11,7 +11,7 @@ const UPDATE_INTERVAL = 24
 const EMPTY = new Uint8Array(0x18)
 let chatemu = 0
 export default class Connection {
-  constructor (server, emulator, username, characterId, emuchat, onConnect, onError) {
+  constructor (server, emulator, username, characterId, emuChat, onConnect, onError) {
     this.disconnect = this.disconnect.bind(this)
     this.ws = new WS(`ws://${server.domain ? server.domain : server.ip}:${server.port}`)
     this.ws.on('open', this.onOpen.bind(this, characterId, username, onConnect))
@@ -22,8 +22,7 @@ export default class Connection {
     this.server = server
     this.emulator = emulator
     this.chat = new Chat()
-    this.emuchat = emuchat
-    chatemu = emuchat
+    this.emuChat = emuChat
   }
   disconnect () {
     this.ws.close()
@@ -86,7 +85,7 @@ export default class Connection {
 		const setmessage = new Buffer([0,0,0,0])
 		const chatout = new Buffer.allocUnsafe(24).fill(0)
         try{
-		if (chatemu == 1){
+		if (this.emuChat == 1){
 		messageBuffer.copy(chatout,0,0,msgLength)
 		chatout.swap32()
         this.emulator.writeMemory(0x367684, chatout)
