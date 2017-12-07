@@ -130,5 +130,4 @@ class TopBarArea extends React.PureComponent {
 }
 export default connect(state => ({
   apiKey: state.getIn(['save', 'data', 'apiKey']),
-  emuchat: state.getIn(['save', 'data', 'emuchat'])
 }))(TopBarArea)
