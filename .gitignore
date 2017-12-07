@@ -5,4 +5,5 @@
 !/build/patches/
 !/build/winprocess/
 !/build/img/
+!/build/winprocess.node
 /release/

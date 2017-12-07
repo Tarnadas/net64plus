@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack --env=dev && cd ./build && electron .",
-    "build": "webpack --env=prod && node ./build-app"
+    "build": "webpack --env=prod && node ./build-app",
+    "rebuild": "electron-rebuild -v 1.7.9 -f -w winprocess"
   },
   "repository": {
     "type": "git",
