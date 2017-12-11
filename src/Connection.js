@@ -1,3 +1,4 @@
+/* eslint-env browser */
 import WS from 'ws'
 
 import { gunzipSync } from 'zlib'
@@ -86,8 +87,8 @@ export default class Connection {
         // TODO
         break
       case PACKET_TYPE.WRONG_VERSION:
-        const major = payload[0]
-        const minor = payload[1]
+        // const major = payload[0]
+        // const minor = payload[1]
         this.ws.close()
         // TODO
         break

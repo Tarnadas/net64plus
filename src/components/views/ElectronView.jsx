@@ -1,13 +1,7 @@
 import React from 'react'
-import {
-  connect
-} from 'react-redux'
-import {
-  Route
-} from 'react-router-dom'
-import {
-  push
-} from 'react-router-redux'
+import { connect } from 'react-redux'
+import { Route } from 'react-router-dom'
+import { push } from 'react-router-redux'
 
 import MainView from './MainView'
 import SettingsView from './SettingsView'

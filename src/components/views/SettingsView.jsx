@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
 
-import SMMButton from '../buttons/SMMButton'
+import SMMButton, { ICON_STYLE } from '../buttons/SMMButton'
 import { setUsername, setCharacter } from '../../actions/save'
 
 const MIN_LENGTH_USERNAME = 3
@@ -58,13 +58,13 @@ class SettingsView extends React.PureComponent {
     const styles = {
       view: {
         display: 'flex',
-        flexWrap: 'wrap',
+        flexDirection: 'column',
+        alignItems: 'center',
         justifyContent: 'space-around',
         flex: '1 1 auto',
         padding: '40px',
         backgroundColor: '#24997e',
         fontSize: '18px',
-        alignItems: 'flex-start',
         color: '#000'
       },
       warningWrapper: {
@@ -80,12 +80,17 @@ class SettingsView extends React.PureComponent {
         height: '30px',
         marginRight: '20px'
       },
+      setting: {
+        width: '100%',
+        display: 'flex'
+      },
       label: {
-        width: '40%'
+        width: '30%'
       },
       input: {
-        width: '40%',
-        fontSize: '16px'
+        flex: '1 0 auto',
+        fontSize: '16px',
+        width: '0'
       }
     }
     return (
@@ -99,20 +104,39 @@ class SettingsView extends React.PureComponent {
             </div>
           }
         </div>
-        <div style={styles.label}>Username:</div>
-        <input style={styles.input} value={this.state.username} onChange={this.onUsernameChange} />
-        <div style={styles.label}>Character:</div>
-        <select style={styles.input} value={this.state.characterId} onChange={this.onCharacterChange}>
-          <option value='0'>Mario</option>
-          <option value='1'>Luigi</option>
-          <option value='2'>Yoshi</option>
-          <option value='3'>Wario</option>
-          <option value='4'>Peach</option>
-          <option value='5'>Toad</option>
-          <option value='6'>Waluigi</option>
-          <option value='7'>Rosalina</option>
-        </select>
-        <SMMButton text='Save' iconSrc='img/submit.png' fontSize='13px' padding='3px' noMargin onClick={this.onSave} />
+        <div style={styles.setting}>
+          <div style={styles.label}>Username:</div>
+          <input style={styles.input} value={this.state.username} onChange={this.onUsernameChange} />
+        </div>
+        <div style={styles.setting}>
+          <div style={styles.label}>Character:</div>
+          <select style={styles.input} value={this.state.characterId} onChange={this.onCharacterChange}>
+            <option value='0'>Mario</option>
+            <option value='1'>Luigi</option>
+            <option value='2'>Yoshi</option>
+            <option value='3'>Wario</option>
+            <option value='4'>Peach</option>
+            <option value='5'>Toad</option>
+            <option value='6'>Waluigi</option>
+            <option value='7'>Rosalina</option>
+          </select>
+        </div>
+        <SMMButton
+          text='Save'
+          iconSrc='img/submit.png'
+          iconStyle={ICON_STYLE.DARK}
+          onClick={this.onSave}
+          styles={{
+            button: {
+              fontSize: '13px',
+              margin: '0px',
+              alignSelf: 'flex-start',
+              justifySelf: 'flex-end'
+            },
+            icon: {
+              padding: '3px'
+            }
+          }} />
       </div>
     )
   }

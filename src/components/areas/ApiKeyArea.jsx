@@ -1,5 +1,5 @@
 import React from 'react'
-import { connect} from 'react-redux'
+import { connect } from 'react-redux'
 import { shell } from 'electron'
 
 import SMMButton from '../buttons/SMMButton'
@@ -128,7 +128,7 @@ class ApiKeyArea extends React.PureComponent {
             <img style={styles.cancelImg} src='img/cancel.svg' />
           </div>
           <div style={styles.apiKeyExplanation}>
-            Go to <span style={styles.link} onClick={this.onSMMDBClick}>SMMDB</span> > Sign In > Show API Key
+            Go to <span style={styles.link} onClick={this.onSMMDBClick}>SMMDB</span> &gt; Sign In &gt; Show API Key
           </div>
           <div style={styles.apiKeyExplanationSmall}>
             (With an API Key, you will be able to join verified servers with a moderation system, resulting in less cheaters (WIP))

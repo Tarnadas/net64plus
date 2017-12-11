@@ -1,7 +1,6 @@
 import React from 'react'
-import {
-  Link
-} from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import { fromJS } from 'immutable'
 
 export const COLOR_SCHEME = {
   YELLOW: 0,
@@ -9,6 +8,10 @@ export const COLOR_SCHEME = {
   RED: 2
 }
 
+export const ICON_STYLE = {
+  DARK: 0,
+  BRIGHT: 1
+}
 export default class SMMButton extends React.PureComponent {
   constructor (props) {
     super(props)
@@ -51,26 +54,20 @@ export default class SMMButton extends React.PureComponent {
   render () {
     const colorScheme = this.props.colorScheme || COLOR_SCHEME.YELLOW
     const onDelete = this.props.onDelete
-    const styles = {
-      smmButton: {
+    let styles = fromJS({
+      button: {
         margin: this.props.noMargin ? '' : '0 10px 10px 10px',
         lineHeight: '40px',
         minWidth: '120px',
         width: 'auto',
         height: '40px',
-        backgroundColor: colorScheme === COLOR_SCHEME.YELLOW ? (
-          this.state.deleteHover ? (
-            '#cc0008'
-          ) : (
-            this.state.hover ? '#323245' : '#ffe500'
-          )
-        ) : (
-          colorScheme === COLOR_SCHEME.GREEN ? (
-            this.state.hover ? '#323245' : '#33cc33'
-          ) : (
-            this.state.hover ? '#323245' : '#CC7034'
-          )
-        ),
+        backgroundColor: colorScheme === COLOR_SCHEME.YELLOW
+          ? this.state.deleteHover
+            ? '#cc0008'
+            : this.state.hover ? '#323245' : '#ffe500'
+          : colorScheme === COLOR_SCHEME.GREEN
+            ? this.state.hover ? '#323245' : '#33cc33'
+            : this.state.hover ? '#323245' : '#CC7034',
         textAlign: 'left',
         cursor: 'pointer',
         outline: 'none',
@@ -83,7 +80,7 @@ export default class SMMButton extends React.PureComponent {
         display: 'inline-block',
         fontSize: this.props.fontSize ? this.props.fontSize : ''
       },
-      smmIcon: {
+      icon: {
         margin: '4px',
         width: this.props.noText ? 'auto' : '32px',
         height: '32px',
@@ -91,23 +88,11 @@ export default class SMMButton extends React.PureComponent {
         borderRadius: '4px',
         padding: this.props.padding ? this.props.padding : ''
       },
-      smmIconDark: {
-        margin: '4px',
-        width: this.props.noText ? 'auto' : '32px',
-        height: '32px',
-        float: 'left',
-        borderRadius: '4px',
-        backgroundColor: 'rgb(50, 50, 69)',
-        padding: this.props.padding ? this.props.padding : ''
+      iconDark: {
+        backgroundColor: 'rgb(50, 50, 69)'
       },
-      smmIconHover: {
-        margin: '4px',
-        width: '32px',
-        height: '32px',
-        float: 'left',
-        borderRadius: '4px',
-        backgroundColor: '#000',
-        padding: this.props.padding ? this.props.padding : ''
+      iconHover: {
+        backgroundColor: '#000'
       },
       cancel: {
         right: '3px',
@@ -123,11 +108,24 @@ export default class SMMButton extends React.PureComponent {
         width: '100%',
         height: '100%'
       }
+    })
+    if (this.props.styles) {
+      styles.mergeDeep(this.props.styles)
     }
-    const iconStyle = this.props.iconColor === 'bright' ? styles.smmIcon : (this.state.hover ? styles.smmIconHover : styles.smmIconDark)
+    styles = styles.toJS()
+    const iconStyle = Object.assign({},
+      styles.icon,
+      this.state.hover ? styles.iconHover : {},
+      this.props.iconStyle === ICON_STYLE.DARK ? styles.iconDark : {}
+    )
+    console.log('STYLES', styles)
+    console.log('MERGED', iconStyle)
+    // const iconStyle = this.props.iconColor === 'bright'
+    //   ? styles.icon
+    //   : (this.state.hover ? styles.iconHover : styles.iconDark)
     const text = this.props.text
     return (
-      <div style={styles.smmButton}
+      <div style={styles.button}
         onMouseEnter={this.mouseEnter}
         onMouseLeave={this.mouseLeave}
         onClick={this.props.onClick ? this.props.onClick : null}
@@ -148,11 +146,11 @@ export default class SMMButton extends React.PureComponent {
           )
         }
         {
-          onDelete && (
+          onDelete &&
           <div style={styles.cancel} onClick={this.onDelete} onMouseEnter={this.deleteEnter} onMouseLeave={this.deleteLeave}>
             <img style={styles.cancelImg} src='img/cancel_yellow.svg' />
           </div>
-        )}
+        }
       </div>
     )
   }

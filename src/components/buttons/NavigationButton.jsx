@@ -14,13 +14,6 @@ export default class NavigationButton extends React.PureComponent {
     this.onMouseLeave = this.onMouseLeave.bind(this)
   }
   onClick () {
-    try {
-      if (this.props.link && this.props.link.charAt(0) === '/') {
-        ga('send', 'pageview', {
-          page: this.props.link
-        })
-      }
-    } catch (err) {}
     this.props.onClick()
   }
   onMouseEnter () {

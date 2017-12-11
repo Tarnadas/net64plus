@@ -103,9 +103,14 @@ class TopBarArea extends React.PureComponent {
       <div style={styles.topbar}>
         <div style={styles.padding}>
           <div style={styles.bar}>
-            <SMMButton text='Navigation' iconSrc='img/menu.png' iconColor='bright'
+            <SMMButton text='Navigation' iconSrc='img/menu.svg' iconColor='bright'
               onMouseEnter={this.onMouseEnterButton}
               onMouseLeave={this.onMouseLeaveButton}
+              styles={{
+                icon: {
+                  padding: '4px'
+                }
+              }}
             />
             <NavigationArea display={hover}
               onMouseEnter={this.onMouseEnterNav}
