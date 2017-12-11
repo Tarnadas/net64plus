@@ -7,10 +7,10 @@ module.exports = [
   {
     target: 'electron-renderer',
     entry: {
-      renderer: path.join(__dirname, 'src/renderer.js')
+      renderer: path.join(__dirname, 'src/renderer.jsx')
     },
     output: {
-      filename: 'renderer.js',
+      filename: 'renderer.jsx',
       path: path.join(__dirname, 'build')
     },
     devtool: 'inline-source-map',
@@ -36,10 +36,13 @@ module.exports = [
     externals: {
       winprocess: 'require(require("path").resolve(__dirname, "winprocess"))'
     },
+    resolve: {
+      extensions: [ '.js', '.jsx', '.json' ]
+    },
     module: {
       loaders: [
         {
-          test: /\.js$/,
+          test: /\.jsx?$/,
           exclude: /node_modules/,
           loader: 'babel-loader',
           query: {
