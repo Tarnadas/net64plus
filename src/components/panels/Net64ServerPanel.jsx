@@ -89,20 +89,15 @@ class Net64ServerPanel extends React.PureComponent {
       borderTop: '1px solid black',
       display: 'flex'
     }
-    return Array.from((function * () {
-      for (let i in players) {
-        if (!players.hasOwnProperty(i)) continue
-        const player = players[i]
-        yield (
-          <div style={style} key={i}>
-            <img src={`img/${CHARACTER_IMAGES[player.characterId]}`} />
-            <div>
-              { player.username }
-            </div>
+    return players.map(
+      (player, index) =>
+        <div style={style} key={index}>
+          <img src={`img/${CHARACTER_IMAGES[player.characterId]}`} />
+          <div>
+            { player.username }
           </div>
-        )
-      }
-    })())
+        </div>
+    )
   }
   render () {
     const server = this.props.server

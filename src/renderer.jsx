@@ -9,7 +9,7 @@ import createHistory from 'history/createMemoryHistory'
 
 import initReducer from './reducers'
 import { initAccount } from './Account'
-import ElectronView from './components/views/ElectronView'
+import AppView from './components/views/AppView'
 import { setAccountData } from './actions/account'
 
 export let store;
@@ -32,7 +32,7 @@ export let store;
   render(
     <Provider store={store}>
       <ConnectedRouter history={history}>
-        <Route path='/' component={ElectronView} />
+        <Route path='/' component={AppView} />
       </ConnectedRouter>
     </Provider>, document.getElementById('root')
   )

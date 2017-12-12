@@ -1,7 +1,5 @@
 import React from 'react'
-import {
-  Link
-} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 export default class NavigationButton extends React.PureComponent {
   constructor (props) {
@@ -70,15 +68,13 @@ export default class NavigationButton extends React.PureComponent {
     return (
       <div style={styles.button} onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave} onClick={this.onClick}>
         {
-          this.props.blank ? (
-            <a href={this.props.link} target='_blank'>
+          this.props.blank
+            ? <a href={this.props.link} target='_blank'>
               { content }
             </a>
-          ) : (
-            <Link to={this.props.link}>
+            : <Link to={this.props.link}>
               { content }
             </Link>
-          )
         }
       </div>
     )

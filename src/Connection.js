@@ -12,7 +12,7 @@ const UPDATE_INTERVAL = 24
 const EMPTY = new Uint8Array(0x18)
 
 export default class Connection {
-  constructor (server, emulator, username, characterId, onConnect, onError) {
+  constructor ({ server, emulator, username, characterId, onConnect, onError }) {
     this.disconnect = this.disconnect.bind(this)
     this.ws = new WS(`ws://${server.domain ? server.domain : server.ip}:${server.port}`)
     this.ws.on('open', this.onOpen.bind(this, characterId, username, onConnect))

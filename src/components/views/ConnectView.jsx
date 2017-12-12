@@ -18,11 +18,9 @@ class ConnectView extends React.PureComponent {
     return (
       <div style={styles.main}>
         {
-          connection ? (
-            <ConnectionArea connection={connection} />
-          ) : (
-            <ConnectArea />
-          )
+          connection
+            ? <ConnectionArea connection={connection} />
+            : <ConnectArea />
         }
       </div>
     )

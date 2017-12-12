@@ -82,7 +82,7 @@ export default class SMMButton extends React.PureComponent {
         borderRadius: '5px',
         boxShadow: '1px 4px 13px 0 rgba(0,0,0,0.5)',
         display: 'inline-block',
-        fontSize: this.props.fontSize ? this.props.fontSize : ''
+        fontSize: this.props.fontSize ? this.props.fontSize : '13px'
       },
       icon: {
         margin: '4px',

@@ -38,13 +38,9 @@ export default class Net64ServerArea extends React.PureComponent {
     setTimeout(this.updateServers, 10000)
   }
   renderServers (servers) {
-    return Array.from((function * () {
-      for (const server of servers) {
-        yield (
-          <Net64ServerPanel key={server.id} server={server} />
-        )
-      }
-    })())
+    return servers.map(
+      server => <Net64ServerPanel key={server.id} server={server} />
+    )
   }
   render () {
     const servers = this.state.servers

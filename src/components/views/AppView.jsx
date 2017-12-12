@@ -15,10 +15,6 @@ class ElectronView extends React.PureComponent {
     super(props)
     this.forcePath = this.forcePath.bind(this)
   }
-  componentWillMount () {
-    this.props.dispatch(push('/browse'))
-    this.forcePath(this.props)
-  }
   componentWillReceiveProps (nextProps) {
     if (nextProps.location.pathname !== this.props.location.pathname) {
       this.forcePath(nextProps)

@@ -1,10 +1,18 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { push } from 'react-router-redux'
 
 import SMMButton from '../buttons/SMMButton'
 import ExternalLink from '../helpers/ExternalLink'
 
 class MainView extends React.PureComponent {
+  constructor (props) {
+    super(props)
+    this.onStartClick = this.onStartClick.bind(this)
+  }
+  onStartClick () {
+    this.props.dispatch(push('/browse'))
+  }
   render () {
     const styles = {
       main: {
@@ -17,11 +25,18 @@ class MainView extends React.PureComponent {
         justifyContent: 'center',
         fontSize: '18px',
         overflow: 'auto',
-        padding: '40px'
+        padding: '20px 40px'
       }
     }
     return (
       <div style={styles.main}>
+        <SMMButton
+          link='https://discord.gg/k9QMFaB'
+          text='Start'
+          iconSrc='img/net64.svg'
+          onClick={this.onStartClick}
+          fontSize='22px'
+        />
         <h2>Thank you for downloading Net64+</h2>
         <div>Net64+ is a modified version of Net64, aka SM64O.
           It uses a different and more performant networking technique.

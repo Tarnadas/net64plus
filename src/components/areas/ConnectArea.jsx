@@ -39,21 +39,32 @@ class ConnectArea extends React.PureComponent {
       this.setState({
         loading: true
       })
-      const connection = new Connection({ ip: this.state.ip, port: this.state.port || '3678', isDirect: true }, this.props.emulator, this.props.username, this.props.characterId, () => {
-        this.props.dispatch(setConnection(connection))
-      }, err => {
-        err = String(err)
-        if (err.includes('getaddrinfo')) {
-          err = 'Could not resolve host name.\nDNS lookup failed'
-        } else if (err.includes('DTIMEDOUT')) {
-          err = 'Server timed out.\nIt might be offline or you inserted a wrong IP address'
-        } else if (err.includes('ECONNREFUSED')) {
-          err = 'Server refused connection.\nThe server might not have set up proper port forwarding or you inserted a wrong port'
+      const connection = new Connection({
+        server: {
+          ip: this.state.ip,
+          port: this.state.port || '3678',
+          isDirect: true
+        },
+        emulator: this.props.emulator,
+        username: this.props.username,
+        characterId: this.props.characterId,
+        onConnect: () => {
+          this.props.dispatch(setConnection(connection))
+        },
+        onError: err => {
+          err = String(err)
+          if (err.includes('getaddrinfo')) {
+            err = 'Could not resolve host name.\nDNS lookup failed'
+          } else if (err.includes('DTIMEDOUT')) {
+            err = 'Server timed out.\nIt might be offline or you inserted a wrong IP address'
+          } else if (err.includes('ECONNREFUSED')) {
+            err = 'Server refused connection.\nThe server might not have set up proper port forwarding or you inserted a wrong port'
+          }
+          this.setState({
+            alert: String(err),
+            loading: false
+          })
         }
-        this.setState({
-          alert: String(err),
-          loading: false
-        })
       })
     } catch (err) {
       this.setState({
@@ -131,7 +142,7 @@ class ConnectArea extends React.PureComponent {
         <input style={styles.input} value={this.state.ip} onChange={this.onIPChange} onKeyPress={this.onKeyPress} />
         <div style={styles.label}>Port:</div>
         <input style={styles.input} value={this.state.port} onChange={this.onPortChange} onKeyPress={this.onKeyPress} />
-        <SMMButton text='Connect' iconSrc='img/net64.svg' fontSize='13px' onClick={this.onConnect} />
+        <SMMButton text='Connect' iconSrc='img/net64.svg' onClick={this.onConnect} />
       </div>
     )
   }

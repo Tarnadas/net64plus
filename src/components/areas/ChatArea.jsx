@@ -49,18 +49,14 @@ class ChatArea extends React.PureComponent {
     }
   }
   renderChatMessages (chat) {
-    return Array.from((function * () {
-      for (let i = 0; i < chat.size; i++) {
-        const message = chat.get(i)
-        yield (
-          <div key={message.key}>
-            {
-              `[${message.time}] ${message.username}: ${message.message}`
-            }
-          </div>
-        )
-      }
-    })())
+    return chat.map(
+      message =>
+        <div key={message.key}>
+          {
+            `[${message.time}] ${message.username}: ${message.message}`
+          }
+        </div>
+    ).toJS()
   }
   render () {
     const styles = {
@@ -99,7 +95,7 @@ class ChatArea extends React.PureComponent {
       <div style={styles.area}>
         <div style={styles.header}>
           <input style={styles.input} value={this.state.message} onChange={this.onMessageChange} onKeyPress={this.onKeyPress} />
-          <SMMButton text='Send' iconSrc='img/submit.png' fontSize='13px' onClick={this.onSend} />
+          <SMMButton text='Send' iconSrc='img/submit.png' onClick={this.onSend} />
         </div>
         <div id='scroll' style={styles.chat} ref={x => { this.chat = x }}>
           {

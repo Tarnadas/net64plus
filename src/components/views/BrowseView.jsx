@@ -18,11 +18,9 @@ class BrowseView extends React.PureComponent {
     return (
       <div style={styles.main}>
         {
-          connection ? (
-            <ConnectionArea connection={connection} />
-          ) : (
-            <Net64ServerArea />
-          )
+          connection
+            ? <ConnectionArea connection={connection} />
+            : <Net64ServerArea />
         }
       </div>
     )

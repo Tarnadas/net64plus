@@ -1,19 +1,13 @@
 import React from 'react'
-import {
-  connect
-} from 'react-redux'
-import {
-  push
-} from 'react-router-redux'
+import { connect } from 'react-redux'
+import { push } from 'react-router-redux'
 import tasklist from 'tasklist'
 
 import Emulator from '../../Emulator'
 import SMMButton from '../buttons/SMMButton'
-import {
-  setEmulator
-} from '../../actions/emulator'
+import { setEmulator } from '../../actions/emulator'
 
-const TIMEOUT = 10000
+const TIMEOUT = 2000
 
 class EmulatorView extends React.PureComponent {
   constructor (props) {
@@ -82,18 +76,27 @@ class EmulatorView extends React.PureComponent {
       justifyContent: 'space-between'
     }
     const onSelect = this.onSelectEmulator
-    return Array.from((function * () {
-      for (const emulator of emulators) {
-        yield (
-          <div style={li} key={emulator.pid}>
-            <div>
-              {emulator.name} | pid: {emulator.pid}
-            </div>
-            <SMMButton text='Select' iconSrc='img/submit.png' fontSize='13px' padding='3px' noMargin onClick={onSelect.bind(null, emulator)} />
+    return emulators.map(
+      emulator =>
+        <div style={li} key={emulator.pid}>
+          <div>
+            {emulator.name} | pid: {emulator.pid}
           </div>
-        )
-      }
-    })())
+          <SMMButton
+            text='Select'
+            iconSrc='img/submit.png'
+            style={{
+              button: {
+                margin: '0'
+              },
+              icon: {
+                padding: '3px'
+              }
+            }}
+            onClick={onSelect.bind(null, emulator)}
+          />
+        </div>
+    )
   }
   render () {
     const emulators = this.state.emulators
