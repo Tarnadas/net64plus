@@ -1,7 +1,5 @@
 import React from 'react'
-import {
-  connect
-} from 'react-redux'
+import { connect } from 'react-redux'
 
 import SMMButton from '../buttons/SMMButton'
 import NavigationArea from './NavigationArea'
@@ -103,7 +101,10 @@ class TopBarArea extends React.PureComponent {
       <div style={styles.topbar}>
         <div style={styles.padding}>
           <div style={styles.bar}>
-            <SMMButton text='Navigation' iconSrc='img/menu.svg' iconColor='bright'
+            <SMMButton
+              text='Navigation'
+              iconSrc='img/menu.svg'
+              iconSrcHover='img/menu_yellow.svg'
               onMouseEnter={this.onMouseEnterButton}
               onMouseLeave={this.onMouseLeaveButton}
               styles={{
@@ -121,7 +122,13 @@ class TopBarArea extends React.PureComponent {
           <div style={styles.button}>
             {
               false &&
-              <SMMButton text={`${apiKey ? 'Change' : 'Add'} API Key`} iconSrc='img/api.png' fontSize='13px' padding='3px' onClick={this.showApiKey} />
+              <SMMButton
+                text={`${apiKey ? 'Change' : 'Add'} API Key`}
+                iconSrc='img/api.png'
+                fontSize='13px'
+                padding='3px'
+                onClick={this.showApiKey}
+              />
             }
           </div>
         </div>

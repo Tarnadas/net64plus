@@ -36,7 +36,7 @@ const BrowserWindow = electron.BrowserWindow;
 
   const onReady = () => {
     mainWindow = new BrowserWindow({
-      width: process.env.NODE_ENV === 'development' ? 1100 : 660,
+      width: process.env.NODE_ENV === 'development' ? 1100 : 670,
       height: 840,
       icon: path.join(__dirname, 'img/icon.png'),
       title: `Net64+ ${process.env.VERSION}`,

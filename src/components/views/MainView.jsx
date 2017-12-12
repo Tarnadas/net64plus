@@ -1,7 +1,8 @@
 import React from 'react'
-import {
-  connect
-} from 'react-redux'
+import { connect } from 'react-redux'
+
+import SMMButton from '../buttons/SMMButton'
+import ExternalLink from '../helpers/ExternalLink'
 
 class MainView extends React.PureComponent {
   render () {
@@ -21,11 +22,38 @@ class MainView extends React.PureComponent {
     }
     return (
       <div style={styles.main}>
-        <div>This is Net64+ Client, a modified client for Net64 aka Sm64O, that uses the WebSocket protocol.</div>
-        <h2>Why?</h2>
-        <div>Because the official client uses the Hazel protocol and I want to make a dedicated server with Node.js. The Hazel protocol is only implemented in C# and honestly, noone uses it (sorry).<br /><br />
-          With this client you won&#39;t be able to connect to any official server. You can only connect to servers, that use my dedicated server software. You also won&#39;t be able to create a server with this client.<br /><br />
-          If you only want to play with friends, the official client is a better choice.</div>
+        <h2>Thank you for downloading Net64+</h2>
+        <div>Net64+ is a modified version of Net64, aka SM64O.
+          It uses a different and more performant networking technique.
+          Right now both programs are not compatible with each other, but the client devs are working it.
+          Net64+ also has a dedicated server software, which makes it extremely easy to host or find servers.
+          There is a server list integrated inside the client, so you will always immediately find servers to play on.
+          If you only want to play with friends, the original client might be a better choice.
+        </div>
+        <h3>This is a client only program</h3>
+        <div>
+          You won&#39;t be able to create a server.<br />
+          If you want to create a server, please visit <ExternalLink href='https://github.com/tarnadas/net64plus-ded'>the GitHub repository of the server software</ExternalLink>
+        </div>
+        <h3>Join our community</h3>
+        <div>
+          <SMMButton
+            link='https://discord.gg/k9QMFaB' blank
+            text='Net64 Discord'
+            iconSrc='img/discord.svg'
+          />
+          <SMMButton
+            link='https://discord.gg/SPZsgSe' blank
+            text='SMMDB Discord'
+            iconSrc='img/discord.svg'
+          />
+          <SMMButton
+            link='https://sm64o.com/' blank
+            text='Forum'
+            iconSrc='img/sm64o.png'
+            noText
+          />
+        </div>
       </div>
     )
   }

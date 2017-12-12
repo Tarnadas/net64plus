@@ -52,6 +52,10 @@ export default class SMMButton extends React.PureComponent {
     this.props.onDelete(this.props.saveId)
   }
   render () {
+    const hover = this.state.hover
+    const iconSrc = this.props.iconSrc
+    const iconSrcHover = this.props.iconSrcHover || iconSrc
+    const text = this.props.text
     const colorScheme = this.props.colorScheme || COLOR_SCHEME.YELLOW
     const onDelete = this.props.onDelete
     let styles = fromJS({
@@ -110,20 +114,14 @@ export default class SMMButton extends React.PureComponent {
       }
     })
     if (this.props.styles) {
-      styles.mergeDeep(this.props.styles)
+      styles = styles.mergeDeep(fromJS(this.props.styles))
     }
     styles = styles.toJS()
     const iconStyle = Object.assign({},
       styles.icon,
-      this.state.hover ? styles.iconHover : {},
+      hover ? styles.iconHover : {},
       this.props.iconStyle === ICON_STYLE.DARK ? styles.iconDark : {}
     )
-    console.log('STYLES', styles)
-    console.log('MERGED', iconStyle)
-    // const iconStyle = this.props.iconColor === 'bright'
-    //   ? styles.icon
-    //   : (this.state.hover ? styles.iconHover : styles.iconDark)
-    const text = this.props.text
     return (
       <div style={styles.button}
         onMouseEnter={this.mouseEnter}
@@ -131,19 +129,33 @@ export default class SMMButton extends React.PureComponent {
         onClick={this.props.onClick ? this.props.onClick : null}
       >
         {
-          this.props.link ? (
-            this.props.blank ? (
-              <a href={this.props.link} target='_blank'>
-                <ButtonSub iconStyle={iconStyle} iconSrc={this.props.iconSrc} text={text} hover={this.state.hover} noText={this.props.noText} />
+          this.props.link
+            ? this.props.blank
+              ? <a href={this.props.link} target='_blank'>
+                <ButtonSub
+                  iconStyle={iconStyle}
+                  iconSrc={hover ? iconSrcHover : iconSrc}
+                  text={text}
+                  hover={hover}
+                  noText={this.props.noText}
+                />
               </a>
-            ) : (
-              <Link to={this.props.link}>
-                <ButtonSub iconStyle={iconStyle} iconSrc={this.props.iconSrc} text={text} hover={this.state.hover} noText={this.props.noText} />
+              : <Link to={this.props.link}>
+                <ButtonSub
+                  iconStyle={iconStyle}
+                  iconSrc={hover ? iconSrcHover : iconSrc}
+                  text={text}
+                  hover={hover}
+                  noText={this.props.noText}
+                />
               </Link>
-            )
-          ) : (
-            <ButtonSub iconStyle={iconStyle} iconSrc={this.props.iconSrc} text={text} hover={this.state.hover} noText={this.props.noText} />
-          )
+            : <ButtonSub
+              iconStyle={iconStyle}
+              iconSrc={hover ? iconSrcHover : iconSrc}
+              text={text}
+              hover={hover}
+              noText={this.props.noText}
+            />
         }
         {
           onDelete &&

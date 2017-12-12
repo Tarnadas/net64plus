@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { shell } from 'electron'
 
 import SMMButton from '../buttons/SMMButton'
+import ExternalLink from '../helpers/ExternalLink'
 import { initAccount } from '../../Account'
 import { setAccountData } from '../../actions/account'
 import { addApiKey, deleteApiKey } from '../../actions/save'
@@ -18,7 +18,6 @@ class ApiKeyArea extends React.PureComponent {
     this.addApiKey = this.addApiKey.bind(this)
     this.deleteApiKey = this.deleteApiKey.bind(this)
     this.handleChange = this.handleChange.bind(this)
-    this.onSMMDBClick = this.onSMMDBClick.bind(this)
   }
   componentWillReceiveProps (nextProps) {
     if (nextProps.apiKey) {
@@ -49,9 +48,6 @@ class ApiKeyArea extends React.PureComponent {
     this.setState({
       apiKey: value
     })
-  }
-  onSMMDBClick () {
-    shell.openExternal('https://smmdb.ddns.net/profile')
   }
   render () {
     const apiKey = this.props.apiKey
@@ -115,10 +111,6 @@ class ApiKeyArea extends React.PureComponent {
         width: '24px',
         height: '24px',
         margin: '4px'
-      },
-      link: {
-        cursor: 'pointer',
-        color: '#56d6ff'
       }
     }
     return (
@@ -128,7 +120,7 @@ class ApiKeyArea extends React.PureComponent {
             <img style={styles.cancelImg} src='img/cancel.svg' />
           </div>
           <div style={styles.apiKeyExplanation}>
-            Go to <span style={styles.link} onClick={this.onSMMDBClick}>SMMDB</span> &gt; Sign In &gt; Show API Key
+            Go to <ExternalLink href='https://smmdb.ddns.net/profile'>SMMDB</ExternalLink> &gt; Sign In &gt; Show API Key
           </div>
           <div style={styles.apiKeyExplanationSmall}>
             (With an API Key, you will be able to join verified servers with a moderation system, resulting in less cheaters (WIP))
