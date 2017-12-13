@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
 
 import SMMButton, { ICON_STYLE } from '../buttons/SMMButton'
-import { setUsername, setCharacter } from '../../actions/save'
+import { setUsername, setCharacter, setEmuChat } from '../../actions/save'
 
 const MIN_LENGTH_USERNAME = 3
 const MAX_LENGTH_USERNAME = 24
@@ -13,13 +13,15 @@ class SettingsView extends React.PureComponent {
     super(props)
     this.state = {
       username: props.saveData.get('username'),
-      characterId: props.saveData.get('character')
+      characterId: props.saveData.get('character'),
+      emuChat: props.saveData.get('emuChat')
     }
     if (!this.state.username) {
       this.state.alert = 'You must set a username'
     }
     this.onUsernameChange = this.onUsernameChange.bind(this)
     this.onCharacterChange = this.onCharacterChange.bind(this)
+    this.onEmuChatChange = this.onEmuChatChange.bind(this)
     this.onSave = this.onSave.bind(this)
   }
   onUsernameChange (e) {
@@ -38,6 +40,12 @@ class SettingsView extends React.PureComponent {
     })
     this.props.connection.sendCharacterChange(characterId)
   }
+  onEmuChatChange (e) {
+    const emuChat = parseInt(e.target.value)
+    this.setState({
+      emuChat
+    })
+  }
   onSave () {
     const username = this.state.username.replace(/\W/g, '')
     if (username.length < MIN_LENGTH_USERNAME) {
@@ -50,6 +58,7 @@ class SettingsView extends React.PureComponent {
       }
       this.props.dispatch(setUsername(username))
       this.props.dispatch(setCharacter(this.state.characterId))
+      this.props.dispatch(setEmuChat(this.state.emuChat))
       this.props.dispatch(push('/browse'))
     }
   }
@@ -121,6 +130,13 @@ class SettingsView extends React.PureComponent {
             <option value='7'>Rosalina</option>
           </select>
         </div>
+        <div style={styles.setting}>
+          <div style={styles.label}>In-Game Chat View:</div>
+          <select style={styles.input} value={this.state.emuChat} onChange={this.onEmuChatChange}>
+            <option value='0'>disable</option>
+            <option value='1'>enable</option>
+          </select>
+        </div>
         <SMMButton
           text='Save'
           iconSrc='img/submit.png'
@@ -136,7 +152,8 @@ class SettingsView extends React.PureComponent {
             icon: {
               padding: '3px'
             }
-          }} />
+          }}
+        />
       </div>
     )
   }
@@ -144,5 +161,6 @@ class SettingsView extends React.PureComponent {
 export default connect(state => ({
   saveData: state.getIn(['save', 'data']),
   emulator: state.get('emulator'),
-  connection: state.get('connection')
+  connection: state.get('connection'),
+  emuChat: state.get('emuChat')
 }))(SettingsView)

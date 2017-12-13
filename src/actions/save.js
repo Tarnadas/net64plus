@@ -11,6 +11,12 @@ export function setCharacter (character) {
     character
   }
 }
+export function setEmuChat (emuchat) {
+  return {
+    type: 'SET_EMUCHAT',
+    emuchat
+  }
+}
 
 export function addApiKey (apiKey) {
   return {

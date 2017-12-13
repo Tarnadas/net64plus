@@ -48,6 +48,7 @@ class ConnectArea extends React.PureComponent {
         emulator: this.props.emulator,
         username: this.props.username,
         characterId: this.props.characterId,
+        emuChat: this.props.emuChat,
         onConnect: () => {
           this.props.dispatch(setConnection(connection))
         },
@@ -150,5 +151,6 @@ class ConnectArea extends React.PureComponent {
 export default connect(state => ({
   emulator: state.get('emulator'),
   username: state.getIn(['save', 'data', 'username']),
-  characterId: state.getIn(['save', 'data', 'character'])
+  characterId: state.getIn(['save', 'data', 'character']),
+  emuChat: state.getIn(['save', 'data', 'emuChat'])
 }))(ConnectArea)
