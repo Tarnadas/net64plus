@@ -14,6 +14,7 @@ const APP_SAVE_DATA = {
   apiKey: '',
   username: '',
   character: 0,
+  emuChat: false,
   lastIp: 'smmdb.ddns.net',
   lastPort: 3678
 }

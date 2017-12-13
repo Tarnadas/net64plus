@@ -34,10 +34,12 @@ class EmulatorView extends React.PureComponent {
   }
   async scan () {
     if (!this.mounted) return
-    const emulators = (await tasklist()).filter(el => el.imageName.includes('Project64') || el.imageName.includes('Mupen64') || el.imageName.includes('Nemu64')).map(el => ({
-      name: el.imageName,
-      pid: el.pid
-    }))
+    const emulators = (await tasklist())
+      .filter(el => el.imageName.includes('Project64') || el.imageName.includes('Mupen64') || el.imageName.includes('Nemu64'))
+      .map(el => ({
+        name: el.imageName,
+        pid: el.pid
+      }))
     if (this.mounted) {
       this.setState({
         emulators

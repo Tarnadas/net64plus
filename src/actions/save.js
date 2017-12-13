@@ -11,10 +11,10 @@ export function setCharacter (character) {
     character
   }
 }
-export function setEmuChat (emuchat) {
+export function setEmuChat (emuChat) {
   return {
-    type: 'SET_EMUCHAT',
-    emuchat
+    type: 'SET_EMU_CHAT',
+    emuChat
   }
 }
 

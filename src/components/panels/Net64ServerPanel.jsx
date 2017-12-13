@@ -53,21 +53,28 @@ class Net64ServerPanel extends React.PureComponent {
       this.setState({
         loading: true
       })
-      const connection = new Connection(this.props.server, this.props.emulator, this.props.username, this.props.characterId, this.props.emuchat, () => {
-        this.props.dispatch(setConnection(connection))
-      }, err => {
-        err = String(err)
-        if (err.includes('getaddrinfo')) {
-          err = 'Could not resolve host name.\nDNS lookup failed'
-        } else if (err.includes('DTIMEDOUT')) {
-          err = 'Server timed out.\nIt might be offline or you inserted a wrong IP address'
-        } else if (err.includes('ECONNREFUSED')) {
-          err = 'Server refused connection.\nThe server might not have set up proper port forwarding or you inserted a wrong port'
+      const connection = new Connection({
+        server: this.props.server,
+        emulator: this.props.emulator,
+        username: this.props.username,
+        characterId: this.props.characterId,
+        onConnect: () => {
+          this.props.dispatch(setConnection(connection))
+        },
+        onError: err => {
+          err = String(err)
+          if (err.includes('getaddrinfo')) {
+            err = 'Could not resolve host name.\nDNS lookup failed'
+          } else if (err.includes('DTIMEDOUT')) {
+            err = 'Server timed out.\nIt might be offline or you inserted a wrong IP address'
+          } else if (err.includes('ECONNREFUSED')) {
+            err = 'Server refused connection.\nThe server might not have set up proper port forwarding or you inserted a wrong port'
+          }
+          this.setState({
+            alert: String(err),
+            loading: false
+          })
         }
-        this.setState({
-          alert: String(err),
-          loading: false
-        })
       })
     } catch (err) {
       this.setState({
@@ -255,6 +262,5 @@ class Net64ServerPanel extends React.PureComponent {
 export default connect(state => ({
   emulator: state.get('emulator'),
   username: state.getIn(['save', 'data', 'username']),
-  characterId: state.getIn(['save', 'data', 'character']),
-  emuchat: state.getIn(['save', 'data', 'emuchat'])
+  characterId: state.getIn(['save', 'data', 'character'])
 }))(Net64ServerPanel)

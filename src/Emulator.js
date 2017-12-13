@@ -42,4 +42,18 @@ export default class Emulator {
     b.writeUInt8(characterId + 1, 0)
     this.writeMemory(0x365FF3, b)
   }
+  displayChatMessage (message, msgLength) {
+    const messageBuffer = Buffer.from(message)
+    const triggerMessage = Buffer.alloc(4)
+    const chatMessage = Buffer.alloc(24)
+    try {
+      messageBuffer.copy(chatMessage, 0, 0, msgLength)
+      chatMessage.swap32()
+      this.emulator.writeMemory(0x367680, triggerMessage)
+      this.emulator.writeMemory(0x367684, chatMessage)
+    } catch (err) {
+      // TODO
+      console.error(err)
+    }
+  }
 }

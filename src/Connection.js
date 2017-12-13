@@ -10,9 +10,11 @@ import { disconnect } from './actions/connection'
 
 const UPDATE_INTERVAL = 24
 const EMPTY = new Uint8Array(0x18)
+const DECODER = new TextDecoder('utf-8')
+const ENCODER = new TextEncoder('utf-8')
 
 export default class Connection {
-  constructor ({ server, emulator, username, characterId, emuChat, onConnect, onError }) {
+  constructor ({ server, emulator, username, characterId, onConnect, onError }) {
     this.disconnect = this.disconnect.bind(this)
     this.ws = new WS(`ws://${server.domain ? server.domain : server.ip}:${server.port}`)
     this.ws.on('open', this.onOpen.bind(this, characterId, username, onConnect))
@@ -23,7 +25,6 @@ export default class Connection {
     this.server = server
     this.emulator = emulator
     this.chat = new Chat()
-    this.emuChat = emuChat
   }
   disconnect () {
     this.ws.close()
@@ -80,20 +81,10 @@ export default class Connection {
         break
       case PACKET_TYPE.CHAT_MESSAGE:
         const msgLength = payload[0]
-        const message = (new TextDecoder('utf-8')).decode(payload.slice(1, msgLength + 1))
-        const username = (new TextDecoder('utf-8')).decode(payload.slice(msgLength + 2, msgLength + 2 + payload[msgLength + 1]))
-        const messageBuffer = Buffer.from(message)
-        const setmessage = Buffer.alloc(4)
-        const chatout = Buffer.allocUnsafe(24).fill(0)
-        try {
-          if (this.emuChat === 1) {
-            messageBuffer.copy(chatout, 0, 0, msgLength)
-            chatout.swap32()
-            this.emulator.writeMemory(0x367684, chatout)
-            this.emulator.writeMemory(0x367680, setmessage)
-          }
-        } catch (err) {
-          // TODO
+        const message = DECODER.decode(payload.slice(1, msgLength + 1))
+        const username = DECODER.decode(payload.slice(msgLength + 2, msgLength + 2 + payload[msgLength + 1]))
+        if (store.getIn(['save', 'data', 'emuChat'])) {
+          this.emulator.displayChatMessage(message, msgLength)
         }
         this.chat.addMessage(message, username)
         break
@@ -118,8 +109,8 @@ export default class Connection {
     }
   }
   sendChatMessage (message) {
-    message = (new TextEncoder('utf-8')).encode(message)
-    const username = (new TextEncoder('utf-8')).encode(this.username)
+    message = ENCODER.encode(message)
+    const username = ENCODER.encode(this.username)
     const chatMessage = new Uint8Array(message.length + username.length + 2)
     chatMessage.set(new Uint8Array([message.length]))
     chatMessage.set(message, 1)

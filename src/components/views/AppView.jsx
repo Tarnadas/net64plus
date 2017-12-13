@@ -95,6 +95,5 @@ class ElectronView extends React.PureComponent {
 export default connect(state => ({
   username: state.getIn(['save', 'data', 'username']),
   emulator: state.get('emulator'),
-  route: state.get('router'),
-  emuchat: state.getIn(['save', 'data', 'emuchat'])
+  route: state.get('router')
 }))(ElectronView)
