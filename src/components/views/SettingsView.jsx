@@ -41,7 +41,7 @@ class SettingsView extends React.PureComponent {
     this.props.connection.sendCharacterChange(characterId)
   }
   onEmuChatChange (e) {
-    const emuChat = parseInt(e.target.value)
+    const emuChat = e.target.checked
     this.setState({
       emuChat
     })
@@ -100,6 +100,12 @@ class SettingsView extends React.PureComponent {
         flex: '1 0 auto',
         fontSize: '16px',
         width: '0'
+      },
+      checkBox: {
+        alignSelf: 'center',
+        margin: '0 auto',
+        width: '20px',
+        height: '20px'
       }
     }
     return (
@@ -132,10 +138,12 @@ class SettingsView extends React.PureComponent {
         </div>
         <div style={styles.setting}>
           <div style={styles.label}>In-Game Chat View:</div>
-          <select style={styles.input} value={this.state.emuChat} onChange={this.onEmuChatChange}>
-            <option value='0'>disable</option>
-            <option value='1'>enable</option>
-          </select>
+          <input
+            style={styles.checkBox}
+            type='checkbox'
+            checked={this.state.emuChat}
+            onChange={this.onEmuChatChange}
+          />
         </div>
         <SMMButton
           text='Save'
