@@ -53,17 +53,17 @@ class MainView extends React.PureComponent {
         <h3>Join our community</h3>
         <div>
           <SMMButton
-            link='https://discord.gg/k9QMFaB' blank
+            link='https://discord.gg/k9QMFaB' external
             text='Net64 Discord'
             iconSrc='img/discord.svg'
           />
           <SMMButton
-            link='https://discord.gg/SPZsgSe' blank
+            link='https://discord.gg/SPZsgSe' external
             text='SMMDB Discord'
             iconSrc='img/discord.svg'
           />
           <SMMButton
-            link='https://sm64o.com/' blank
+            link='https://sm64o.com/' external
             text='Forum'
             iconSrc='img/sm64o.png'
             noText

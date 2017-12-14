@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { fromJS } from 'immutable'
+import { shell } from 'electron'
 
 export const COLOR_SCHEME = {
   YELLOW: 0,
@@ -19,11 +20,15 @@ export default class SMMButton extends React.PureComponent {
       hover: false,
       deleteHover: false
     }
+    this.onOpenExternal = this.onOpenExternal.bind(this)
     this.mouseEnter = this.mouseEnter.bind(this)
     this.mouseLeave = this.mouseLeave.bind(this)
     this.deleteEnter = this.deleteEnter.bind(this)
     this.deleteLeave = this.deleteLeave.bind(this)
     this.onDelete = this.onDelete.bind(this)
+  }
+  onOpenExternal () {
+    if (this.props.link) shell.openExternal(this.props.link)
   }
   mouseEnter () {
     this.setState({
@@ -126,29 +131,25 @@ export default class SMMButton extends React.PureComponent {
       <div style={styles.button}
         onMouseEnter={this.mouseEnter}
         onMouseLeave={this.mouseLeave}
-        onClick={this.props.onClick ? this.props.onClick : null}
+        onClick={
+          this.props.onClick
+            ? this.props.onClick
+            : this.props.external
+              ? this.onOpenExternal
+              : null
+        }
       >
         {
-          this.props.link
-            ? this.props.blank
-              ? <a href={this.props.link} target='_blank'>
-                <ButtonSub
-                  iconStyle={iconStyle}
-                  iconSrc={hover ? iconSrcHover : iconSrc}
-                  text={text}
-                  hover={hover}
-                  noText={this.props.noText}
-                />
-              </a>
-              : <Link to={this.props.link}>
-                <ButtonSub
-                  iconStyle={iconStyle}
-                  iconSrc={hover ? iconSrcHover : iconSrc}
-                  text={text}
-                  hover={hover}
-                  noText={this.props.noText}
-                />
-              </Link>
+          this.props.link && !this.props.external
+            ? <Link to={this.props.link}>
+              <ButtonSub
+                iconStyle={iconStyle}
+                iconSrc={hover ? iconSrcHover : iconSrc}
+                text={text}
+                hover={hover}
+                noText={this.props.noText}
+              />
+            </Link>
             : <ButtonSub
               iconStyle={iconStyle}
               iconSrc={hover ? iconSrcHover : iconSrc}

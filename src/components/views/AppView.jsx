@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Route } from 'react-router-dom'
 import { push } from 'react-router-redux'
+import got from 'got'
 
 import MainView from './MainView'
 import SettingsView from './SettingsView'
@@ -9,11 +10,57 @@ import EmulatorView from './EmulatorView'
 import BrowseView from './BrowseView'
 import ConnectView from './ConnectView'
 import TopBarArea from '../areas/TopBarArea'
+import NewVersionArea from '../areas/NewVersionArea'
 
 class ElectronView extends React.PureComponent {
   constructor (props) {
     super(props)
+    this.state = {
+      newVersionUrl: null,
+      patchNotes: ''
+    }
     this.forcePath = this.forcePath.bind(this)
+    this.onClosePatchNotes = this.onClosePatchNotes.bind(this)
+  }
+  async componentWillMount () {
+    try {
+      const releases = (await got('https://api.github.com/repos/tarnadas/net64plus/releases', {
+        json: true,
+        useElectronNet: false
+      })).body
+      const mapVersionToNumber = versionNumber => versionNumber != null ? parseInt(versionNumber) : 0
+      let [currentMajor, currentMinor, currentPatch] = process.env.VERSION.split('.')
+        .map(mapVersionToNumber)
+      if (currentPatch == null) currentPatch = 0
+      for (const release of releases) {
+        if (release.draft == null || release.draft) continue
+        if (release.prerelease) continue
+        if (release.assets == null) continue
+        if (!release.tag_name) continue
+        let [major, minor, patch] = release.tag_name.split('.')
+          .map(mapVersionToNumber)
+        if (patch == null) patch = 0
+        if (major < currentMajor) continue
+        if (minor < currentMinor) continue
+        if (patch < currentPatch) continue
+        if (major === currentMajor && minor === currentMinor && patch === currentPatch) continue
+        let foundUpdate = false
+        for (const asset of release.assets) {
+          if (asset.name == null || !asset.name.includes('win32-x64')) continue
+          const newVersionUrl = asset.browser_download_url
+          if (!newVersionUrl) continue
+          this.setState({
+            newVersionUrl,
+            patchNotes: release.body
+          })
+          foundUpdate = true
+          break
+        }
+        if (foundUpdate) break
+      }
+    } catch (err) {
+      console.error(err)
+    }
   }
   componentWillReceiveProps (nextProps) {
     if (nextProps.location.pathname !== this.props.location.pathname) {
@@ -29,7 +76,14 @@ class ElectronView extends React.PureComponent {
       }
     }
   }
+  onClosePatchNotes () {
+    this.setState({
+      newVersionUrl: ''
+    })
+  }
   render () {
+    const newVersionUrl = this.state.newVersionUrl
+    const patchNotes = this.state.patchNotes
     const styles = {
       global: {
         width: '100%',
@@ -71,6 +125,10 @@ class ElectronView extends React.PureComponent {
     }
     return (
       <div style={styles.global}>
+        {
+          newVersionUrl &&
+          <NewVersionArea versionUrl={newVersionUrl} patchNotes={patchNotes} onClose={this.onClosePatchNotes} />
+        }
         <TopBarArea />
         <div style={styles.logo}>
           <div style={styles.logoFont}>
