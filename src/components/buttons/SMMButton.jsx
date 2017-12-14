@@ -65,10 +65,10 @@ export default class SMMButton extends React.PureComponent {
     const onDelete = this.props.onDelete
     let styles = fromJS({
       button: {
+        flex: '0 0 auto',
         margin: this.props.noMargin ? '' : '0 10px 10px 10px',
         lineHeight: '40px',
         minWidth: '120px',
-        width: 'auto',
         height: '40px',
         backgroundColor: colorScheme === COLOR_SCHEME.YELLOW
           ? this.state.deleteHover

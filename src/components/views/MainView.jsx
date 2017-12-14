@@ -22,7 +22,6 @@ class MainView extends React.PureComponent {
         flex: '1 1 auto',
         color: '#000',
         alignItems: 'center',
-        justifyContent: 'center',
         fontSize: '18px',
         overflow: 'auto',
         padding: '20px 40px'
