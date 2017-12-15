@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Route } from 'react-router-dom'
+import { Route, Link } from 'react-router-dom'
 import { push } from 'react-router-redux'
 import got from 'got'
 
@@ -9,6 +9,7 @@ import SettingsView from './SettingsView'
 import EmulatorView from './EmulatorView'
 import BrowseView from './BrowseView'
 import ConnectView from './ConnectView'
+import AboutView from './AboutView'
 import TopBarArea from '../areas/TopBarArea'
 import NewVersionArea from '../areas/NewVersionArea'
 
@@ -19,10 +20,19 @@ class ElectronView extends React.PureComponent {
       newVersionUrl: null,
       patchNotes: ''
     }
+    this.updateCheck = this.updateCheck.bind(this)
     this.forcePath = this.forcePath.bind(this)
     this.onClosePatchNotes = this.onClosePatchNotes.bind(this)
   }
-  async componentWillMount () {
+  componentWillMount () {
+    this.updateCheck()
+  }
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.location.pathname !== this.props.location.pathname) {
+      this.forcePath(nextProps)
+    }
+  }
+  async updateCheck () {
     try {
       const releases = (await got('https://api.github.com/repos/tarnadas/net64plus/releases', {
         json: true,
@@ -34,8 +44,8 @@ class ElectronView extends React.PureComponent {
       if (currentPatch == null) currentPatch = 0
       for (const release of releases) {
         if (release.draft == null || release.draft) continue
-        if (release.prerelease) continue
-        if (release.assets == null) continue
+        if (release.prerelease == null || release.prerelease) continue
+        if (release.assets == null || release.assets.length === 0) continue
         if (!release.tag_name) continue
         let [major, minor, patch] = release.tag_name.split('.')
           .map(mapVersionToNumber)
@@ -59,19 +69,15 @@ class ElectronView extends React.PureComponent {
         if (foundUpdate) break
       }
     } catch (err) {
-      console.error(err)
-    }
-  }
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.location.pathname !== this.props.location.pathname) {
-      this.forcePath(nextProps)
+      setTimeout(this.updateCheck, 15000)
     }
   }
   forcePath (props) {
-    if (props.location.pathname !== '/') {
+    const pathName = props.location.pathname
+    if (pathName !== '/' && pathName !== '/about') {
       if (!props.username) {
         props.dispatch(push('/settings'))
-      } else if (!props.emulator && props.location.pathname !== '/settings') {
+      } else if (!props.emulator && pathName !== '/settings') {
         props.dispatch(push('/emulator'))
       }
     }
@@ -117,10 +123,20 @@ class ElectronView extends React.PureComponent {
         height: '39px',
         display: 'flex',
         alignItems: 'center',
-        flexShrink: '0'
+        flex: '0 0 auto',
+        overflow: 'hidden'
       },
       disclaimer: {
         flex: '1 0 0%'
+      },
+      footerLinks: {
+        padding: '0 20px'
+      },
+      footerLink: {
+        padding: '0 6px',
+        borderRight: '1px solid black',
+        borderLeft: '1px solid black',
+        color: '#1d31ff'
       }
     }
     return (
@@ -140,10 +156,14 @@ class ElectronView extends React.PureComponent {
         <Route path='/emulator' component={EmulatorView} />
         <Route path='/browse' component={BrowseView} />
         <Route path='/connect' component={ConnectView} />
+        <Route path='/about' component={AboutView} />
         <div style={styles.footer}>
           <div style={styles.disclaimer}>
             Net64+ and SMMDB are not affiliated or associated with any other company.<br />
             All logos, trademarks, and trade names used herein are the property of their respective owners.
+          </div>
+          <div style={styles.footerLinks}>
+            <Link to='/about' style={styles.footerLink}>About</Link>
           </div>
         </div>
       </div>
