@@ -51,9 +51,14 @@ export default class AboutView extends React.PureComponent {
             Quasmok
           </div>
         </div>
-        <h2>JSECoin</h2>
+        <h2 style={{marginTop: '20px'}}>Monetization</h2>
         <div style={styles.text}>
-          Bla bla bla
+          Net64+ uses JSECoin for monetization. It is a cryptocurrency which is mined while the program is running.
+          At first this might sound like a bad deal for the users, but the idea of JSECoin is to only use resources of the CPU, that would otherwise be wasted.
+          Please open task manager and check for yourself.<br/>
+          Please also compare it to how you feel about ads as monetization.<br/><br/>
+          You also have the option to opt-out of mining by clicking <a href='https://server.jsecoin.com/optout/' target='_blank'>here</a> and restarting Net64+.
+          If you want to opt-in please click <a href href='https://server.jsecoin.com/optin/' target='_blank'>here</a>.
         </div>
       </div>
     )
