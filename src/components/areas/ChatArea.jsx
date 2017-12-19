@@ -64,7 +64,7 @@ class ChatArea extends React.PureComponent {
         display: 'flex',
         flexDirection: 'column',
         color: '#000',
-        flex: '1 1 auto',
+        flex: '1 0 auto',
         margin: '8px',
         fontSize: '18px',
         alignItems: 'flex-start'
@@ -81,8 +81,7 @@ class ChatArea extends React.PureComponent {
         overflowX: 'hidden',
         flexDirection: 'column',
         backgroundColor: '#fff',
-        flex: '1 1 auto',
-        minHeight: '150px',
+        flex: '1 0 150px',
         width: '100%',
         fontFamily: 'arial'
       },

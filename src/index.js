@@ -1,11 +1,8 @@
-import electron from 'electron'
+import { app, BrowserWindow, Tray, Menu } from 'electron'
 import rimraf from 'rimraf'
 
 import path from 'path'
-import fs from 'fs'
-
-const app = electron.app
-const BrowserWindow = electron.BrowserWindow;
+import fs from 'fs';
 
 (async () => {
   let mainWindow = null
@@ -41,7 +38,8 @@ const BrowserWindow = electron.BrowserWindow;
       icon: path.join(__dirname, 'img/icon.png'),
       title: `Net64+ ${process.env.VERSION}`,
       webPreferences: {
-        webSecurity: false
+        webSecurity: false,
+        nodeIntegrationInWorker: true
       }
     })
 
@@ -53,10 +51,6 @@ const BrowserWindow = electron.BrowserWindow;
       })
       mainWindow.webContents.openDevTools()
     }
-
-    mainWindow.on('closed', () => {
-      mainWindow = null
-    })
   }
 
   app.on('ready', onReady)

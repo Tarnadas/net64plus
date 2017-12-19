@@ -49,8 +49,8 @@ export default class Emulator {
     try {
       messageBuffer.copy(chatMessage, 0, 0, msgLength)
       chatMessage.swap32()
-      this.emulator.writeMemory(0x367680, triggerMessage)
-      this.emulator.writeMemory(0x367684, chatMessage)
+      this.writeMemory(0x367680, triggerMessage)
+      this.writeMemory(0x367684, chatMessage)
     } catch (err) {
       // TODO
       console.error(err)

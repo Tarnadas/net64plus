@@ -83,7 +83,7 @@ export default class Connection {
         const msgLength = payload[0]
         const message = DECODER.decode(payload.slice(1, msgLength + 1))
         const username = DECODER.decode(payload.slice(msgLength + 2, msgLength + 2 + payload[msgLength + 1]))
-        if (store.getIn(['save', 'data', 'emuChat'])) {
+        if (store.getState().getIn(['save', 'data', 'emuChat'])) {
           this.emulator.displayChatMessage(message, msgLength)
         }
         this.chat.addMessage(message, username)
