@@ -20,7 +20,7 @@ export default function save (state, action) {
       state = state.deleteIn(['data', 'apiKey'])
       break
     case 'SET_VERSION':
-      state = state.setIn(['data', 'version', action.version])
+      state = state.setIn(['data', 'version'], action.version)
       break
     case 'MINER_ENABLED':
       state = state.setIn(['data', 'minerEnabled'], action.minerEnabled)

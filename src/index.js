@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Tray, Menu } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import rimraf from 'rimraf'
 
 import path from 'path'

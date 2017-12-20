@@ -10,6 +10,7 @@ import EmulatorView from './EmulatorView'
 import BrowseView from './BrowseView'
 import ConnectView from './ConnectView'
 import AboutView from './AboutView'
+import FaqView from './FaqView'
 import TopBarArea from '../areas/TopBarArea'
 import NewVersionArea from '../areas/NewVersionArea'
 
@@ -26,6 +27,9 @@ class AppView extends React.PureComponent {
   }
   componentWillMount () {
     this.updateCheck()
+    if (this.props.version !== process.env.VERSION) {
+      this.props.dispatch(push('/faq'))
+    }
   }
   componentWillReceiveProps (nextProps) {
     if (nextProps.location.pathname !== this.props.location.pathname) {
@@ -74,7 +78,7 @@ class AppView extends React.PureComponent {
   }
   forcePath (props) {
     const pathName = props.location.pathname
-    if (pathName !== '/' && pathName !== '/about') {
+    if (pathName !== '/' && pathName !== '/about' && pathName !== '/faq') {
       if (!props.username) {
         props.dispatch(push('/settings'))
       } else if (!props.emulator && pathName !== '/settings') {
@@ -157,6 +161,7 @@ class AppView extends React.PureComponent {
         <Route path='/browse' component={BrowseView} />
         <Route path='/connect' component={ConnectView} />
         <Route path='/about' component={AboutView} />
+        <Route path='/faq' component={FaqView} />
         <div style={styles.footer}>
           <div style={styles.disclaimer}>
             Net64+ and SMMDB are not affiliated or associated with any other company.<br />
@@ -172,6 +177,7 @@ class AppView extends React.PureComponent {
 }
 export default connect(state => ({
   username: state.getIn(['save', 'data', 'username']),
+  version: state.getIn(['save', 'data', 'version']),
   emulator: state.get('emulator'),
   route: state.get('router')
 }))(AppView)

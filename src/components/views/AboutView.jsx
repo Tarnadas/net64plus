@@ -1,7 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import SMMButton from '../buttons/SMMButton'
 import { minerEnabled } from '../../actions/save'
 import { workers } from '../../renderer'
 

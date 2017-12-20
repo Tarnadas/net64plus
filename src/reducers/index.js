@@ -23,7 +23,6 @@ const APP_SAVE_DATA = {
 
 export default function initReducer (history, electronSave) {
   const appSaveData = Object.assign({}, APP_SAVE_DATA, electronSave.appSaveData)
-  appSaveData.version = process.env.NET64_VERSION
   const appSavePath = electronSave.appSavePath || ''
   let initialState = fromJS({
     save: {
