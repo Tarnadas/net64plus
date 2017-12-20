@@ -13,7 +13,7 @@ import AboutView from './AboutView'
 import TopBarArea from '../areas/TopBarArea'
 import NewVersionArea from '../areas/NewVersionArea'
 
-class ElectronView extends React.PureComponent {
+class AppView extends React.PureComponent {
   constructor (props) {
     super(props)
     this.state = {
@@ -174,4 +174,4 @@ export default connect(state => ({
   username: state.getIn(['save', 'data', 'username']),
   emulator: state.get('emulator'),
   route: state.get('router')
-}))(ElectronView)
+}))(AppView)

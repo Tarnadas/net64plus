@@ -1,6 +1,26 @@
 import React from 'react'
+import { connect } from 'react-redux'
 
-export default class AboutView extends React.PureComponent {
+import SMMButton from '../buttons/SMMButton'
+import { minerEnabled } from '../../actions/save'
+import { workers } from '../../renderer'
+
+class AboutView extends React.PureComponent {
+  constructor (props) {
+    super(props)
+    this.onOptOut = this.onOptOut.bind(this)
+    this.onOptIn = this.onOptIn.bind(this)
+  }
+  onOptOut () {
+    if (!this.props.minerEnabled) return
+    workers.disable()
+    this.props.dispatch(minerEnabled(false))
+  }
+  onOptIn () {
+    if (this.props.minerEnabled) return
+    workers.enable()
+    this.props.dispatch(minerEnabled(true))
+  }
   render () {
     const styles = {
       view: {
@@ -16,6 +36,10 @@ export default class AboutView extends React.PureComponent {
       },
       text: {
         paddingLeft: '14px'
+      },
+      link: {
+        cursor: 'pointer',
+        color: '#227'
       }
     }
     return (
@@ -56,10 +80,13 @@ export default class AboutView extends React.PureComponent {
           Net64+ uses JSECoin for monetization. It is a cryptocurrency which is mined while the program is running.
           At first this might sound like a bad deal for the users, but the idea of JSECoin is to only use resources of the CPU, that would otherwise be wasted.<br/>
           Please also compare it to how you feel about ads as monetization.<br/><br/>
-          You also have the option to opt-out of mining by clicking <a href='https://server.jsecoin.com/optout/' target='_blank'>here</a> and restarting Net64+.
-          If you want to opt-in please click <a href href='https://server.jsecoin.com/optin/' target='_blank'>here</a>.
+          You also have the option to opt-out of mining by clicking <div style={styles.link} onClick={this.onOptOut}>here</div>.
+          If you want to opt-in please click <div style={styles.link} onClick={this.onOptIn}>here</div>.
         </div>
       </div>
     )
   }
 }
+export default connect(state => ({
+  minerEnabled: state.getIn(['save', 'data', 'minerEnabled'])
+}))(AboutView)

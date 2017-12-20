@@ -30,3 +30,17 @@ export function deleteApiKey () {
     type: 'DELETE_API_KEY'
   }
 }
+
+export function setVersion (version) {
+  return {
+    type: 'SET_VERSION',
+    version
+  }
+}
+
+export function minerEnabled (minerEnabled) {
+  return {
+    type: 'MINER_ENABLED',
+    minerEnabled
+  }
+}
