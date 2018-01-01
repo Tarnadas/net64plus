@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
 
 import SMMButton, { ICON_STYLE } from '../buttons/SMMButton'
+import WarningPanel from '../panels/WarningPanel'
 import { setUsername, setCharacter, setEmuChat } from '../../actions/save'
 
 const MIN_LENGTH_USERNAME = 3
@@ -17,7 +18,7 @@ class SettingsView extends React.PureComponent {
       emuChat: props.saveData.get('emuChat')
     }
     if (!this.state.username) {
-      this.state.alert = 'You must set a username'
+      this.state.warning = 'You must set a username'
     }
     this.onUsernameChange = this.onUsernameChange.bind(this)
     this.onCharacterChange = this.onCharacterChange.bind(this)
@@ -38,7 +39,6 @@ class SettingsView extends React.PureComponent {
     this.setState({
       characterId
     })
-    this.props.connection.sendCharacterChange(characterId)
   }
   onEmuChatChange (e) {
     const emuChat = e.target.checked
@@ -50,20 +50,20 @@ class SettingsView extends React.PureComponent {
     const username = this.state.username.replace(/\W/g, '')
     if (username.length < MIN_LENGTH_USERNAME) {
       this.setState({
-        alert: 'Your username is too short'
+        warning: 'Your username is too short'
       })
     } else {
       if (this.props.emulator) {
         this.props.emulator.changeCharacter(this.state.characterId)
       }
       this.props.dispatch(setUsername(username))
-      this.props.dispatch(setCharacter(this.state.characterId))
+      this.props.dispatch(setCharacter(this.state.characterId, this.props.connection))
       this.props.dispatch(setEmuChat(this.state.emuChat))
       this.props.dispatch(push('/browse'))
     }
   }
   render () {
-    const alert = this.state.alert
+    const warning = this.state.warning
     const styles = {
       view: {
         display: 'flex',
@@ -75,19 +75,6 @@ class SettingsView extends React.PureComponent {
         backgroundColor: '#24997e',
         fontSize: '18px',
         color: '#000'
-      },
-      warningWrapper: {
-        width: '100%'
-      },
-      warning: {
-        color: '#a00003',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      },
-      warningImg: {
-        height: '30px',
-        marginRight: '20px'
       },
       setting: {
         width: '100%',
@@ -110,15 +97,10 @@ class SettingsView extends React.PureComponent {
     }
     return (
       <div style={styles.view}>
-        <div style={styles.warningWrapper}>
-          {
-            alert &&
-            <div style={styles.warning}>
-              <img style={styles.warningImg} src='img/warning.svg' />
-              <div>{alert}</div>
-            </div>
-          }
-        </div>
+        {
+          warning &&
+          <WarningPanel warning={warning} />
+        }
         <div style={styles.setting}>
           <div style={styles.label}>Username:</div>
           <input style={styles.input} value={this.state.username} onChange={this.onUsernameChange} />
@@ -169,6 +151,6 @@ class SettingsView extends React.PureComponent {
 export default connect(state => ({
   saveData: state.getIn(['save', 'data']),
   emulator: state.get('emulator'),
-  connection: state.get('connection'),
+  connection: state.getIn(['connection', 'connection']),
   emuChat: state.get('emuChat')
 }))(SettingsView)

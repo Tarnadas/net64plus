@@ -5,6 +5,7 @@ import tasklist from 'tasklist'
 
 import Emulator from '../../Emulator'
 import SMMButton from '../buttons/SMMButton'
+import WarningPanel from '../panels/WarningPanel'
 import { setEmulator } from '../../actions/emulator'
 
 const TIMEOUT = 2000
@@ -17,7 +18,7 @@ class EmulatorView extends React.PureComponent {
       loading: false
     }
     if (!props.emulator) {
-      this.state.alert = 'You must start and select an emulator'
+      this.state.warning = 'You must start and select an emulator'
     }
     this.scan = this.scan.bind(this)
     this.onSelectEmulator = this.onSelectEmulator.bind(this)
@@ -61,7 +62,7 @@ class EmulatorView extends React.PureComponent {
       if (!this.mounted) return
       this.setState({
         loading: false,
-        alert: 'Could not inject emulator.\nDid you start Super Mario 64 (USA)?'
+        warning: 'Could not inject emulator.\nDid you start Super Mario 64 (USA)?\nYou might have to start Net64+ as administrator.'
       })
     }, TIMEOUT)
   }
@@ -103,7 +104,7 @@ class EmulatorView extends React.PureComponent {
   render () {
     const emulators = this.state.emulators
     const loading = this.state.loading
-    const alert = this.state.alert
+    const warning = this.state.warning
     const styles = {
       main: {
         display: 'flex',
@@ -116,19 +117,6 @@ class EmulatorView extends React.PureComponent {
         fontSize: '18px',
         overflow: 'auto',
         padding: '40px 20px'
-      },
-      warningWrapper: {
-        width: '100%'
-      },
-      warning: {
-        color: '#a00003',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      },
-      warningImg: {
-        height: '30px',
-        marginRight: '20px'
       },
       ul: {
         width: '100%',
@@ -152,15 +140,10 @@ class EmulatorView extends React.PureComponent {
     }
     return (
       <div style={styles.main} id='scroll'>
-        <div style={styles.warningWrapper}>
-          {
-            alert &&
-            <div style={styles.warning}>
-              <img style={styles.warningImg} src='img/warning.svg' />
-              <div>{alert}</div>
-            </div>
-          }
-        </div>
+        {
+          warning &&
+          <WarningPanel warning={warning} />
+        }
         {
           !emulators || emulators.length === 0 ? (
             <div>Scanning for emulators...</div>

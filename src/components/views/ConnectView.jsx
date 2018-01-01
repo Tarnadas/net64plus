@@ -7,6 +7,7 @@ import ConnectArea from '../areas/ConnectArea'
 class ConnectView extends React.PureComponent {
   render () {
     const connection = this.props.connection
+    const connectionError = this.props.connectionError
     const styles = {
       main: {
         display: 'flex',
@@ -20,12 +21,13 @@ class ConnectView extends React.PureComponent {
         {
           connection
             ? <ConnectionArea connection={connection} />
-            : <ConnectArea />
+            : <ConnectArea connectionError={connectionError} />
         }
       </div>
     )
   }
 }
 export default connect(state => ({
-  connection: state.get('connection')
+  connection: state.getIn(['connection', 'connection']),
+  connectionError: state.getIn(['connection', 'error'])
 }))(ConnectView)

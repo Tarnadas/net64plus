@@ -106,6 +106,6 @@ class ChatArea extends React.PureComponent {
   }
 }
 export default connect(state => ({
-  connection: state.get('connection'),
+  connection: state.getIn(['connection', 'connection']),
   chat: state.getIn(['chat', 'global'])
 }))(ChatArea)

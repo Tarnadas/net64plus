@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import SMMButton from '../buttons/SMMButton'
+import WarningPanel from '../panels/WarningPanel'
 import Connection from '../../Connection'
 import { setConnection } from '../../actions/connection'
 
@@ -11,13 +12,26 @@ class ConnectArea extends React.PureComponent {
     this.state = {
       ip: '',
       port: '',
-      alert: '',
+      warning: '',
       loading: false
     }
     this.onIPChange = this.onIPChange.bind(this)
     this.onPortChange = this.onPortChange.bind(this)
     this.onKeyPress = this.onKeyPress.bind(this)
     this.onConnect = this.onConnect.bind(this)
+  }
+  componentWillMount () {
+    if (!this.props.connectionError) return
+    this.setState({
+      warning: String(this.props.connectionError)
+    })
+  }
+  componentWillReceiveProps (nextProps) {
+    if (!nextProps.connectionError || nextProps.connectionError === this.props.connectionError) return
+    this.setState({
+      warning: String(nextProps.connectionError),
+      loading: false
+    })
   }
   onIPChange (e) {
     this.setState({
@@ -58,10 +72,10 @@ class ConnectArea extends React.PureComponent {
           } else if (err.includes('DTIMEDOUT')) {
             err = 'Server timed out.\nIt might be offline or you inserted a wrong IP address'
           } else if (err.includes('ECONNREFUSED')) {
-            err = 'Server refused connection.\nThe server might not have set up proper port forwarding or you inserted a wrong port'
+            err = 'Server refused connection.\nThe server might not have set up proper port forwarding or you inserted a wrong IP/port'
           }
           this.setState({
-            alert: String(err),
+            warning: String(err),
             loading: false
           })
         }
@@ -74,7 +88,7 @@ class ConnectArea extends React.PureComponent {
     }
   }
   render () {
-    const alert = this.state.alert
+    const warning = this.state.warning
     const loading = this.state.loading
     const styles = {
       area: {
@@ -85,21 +99,8 @@ class ConnectArea extends React.PureComponent {
         padding: '40px',
         backgroundColor: '#24997e',
         fontSize: '18px',
-        alignItems: 'flex-start',
-        color: '#000'
-      },
-      warningWrapper: {
-        width: '100%'
-      },
-      warning: {
-        color: '#a00003',
-        display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
-      },
-      warningImg: {
-        height: '30px',
-        marginRight: '20px'
+        color: '#000'
       },
       label: {
         width: '40%'
@@ -129,15 +130,10 @@ class ConnectArea extends React.PureComponent {
             <img src='img/load.gif' />
           </div>
         }
-        <div style={styles.warningWrapper}>
-          {
-            alert &&
-            <div style={styles.warning}>
-              <img style={styles.warningImg} src='img/warning.svg' />
-              <div>{alert}</div>
-            </div>
-          }
-        </div>
+        {
+          warning &&
+          <WarningPanel warning={warning} />
+        }
         <div style={styles.label}>IP address:</div>
         <input style={styles.input} value={this.state.ip} onChange={this.onIPChange} onKeyPress={this.onKeyPress} />
         <div style={styles.label}>Port:</div>

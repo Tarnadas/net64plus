@@ -6,8 +6,7 @@ export const PACKET_TYPE = {
   CHARACTER_SWITCH: 4,
   PING: 5,
   WRONG_VERSION: 6,
-  CLIENT_KICKED: 7,
-  CLIENT_BANNED: 8
+  SERVER_FULL: 7
 }
 
 export default class Packet {

@@ -17,8 +17,7 @@ const APP_SAVE_DATA = {
   emuChat: false,
   lastIp: 'smmdb.ddns.net',
   lastPort: 3678,
-  version: '',
-  minerEnabled: true
+  version: ''
 }
 
 export default function initReducer (history, electronSave) {
@@ -34,7 +33,10 @@ export default function initReducer (history, electronSave) {
     },
     account: {},
     emulator: null,
-    connection: null,
+    connection: {
+      connection: null,
+      error: null
+    },
     chat: {
       global: []
     }

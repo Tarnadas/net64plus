@@ -12,6 +12,11 @@
     }
   },
   "rules": {
-    "react/prop-types": "off"
+    "react/prop-types": "off",
+    "react/jsx-no-target-blank": "off"
+  },
+  "env": {
+    "browser": true,
+    "worker": true
   }
 }

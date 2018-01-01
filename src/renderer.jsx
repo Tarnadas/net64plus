@@ -11,10 +11,8 @@ import initReducer from './reducers'
 import { initAccount } from './Account'
 import AppView from './components/views/AppView'
 import { setAccountData } from './actions/account'
-import Workers from './Workers'
 
-export let store
-export let workers;
+export let store;
 
 (async () => {
   const history = createHistory()
@@ -30,7 +28,6 @@ export let workers;
   if (account) {
     store.dispatch(setAccountData(account))
   }
-  workers = new Workers(store)
 
   render(
     <Provider store={store}>

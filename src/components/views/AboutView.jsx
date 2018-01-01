@@ -1,25 +1,6 @@
 import React from 'react'
-import { connect } from 'react-redux'
 
-import { minerEnabled } from '../../actions/save'
-import { workers } from '../../renderer'
-
-class AboutView extends React.PureComponent {
-  constructor (props) {
-    super(props)
-    this.onOptOut = this.onOptOut.bind(this)
-    this.onOptIn = this.onOptIn.bind(this)
-  }
-  onOptOut () {
-    if (!this.props.minerEnabled) return
-    workers.disable()
-    this.props.dispatch(minerEnabled(false))
-  }
-  onOptIn () {
-    if (this.props.minerEnabled) return
-    workers.enable()
-    this.props.dispatch(minerEnabled(true))
-  }
+export default class AboutView extends React.PureComponent {
   render () {
     const styles = {
       view: {
@@ -42,7 +23,7 @@ class AboutView extends React.PureComponent {
       }
     }
     return (
-      <div style={styles.view}>
+      <div style={styles.view} id='scroll'>
         <h2>Credits</h2>
         <div>
           <h3>Net64 Online Team</h3>
@@ -81,7 +62,7 @@ MIT License<br/><br/>
 Copyright (c) 2017 Mario Reder<br/><br/>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
+of this software and associated documentation files (the &quot;Software&quot;), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
@@ -90,7 +71,7 @@ furnished to do so, subject to the following conditions:<br/><br/>
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.<br/><br/>
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -101,15 +82,13 @@ SOFTWARE.
         <h2 style={{marginTop: '20px'}}>Monetization</h2>
         <div style={styles.text}>
           Net64+ uses JSECoin for monetization. It is a cryptocurrency which is mined while the program is running.
-          At first this might sound like a bad deal for the users, but the idea of JSECoin is to only use resources of the CPU, that would otherwise be wasted.<br/>
+          At first this might sound like a bad deal for the users, but the idea of JSECoin is to only use resources of the CPU, that would otherwise be wasted.
+          Please open task manager and check for yourself.<br/>
           Please also compare it to how you feel about ads as monetization.<br/><br/>
-          You also have the option to opt-out of mining by clicking <div style={styles.link} onClick={this.onOptOut}>here</div>.
-          If you want to opt-in please click <div style={styles.link} onClick={this.onOptIn}>here</div>.
+          You also have the option to opt-out of mining by clicking <a href='https://server.jsecoin.com/optout/' target='_blank'>here</a> and restarting Net64+.
+          If you want to opt-in please click <a href='https://server.jsecoin.com/optin/' target='_blank'>here</a>.
         </div>
       </div>
     )
   }
 }
-export default connect(state => ({
-  minerEnabled: state.getIn(['save', 'data', 'minerEnabled'])
-}))(AboutView)

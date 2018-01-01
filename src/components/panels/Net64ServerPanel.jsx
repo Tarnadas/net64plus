@@ -5,6 +5,7 @@ import marked from 'marked'
 import { emojify } from 'node-emoji'
 
 import SMMButton from '../buttons/SMMButton'
+import WarningPanel from '../panels/WarningPanel'
 import Connection from '../../Connection'
 import { disconnect, setConnection } from '../../actions/connection'
 
@@ -18,7 +19,7 @@ class Net64ServerPanel extends React.PureComponent {
     this.state = {
       display: !!props.isConnected,
       loading: false,
-      alert: ''
+      warning: ''
     }
     this.onToggle = this.onToggle.bind(this)
     this.onConnect = this.onConnect.bind(this)
@@ -71,7 +72,7 @@ class Net64ServerPanel extends React.PureComponent {
             err = 'Server refused connection.\nThe server might not have set up proper port forwarding or you inserted a wrong port'
           }
           this.setState({
-            alert: String(err),
+            warning: String(err),
             loading: false
           })
         }
@@ -110,7 +111,7 @@ class Net64ServerPanel extends React.PureComponent {
     const server = this.props.server
     const isConnected = this.props.isConnected
     const loading = this.state.loading
-    const alert = this.state.alert
+    const warning = this.state.warning
     const styles = {
       panel: {
         fontSize: '18px',
@@ -161,19 +162,6 @@ class Net64ServerPanel extends React.PureComponent {
       el: {
         margin: '6px'
       },
-      warningWrapper: {
-        width: '100%'
-      },
-      warning: {
-        color: '#a00003',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      },
-      warningImg: {
-        height: '30px',
-        marginRight: '20px'
-      },
       loading: {
         display: 'flex',
         position: 'fixed',
@@ -223,15 +211,10 @@ class Net64ServerPanel extends React.PureComponent {
             </div>
           ) : (
             <div style={styles.details}>
-              <div style={styles.warningWrapper}>
-                {
-                  alert &&
-                  <div style={styles.warning}>
-                    <img style={styles.warningImg} src='img/warning.svg' />
-                    <div>{alert}</div>
-                  </div>
-                }
-              </div>
+              {
+                warning &&
+                <WarningPanel warning={warning} />
+              }
               <div style={styles.left}>
                 <div style={styles.el}>
                   { server.domain || server.ip }:{ server.port }

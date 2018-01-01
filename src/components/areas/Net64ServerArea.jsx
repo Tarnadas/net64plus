@@ -4,13 +4,15 @@ import got from 'got'
 import { resolve } from 'url'
 
 import Net64ServerPanel from '../panels/Net64ServerPanel'
+import WarningPanel from '../panels/WarningPanel'
 import { domain } from '../../variables'
 
 export default class Net64ServerArea extends React.PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      servers: []
+      servers: [],
+      warning: ''
     }
     this.updateServers = this.updateServers.bind(this)
     this.renderServers = this.renderServers.bind(this)
@@ -21,6 +23,13 @@ export default class Net64ServerArea extends React.PureComponent {
   }
   componentWillUnmount () {
     this.mounted = false
+  }
+  componentWillReceiveProps (nextProps) {
+    if (!nextProps.connectionError || nextProps.connectionError === this.props.connectionError) return
+    this.setState({
+      warning: String(nextProps.connectionError),
+      loading: false
+    })
   }
   async updateServers () {
     if (!this.mounted) return
@@ -44,6 +53,7 @@ export default class Net64ServerArea extends React.PureComponent {
   }
   render () {
     const servers = this.state.servers
+    const warning = this.state.warning
     const styles = {
       list: {
         overflowY: 'auto',
@@ -55,6 +65,10 @@ export default class Net64ServerArea extends React.PureComponent {
     }
     return (
       <div id='scroll' style={styles.list}>
+        {
+          warning &&
+          <WarningPanel warning={warning} />
+        }
         {
           this.renderServers(servers)
         }

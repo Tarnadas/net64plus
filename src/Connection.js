@@ -6,7 +6,7 @@ import { gunzipSync } from 'zlib'
 import Packet, { PACKET_TYPE } from './Packet'
 import Chat from './Chat'
 import { store } from './renderer'
-import { disconnect } from './actions/connection'
+import { disconnect, setConnectionError } from './actions/connection'
 
 const UPDATE_INTERVAL = 24
 const EMPTY = new Uint8Array(0x18)
@@ -22,9 +22,10 @@ export default class Connection {
     this.ws.on('close', this.onClose.bind(this))
     this.ws.on('message', this.onMessage.bind(this))
     this.username = username // TODO there is no reason to send current username. This will break backwards compatibility
-    this.server = server
+    this.server = Object.assign(server, { ip: '127.0.0.1' })
     this.emulator = emulator
     this.chat = new Chat()
+    this.hasError = false
   }
   disconnect () {
     this.ws.close()
@@ -37,21 +38,22 @@ export default class Connection {
     handshake[2] = 4
     handshake[3] = characterId
     handshake[4] = username.length
-    handshake.set((new TextEncoder('utf-8')).encode(username), 5)
+    handshake.set(ENCODER.encode(username), 5)
     this.ws.send(handshake)
   }
   onError (onError, err) {
     onError(err)
-    if (this.loop) {
-      this.ws.close()
-    }
+    this.hasError = true
   }
-  onClose () {
+  onClose (code) {
     if (this.loop) {
       clearInterval(this.loop)
       this.loop = null
     }
     store.dispatch(disconnect())
+    if (code === 1006 && !this.hasError) {
+      store.dispatch(setConnectionError('Lost connection to server'))
+    }
     this.chat.clear()
   }
   onMessage (data) {
@@ -97,6 +99,10 @@ export default class Connection {
         this.ws.close()
         // TODO
         break
+      case PACKET_TYPE.SERVER_FULL:
+        store.dispatch(setConnectionError('Server is full'))
+        this.ws.close()
+        break
     }
   }
   sendPlayerData () {
@@ -105,7 +111,10 @@ export default class Connection {
       try {
         this.ws.send(Packet.create(PACKET_TYPE.PLAYER_DATA, playerData))
         this.emulator.writeMemory(0x367800, playerData)
-      } catch (err) {}
+      } catch (err) {
+        // console.error(err)
+        // store.dispatch(setConnectionError(err))
+      }
     }
   }
   sendChatMessage (message) {

@@ -9,6 +9,9 @@ export default function save (state, action) {
       break
     case 'SET_CHARACTER':
       state = state.setIn(['data', 'character'], action.character)
+      if (action.connection) {
+        action.connection.sendCharacterChange(action.character)
+      }
       break
     case 'SET_EMU_CHAT':
       state = state.setIn(['data', 'emuChat'], action.emuChat)
@@ -21,9 +24,6 @@ export default function save (state, action) {
       break
     case 'SET_VERSION':
       state = state.setIn(['data', 'version'], action.version)
-      break
-    case 'MINER_ENABLED':
-      state = state.setIn(['data', 'minerEnabled'], action.minerEnabled)
       break
   }
   saveState(state)

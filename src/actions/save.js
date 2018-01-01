@@ -5,10 +5,11 @@ export function setUsername (username) {
   }
 }
 
-export function setCharacter (character) {
+export function setCharacter (character, connection) {
   return {
     type: 'SET_CHARACTER',
-    character
+    character,
+    connection
   }
 }
 export function setEmuChat (emuChat) {
@@ -35,12 +36,5 @@ export function setVersion (version) {
   return {
     type: 'SET_VERSION',
     version
-  }
-}
-
-export function minerEnabled (minerEnabled) {
-  return {
-    type: 'MINER_ENABLED',
-    minerEnabled
   }
 }

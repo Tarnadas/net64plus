@@ -13,7 +13,7 @@ module.exports = [
       filename: 'renderer.jsx',
       path: path.join(__dirname, 'build')
     },
-    devtool: 'inline-source-map',
+    devtool: 'source-map',
     node: {
       __dirname: true,
       __filename: false,

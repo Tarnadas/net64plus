@@ -7,6 +7,7 @@ import Net64ServerArea from '../areas/Net64ServerArea'
 class BrowseView extends React.PureComponent {
   render () {
     const connection = this.props.connection
+    const connectionError = this.props.connectionError
     const styles = {
       main: {
         display: 'flex',
@@ -18,14 +19,15 @@ class BrowseView extends React.PureComponent {
     return (
       <div style={styles.main}>
         {
-          connection
+          connection && !connectionError
             ? <ConnectionArea connection={connection} />
-            : <Net64ServerArea />
+            : <Net64ServerArea connectionError={connectionError} />
         }
       </div>
     )
   }
 }
 export default connect(state => ({
-  connection: state.get('connection')
+  connection: state.getIn(['connection', 'connection']),
+  connectionError: state.getIn(['connection', 'error'])
 }))(BrowseView)
