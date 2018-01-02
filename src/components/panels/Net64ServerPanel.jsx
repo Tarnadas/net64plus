@@ -99,12 +99,14 @@ class Net64ServerPanel extends React.PureComponent {
     }
     return players.map(
       (player, index) =>
-        <div style={style} key={index}>
-          <img src={`img/${CHARACTER_IMAGES[player.characterId]}`} />
-          <div>
-            { player.username }
+        player
+          ? <div style={style} key={index}>
+            <img src={`img/${CHARACTER_IMAGES[player.characterId]}`} />
+            <div>
+              { player.username }
+            </div>
           </div>
-        </div>
+          : <div key={index} />
     )
   }
   render () {
