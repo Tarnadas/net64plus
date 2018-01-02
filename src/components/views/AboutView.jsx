@@ -79,15 +79,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
         </code>
-        <h2 style={{marginTop: '20px'}}>Monetization</h2>
-        <div style={styles.text}>
-          Net64+ uses JSECoin for monetization. It is a cryptocurrency which is mined while the program is running.
-          At first this might sound like a bad deal for the users, but the idea of JSECoin is to only use resources of the CPU, that would otherwise be wasted.
-          Please open task manager and check for yourself.<br/>
-          Please also compare it to how you feel about ads as monetization.<br/><br/>
-          You also have the option to opt-out of mining by clicking <a href='https://server.jsecoin.com/optout/' target='_blank'>here</a> and restarting Net64+.
-          If you want to opt-in please click <a href='https://server.jsecoin.com/optin/' target='_blank'>here</a>.
-        </div>
       </div>
     )
   }
