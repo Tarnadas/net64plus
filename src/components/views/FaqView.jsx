@@ -41,13 +41,13 @@ class FaqView extends React.PureComponent {
     }
     return (
       <div style={styles.view}>
-        <h2>FAQ</h2>
+        <h1>FAQ</h1>
         <SMMButton
           iconSrc='img/net64.svg'
           text='Got it!'
           onClick={this.onDone}
         />
-        <h3>Monetization</h3>
+        <h2>Monetization</h2>
         <div style={styles.text}>
           Net64+ uses JSECoin for monetization. It is a cryptocurrency which is mined while the program is running.
           At first this might sound like a bad deal for the users, but the idea of JSECoin is to only use resources of the CPU (~1-3%), that would otherwise be wasted.
@@ -63,6 +63,7 @@ class FaqView extends React.PureComponent {
           If you still want to opt-out of mining, you can do so by clicking <a href='https://server.jsecoin.com/optout/' target='_blank'>here</a> and restarting Net64+.
           If you want to opt-in please click <a href='https://server.jsecoin.com/optin/' target='_blank'>here</a>.
         </div>
+        <h2 style={{marginTop: '40px'}}>Emulator settings</h2>
         <div style={styles.text}>
           Make sure your emulator settings match the green circles
         </div>
