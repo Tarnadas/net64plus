@@ -62,9 +62,9 @@ class MainView extends React.PureComponent {
             iconSrc='img/net64.svg'
           />
           <SMMButton
-            link='https://discord.gg/SPZsgSe' external
-            text='SMMDB Discord'
-            iconSrc='img/discord.svg'
+            link='https://reddit.com/r/Net64' external
+            text='Net64 SubReddit'
+            iconSrc='img/reddit.svg'
           />
         </div>
       </div>
