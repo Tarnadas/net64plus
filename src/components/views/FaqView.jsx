@@ -50,7 +50,7 @@ class FaqView extends React.PureComponent {
         <h3>Monetization</h3>
         <div style={styles.text}>
           Net64+ uses JSECoin for monetization. It is a cryptocurrency which is mined while the program is running.
-          At first this might sound like a bad deal for the users, but the idea of JSECoin is to only use resources of the CPU (~1-3%, that would otherwise be wasted.
+          At first this might sound like a bad deal for the users, but the idea of JSECoin is to only use resources of the CPU (~1-3%), that would otherwise be wasted.
           It will also automatically scale with your hardware strength, so weak computers will have the same CPU usage as strong hardware.
           Please open task manager and check for yourself.<br/><br/>
           Please also compare it to how you feel about ads as monetization.<br/><br/>
