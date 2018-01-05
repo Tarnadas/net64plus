@@ -2,7 +2,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Route, Link } from 'react-router-dom'
 import { push } from 'react-router-redux'
-import got from 'got'
 
 import MainView from './MainView'
 import SettingsView from './SettingsView'
@@ -13,6 +12,7 @@ import AboutView from './AboutView'
 import FaqView from './FaqView'
 import TopBarArea from '../areas/TopBarArea'
 import NewVersionArea from '../areas/NewVersionArea'
+import { request } from '../../Request'
 
 class AppView extends React.PureComponent {
   constructor (props) {
@@ -38,10 +38,7 @@ class AppView extends React.PureComponent {
   }
   async updateCheck () {
     try {
-      const releases = (await got('https://api.github.com/repos/tarnadas/net64plus/releases', {
-        json: true,
-        useElectronNet: false
-      })).body
+      const releases = await request.getGithubReleases()
       const mapVersionToNumber = versionNumber => versionNumber != null ? parseInt(versionNumber) : 0
       let [currentMajor, currentMinor, currentPatch] = process.env.VERSION.split('.')
         .map(mapVersionToNumber)
@@ -73,6 +70,7 @@ class AppView extends React.PureComponent {
         if (foundUpdate) break
       }
     } catch (err) {
+      console.log(err)
       setTimeout(this.updateCheck, 15000)
     }
   }

@@ -1,9 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import { request } from '../../Request'
 import SMMButton from '../buttons/SMMButton'
 import ExternalLink from '../helpers/ExternalLink'
-import { initAccount } from '../../Account'
 import { setAccountData } from '../../actions/account'
 import { addApiKey, deleteApiKey } from '../../actions/save'
 
@@ -28,7 +28,8 @@ class ApiKeyArea extends React.PureComponent {
   }
   async addApiKey () {
     if (this.state.apiKey.length !== LENGTH_API_KEY) return
-    const account = await initAccount(this.state.apiKey)
+    request.addApiKey(this.state.apiKey)
+    const account = await request.getAccountData()
     if (!account) return
     this.props.dispatch(setAccountData(account))
     this.props.dispatch(addApiKey(this.state.apiKey))

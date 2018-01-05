@@ -8,7 +8,7 @@ import { remote } from 'electron'
 import createHistory from 'history/createMemoryHistory'
 
 import initReducer from './reducers'
-import { initAccount } from './Account'
+import { request } from './Request'
 import AppView from './components/views/AppView'
 import { setAccountData } from './actions/account'
 
@@ -19,7 +19,8 @@ export let store;
   const save = remote.getGlobal('save')
   let account
   if (save != null && save.appSaveData != null && save.appSaveData.apiKey) {
-    account = await initAccount(save.appSaveData.apiKey)
+    request.addApiKey(save.appSaveData.apiKey)
+    account = await request.getAccountData()
     if (!account) {
       save.appSaveData.apiKey = ''
     }

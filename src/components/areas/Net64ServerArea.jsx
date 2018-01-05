@@ -1,11 +1,10 @@
 import React from 'react'
-import got from 'got'
 
 import { resolve } from 'url'
 
 import Net64ServerPanel from '../panels/Net64ServerPanel'
 import WarningPanel from '../panels/WarningPanel'
-import { domain } from '../../variables'
+import { request } from '../../Request'
 
 export default class Net64ServerArea extends React.PureComponent {
   constructor (props) {
@@ -34,10 +33,8 @@ export default class Net64ServerArea extends React.PureComponent {
   async updateServers () {
     if (!this.mounted) return
     try {
-      const servers = (await got(resolve(domain, `api/getnet64servers`), {
-        json: true,
-        useElectronNet: false
-      })).body
+      const servers = await request.getNet64Servers()
+      if (!servers || !this.mounted) return
       if (this.mounted) {
         this.setState({
           servers
