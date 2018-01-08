@@ -105,6 +105,7 @@ class EmulatorView extends React.PureComponent {
       if (emulator.base !== -1) {
         this.props.dispatch(setEmulator(emulator))
         this.props.dispatch(push('/browse'))
+        emulator.displayChatMessage('- Net64 connected -', 19)
       }
     }, 10)
     setTimeout(() => {

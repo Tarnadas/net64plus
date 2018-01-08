@@ -61,6 +61,7 @@ class Net64ServerPanel extends React.PureComponent {
         characterId: this.props.characterId,
         onConnect: () => {
           this.props.dispatch(setConnection(connection))
+          this.props.emulator.displayChatMessage('- connected to server -', 23)
         },
         onError: err => {
           err = String(err)
