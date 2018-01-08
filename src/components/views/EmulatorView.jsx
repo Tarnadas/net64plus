@@ -1,14 +1,16 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
-import tasklist from 'tasklist'
+import parse from 'csv-parse'
+
+import { spawn } from 'child_process'
 
 import Emulator from '../../Emulator'
 import SMMButton from '../buttons/SMMButton'
 import WarningPanel from '../panels/WarningPanel'
 import { setEmulator } from '../../actions/emulator'
 
-const TIMEOUT = 2000
+const TIMEOUT = 1000
 
 class EmulatorView extends React.PureComponent {
   constructor (props) {
@@ -35,15 +37,62 @@ class EmulatorView extends React.PureComponent {
   }
   async scan () {
     if (!this.mounted) return
-    const emulators = (await tasklist())
-      .filter(el => el.imageName.includes('Project64') || el.imageName.includes('Mupen64') || el.imageName.includes('Nemu64'))
-      .map(el => ({
-        name: el.imageName,
-        pid: el.pid
+
+    try {
+      const emulators = (await Promise.all((await new Promise((resolve, reject) => {
+        const tasklist = spawn('tasklist', ['/FO', 'CSV', '/NH'])
+        let stdout = ''
+        tasklist.stdout.on('data', data => {
+          stdout += data.toString()
+        })
+        tasklist.stderr.on('data', data => {
+          console.error(`tasklist stderr: ${data}`)
+        })
+        tasklist.on('close', code => {
+          if (code !== 0) {
+            console.log(`tasklist process exited with code ${code}`)
+          }
+          parse(stdout, (err, data) => {
+            if (err) reject(err)
+            resolve(data)
+          })
+        })
       }))
-    if (this.mounted) {
+        .filter(process => process[0].match(/project64/i))
+        .map(process =>
+          new Promise((resolve, reject) => {
+            const tasklist = spawn('tasklist', ['/FI', `PID eq ${process[1]}`, '/FO', 'CSV', '/NH', '/V'])
+            let stdout = ''
+            tasklist.stdout.on('data', data => {
+              stdout += data.toString()
+            })
+            tasklist.stderr.on('data', data => {
+              console.error(`tasklist stderr: ${data}`)
+            })
+            tasklist.on('close', code => {
+              if (code !== 0) {
+                console.log(`tasklist process exited with code ${code}`)
+              }
+              parse(stdout, (err, data) => {
+                if (err) reject(err)
+                if (data.length === 0) reject(new Error(`tasklist couldn't find process with PID ${process[1]}`))
+                resolve(data[0])
+              })
+            })
+          })
+        )))
+        .map(process => ({
+          name: process[0],
+          pid: process[1],
+          windowName: process[8]
+        }))
+      if (!this.mounted) return
       this.setState({
         emulators
+      })
+    } catch (err) {
+      this.setState({
+        warning: `Scanning for emulator failed:\n\n${err}`
       })
     }
   }
@@ -80,25 +129,36 @@ class EmulatorView extends React.PureComponent {
     }
     const onSelect = this.onSelectEmulator
     return emulators.map(
-      emulator =>
-        <div style={li} key={emulator.pid}>
-          <div>
-            {emulator.name} | pid: {emulator.pid}
+      emulator => {
+        let romName
+        try {
+          const windowName = emulator.windowName
+          romName = windowName.includes(' - ')
+            ? emulator.windowName.split(' - Project64')[0]
+            : null
+        } catch (err) {}
+        return (
+          <div style={li} key={emulator.pid}>
+            <div>
+              { emulator.name } | pid: { emulator.pid } | { romName || 'Game is not running' }
+            </div>
+            <SMMButton
+              text='Select'
+              iconSrc='img/submit.png'
+              style={{
+                button: {
+                  margin: '0'
+                },
+                icon: {
+                  padding: '3px'
+                }
+              }}
+              enabled={romName != null}
+              onClick={onSelect.bind(null, emulator)}
+            />
           </div>
-          <SMMButton
-            text='Select'
-            iconSrc='img/submit.png'
-            style={{
-              button: {
-                margin: '0'
-              },
-              icon: {
-                padding: '3px'
-              }
-            }}
-            onClick={onSelect.bind(null, emulator)}
-          />
-        </div>
+        )
+      }
     )
   }
   render () {
@@ -146,7 +206,7 @@ class EmulatorView extends React.PureComponent {
         }
         {
           !emulators || emulators.length === 0 ? (
-            <div>Scanning for emulators...</div>
+            <div>Scanning for running emulators...</div>
           ) : (
             <div style={styles.ul}>
               { this.renderEmulators(emulators) }

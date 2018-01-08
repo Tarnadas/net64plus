@@ -13,6 +13,7 @@ export const ICON_STYLE = {
   DARK: 0,
   BRIGHT: 1
 }
+
 export default class SMMButton extends React.PureComponent {
   constructor (props) {
     super(props)
@@ -63,6 +64,9 @@ export default class SMMButton extends React.PureComponent {
     const text = this.props.text
     const colorScheme = this.props.colorScheme || COLOR_SCHEME.YELLOW
     const onDelete = this.props.onDelete
+    const enabled = this.props.enabled == null
+      ? true
+      : this.props.enabled
     let styles = fromJS({
       button: {
         flex: '0 0 auto',
@@ -70,13 +74,15 @@ export default class SMMButton extends React.PureComponent {
         lineHeight: '40px',
         minWidth: '120px',
         height: '40px',
-        backgroundColor: colorScheme === COLOR_SCHEME.YELLOW
-          ? this.state.deleteHover
-            ? '#cc0008'
-            : this.state.hover ? '#323245' : '#ffe500'
-          : colorScheme === COLOR_SCHEME.GREEN
-            ? this.state.hover ? '#323245' : '#33cc33'
-            : this.state.hover ? '#323245' : '#CC7034',
+        backgroundColor: enabled
+          ? colorScheme === COLOR_SCHEME.YELLOW
+            ? this.state.deleteHover
+              ? '#cc0008'
+              : this.state.hover ? '#323245' : '#ffe500'
+            : colorScheme === COLOR_SCHEME.GREEN
+              ? this.state.hover ? '#323245' : '#33cc33'
+              : this.state.hover ? '#323245' : '#CC7034'
+          : '#666',
         textAlign: 'left',
         cursor: 'pointer',
         outline: 'none',
@@ -124,7 +130,13 @@ export default class SMMButton extends React.PureComponent {
     styles = styles.toJS()
     const iconStyle = Object.assign({},
       styles.icon,
-      hover ? styles.iconHover : {},
+      enabled
+        ? hover
+          ? styles.iconHover
+          : {}
+        : {
+          backgroundColor: '#666'
+        },
       this.props.iconStyle === ICON_STYLE.DARK ? styles.iconDark : {}
     )
     return (
@@ -132,11 +144,13 @@ export default class SMMButton extends React.PureComponent {
         onMouseEnter={this.mouseEnter}
         onMouseLeave={this.mouseLeave}
         onClick={
-          this.props.onClick
+          enabled
             ? this.props.onClick
-            : this.props.external
-              ? this.onOpenExternal
-              : null
+              ? this.props.onClick
+              : this.props.external
+                ? this.onOpenExternal
+                : null
+            : null
         }
       >
         {
@@ -146,6 +160,7 @@ export default class SMMButton extends React.PureComponent {
                 iconStyle={iconStyle}
                 iconSrc={hover ? iconSrcHover : iconSrc}
                 text={text}
+                enabled={enabled}
                 hover={hover}
                 noText={this.props.noText}
               />
@@ -154,6 +169,7 @@ export default class SMMButton extends React.PureComponent {
               iconStyle={iconStyle}
               iconSrc={hover ? iconSrcHover : iconSrc}
               text={text}
+              enabled={enabled}
               hover={hover}
               noText={this.props.noText}
             />
@@ -176,7 +192,11 @@ class ButtonSub extends React.PureComponent {
         height: '100%'
       },
       text: {
-        color: this.props.hover ? '#fff' : '#323245',
+        color: this.props.enabled
+          ? this.props.hover
+            ? '#fff'
+            : '#323245'
+          : '#fff',
         float: 'left',
         width: 'auto',
         paddingRight: '5px'
