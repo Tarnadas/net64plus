@@ -1,12 +1,13 @@
 export const PACKET_TYPE = {
   HANDSHAKE: 0,
-  PLAYER_DATA: 1,
+  MEMORY_DATA: 1,
   GAME_MODE: 2,
   CHAT_MESSAGE: 3,
   CHARACTER_SWITCH: 4,
   PING: 5,
   WRONG_VERSION: 6,
-  SERVER_FULL: 7
+  SERVER_FULL: 7,
+  SET_SERVER_FLAG: 8
 }
 
 export default class Packet {

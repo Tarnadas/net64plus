@@ -62,20 +62,18 @@ export default class Connection {
     switch (type) {
       case PACKET_TYPE.HANDSHAKE:
         this.playerId = payload[0]
+        this.emulator.setPlayerId(payload[0])
         this.chat.addMessage(`Your player ID is ${this.playerId}`, '[SERVER]')
         this.loop = setInterval(this.sendPlayerData.bind(this), UPDATE_INTERVAL)
         break
-      case PACKET_TYPE.PLAYER_DATA:
+      case PACKET_TYPE.MEMORY_DATA:
         payload = gunzipSync(payload)
-        let j = 2
-        for (let i = 0; i < payload.length; i += 0x18) {
-          if (this.playerId === payload[i + 3]) continue
-          payload.writeUInt8(j, i + 3)
-          this.emulator.writeMemory(0x367700 + 0x100 * j, payload.slice(i, i + 0x18))
-          j++
-        }
-        for (; j < 24; j++) {
-          this.emulator.writeMemory(0x367700 + 0x100 * j, EMPTY)
+        for (let offset = 0; offset < payload.length;) {
+          const length = payload.readUInt32BE(offset)
+          const writeTo = payload.readUInt32BE(offset + 4)
+          const data = payload.readUInt32BE(offset + 8, length)
+          this.emulator.writeMemory(writeTo, data)
+          offset += length + 8
         }
         break
       case PACKET_TYPE.GAME_MODE:
@@ -105,16 +103,27 @@ export default class Connection {
         break
     }
   }
-  sendPlayerData () {
-    const playerData = this.emulator.readMemory(0x367700, 0x18)
-    if (playerData[0xF] !== 0) {
-      try {
-        this.ws.send(Packet.create(PACKET_TYPE.PLAYER_DATA, playerData))
-        this.emulator.writeMemory(0x367800, playerData)
-      } catch (err) {
-        // console.error(err)
-        // store.dispatch(setConnectionError(err))
-      }
+  sendMemoryData () {
+    const memoryData = Buffer.concat(
+      Array.from((function * () {
+        for (let baseAdr = 0x367400, offset = 0; offset < 0x240; offset += 12) {
+          const readFrom = this.emulator.readMemory(baseAdr + offset).readInt32BE(0)
+          const length = this.emulator.readMemory(baseAdr + offset + 4, 4).readInt32BE(0)
+          const packetLength = Buffer.allocUnsafe(4)
+          packetLength.writeInt32BE(length, 0)
+          yield Buffer.concat([
+            packetLength,
+            this.emulator.readMemory(baseAdr + offset + 8, 4),
+            this.emulator.readMemory(readFrom, length)
+          ])
+        }
+      })())
+    )
+    try {
+      this.ws.send(Packet.create(PACKET_TYPE.MEMORY_DATA, memoryData))
+    } catch (err) {
+      // console.error(err)
+      // store.dispatch(setConnectionError(err))
     }
   }
   sendChatMessage (message) {

@@ -27,15 +27,20 @@ export default class Emulator {
     const b = Buffer.allocUnsafe(1)
     b.writeUInt8(characterId + 1, 0)
     this.writeMemory(0x365FF3, b) // character ID
-    b.writeUInt8(1, 0)
+    b.writeUInt8(0, 0)
     this.writeMemory(0x365FFC, b) // isServer flag
-    this.writeMemory(0x367703, b) // player ID
   }
   writeMemory (offset, buffer) {
     this.process.writeMemory(this.base + offset, buffer)
   }
   readMemory (offset, length) {
     return this.process.readMemory(this.base + offset, length)
+  }
+  setPlayerId (playerId) {
+    this.writeMemory(0x367703, playerId)
+  }
+  setServerFlag (isServer) {
+    this.writeMemory(0x365FFC, isServer)
   }
   changeCharacter (characterId) {
     const b = Buffer.allocUnsafe(1)
