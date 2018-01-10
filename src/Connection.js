@@ -11,7 +11,20 @@ const UPDATE_INTERVAL = 24
 const DECODER = new TextDecoder('utf-8')
 const ENCODER = new TextEncoder('utf-8')
 
+/**
+ * A Connection object represents the connection to an actual
+ * Net64+ server.
+ */
 export default class Connection {
+  /**
+   * Connection constructor.
+   * @param {object} args.server Server to connect to
+   * @param {Emulator} args.emulator Currently selected emulator
+   * @param {string} args.username Username from  settings
+   * @param {characterId} args.characterId Character ID from settings
+   * @param {() => void} args.onConnect Connection callback function
+   * @param {(err: string) => void} args.onError Error callback function
+   */
   constructor ({ server, emulator, username, characterId, onConnect, onError }) {
     this.disconnect = this.disconnect.bind(this)
     this.ws = new WS(`ws://${server.domain ? server.domain : server.ip}:${server.port}`)
@@ -25,9 +38,20 @@ export default class Connection {
     this.chat = new Chat()
     this.hasError = false
   }
+
+  /**
+   * Actively disconnect WebSocket connection.
+   */
   disconnect () {
     this.ws.close()
   }
+
+  /**
+   * Websocket connected.
+   * @param {number} characterId Character ID from settings
+   * @param {string} username Username from settings
+   * @param {() => void} onConnect Connection callback function
+   */
   onOpen (characterId, username, onConnect) {
     onConnect()
     const handshake = new Uint8Array(29)
@@ -39,10 +63,21 @@ export default class Connection {
     handshake.set(ENCODER.encode(username), 5)
     this.ws.send(handshake)
   }
+
+  /**
+   * WebSocket error.
+   * @param {(err: string) => void} onError Error callback function
+   * @param {Error} err Error object
+   */
   onError (onError, err) {
     onError(err)
     this.hasError = true
   }
+
+  /**
+   * WebSocket disconnected.
+   * @param {number} code Exit code
+   */
   onClose (code) {
     if (this.loop) {
       clearInterval(this.loop)
@@ -54,6 +89,11 @@ export default class Connection {
     }
     this.chat.clear()
   }
+
+  /**
+   * Schedule received message from server.
+   * @param {Buffer} data Received data
+   */
   onMessage (data) {
     const type = data[0]
     let payload = data.slice(1)
@@ -101,6 +141,10 @@ export default class Connection {
         break
     }
   }
+
+  /**
+   * Send all memory data to connected server.
+   */
   sendMemoryData () {
     const memoryData = Buffer.concat(
       Array.from((function * () {
@@ -124,6 +168,11 @@ export default class Connection {
       // store.dispatch(setConnectionError(err))
     }
   }
+
+  /**
+   * Send chat message to server.
+   * @param {string} message The message to send
+   */
   sendChatMessage (message) {
     message = ENCODER.encode(message)
     const username = ENCODER.encode(this.username)
@@ -134,6 +183,11 @@ export default class Connection {
     chatMessage.set(username, message.length + 2)
     this.ws.send(Packet.create(PACKET_TYPE.CHAT_MESSAGE, chatMessage))
   }
+
+  /**
+   * Send character change message to server.
+   * @param {number} characterId Character ID to change to
+   */
   sendCharacterChange (characterId) {
     const packet = new Uint8Array(1)
     packet[0] = characterId
