@@ -115,7 +115,7 @@ export default class Connection {
         }
         break
       case PACKET_TYPE.GAME_MODE:
-        this.emulator.writeMemory(0x365FF7, payload)
+        this.emulator.writeMemory(0xFF5FF7, payload)
         break
       case PACKET_TYPE.CHAT_MESSAGE:
         const msgLength = payload[0]
@@ -148,7 +148,7 @@ export default class Connection {
   sendMemoryData () {
     const memoryData = Buffer.concat(
       Array.from((function * () {
-        for (let baseAdr = 0x367400, offset = 0; offset < 0x240; offset += 12) {
+        for (let baseAdr = 0xFF7400, offset = 0; offset < 0x240; offset += 12) {
           const readFrom = this.emulator.readMemory(baseAdr + offset).readInt32BE(0)
           const length = this.emulator.readMemory(baseAdr + offset + 4, 4).readInt32BE(0)
           const packetLength = Buffer.allocUnsafe(4)

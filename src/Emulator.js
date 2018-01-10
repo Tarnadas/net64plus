@@ -26,9 +26,9 @@ export default class Emulator {
     }
     const b = Buffer.allocUnsafe(1)
     b.writeUInt8(characterId + 1, 0)
-    this.writeMemory(0x365FF3, b) // character ID
+    this.writeMemory(0xFF5FF3, b) // character ID
     b.writeUInt8(0, 0)
-    this.writeMemory(0x365FFC, b) // isServer flag
+    this.writeMemory(0xFF5FFC, b) // isServer flag
   }
   writeMemory (offset, buffer) {
     this.process.writeMemory(this.base + offset, buffer)
@@ -37,15 +37,15 @@ export default class Emulator {
     return this.process.readMemory(this.base + offset, length)
   }
   setPlayerId (playerId) {
-    this.writeMemory(0x367703, playerId)
+    this.writeMemory(0xFF7703, playerId)
   }
   setServerFlag (isServer) {
-    this.writeMemory(0x365FFC, isServer)
+    this.writeMemory(0xFF5FFC, isServer)
   }
   changeCharacter (characterId) {
     const b = Buffer.allocUnsafe(1)
     b.writeUInt8(characterId + 1, 0)
-    this.writeMemory(0x365FF3, b)
+    this.writeMemory(0xFF5FF3, b)
   }
   displayChatMessage (message, msgLength) {
     const messageBuffer = Buffer.from(message)
@@ -54,8 +54,8 @@ export default class Emulator {
     try {
       messageBuffer.copy(chatMessage, 0, 0, msgLength)
       chatMessage.swap32()
-      this.writeMemory(0x367680, triggerMessage)
-      this.writeMemory(0x367684, chatMessage)
+      this.writeMemory(0xFF7680, triggerMessage)
+      this.writeMemory(0xFF7684, chatMessage)
     } catch (err) {
       // TODO
       console.error(err)
