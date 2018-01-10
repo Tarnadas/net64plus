@@ -17,6 +17,7 @@
   },
   "env": {
     "browser": true,
-    "worker": true
+    "worker": true,
+    "jest": true
   }
 }

@@ -19,7 +19,7 @@ export default class Emulator {
       if (val2 !== 0x275A7650) continue
       this.base = i
     }
-    const basePath = './patches'
+    const basePath = process.env.NODE_ENV === 'test' ? './build/patches' : './patches'
     const patches = fs.readdirSync(basePath)
     for (const patch of patches) {
       this.writeMemory(parseInt(patch, 16), fs.readFileSync(path.join(basePath, patch)))

@@ -7,7 +7,8 @@
     "start": "webpack --env=dev && cd ./build && electron .",
     "build": "webpack --env=prod && node ./build-app",
     "rebuild": "electron-rebuild -v 1.6.14 -f -w winprocess",
-    "lint": "eslint --ext .js,.jsx src"
+    "lint": "eslint --ext .js,.jsx src",
+    "test": "jest spec"
   },
   "repository": {
     "type": "git",
@@ -27,6 +28,11 @@
     "url": "https://github.com/Tarnadas/net64plus/issues"
   },
   "homepage": "http://smmdb.ddns.net/net64",
+  "jest": {
+    "setupFiles": [
+      "./jest-browser-setup.js"
+    ]
+  },
   "dependencies": {
     "axios": "^0.17.1",
     "csv-parse": "^2.0.0",
@@ -54,7 +60,6 @@
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.0",
     "babili-webpack-plugin": "^0.1.2",
-    "chai": "^4.1.2",
     "core-js": "^2.5.1",
     "devtron": "^1.4.0",
     "electron-debug": "^1.4.0",
@@ -65,8 +70,9 @@
     "eslint-plugin-react": "^7.5.1",
     "file-loader": "^1.1.5",
     "html-webpack-plugin": "^2.30.1",
-    "mocha": "^4.0.1",
+    "jest": "^22.0.5",
     "standard": "^10.0.3",
+    "text-encoding": "^0.6.4",
     "url-loader": "^0.6.2",
     "webpack": "^3.6.0",
     "webpack-sources": "^1.0.1"

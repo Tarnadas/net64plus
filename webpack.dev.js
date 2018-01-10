@@ -44,19 +44,7 @@ module.exports = [
         {
           test: /\.jsx?$/,
           exclude: /node_modules/,
-          loader: 'babel-loader',
-          query: {
-            babelrc: false,
-            presets: [
-              ['env', {
-                targets: {
-                  electron: '1.6.14'
-                },
-                useBuiltIns: true
-              }]
-            ],
-            plugins: ['transform-react-jsx']
-          }
+          loader: 'babel-loader'
         },
         {
           test: /\.(png|jpg)$/,

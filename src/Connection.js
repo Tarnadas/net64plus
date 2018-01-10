@@ -1,4 +1,3 @@
-/* eslint-env browser */
 import WS from 'ws'
 
 import { gunzipSync } from 'zlib'
@@ -9,7 +8,6 @@ import { store } from './renderer'
 import { disconnect, setConnectionError } from './actions/connection'
 
 const UPDATE_INTERVAL = 24
-const EMPTY = new Uint8Array(0x18)
 const DECODER = new TextDecoder('utf-8')
 const ENCODER = new TextEncoder('utf-8')
 
