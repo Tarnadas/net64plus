@@ -116,6 +116,9 @@ class SettingsView extends React.PureComponent {
             <option value='5'>Toad</option>
             <option value='6'>Waluigi</option>
             <option value='7'>Rosalina</option>
+            <option value='8'>Sonic</option>
+            <option value='11'>Goomba</option>
+            <option value='12'>Kirby</option>
           </select>
         </div>
         <div style={styles.setting}>
