@@ -18,12 +18,14 @@ const ENCODER = new TextEncoder('utf-8')
 export default class Connection {
   /**
    * Connection constructor.
-   * @param {object} args.server Server to connect to
-   * @param {Emulator} args.emulator Currently selected emulator
-   * @param {string} args.username Username from  settings
-   * @param {characterId} args.characterId Character ID from settings
-   * @param {() => void} args.onConnect Connection callback function
-   * @param {(err: string) => void} args.onError Error callback function
+   *
+   * @param {Object} args - Method arguments
+   * @param {Object} args.server - Server to connect to
+   * @param {Emulator} args.emulator - Currently selected emulator
+   * @param {string} args.username - Username from  settings
+   * @param {number} args.characterId - Character ID from settings
+   * @param {() => void} args.onConnect - Connection callback function
+   * @param {(err: string) => void} args.onError - Error callback function
    */
   constructor ({ server, emulator, username, characterId, onConnect, onError }) {
     this.disconnect = this.disconnect.bind(this)
@@ -34,6 +36,10 @@ export default class Connection {
     this.ws.on('message', this.onMessage.bind(this))
     this.username = username // TODO there is no reason to send current username. This will break backwards compatibility
     this.server = Object.assign(server, { ip: '127.0.0.1' })
+
+    /**
+     * @type {module:Emulator}
+     */
     this.emulator = emulator
     this.chat = new Chat()
     this.hasError = false
@@ -48,9 +54,10 @@ export default class Connection {
 
   /**
    * Websocket connected.
-   * @param {number} characterId Character ID from settings
-   * @param {string} username Username from settings
-   * @param {() => void} onConnect Connection callback function
+   *
+   * @param {number} characterId - Character ID from settings
+   * @param {string} username - Username from settings
+   * @param {() => void} onConnect - Connection callback function
    */
   onOpen (characterId, username, onConnect) {
     onConnect()
@@ -66,8 +73,9 @@ export default class Connection {
 
   /**
    * WebSocket error.
-   * @param {(err: string) => void} onError Error callback function
-   * @param {Error} err Error object
+   *
+   * @param {(err: string) => void} onError - Error callback function
+   * @param {Error} err - Error object
    */
   onError (onError, err) {
     onError(err)
@@ -76,7 +84,8 @@ export default class Connection {
 
   /**
    * WebSocket disconnected.
-   * @param {number} code Exit code
+   *
+   * @param {number} code - Exit code
    */
   onClose (code) {
     if (this.loop) {
@@ -92,7 +101,8 @@ export default class Connection {
 
   /**
    * Schedule received message from server.
-   * @param {Buffer} data Received data
+   *
+   * @param {Buffer} data - Received data
    */
   onMessage (data) {
     const type = data[0]
@@ -171,7 +181,8 @@ export default class Connection {
 
   /**
    * Send chat message to server.
-   * @param {string} message The message to send
+   *
+   * @param {string} message - The message to send
    */
   sendChatMessage (message) {
     message = ENCODER.encode(message)
@@ -186,7 +197,8 @@ export default class Connection {
 
   /**
    * Send character change message to server.
-   * @param {number} characterId Character ID to change to
+   *
+   * @param {number} characterId - Character ID to change to
    */
   sendCharacterChange (characterId) {
     const packet = new Uint8Array(1)

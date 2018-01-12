@@ -4,7 +4,9 @@
     "plugin:react/recommended"
   ],
   "plugins": [
-    "react"
+    "react",
+    "jsdoc",
+    "private-props"
   ],
   "parserOptions": {
     "ecmaFeatures": {
@@ -13,7 +15,25 @@
   },
   "rules": {
     "react/prop-types": "off",
-    "react/jsx-no-target-blank": "off"
+    "react/jsx-no-target-blank": "off",
+    "jsdoc/check-param-names": 1,
+    "jsdoc/check-tag-names": 1,
+    "jsdoc/check-types": 1,
+    "jsdoc/newline-after-description": 1,
+    "jsdoc/require-hyphen-before-param-description": 1,
+    "jsdoc/require-param": 1,
+    "jsdoc/require-param-description": 1,
+    "jsdoc/require-param-name": 1,
+    "jsdoc/require-param-type": 1,
+    "jsdoc/require-returns-description": 1,
+    "jsdoc/require-returns-type": 1,
+    "private-props/no-use-outside": [2, {
+      "privateMatchers": [
+        "^_", 
+        "^handle.",
+        "^on."
+      ]
+    }]
   },
   "env": {
     "browser": true,

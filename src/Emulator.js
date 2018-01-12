@@ -3,7 +3,18 @@ import winProcess from 'winprocess'
 import fs from 'fs'
 import path from 'path'
 
+/**
+ * An Emulator object represents the connection
+ * to the loaded emulator.
+ * @module Emulator
+ */
 export default class Emulator {
+  /**
+   * Emulator constructor.
+   *
+   * @param {number} processId - Process ID to load
+   * @param {number} characterId - Character ID from settings
+   */
   constructor (processId, characterId) {
     this.process = winProcess.Process(processId)
     this.process.open()
@@ -33,20 +44,54 @@ export default class Emulator {
   writeMemory (offset, buffer) {
     this.process.writeMemory(this.base + offset, buffer)
   }
+
+  /**
+   * Reads memory.
+   *
+   * @param {number} offset - Offset to read from
+   * @param {number} length - How many
+   * @returns {Buffer} Memory buffer
+   */
   readMemory (offset, length) {
     return this.process.readMemory(this.base + offset, length)
   }
+
+  /**
+   * Set player ID after successfull server handshake.
+   *
+   * @param {number} playerId - Player ID to send
+   */
   setPlayerId (playerId) {
     this.writeMemory(0xFF7703, playerId)
   }
+
+  /**
+   * Write server flag to memory.
+   * There must always be one user in charge of various decisions for minigames.
+   *
+   * @param {number} isServer - Server flag to write
+   */
   setServerFlag (isServer) {
     this.writeMemory(0xFF5FFC, isServer)
   }
+
+  /**
+   * Writes new character ID into memory.
+   *
+   * @param {number} characterId - Character ID to write to
+   */
   changeCharacter (characterId) {
     const b = Buffer.allocUnsafe(1)
     b.writeUInt8(characterId + 1, 0)
     this.writeMemory(0xFF5FF3, b)
   }
+
+  /**
+   * Displays a chat message in-game.
+   *
+   * @param {string} message - Message to display
+   * @param {number} msgLength - Message length
+   */
   displayChatMessage (message, msgLength) {
     const messageBuffer = Buffer.from(message)
     const triggerMessage = Buffer.alloc(4)
