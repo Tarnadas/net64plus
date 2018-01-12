@@ -10,7 +10,8 @@ import SMMButton from '../buttons/SMMButton'
 import WarningPanel from '../panels/WarningPanel'
 import { setEmulator } from '../../actions/emulator'
 
-const TIMEOUT = 1000
+const TIMEOUT = 500
+const ERROR_TIMEOUT = 5000
 
 class EmulatorView extends React.PureComponent {
   constructor (props) {
@@ -29,56 +30,88 @@ class EmulatorView extends React.PureComponent {
   }
   componentDidMount () {
     this.scan()
-    this.timer = setInterval(this.scan, 10000)
+    this.timer = setInterval(this.scan, TIMEOUT)
   }
   componentWillUnmount () {
     clearInterval(this.timer)
     this.mounted = false
   }
-  async scan () {
+  async scan (useAbsolutePathFallback = false) {
     if (!this.mounted) return
 
     try {
+      const systemRoot = process.env.SystemRoot
       const emulators = (await Promise.all((await new Promise((resolve, reject) => {
-        const tasklist = spawn('tasklist', ['/FO', 'CSV', '/NH'])
-        let stdout = ''
-        tasklist.stdout.on('data', data => {
-          stdout += data.toString()
-        })
-        tasklist.stderr.on('data', data => {
-          console.error(`tasklist stderr: ${data}`)
-        })
-        tasklist.on('close', code => {
-          if (code !== 0) {
-            console.log(`tasklist process exited with code ${code}`)
-          }
-          parse(stdout, (err, data) => {
-            if (err) reject(err)
-            resolve(data)
+        try {
+          const tasklist = spawn(
+            useAbsolutePathFallback ? `${systemRoot}\\System32\\tasklist.exe` : 'tasklist', ['/FO', 'CSV', '/NH']
+          )
+          tasklist.on('error', err => {
+            if (String(err).includes('ENOENT')) {
+              reject(new Error('Couldn\'t find "tasklist" in your system\'s PATH variable. Wtf did you do?'))
+            } else {
+              reject(err)
+            }
           })
-        })
+          let stdout = ''
+          let stderr = ''
+          tasklist.stdout.on('data', data => {
+            stdout += data.toString()
+          })
+          tasklist.stderr.on('data', data => {
+            stderr += data.toString()
+          })
+          tasklist.on('close', code => {
+            if (code !== 0) {
+              reject(stderr)
+            }
+            parse(stdout, (err, data) => {
+              if (err) reject(err)
+              resolve(data)
+            })
+          })
+        } catch (err) {
+          reject(err)
+        }
       }))
         .filter(process => process[0].match(/project64/i))
         .map(process =>
           new Promise((resolve, reject) => {
-            const tasklist = spawn('tasklist', ['/FI', `PID eq ${process[1]}`, '/FO', 'CSV', '/NH', '/V'])
-            let stdout = ''
-            tasklist.stdout.on('data', data => {
-              stdout += data.toString()
-            })
-            tasklist.stderr.on('data', data => {
-              console.error(`tasklist stderr: ${data}`)
-            })
-            tasklist.on('close', code => {
-              if (code !== 0) {
-                console.log(`tasklist process exited with code ${code}`)
-              }
-              parse(stdout, (err, data) => {
-                if (err) reject(err)
-                if (data.length === 0) reject(new Error(`tasklist couldn't find process with PID ${process[1]}`))
-                resolve(data[0])
+            try {
+              const tasklist = spawn(
+                useAbsolutePathFallback
+                  ? `${systemRoot}\\System32\\tasklist.exe`
+                  : 'tasklist',
+                ['/FI', `PID eq ${process[1]}`, '/FO', 'CSV', '/NH', '/V']
+              )
+              tasklist.on('error', err => {
+                if (String(err).includes('ENOENT')) {
+                  reject(new Error('Couldn\'t find "tasklist" in your system\'s PATH variable. Wtf did you do?'))
+                } else {
+                  reject(err)
+                }
               })
-            })
+              let stdout = ''
+              let stderr = ''
+              tasklist.stdout.on('data', data => {
+                stdout += data.toString()
+              })
+              tasklist.stderr.on('data', data => {
+                stderr += data.toString()
+              })
+              tasklist.on('close', code => {
+                if (code !== 0) {
+                  reject(stderr)
+                }
+                parse(stdout, (err, data) => {
+                  if (err) reject(err)
+                  if (data.length === 0) reject(new Error(`tasklist couldn't find process with PID ${process[1]}`))
+                  resolve(data[0])
+                })
+              })
+            } catch (err) {
+              reject(err)
+            }
           })
         )))
         .map(process => ({
@@ -91,9 +124,13 @@ class EmulatorView extends React.PureComponent {
         emulators
       })
     } catch (err) {
-      this.setState({
-        warning: `Scanning for emulator failed:\n\n${err}`
-      })
+      if (useAbsolutePathFallback) {
+        this.setState({
+          warning: `Scanning for emulator failed:\n\n${err}`
+        })
+      } else {
+        return this.scan(true)
+      }
     }
   }
   async onSelectEmulator (e) {
@@ -114,7 +151,7 @@ class EmulatorView extends React.PureComponent {
         loading: false,
         warning: 'Could not inject emulator.\nDid you start Super Mario 64 (USA)?\nYou might have to start Net64+ as administrator.'
       })
-    }, TIMEOUT)
+    }, ERROR_TIMEOUT)
   }
   renderEmulators (emulators) {
     const li = {
