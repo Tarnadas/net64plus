@@ -10,7 +10,7 @@ import SMMButton from '../buttons/SMMButton'
 import WarningPanel from '../panels/WarningPanel'
 import { setEmulator } from '../../actions/emulator'
 
-const TIMEOUT = 500
+const TIMEOUT = 2000
 const ERROR_TIMEOUT = 5000
 
 class EmulatorView extends React.PureComponent {
@@ -67,6 +67,7 @@ class EmulatorView extends React.PureComponent {
             }
             parse(stdout, (err, data) => {
               if (err) reject(err)
+              tasklist.kill()
               resolve(data)
             })
           })
@@ -106,6 +107,7 @@ class EmulatorView extends React.PureComponent {
                 parse(stdout, (err, data) => {
                   if (err) reject(err)
                   if (data.length === 0) reject(new Error(`tasklist couldn't find process with PID ${process[1]}`))
+                  tasklist.kill()
                   resolve(data[0])
                 })
               })
