@@ -1,5 +1,7 @@
 # Net64+ Client
 
+[![Discord](https://discordapp.com/api/guilds/354358899328942081/widget.png)](https://discord.gg/net64)
+
 This is a modified client for Net64 aka Sm64O, that uses the Websocket protocol.
 
 ## Download
