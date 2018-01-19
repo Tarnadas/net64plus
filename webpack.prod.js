@@ -8,10 +8,10 @@ module.exports = [
   {
     target: 'electron-renderer',
     entry: {
-      renderer: path.join(__dirname, 'src/renderer.jsx')
+      renderer: path.join(__dirname, 'src/renderer.tsx')
     },
     output: {
-      filename: 'renderer.jsx',
+      filename: 'renderer.js',
       path: path.join(__dirname, 'build')
     },
     devtool: 'inline-source-map',
@@ -71,7 +71,7 @@ module.exports = [
   },
   {
     target: 'electron',
-    entry: path.join(__dirname, 'src/index.js'),
+    entry: path.join(__dirname, 'src/index.ts'),
     output: {
       filename: 'index.js',
       path: path.join(__dirname, 'build')
@@ -90,6 +90,14 @@ module.exports = [
       new BabiliPlugin({
         keepFnName: true
       })
-    ]
+    ],
+    module: {
+      loaders: [
+        {
+          test: /\.tsx?$/,
+          loader: 'awesome-typescript-loader'
+        }
+      ]
+    }
   }
 ]

@@ -2,15 +2,16 @@ const webpack = require('webpack')
 const path = require('path')
 
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const { CheckerPlugin } = require('awesome-typescript-loader')
 
 module.exports = [
   {
     target: 'electron-renderer',
     entry: {
-      renderer: path.join(__dirname, 'src/renderer.jsx')
+      renderer: path.join(__dirname, 'src/renderer.tsx')
     },
     output: {
-      filename: 'renderer.jsx',
+      filename: 'renderer.js',
       path: path.join(__dirname, 'build')
     },
     devtool: 'source-map',
@@ -31,16 +32,21 @@ module.exports = [
         filename: 'index.html',
         template: 'src/template.html'
       }),
+      new CheckerPlugin(),
       new webpack.optimize.ModuleConcatenationPlugin()
     ],
     externals: {
       winprocess: 'require(require("path").resolve(__dirname, "winprocess"))'
     },
     resolve: {
-      extensions: [ '.js', '.jsx', '.json' ]
+      extensions: [ '.ts', '.tsx', '.js', '.jsx', '.json' ]
     },
     module: {
       loaders: [
+        {
+          test: /\.tsx?$/,
+          loader: 'awesome-typescript-loader'
+        },
         {
           test: /\.jsx?$/,
           exclude: /node_modules/,
@@ -67,7 +73,7 @@ module.exports = [
   },
   {
     target: 'electron',
-    entry: path.join(__dirname, 'src/index.js'),
+    entry: path.join(__dirname, 'src/index.ts'),
     output: {
       filename: 'index.js',
       path: path.join(__dirname, 'build')
@@ -82,6 +88,14 @@ module.exports = [
         NODE_ENV: 'development',
         VERSION: process.env.npm_package_version.slice(-2) === '.0' ? process.env.npm_package_version.slice(0, process.env.npm_package_version.length - 2) : process.env.npm_package_version
       })
-    ]
+    ],
+    module: {
+      loaders: [
+        {
+          test: /\.tsx?$/,
+          loader: 'awesome-typescript-loader'
+        }
+      ]
+    }
   }
 ]

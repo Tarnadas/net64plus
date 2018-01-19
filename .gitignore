@@ -7,3 +7,4 @@
 !/build/styles/
 !/build/winprocess.node
 /release/
+yarn-error.log
