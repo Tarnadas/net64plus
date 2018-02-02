@@ -1,0 +1,5 @@
+syntax = 'proto3';
+
+message UnlocksUpdate {
+  repeated Unlockable unlocks = 1;
+}

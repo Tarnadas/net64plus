@@ -17,5 +17,13 @@ export const connection = (state: ConnectionState = initialState.connection, act
       case 'DISCONNECT':
         draft.connection = null
         break
+      case 'SET_PLAYERS':
+        if (!draft.connection) return
+        draft.connection.server.players = action.players
+        break
+      case 'SET_PLAYER':
+        if (!draft.connection) return
+        // TODO
+        // draft.connection.server.players = action.players
     }
   })

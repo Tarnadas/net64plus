@@ -1,0 +1,6 @@
+syntax = 'proto3';
+
+message Unlockable {
+  uint32 id = 1;
+  uint64 timestamp = 2;
+}

@@ -1,17 +1,19 @@
 import * as WS from 'ws'
-
-import { gunzipSync } from 'zlib'
+import * as protobuf from 'protobufjs'
 
 import { Emulator } from './Emulator'
-import { Server } from './models/Server.model'
 import { Packet, PACKET_TYPE } from './Packet'
 import { addGlobalMessage, clearGlobalMessages } from './Chat'
 import { store } from './renderer'
-import { disconnect, setConnectionError } from './actions/connection'
+import { disconnect, setConnectionError, setPlayers } from './actions/connection'
+import { Server, Player } from './models/Server.model'
 
 const UPDATE_INTERVAL = 32
 const DECODER = new TextDecoder('utf-8')
 const ENCODER = new TextEncoder('utf-8')
+
+const playerUpdate = protobuf.loadSync('../proto/PlayerUpdate.proto').lookupType('PlayerUpdate')
+const playerListUpdate = protobuf.loadSync('../proto/PlayerListUpdate.proto').lookupType('PlayerListUpdate')
 
 export interface ConnectionConstructorParameters {
   /** Server to connect to */
@@ -44,8 +46,6 @@ export class Connection {
 
   private emulator: Emulator
 
-  private username: string
-
   private playerId: number | null = null
 
   private loop: number | null = null
@@ -66,7 +66,6 @@ export class Connection {
     this.ws.on('error', this.onError.bind(this, onError))
     this.ws.on('close', this.onClose.bind(this))
     this.ws.on('message', this.onMessage.bind(this))
-    this.username = username // TODO there is no reason to send current username. This will break backwards compatibility
     this.server = Object.assign(server, { ip: '127.0.0.1' })
     this.emulator = emulator
   }
@@ -138,10 +137,38 @@ export class Connection {
         this.playerId = payload[0]
         this.emulator.setPlayerId(payload[0])
         addGlobalMessage(`Your player ID is ${this.playerId}`, '[SERVER]')
-        this.loop = setInterval(this.sendMemoryData.bind(this), UPDATE_INTERVAL)
+        this.loop = setInterval(this.sendAll.bind(this), UPDATE_INTERVAL)
         break
-      case PACKET_TYPE.MEMORY_DATA:
-        payload = gunzipSync(payload)
+      case PACKET_TYPE.PING:
+        // TODO
+        break
+      case PACKET_TYPE.WRONG_VERSION:
+        const major = payload[0]
+        const minor = payload[1]
+        store.dispatch(setConnectionError('Client and server version are incompatible'))
+        this.ws.close()
+        // TODO
+        break
+      case PACKET_TYPE.SERVER_FULL:
+        store.dispatch(setConnectionError('Server is full'))
+        this.ws.close()
+        break
+      case PACKET_TYPE.PLAYER_LIST_UPDATE:
+        const players: Player[] = playerListUpdate.toObject(playerListUpdate.decode(payload)) as Player[]
+        store.dispatch(setPlayers(players))
+        break
+      case PACKET_TYPE.PLAYER_UPDATE:
+        const player: Player = playerUpdate.toObject(playerUpdate.decode(payload)) as Player
+        store.dispatch(setPlayer(player))
+        break
+      case PACKET_TYPE.PLAYER_DATA:
+        for (let i = 0, j = 0; i < payload.length; i += 0x18, j++) {
+          // ignore own player data
+          if (this.playerId === payload[i + 3]) continue
+          this.emulator.writeMemory(0xFF7800 + 0x100 * j, payload.slice(i, i + 0x1C))
+        }
+        break
+      case PACKET_TYPE.META_DATA:
         for (let offset = 0; offset < payload.length;) {
           const length = payload.readUInt32BE(offset)
           const writeTo = payload.readUInt32BE(offset + 4)
@@ -155,38 +182,52 @@ export class Connection {
         break
       case PACKET_TYPE.CHAT_MESSAGE:
         const msgLength = payload[0]
-        const message = DECODER.decode(payload.slice(1, msgLength + 1))
-        const username = DECODER.decode(payload.slice(msgLength + 2, msgLength + 2 + payload[msgLength + 1]))
+        const userId = payload[1]
+        const message = DECODER.decode(payload.slice(2, msgLength + 2))
+        // const username = DECODER.decode(payload.slice(msgLength + 2, msgLength + 2 + payload[msgLength + 1]))
         if (store.getState().save.appSaveData.emuChat) {
           this.emulator.displayChatMessage(message, msgLength)
         }
+        const username = this.server.players[]
         addGlobalMessage(message, username)
-        break
-      case PACKET_TYPE.PING:
-        // TODO
-        break
-      case PACKET_TYPE.WRONG_VERSION:
-        // const major = payload[0]
-        // const minor = payload[1]
-        this.ws.close()
-        // TODO
-        break
-      case PACKET_TYPE.SERVER_FULL:
-        store.dispatch(setConnectionError('Server is full'))
-        this.ws.close()
         break
     }
   }
 
   /**
-   * Send all memory data to connected server.
+   * Send all packets to connected server.
    */
-  private sendMemoryData (): void {
+  private sendAll (): void {
+    this.sendPlayerData()
+    this.sendMetaData()
+  }
+
+  /**
+   * Send player data to connected server.
+   */
+  private sendPlayerData (): void {
+    const playerData = this.emulator.readMemory(0xFF7700, 0x1C)
+    if (playerData[0xF] !== 0) {
+      try {
+        this.ws.send(new Packet(PACKET_TYPE.PLAYER_DATA, playerData))
+      } catch (err) {}
+    }
+  }
+
+  /**
+   * Send all meta data to connected server.
+   */
+  private sendMetaData (): void {
     const self = this
-    const memoryData = Buffer.concat(
+    const metaData = Buffer.concat(
       Array.from((function * () {
         for (let baseAdr = 0xFF7400, offset = 0; offset < 0x240; offset += 12) {
           const readFrom = self.emulator.readMemory(baseAdr + offset, 4).readInt32BE(0)
+          // TODO @Kaze: this should be handled in assembly
+          // we don't want to send player data as meta data
+          if (readFrom >= 0xFF7700 && readFrom < 0xFF9100) {
+            continue
+          }
           const length = self.emulator.readMemory(baseAdr + offset + 4, 4).readInt32BE(0)
           const packetLength = Buffer.allocUnsafe(4)
           packetLength.writeInt32BE(length, 0)
@@ -199,11 +240,8 @@ export class Connection {
       })())
     )
     try {
-      this.ws.send(new Packet(PACKET_TYPE.MEMORY_DATA, memoryData))
-    } catch (err) {
-      // console.error(err)
-      // store.dispatch(setConnectionError(err))
-    }
+      this.ws.send(new Packet(PACKET_TYPE.META_DATA, metaData))
+    } catch (err) {}
   }
 
   /**
@@ -213,23 +251,21 @@ export class Connection {
    */
   public sendChatMessage (message: string): void {
     const messageBinary = ENCODER.encode(message)
-    const username = ENCODER.encode(this.username)
-    const chatMessage = new Uint8Array(message.length + username.length + 2)
+    const chatMessage = new Uint8Array(message.length + 1)
     chatMessage.set(new Uint8Array([message.length]))
     chatMessage.set(messageBinary, 1)
-    chatMessage.set(new Uint8Array([username.length]), message.length + 1)
-    chatMessage.set(username, message.length + 2)
     this.ws.send(new Packet(PACKET_TYPE.CHAT_MESSAGE, chatMessage))
   }
 
   /**
-   * Send character change message to server.
+   * Send player update message to server.
    *
-   * @param {number} characterId - Character ID to change to
+   * @param {username: string, characterId: number} args - Arguments
+   * @param {string} args.username - Username to change to
+   * @param {number} args.characterId - Character ID to change to
    */
-  public sendCharacterChange (characterId: number): void {
-    const packet = new Uint8Array(1)
-    packet[0] = characterId
-    this.ws.send(new Packet(PACKET_TYPE.CHARACTER_SWITCH, packet))
+  public sendPlayerUpdate ({username, characterId}: {username: string, characterId: number}): void {
+    const packet = playerUpdate.encode(playerUpdate.create({username, characterId})).finish()
+    this.ws.send(new Packet(PACKET_TYPE.PLAYER_UPDATE, packet))
   }
 }

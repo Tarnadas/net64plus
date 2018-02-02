@@ -1,0 +1,6 @@
+syntax = 'proto3';
+
+message PlayerUpdate {
+  uint32 player_id = 1;
+  Player player = 2;
+}
