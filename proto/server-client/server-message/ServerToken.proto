@@ -1,0 +1,9 @@
+syntax = 'proto3';
+
+message ServerToken {
+  enum TokenType {
+    GRANT = 1;
+    LOSE = 2;
+  }
+  TokenType token_type = 1;
+}

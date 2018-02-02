@@ -1,5 +1,12 @@
 import { Connection } from '../Connection'
-import { SetConnectionAction, SetConnectionErrorAction, DisconnectAction } from './models/connection.model'
+import {
+  SetConnectionAction,
+  SetConnectionErrorAction,
+  DisconnectAction,
+  SetPlayersAction,
+  SetPlayerAction
+} from './models/connection.model'
+import { Player } from '../models/Server.model'
 
 export function setConnection (connection: Connection): SetConnectionAction {
   return {
@@ -18,5 +25,20 @@ export function setConnectionError (error: string): SetConnectionErrorAction {
 export function disconnect (): DisconnectAction {
   return {
     type: 'DISCONNECT'
+  }
+}
+
+export function setPlayers (players: Player[]): SetPlayersAction {
+  return {
+    type: 'SET_PLAYERS',
+    players
+  }
+}
+
+export function setPlayer (playerId: number, player: Player): SetPlayerAction {
+  return {
+    type: 'SET_PLAYER',
+    playerId,
+    player
   }
 }

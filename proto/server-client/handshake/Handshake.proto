@@ -1,0 +1,7 @@
+syntax = 'proto3';
+
+import "../player_update/PlayerListUpdate.proto";
+
+message Handshake {
+  PlayerListUpdate player_list = 1;
+}

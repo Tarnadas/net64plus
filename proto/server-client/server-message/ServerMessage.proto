@@ -1,0 +1,19 @@
+syntax = 'proto3';
+
+import "connection-denied/ConnectionDenied.proto";
+import "GameMode.proto";
+import "ServerToken.proto";
+
+message ServerMessage {
+  enum MessageType {
+    CONNECTION_DENIED = 1;
+    GAME_MODE = 2;
+    SERVER_TOKEN = 3;
+  }
+  MessageType message_type = 1;
+  oneof message {
+    ConnectionDenied connection_denied = 2;
+    GameMode game_mode = 3;
+    ServerToken server_token = 4;
+  }
+}

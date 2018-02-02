@@ -55,6 +55,7 @@
     "immer": "^0.8.1",
     "marked": "^0.3.9",
     "node-emoji": "^1.8.1",
+    "protobufjs": "^6.8.4",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "react-redux": "^5.0.6",

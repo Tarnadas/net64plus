@@ -1,0 +1,16 @@
+syntax = 'proto3';
+
+import "ServerFull.proto";
+import "WrongVersion.proto";
+
+message ConnectionDenied {
+  enum Reason {
+    SERVER_FULL = 1;
+    WRONG_VERSION = 2;
+  }
+  Reason reason = 1;
+  oneof message {
+    ServerFull server_full = 2;
+    WrongVersion wrong_version = 3;
+  }
+}

@@ -1,0 +1,6 @@
+syntax = 'proto3';
+
+message ChatGlobal {
+  uint32 sender_id = 1;
+  string message = 2;
+}
