@@ -33,5 +33,5 @@ export const save = (state: SaveState = initialState.save, action: SaveAction) =
   })
 
 function saveState (state: SaveState): void {
-  fs.writeFileSync(path.join(state.appSavePath, 'save.json'), JSON.stringify(state.appSaveData, null, 2))
+  fs.writeFile(path.join(state.appSavePath, 'save.json'), JSON.stringify(state.appSaveData, null, 2), () => {})
 }

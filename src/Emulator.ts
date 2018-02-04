@@ -33,11 +33,31 @@ export class Emulator {
       if (val2 !== 0x275A7650) continue
       this.baseAddress = i
     }
+    this.patchMemory(characterId)
+  }
+
+  private async patchMemory (characterId: number): Promise<void> {
     const basePath = process.env.NODE_ENV === 'test' ? './build/patches' : './patches'
     const patches = fs.readdirSync(basePath)
+    const patchBuffersPromise: Promise<{patchId: number, data: Buffer}>[] = []
     for (const patch of patches) {
-      this.writeMemory(parseInt(patch, 16), fs.readFileSync(path.join(basePath, patch)))
+      patchBuffersPromise.push(
+        new Promise((resolve, reject) => {
+          fs.readFile(path.join(basePath, patch), (err, data) => {
+            if (err) reject(err)
+            resolve({
+              patchId: parseInt(patch, 16),
+              data
+            })
+          })
+        })
+      )
     }
+    const patchBuffers = await Promise.all(patchBuffersPromise)
+    for (const patchBuffer of patchBuffers) {
+      this.writeMemory(patchBuffer.patchId, patchBuffer.data)
+    }
+
     const b = Buffer.allocUnsafe(1)
     b.writeUInt8(characterId + 1, 0)
     this.writeMemory(0xFF5FF3, b) // character ID
