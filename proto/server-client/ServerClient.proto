@@ -1,20 +1,20 @@
 syntax = 'proto3';
 
 import "handshake/Handshake.proto";
-import "ping/Ping.proto";
+import "../shared/ping/Ping.proto";
 import "server-message/ServerMessage.proto";
 import "player-update/PlayerListUpdate.proto";
-import "player-update/PlayerUpdate.proto";
+import "../shared/player-update/PlayerUpdate.proto";
 import "../shared/meta-data/MetaData.proto";
 import "../shared/chat-message/Chat.proto";
 
 message ServerClient {
   enum MessageType {
-    HANDSHAKE = 0;
-    PING = 1;
-    SERVER_MESSAGE = 2;
-    PLAYER_LIST_UPDATE = 3;
-    PLAYER_UPDATE = 4;
+    HANDSHAKE = 2;
+    PING = 3;
+    SERVER_MESSAGE = 4;
+    PLAYER_LIST_UPDATE = 5;
+    PLAYER_UPDATE = 6;
     PLAYER_DATA = 128;
     META_DATA = 129;
     CHAT_MESSAGE = 130;
@@ -26,7 +26,8 @@ message ServerClient {
     ServerMessage server_message = 4;
     PlayerListUpdate player_list_update_message = 5;
     PlayerUpdate player_update_message = 6;
-    MetaData meta_data_message = 7;
-    Chat chat_message = 8;
+    PlayerData player_data = 128;
+    MetaData meta_data_message = 129;
+    Chat chat_message = 130;
   }
 }
