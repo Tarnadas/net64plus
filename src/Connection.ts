@@ -5,8 +5,10 @@ import { Emulator } from './Emulator'
 import { Packet, PACKET_TYPE } from './Packet'
 import { addGlobalMessage, clearGlobalMessages } from './Chat'
 import { store } from './renderer'
-import { disconnect, setConnectionError, setPlayers } from './actions/connection'
+import { disconnect, setConnectionError, setPlayer, setPlayers } from './actions/connection'
 import { Server, Player } from './models/Server.model'
+import { ClientServerMessage } from '../proto/ClientServerMessage.js'
+import { ServerClient, ServerClientMessage } from '../proto/ServerClientMessage.js'
 
 const UPDATE_INTERVAL = 32
 const DECODER = new TextDecoder('utf-8')
@@ -46,7 +48,7 @@ export class Connection {
 
   private emulator: Emulator
 
-  private playerId: number | null = null
+  private playerId?: number
 
   private loop: number | null = null
 
@@ -67,6 +69,7 @@ export class Connection {
     this.ws.on('close', this.onClose.bind(this))
     this.ws.on('message', this.onMessage.bind(this))
     this.server = Object.assign(server, { ip: '127.0.0.1' })
+    this.server.players = []
     this.emulator = emulator
   }
 
@@ -130,15 +133,29 @@ export class Connection {
    * @param {Buffer} data - Received data
    */
   private onMessage (data: Buffer): void {
-    const type = data[0]
-    let payload = data.slice(1)
-    switch (type) {
-      case PACKET_TYPE.HANDSHAKE:
-        this.playerId = payload[0]
-        this.emulator.setPlayerId(payload[0])
+    const message = ServerClientMessage.decode(data)
+    if (message.compression === ServerClientMessage.Compression.ZSTD) {
+      // TODO compression
+      return
+    }
+    if (!message.data) return
+    switch (message.data.messageType) {
+      case ServerClient.MessageType.HANDSHAKE:
+        const handshake = message.data.handshake
+        if (!handshake || !handshake.playerId) return
+        this.playerId = handshake.playerId
+        if (handshake.playerList) {
+          store.dispatch(setPlayers(handshake.playerList.players as Player[]))
+        }
+        this.emulator.setPlayerId(this.playerId)
         addGlobalMessage(`Your player ID is ${this.playerId}`, '[SERVER]')
         this.loop = setInterval(this.sendAll.bind(this), UPDATE_INTERVAL)
         break
+    }
+
+    const type = data[0]
+    let payload = data.slice(1)
+    switch (type) {
       case PACKET_TYPE.PING:
         // TODO
         break
@@ -159,7 +176,7 @@ export class Connection {
         break
       case PACKET_TYPE.PLAYER_UPDATE:
         const player: Player = playerUpdate.toObject(playerUpdate.decode(payload)) as Player
-        store.dispatch(setPlayer(player))
+        store.dispatch(setPlayer(0, player))
         break
       case PACKET_TYPE.PLAYER_DATA:
         for (let i = 0, j = 0; i < payload.length; i += 0x18, j++) {
@@ -188,7 +205,8 @@ export class Connection {
         if (store.getState().save.appSaveData.emuChat) {
           this.emulator.displayChatMessage(message, msgLength)
         }
-        const username = this.server.players[]
+        if (!this.server.players) throw new Error('this.server.players not defined')
+        const username = this.server.players[userId].username
         addGlobalMessage(message, username)
         break
     }

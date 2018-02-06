@@ -23,7 +23,7 @@ export const connection = (state: ConnectionState = initialState.connection, act
         break
       case 'SET_PLAYER':
         if (!draft.connection) return
-        // TODO
-        // draft.connection.server.players = action.players
+        if (!draft.connection.server.players) draft.connection.server.players = []
+        draft.connection.server.players[action.playerId] = action.player
     }
   })
