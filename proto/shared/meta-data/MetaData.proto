@@ -1,7 +1,0 @@
-syntax = 'proto3';
-
-import "Meta.proto";
-
-message MetaData {
-  repeated Meta meta_data = 1;
-}

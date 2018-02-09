@@ -1,7 +1,0 @@
-syntax = 'proto3';
-
-import "Player.proto";
-
-message PlayerListUpdate {
-  repeated Player players = 1;
-}

@@ -1,6 +1,0 @@
-syntax = 'proto3';
-
-message Player {
-  string username = 1;
-  uint32 character_id = 2;
-}

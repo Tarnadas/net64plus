@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+import "server-client/player.proto";
+
+message Handshake{
+	uint32 user_id = 1;
+	PlayerList players = 2;
+}

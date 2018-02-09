@@ -1,7 +1,0 @@
-syntax = 'proto3';
-
-message ChatPrivate {
-  uint32 sender_id = 1;
-  string message = 2;
-  uint32 receiver_id = 3;
-}

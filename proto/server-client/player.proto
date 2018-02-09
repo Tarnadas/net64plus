@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+message Player{
+	string name = 1;
+	fixed32 character_id = 2;
+	fixed32 player_id = 3;
+}
+
+message PlayerList{
+	repeated Player players = 1;
+}
