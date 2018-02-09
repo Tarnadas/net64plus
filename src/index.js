@@ -14,20 +14,24 @@ import fs from 'fs';
     appSavePath
   }
   if (fs.existsSync(path.join(appSavePath, 'save.json'))) {
-    const appSaveData = JSON.parse(fs.readFileSync(path.join(appSavePath, 'save.json')))
-    if (appSaveData == null) {
-      await new Promise(resolve => {
-        rimraf(appSavePath, err => {
-          if (err) {
-            console.log(err)
-          } else {
-            fs.mkdirSync(appSavePath)
-          }
-          resolve()
+    try {
+      const appSaveData = JSON.parse(fs.readFileSync(path.join(appSavePath, 'save.json')))
+      if (appSaveData == null) {
+        await new Promise(resolve => {
+          rimraf(appSavePath, err => {
+            if (err) {
+              console.log(err)
+            } else {
+              fs.mkdirSync(appSavePath)
+            }
+            resolve()
+          })
         })
-      })
-    } else {
-      global.save.appSaveData = appSaveData
+      } else {
+        global.save.appSaveData = appSaveData
+      }
+    } catch (err) {
+      // TODO find cause of corrupted appdata
     }
   }
 
