@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+import "server-client/server_client.proto";
+
+message ServerClientMessage{
+	bool compressed = 1;			//I think we should never compress WrongVersion messages
+	uint32 uncompressed_size = 2;
+	oneof message{
+		bytes compressed_msg = 3;
+		ServerClient msg = 4;
+	}
+}

@@ -1,9 +1,0 @@
-syntax = 'proto3';
-
-message GameMode {
-  enum GameModeType {
-    DEFAULT = 1;
-    // I have no idea what else
-  }
-  GameModeType game_mode = 1;
-}
