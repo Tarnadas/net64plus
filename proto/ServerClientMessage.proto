@@ -3,7 +3,12 @@ syntax = "proto3";
 import "server-client/ServerClient.proto";
 
 message ServerClientMessage {
-  bool compressed = 1;      //I think we should never compress WrongVersion messages
+  enum Compression {
+    NONE = 0;
+    GZIP = 1;
+    ZSTD = 2;
+  }
+  Compression compression_type = 1;
   uint32 uncompressed_size = 2;
   oneof message {
     bytes compressed_msg = 3;
