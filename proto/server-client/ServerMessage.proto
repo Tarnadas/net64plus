@@ -2,21 +2,21 @@ syntax = "proto3";
 
 import "server-client/ConnectionDenied.proto";
 
-message GameMode{
-	enum GameModeType{
-		DEFAULT = 0;
-	}
-	GameModeType gamemode = 1;
+message GameMode {
+  enum GameModeType {
+    DEFAULT = 0;
+  }
+  GameModeType gamemode = 1;
 }
 
-message ServerMessage{
-	enum MessageType{
-		CONNECTION_DENIED = 0;
-		GAME_MODE = 1;
-	}
-	MessageType type = 1;
-	oneof message{
-		ConnectionDenied connection_denied = 2;
-		GameMode game_mode = 3;
-	}
+message ServerMessage {
+  enum MessageType {
+    CONNECTION_DENIED = 0;
+    GAME_MODE = 1;
+  }
+  MessageType type = 1;
+  oneof message {
+    ConnectionDenied connection_denied = 2;
+    GameMode game_mode = 3;
+  }
 }

@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-message MinigameData{
-	uint32 length = 1;
-	uint32 address = 2;
-	bytes data = 3;
+message MinigameData {
+  uint32 length = 1;
+  uint32 address = 2;
+  bytes data = 3;
 }
 
-message MinigameDataList{
-	repeated MinigameData minigame_data = 1;
+message MinigameDataList {
+  repeated MinigameData minigame_data = 1;
 }

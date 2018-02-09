@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "server-client/Player.proto";
 
-message Handshake{
-	uint32 user_id = 1;
-	PlayerList players = 2;
+message Handshake {
+  uint32 user_id = 1;
+  PlayerList players = 2;
 }

@@ -7,25 +7,25 @@ import "shared/Ping.proto";
 import "shared/ChatMessage.proto";
 import "shared/MinigameData.proto";
 
-message ServerClient{
-	enum MessageType{
-		HANDSHAKE = 0;
-		PING = 1;
-		SERVER_MESSAGE = 2;
-		PLAYER_LIST = 3;
-		PLAYER_UPDATE = 4;
-		PLAYER_DATA = 5;
-		MINIGAME_DATA = 6;
-		CHAT_MESSAGE = 7;
-	}
-	MessageType type = 1;
-	oneof message{
-		Handshake handshake = 2;
-		Ping ping = 3;
-		ServerMessage server_message = 4;
-		PlayerList player_list = 5;
-		Player player_update = 6;
-		Chat chat = 7;
-		MinigameDataList minigame_data = 8;
-	}
+message ServerClient {
+  enum MessageType {
+    HANDSHAKE = 0;
+    PING = 1;
+    SERVER_MESSAGE = 2;
+    PLAYER_LIST = 3;
+    PLAYER_UPDATE = 4;
+    PLAYER_DATA = 5;
+    MINIGAME_DATA = 6;
+    CHAT_MESSAGE = 7;
+  }
+  MessageType type = 1;
+  oneof message {
+    Handshake handshake = 2;
+    Ping ping = 3;
+    ServerMessage server_message = 4;
+    PlayerList player_list = 5;
+    Player player_update = 6;
+    Chat chat = 7;
+    MinigameDataList minigame_data = 8;
+  }
 }
