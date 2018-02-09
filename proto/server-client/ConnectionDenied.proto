@@ -3,8 +3,8 @@ syntax = "proto3";
 message ServerFull{}
 
 message WrongVersion{
-	fixed32 min_version = 1;
-	fixed32 max_version = 2;
+	uint32 min_version = 1;
+	uint32 max_version = 2;
 }
 
 message ConnectionDenied{
