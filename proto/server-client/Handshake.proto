@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "server-client/player.proto";
+import "server-client/Player.proto";
 
 message Handshake{
 	uint32 user_id = 1;

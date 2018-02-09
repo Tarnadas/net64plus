@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-import "server-client/handshake.proto";
-import "server-client/player.proto";
-import "server-client/server_message.proto";
-import "shared/ping.proto";
-import "shared/chat_message.proto";
-import "shared/minigame_data.proto";
+import "server-client/Handshake.proto";
+import "server-client/Player.proto";
+import "server-client/ServerMessage.proto";
+import "shared/Ping.proto";
+import "shared/ChatMessage.proto";
+import "shared/MinigameData.proto";
 
 message ServerClient{
 	enum MessageType{

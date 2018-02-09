@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "server-client/connection_denied.proto";
+import "server-client/ConnectionDenied.proto";
 
 message GameMode{
 	enum GameModeType{

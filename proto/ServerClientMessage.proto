@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "server-client/server_client.proto";
+import "server-client/ServerClient.proto";
 
 message ServerClientMessage{
 	bool compressed = 1;			//I think we should never compress WrongVersion messages
