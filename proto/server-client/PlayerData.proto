@@ -1,7 +1,9 @@
 syntax = "proto3";
 
+package ServerClient;
+
 message PlayerData {
   uint32 player_num = 1;
-  uint32 data_length = 2;
+  uint32 player_length = 2;
   bytes player_data = 3;
 }

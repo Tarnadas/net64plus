@@ -1,6 +1,10 @@
 syntax = "proto3";
 
-message ServerFull {}
+package ServerClient;
+
+message ServerFull {
+  uint32 max_players = 1;
+}
 
 message WrongVersion {
   uint32 min_version = 1;

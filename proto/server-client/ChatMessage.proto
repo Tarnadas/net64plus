@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package ServerClient;
+
+message Chat {
+  enum ChatType {
+    CHAT_GLOBAL = 0;
+    CHAT_PRIVATE = 1;
+    CHAT_TEAM = 2;
+  }
+  ChatType chat_type = 1;
+  uint32 sender_id = 2;
+  string message = 3;
+}

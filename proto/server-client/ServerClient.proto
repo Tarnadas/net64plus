@@ -1,31 +1,37 @@
 syntax = "proto3";
 
 import "server-client/Handshake.proto";
-import "server-client/Player.proto";
+import "server-client/PlayerList.proto";
 import "server-client/ServerMessage.proto";
-import "shared/Ping.proto";
-import "shared/ChatMessage.proto";
+import "server-client/ChatMessage.proto";
+import "server-client/PlayerData.proto";
 import "shared/MinigameData.proto";
+import "shared/Ping.proto";
+import "shared/Player.proto";
+
+package ServerClient;
 
 message ServerClient {
   enum MessageType {
-    HANDSHAKE = 0;
-    PING = 1;
-    SERVER_MESSAGE = 2;
-    PLAYER_LIST = 3;
-    PLAYER_UPDATE = 4;
-    PLAYER_DATA = 5;
-    MINIGAME_DATA = 6;
-    CHAT_MESSAGE = 7;
+    UNUSED = 0;
+    HANDSHAKE = 2;
+    PING = 3;
+    SERVER_MESSAGE = 4;
+    PLAYER_LIST = 5;
+    PLAYER_UPDATE = 6;
+    PLAYER_DATA = 128;
+    MINIGAME_DATA = 129;
+    CHAT_MESSAGE = 130;
   }
-  MessageType type = 1;
+  MessageType message_type = 1;
   oneof message {
     Handshake handshake = 2;
     Ping ping = 3;
     ServerMessage server_message = 4;
     PlayerList player_list = 5;
     Player player_update = 6;
-    Chat chat = 7;
-    MinigameDataList minigame_data = 8;
+    PlayerData player_data = 128;
+    MinigameDataList minigame_data = 129;
+    Chat chat = 130;
   }
 }

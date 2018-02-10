@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package ClientServer;
+
+message ChatGlobal {}
+
+message ChatPrivate {
+  uint32 receiver_id = 1;
+}
+
+message ChatTeam {
+  uint32 team_id = 1;
+}
+
+message Chat {
+  enum ChatType {
+    GLOBAL = 0;
+    PRIVATE = 1;
+    TEAM = 2;
+  }
+  ChatType chat_type = 1;
+  string chat_message = 2;
+  oneof message {
+    ChatGlobal global = 3;
+    ChatPrivate private = 4;
+    ChatTeam team = 5;
+  }
+}

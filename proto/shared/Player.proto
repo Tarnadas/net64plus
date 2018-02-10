@@ -5,7 +5,3 @@ message Player {
   uint32 character_id = 2;
   uint32 player_id = 3;
 }
-
-message PlayerList {
-  repeated Player players = 1;
-}

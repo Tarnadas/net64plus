@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+import "shared/Player.proto";
+
+package ServerClient;
+
+message PlayerList {
+  repeated Player players = 1;
+}
