@@ -2,8 +2,8 @@ syntax = "proto3";
 
 import "shared/Player.proto";
 
-package ServerClient;
+package Net64Protocol.ServerClient;
 
 message PlayerList {
-  repeated Player players = 1;
+  repeated Shared.Player players = 1;
 }

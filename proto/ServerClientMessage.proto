@@ -1,19 +1,15 @@
 syntax = "proto3";
 
 import "server-client/ServerClient.proto";
+import "shared/Compression.proto";
 
-package ServerClient;
+package Net64Protocol;
 
 message ServerClientMessage {
-  enum Compression {
-    NONE = 0;
-    GZIP = 1;
-    ZSTD = 2;
-  }
-  Compression compression = 1;
+  Shared.Compression compression = 1;
   uint32 uncompressed_size = 2;
   oneof message {
     bytes compressed_msg = 3;
-    ServerClient msg = 4;
+    ServerClient.ServerClient msg = 4;
   }
 }

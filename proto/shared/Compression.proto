@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package Net64Protocol.Shared;
+
+enum Compression {
+  NONE = 0;
+  GZIP = 1;
+  ZSTD = 2;
+}

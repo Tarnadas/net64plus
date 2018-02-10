@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package Net64Protocol.Shared;
+
 message Player {
   string name = 1;
   uint32 character_id = 2;

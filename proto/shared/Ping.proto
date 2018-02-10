@@ -1,3 +1,5 @@
 syntax = "proto3";
 
+package Net64Protocol.Shared;
+
 message Ping{}

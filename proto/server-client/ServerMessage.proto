@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "server-client/ConnectionDenied.proto";
 
-package ServerClient;
+package Net64Protocol.ServerClient;
 
 message GameMode {
   enum GameModeType {

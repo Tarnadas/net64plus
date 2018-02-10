@@ -9,7 +9,7 @@ import "shared/MinigameData.proto";
 import "shared/Ping.proto";
 import "shared/Player.proto";
 
-package ServerClient;
+package Net64Protocol.ServerClient;
 
 message ServerClient {
   enum MessageType {
@@ -26,12 +26,12 @@ message ServerClient {
   MessageType message_type = 1;
   oneof message {
     Handshake handshake = 2;
-    Ping ping = 3;
+    Shared.Ping ping = 3;
     ServerMessage server_message = 4;
     PlayerList player_list = 5;
-    Player player_update = 6;
+    Shared.Player player_update = 6;
     PlayerData player_data = 128;
-    MinigameDataList minigame_data = 129;
+    Shared.MinigameDataList minigame_data = 129;
     Chat chat = 130;
   }
 }

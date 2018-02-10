@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package ClientServer;
+package Net64Protocol.ClientServer;
 
 message PlayerData {
   uint32 data_length = 1;

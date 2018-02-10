@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package ServerClient;
+package Net64Protocol.ServerClient;
 
 message Chat {
   enum ChatType {

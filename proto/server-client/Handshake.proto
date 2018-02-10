@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package ServerClient;
+package Net64Protocol.ServerClient;
 
 import "server-client/PlayerList.proto";
 
