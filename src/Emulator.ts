@@ -120,14 +120,13 @@ export class Emulator {
    * Displays a chat message in-game.
    *
    * @param {string} message - Message to display
-   * @param {number} msgLength - Message length
    */
-  public displayChatMessage (message: string, msgLength: number) {
+  public displayChatMessage (message: string) {
     const messageBuffer = Buffer.from(message)
     const triggerMessage = Buffer.alloc(4)
     const chatMessage = Buffer.alloc(24)
     try {
-      messageBuffer.copy(chatMessage, 0, 0, msgLength)
+      messageBuffer.copy(chatMessage, 0, 0, Math.min(24, chatMessage.length))
       chatMessage.swap32()
       this.writeMemory(0xFF7680, triggerMessage)
       this.writeMemory(0xFF7684, chatMessage)

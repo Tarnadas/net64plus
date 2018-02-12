@@ -1,21 +1,16 @@
 import * as WS from 'ws'
-import * as protobuf from 'protobufjs'
 
 import { Emulator } from './Emulator'
-import { Packet, PACKET_TYPE } from './Packet'
 import { addGlobalMessage, clearGlobalMessages } from './Chat'
 import { store } from './renderer'
 import { disconnect, setConnectionError, setPlayer, setPlayers } from './actions/connection'
 import { Server, Player } from './models/Server.model'
-import { ClientServerMessage } from '../proto/ClientServerMessage.js'
-import { ServerClient, ServerClientMessage } from '../proto/ServerClientMessage.js'
+import { Compression, ClientServerMessage, IClientServerMessage, ClientServer, Chat } from '../proto/ClientServerMessage.js'
+import { ServerClientMessage, ServerClient, ServerMessage, ConnectionDenied, GameMode, IServerClient, IServerMessage, IConnectionDenied } from '../proto/ServerClientMessage.js'
 
 const UPDATE_INTERVAL = 32
 const DECODER = new TextDecoder('utf-8')
 const ENCODER = new TextEncoder('utf-8')
-
-const playerUpdate = protobuf.loadSync('../proto/PlayerUpdate.proto').lookupType('PlayerUpdate')
-const playerListUpdate = protobuf.loadSync('../proto/PlayerListUpdate.proto').lookupType('PlayerListUpdate')
 
 export interface ConnectionConstructorParameters {
   /** Server to connect to */
@@ -50,7 +45,7 @@ export class Connection {
 
   private playerId?: number
 
-  private loop: number | null = null
+  private loop: NodeJS.Timer | null = null
 
   private hasError: boolean = false
 
@@ -63,6 +58,7 @@ export class Connection {
     server, emulator, username, characterId, onConnect, onError
   }: ConnectionConstructorParameters) {
     this.disconnect = this.disconnect.bind(this)
+    this.sendAll = this.sendAll.bind(this)
     this.ws = new WS(`ws://${server.domain ? server.domain : server.ip}:${server.port}`)
     this.ws.on('open', this.onOpen.bind(this, characterId, username, onConnect))
     this.ws.on('error', this.onError.bind(this, onError))
@@ -89,14 +85,20 @@ export class Connection {
    */
   private onOpen (characterId: number, username: string, onConnect: () => void): void {
     onConnect()
-    const handshake = new Uint8Array(29)
-    handshake[0] = PACKET_TYPE.HANDSHAKE
-    handshake[1] = 0
-    handshake[2] = 4
-    handshake[3] = characterId
-    handshake[4] = username.length
-    handshake.set(ENCODER.encode(username), 5)
-    this.ws.send(handshake)
+    const handshake: IClientServerMessage = {
+      compression: Compression.NONE,
+      data: {
+        messageType: ClientServer.MessageType.HANDSHAKE,
+        handshake: {
+          major: 1,
+          minor: 0,
+          characterId,
+          username
+        }
+      }
+    }
+    const handshakeMessage = ClientServerMessage.encode(ClientServerMessage.fromObject(handshake)).finish()
+    this.ws.send(handshakeMessage)
   }
 
   /**
@@ -128,86 +130,239 @@ export class Connection {
   }
 
   /**
-   * Schedule received message from server.
+   * Handle received message from server.
    *
    * @param {Buffer} data - Received data
    */
   private onMessage (data: Buffer): void {
     const message = ServerClientMessage.decode(data)
-    if (message.compression === ServerClientMessage.Compression.ZSTD) {
+    if (message.compression === Compression.ZSTD) {
       // TODO compression
       return
     }
-    if (!message.data) return
-    switch (message.data.messageType) {
+    const messageData = message.data
+    if (!messageData) return
+    switch (messageData.messageType) {
       case ServerClient.MessageType.HANDSHAKE:
-        const handshake = message.data.handshake
-        if (!handshake || !handshake.playerId) return
-        this.playerId = handshake.playerId
-        if (handshake.playerList) {
-          store.dispatch(setPlayers(handshake.playerList.players as Player[]))
-        }
-        this.emulator.setPlayerId(this.playerId)
-        addGlobalMessage(`Your player ID is ${this.playerId}`, '[SERVER]')
-        this.loop = setInterval(this.sendAll.bind(this), UPDATE_INTERVAL)
+        this.onHandshake(messageData)
+        break
+      case ServerClient.MessageType.PING:
+        this.onPing(messageData)
+        break
+      case ServerClient.MessageType.SERVER_MESSAGE:
+        this.onServerMessage(messageData)
+        break
+      case ServerClient.MessageType.PLAYER_LIST_UPDATE:
+        this.onPlayerListUpdate(messageData)
+        break
+      case ServerClient.MessageType.PLAYER_UPDATE:
+        this.onPlayerUpdate(messageData)
+        break
+      case ServerClient.MessageType.PLAYER_DATA:
+        this.onPlayerData(messageData)
+        break
+      case ServerClient.MessageType.META_DATA:
+        this.onMetaData(messageData)
+        break
+      case ServerClient.MessageType.CHAT:
+        this.onChatMessage(messageData)
         break
     }
+  }
 
-    const type = data[0]
-    let payload = data.slice(1)
-    switch (type) {
-      case PACKET_TYPE.PING:
-        // TODO
+  /**
+   * Handle handshake message.
+   *
+   * @param {IServerClient} messageData - The decoded message
+   */
+  private onHandshake (messageData: IServerClient): void {
+    const handshake = messageData.handshake
+    if (!handshake || !handshake.playerId) return
+    this.playerId = handshake.playerId
+    if (handshake.playerList) {
+      const players = handshake.playerList.playerUpdates as Player[]
+      if (!players) return
+      store.dispatch(setPlayers(players))
+    }
+    this.emulator.setPlayerId(this.playerId)
+    addGlobalMessage(`Your player ID is ${this.playerId}`, '[SERVER]')
+    this.loop = setInterval(this.sendAll, UPDATE_INTERVAL)
+  }
+
+  /**
+   * Handle ping message.
+   *
+   * @param {IServerClient} messageData - The decoded message
+   */
+  private onPing (messageData: IServerClient): void {
+    // TODO
+  }
+
+  /**
+   * Handle server message.
+   *
+   * @param {IServerClient} messageData - The decoded message
+   */
+  private onServerMessage (messageData: IServerClient): void {
+    if (!messageData.serverMessage) return
+    const serverMessage = messageData.serverMessage
+    switch (serverMessage.messageType) {
+      case ServerMessage.MessageType.CONNECTION_DENIED:
+        this.onConnectionDenied(serverMessage)
         break
-      case PACKET_TYPE.WRONG_VERSION:
-        const major = payload[0]
-        const minor = payload[1]
-        store.dispatch(setConnectionError('Client and server version are incompatible'))
-        this.ws.close()
-        // TODO
+      case ServerMessage.MessageType.GAME_MODE:
+        this.onGameMode(serverMessage)
         break
-      case PACKET_TYPE.SERVER_FULL:
-        store.dispatch(setConnectionError('Server is full'))
-        this.ws.close()
+      case ServerMessage.MessageType.SERVER_TOKEN:
+        this.onServerToken(serverMessage)
         break
-      case PACKET_TYPE.PLAYER_LIST_UPDATE:
-        const players: Player[] = playerListUpdate.toObject(playerListUpdate.decode(payload)) as Player[]
-        store.dispatch(setPlayers(players))
+    }
+  }
+
+  /**
+   * Handle connection denied message.
+   *
+   * @param {IServerMessage} serverMessage - The decoded message
+   */
+  private onConnectionDenied (serverMessage: IServerMessage): void {
+    const connectionDenied = serverMessage.connectionDenied
+    if (!connectionDenied) return
+    switch (connectionDenied.reason) {
+      case ConnectionDenied.Reason.SERVER_FULL:
+        this.onServerFull(connectionDenied)
         break
-      case PACKET_TYPE.PLAYER_UPDATE:
-        const player: Player = playerUpdate.toObject(playerUpdate.decode(payload)) as Player
-        store.dispatch(setPlayer(0, player))
+      case ConnectionDenied.Reason.WRONG_VERSION:
+        this.onWrongVersion(connectionDenied)
         break
-      case PACKET_TYPE.PLAYER_DATA:
-        for (let i = 0, j = 0; i < payload.length; i += 0x18, j++) {
-          // ignore own player data
-          if (this.playerId === payload[i + 3]) continue
-          this.emulator.writeMemory(0xFF7800 + 0x100 * j, payload.slice(i, i + 0x1C))
-        }
-        break
-      case PACKET_TYPE.META_DATA:
-        for (let offset = 0; offset < payload.length;) {
-          const length = payload.readUInt32BE(offset)
-          const writeTo = payload.readUInt32BE(offset + 4)
-          const data = payload.slice(offset + 8, offset + 8 + length)
-          this.emulator.writeMemory(writeTo, data)
-          offset += length + 8
-        }
-        break
-      case PACKET_TYPE.GAME_MODE:
-        this.emulator.writeMemory(0xFF5FF7, payload)
-        break
-      case PACKET_TYPE.CHAT_MESSAGE:
-        const msgLength = payload[0]
-        const userId = payload[1]
-        const message = DECODER.decode(payload.slice(2, msgLength + 2))
-        // const username = DECODER.decode(payload.slice(msgLength + 2, msgLength + 2 + payload[msgLength + 1]))
+    }
+    this.ws.close()
+  }
+
+  /**
+   * Handle server full message.
+   *
+   * @param {IConnectionDenied} connectionDenied - The decoded message
+   */
+  private onServerFull (connectionDenied: IConnectionDenied): void {
+    const serverFull = connectionDenied.serverFull
+    if (!serverFull) return
+    store.dispatch(setConnectionError(`Server is full`))
+  }
+
+  /**
+   * Handle wrong version message.
+   *
+   * @param {IConnectionDenied} connectionDenied - The decoded message
+   */
+  private onWrongVersion (connectionDenied: IConnectionDenied): void {
+    const wrongVersion = connectionDenied.wrongVersion
+    if (!wrongVersion) return
+    store.dispatch(setConnectionError(`The server's network API version (${wrongVersion.majorVersion}.${wrongVersion.minorVersion}) is incompatible with your client version`))
+    // TODO add server version -> client version mapping
+  }
+
+  /**
+   * Handle game mode message.
+   *
+   * @param {IServerMessage} serverMessage - The decoded message
+   */
+  private onGameMode (serverMessage: IServerMessage): void {
+    const gameMode = serverMessage.gameMode
+    if (!gameMode || !gameMode.gameMode) return
+    const gameModeBuffer = Buffer.from(new Uint8Array([gameMode.gameMode]).buffer as ArrayBuffer)
+    this.emulator.writeMemory(0xFF5FF7, gameModeBuffer)
+  }
+
+  /**
+   * Handle server token message.
+   *
+   * @param {IServerClient} serverMessage - The decoded message
+   */
+  private onServerToken (serverMessage: IServerMessage): void {
+    // TODO
+  }
+
+  /**
+   * Handle player list update message.
+   *
+   * @param {IServerClient} messageData - The decoded message
+   */
+  private onPlayerListUpdate (messageData: IServerClient): void {
+    if (!messageData.playerListUpdate) return
+    const players = messageData.playerListUpdate.playerUpdates as Player[]
+    if (!players) return
+    store.dispatch(setPlayers(players))
+  }
+
+  /**
+   * Handle player update message.
+   *
+   * @param {IServerClient} messageData - The decoded message
+   */
+  private onPlayerUpdate (messageData: IServerClient): void {
+    if (!messageData.playerUpdate || !messageData.playerUpdate.playerId || !messageData.playerUpdate.player) return
+    const player = messageData.playerUpdate.player as Player
+    store.dispatch(setPlayer(messageData.playerUpdate.playerId, player))
+  }
+
+  /**
+   * Handle player data message.
+   *
+   * @param {IServerClient} messageData - The decoded message
+   */
+  private onPlayerData (messageData: IServerClient): void {
+    const playerData = messageData.playerData
+    if (!playerData || !playerData.dataLength || !playerData.playerData || !playerData.playerLength) return
+    const payload = playerData.playerData
+    if (!payload) return
+    // TODO playerLength?
+    for (let i = 0, j = 0; i < payload.length; i += playerData.dataLength, j++) {
+      // ignore own player data
+      if (this.playerId === payload[i + 3]) continue
+      this.emulator.writeMemory(0xFF7800 + 0x100 * j, Buffer.from(payload.buffer.slice(i, i + 0x1C) as ArrayBuffer))
+    }
+  }
+
+  /**
+   * Handle meta data message.
+   *
+   * @param {IServerClient} messageData - The decoded message
+   */
+  private onMetaData (messageData: IServerClient): void {
+    if (!messageData.metaData) return
+    const metaData = messageData.metaData.metaData
+    if (!metaData) return
+    for (const meta of metaData) {
+      const length = meta.length
+      const address = meta.address
+      const data = meta.data
+      if (!length || !address || !data) continue
+      this.emulator.writeMemory(address, Buffer.from(data.buffer as ArrayBuffer))
+    }
+  }
+
+  /**
+   * Handle chat message.
+   *
+   * @param {IServerClient} messageData - The decoded message
+   */
+  private onChatMessage (messageData: IServerClient): void {
+    const chat = messageData.chat
+    if (!chat) return
+    const message = chat.message
+    const senderId = chat.senderId
+    if (!message || senderId == null) return
+    switch (chat.chatType) {
+      case Chat.ChatType.CHAT_GLOBAL:
         if (store.getState().save.appSaveData.emuChat) {
-          this.emulator.displayChatMessage(message, msgLength)
+          this.emulator.displayChatMessage(message)
         }
         if (!this.server.players) throw new Error('this.server.players not defined')
-        const username = this.server.players[userId].username
+        const username = this.server.players[senderId].username
         addGlobalMessage(message, username)
+        break
+      case Chat.ChatType.CHAT_PRIVATE:
+        // TODO
         break
     }
   }
@@ -224,11 +379,28 @@ export class Connection {
    * Send player data to connected server.
    */
   private sendPlayerData (): void {
-    const playerData = this.emulator.readMemory(0xFF7700, 0x1C)
-    if (playerData[0xF] !== 0) {
+    const playerDataBuffer = this.emulator.readMemory(0xFF7700, 0x1C)
+    if (playerDataBuffer[0xF] !== 0) {
       try {
-        this.ws.send(new Packet(PACKET_TYPE.PLAYER_DATA, playerData))
-      } catch (err) {}
+        const playerData: IClientServerMessage = {
+          compression: Compression.NONE,
+          data: {
+            messageType: ClientServer.MessageType.PLAYER_DATA,
+            playerData: {
+              dataLength: 0x1C,
+              playerData: playerDataBuffer
+            }
+          }
+        }
+        const playerDataMessage = ClientServerMessage.encode(ClientServerMessage.fromObject(playerData)).finish()
+        this.ws.send(playerDataMessage)
+      } catch (err) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error(err)
+        } else {
+          // TODO global error handler
+        }
+      }
     }
   }
 
@@ -236,30 +408,41 @@ export class Connection {
    * Send all meta data to connected server.
    */
   private sendMetaData (): void {
-    const self = this
-    const metaData = Buffer.concat(
-      Array.from((function * () {
-        for (let baseAdr = 0xFF7400, offset = 0; offset < 0x240; offset += 12) {
-          const readFrom = self.emulator.readMemory(baseAdr + offset, 4).readInt32BE(0)
-          // TODO @Kaze: this should be handled in assembly
-          // we don't want to send player data as meta data
-          if (readFrom >= 0xFF7700 && readFrom < 0xFF9100) {
-            continue
-          }
-          const length = self.emulator.readMemory(baseAdr + offset + 4, 4).readInt32BE(0)
-          const packetLength = Buffer.allocUnsafe(4)
-          packetLength.writeInt32BE(length, 0)
-          yield Buffer.concat([
-            packetLength,
-            self.emulator.readMemory(baseAdr + offset + 8, 4),
-            self.emulator.readMemory(readFrom, length)
-          ])
-        }
-      })())
-    )
     try {
-      this.ws.send(new Packet(PACKET_TYPE.META_DATA, metaData))
-    } catch (err) {}
+      const self = this
+      const metaData: IClientServerMessage = {
+        compression: Compression.NONE,
+        data: {
+          messageType: ClientServer.MessageType.META_DATA,
+          metaData: {
+            metaData: Array.from((function * () {
+              for (let baseAdr = 0xFF7400, offset = 0; offset < 0x240; offset += 12) {
+                const readFrom = self.emulator.readMemory(baseAdr + offset, 4).readInt32BE(0)
+                // TODO @Kaze: this should be handled in assembly
+                // we don't want to send player data as meta data
+                if (readFrom >= 0xFF7700 && readFrom < 0xFF9100) {
+                  continue
+                }
+                const length = self.emulator.readMemory(baseAdr + offset + 4, 4).readInt32BE(0)
+                yield {
+                  length,
+                  address: readFrom,
+                  data: self.emulator.readMemory(readFrom, length)
+                }
+              }
+            })())
+          }
+        }
+      }
+      const metaDataMessage = ClientServerMessage.encode(ClientServerMessage.fromObject(metaData)).finish()
+      this.ws.send(metaDataMessage)
+    } catch (err) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error(err)
+      } else {
+        // TODO global error handler
+      }
+    }
   }
 
   /**
@@ -268,11 +451,18 @@ export class Connection {
    * @param {string} message - The message to send
    */
   public sendChatMessage (message: string): void {
-    const messageBinary = ENCODER.encode(message)
-    const chatMessage = new Uint8Array(message.length + 1)
-    chatMessage.set(new Uint8Array([message.length]))
-    chatMessage.set(messageBinary, 1)
-    this.ws.send(new Packet(PACKET_TYPE.CHAT_MESSAGE, chatMessage))
+    const chat: IClientServerMessage = {
+      compression: Compression.NONE,
+      data: {
+        messageType: ClientServer.MessageType.CHAT,
+        chat: {
+          chatType: Chat.ChatType.CHAT_GLOBAL,
+          message
+        }
+      }
+    }
+    const chatMessage = ClientServerMessage.encode(ClientServerMessage.fromObject(chat)).finish()
+    this.ws.send(chatMessage)
   }
 
   /**
@@ -283,7 +473,17 @@ export class Connection {
    * @param {number} args.characterId - Character ID to change to
    */
   public sendPlayerUpdate ({username, characterId}: {username: string, characterId: number}): void {
-    const packet = playerUpdate.encode(playerUpdate.create({username, characterId})).finish()
-    this.ws.send(new Packet(PACKET_TYPE.PLAYER_UPDATE, packet))
+    const playerUpdate: IClientServerMessage = {
+      compression: Compression.NONE,
+      data: {
+        messageType: ClientServer.MessageType.PLAYER_UPDATE,
+        player: {
+          characterId,
+          username
+        }
+      }
+    }
+    const playerUpdateMessage = ClientServerMessage.encode(ClientServerMessage.fromObject(playerUpdate)).finish()
+    this.ws.send(playerUpdateMessage)
   }
 }
