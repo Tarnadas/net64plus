@@ -1,0 +1,12 @@
+syntax = 'proto3'; 
+
+import "shared/player-update/Player.proto";
+
+message PlayerUpdate { 
+  uint32 player_id = 1; 
+  Player player = 2; 
+}
+
+message PlayerListUpdate {
+  repeated Player players = 1;
+}

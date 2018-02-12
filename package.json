@@ -6,7 +6,7 @@
   "scripts": {
     "start": "webpack --env=dev && cd ./build && electron .",
     "build": "webpack --env=prod && node ./build-app",
-    "build:proto": "pbjs -t static-module -w commonjs -o ./proto/ServerClientMessage.js ./proto/ServerClientMessage.proto && pbts -o ./proto/ServerClientMessage.d.ts ./proto/ServerClientMessage.js && pbjs -t static-module -w commonjs -o ./proto/ClientServerMessage.js ./proto/ClientServerMessage.proto && pbts -o ./proto/ClientServerMessage.d.ts ./proto/ClientServerMessage.js",
+    "build:proto": "pbjs -t static-module -w commonjs -p ./proto -o ./proto/ServerClientMessage.js ./proto/ServerClientMessage.proto && pbts -o ./proto/ServerClientMessage.d.ts ./proto/ServerClientMessage.js && pbjs -t static-module -w commonjs -p ./proto -o ./proto/ClientServerMessage.js ./proto/ClientServerMessage.proto && pbts -o ./proto/ClientServerMessage.d.ts ./proto/ClientServerMessage.js",
     "rebuild": "electron-rebuild -v 1.6.16 -f -w winprocess",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
     "test": "jest spec"

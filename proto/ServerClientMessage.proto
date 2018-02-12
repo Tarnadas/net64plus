@@ -1,12 +1,9 @@
-syntax = 'proto3';
+syntax = "proto3";
 
-import "./server-client/ServerClient.proto";
+import "server-client/ServerClient.proto";
+import "shared/Compression.proto";
 
 message ServerClientMessage {
-  enum Compression {
-    NONE = 0;
-    ZSTD = 1;
-  }
   Compression compression = 1;
   uint32 uncompressed_size = 2;
   oneof message {

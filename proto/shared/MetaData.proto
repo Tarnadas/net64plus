@@ -1,7 +1,11 @@
-syntax = 'proto3';
+syntax = "proto3";
 
 message Meta {
   uint32 length = 1;
   uint32 address = 2;
   bytes data = 3;
+}
+
+message MetaData {
+  repeated Meta meta_data = 1;
 }

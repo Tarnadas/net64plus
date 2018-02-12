@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+enum Compression {
+  NONE = 0;
+  ZSTD = 1;
+  GZIP = 2;
+}

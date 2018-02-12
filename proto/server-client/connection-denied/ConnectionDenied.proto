@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+message ConnectionDenied {
+  enum Reason {
+    SERVER_FULL = 0;
+    WRONG_VERSION = 1;
+  }
+  Reason reason = 1;
+  oneof message {
+    ServerFull server_full = 2;
+    WrongVersion wrong_version = 3;
+  }
+}
+
+message ServerFull {
+  uint32 max_players = 1;
+}
+
+message WrongVersion {
+  string major_version = 1;
+  string minor_version = 2;
+}

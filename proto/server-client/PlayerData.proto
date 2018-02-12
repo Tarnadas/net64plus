@@ -1,6 +1,7 @@
-syntax = 'proto3';
+syntax = "proto3";
 
 message PlayerData {
+  uint32 player_length = 1;
   uint32 data_length = 2;
   bytes player_data = 3;
 }

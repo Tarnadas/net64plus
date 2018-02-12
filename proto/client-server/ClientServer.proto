@@ -1,28 +1,29 @@
-syntax = 'proto3';
+syntax = "proto3";
 
-import "handshake/Handshake.proto";
-import "../shared/ping/Ping.proto";
-import "../shared/player-update/PlayerUpdate.proto";
-import "player-data/PlayerData.proto";
-import "../shared/meta-data/MetaData.proto";
-import "../shared/chat-message/Chat.proto";
+import "client-server/Handshake.proto";
+import "shared/Ping.proto";
+import "shared/Player.proto";
+import "client-server/PlayerData.proto";
+import "shared/MetaData.proto";
+import "shared/Chat.proto";
 
 message ClientServer {
   enum MessageType {
+    UNKNOWN = 0;
     HANDSHAKE = 2;
     PING = 3;
     PLAYER_UPDATE = 6;
     PLAYER_DATA = 128;
     META_DATA = 129;
-    CHAT_MESSAGE = 130;
+    CHAT = 130;
   }
   MessageType message_type = 1;
   oneof message {
     Handshake handshake = 2;
     Ping ping = 3;
-    PlayerUpdate player_update = 6;
+    Player player = 6;
     PlayerData player_data = 128;
     MetaData meta_data = 129;
-    Chat chat_message = 130;
+    Chat chat = 130;
   }
 }

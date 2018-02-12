@@ -1,6 +1,0 @@
-syntax = 'proto3';
-
-message WrongVersion {
-  string min_version = 1;
-  string max_version = 2;
-}

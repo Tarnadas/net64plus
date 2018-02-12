@@ -15,7 +15,7 @@ $root.ClientServerMessage = (function() {
      * Properties of a ClientServerMessage.
      * @exports IClientServerMessage
      * @interface IClientServerMessage
-     * @property {ClientServerMessage.Compression|null} [compression] ClientServerMessage compression
+     * @property {Compression|null} [compression] ClientServerMessage compression
      * @property {number|null} [uncompressedSize] ClientServerMessage uncompressedSize
      * @property {Uint8Array|null} [compressedData] ClientServerMessage compressedData
      * @property {IClientServer|null} [data] ClientServerMessage data
@@ -38,7 +38,7 @@ $root.ClientServerMessage = (function() {
 
     /**
      * ClientServerMessage compression.
-     * @member {ClientServerMessage.Compression} compression
+     * @member {Compression} compression
      * @memberof ClientServerMessage
      * @instance
      */
@@ -202,6 +202,7 @@ $root.ClientServerMessage = (function() {
                 return "compression: enum value expected";
             case 0:
             case 1:
+            case 2:
                 break;
             }
         if (message.uncompressedSize != null && message.hasOwnProperty("uncompressedSize"))
@@ -246,6 +247,10 @@ $root.ClientServerMessage = (function() {
         case 1:
             message.compression = 1;
             break;
+        case "GZIP":
+        case 2:
+            message.compression = 2;
+            break;
         }
         if (object.uncompressedSize != null)
             message.uncompressedSize = object.uncompressedSize >>> 0;
@@ -280,7 +285,7 @@ $root.ClientServerMessage = (function() {
             object.uncompressedSize = 0;
         }
         if (message.compression != null && message.hasOwnProperty("compression"))
-            object.compression = options.enums === String ? $root.ClientServerMessage.Compression[message.compression] : message.compression;
+            object.compression = options.enums === String ? $root.Compression[message.compression] : message.compression;
         if (message.uncompressedSize != null && message.hasOwnProperty("uncompressedSize"))
             object.uncompressedSize = message.uncompressedSize;
         if (message.compressedData != null && message.hasOwnProperty("compressedData")) {
@@ -307,20 +312,6 @@ $root.ClientServerMessage = (function() {
         return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
     };
 
-    /**
-     * Compression enum.
-     * @name ClientServerMessage.Compression
-     * @enum {string}
-     * @property {number} NONE=0 NONE value
-     * @property {number} ZSTD=1 ZSTD value
-     */
-    ClientServerMessage.Compression = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
-        values[valuesById[0] = "NONE"] = 0;
-        values[valuesById[1] = "ZSTD"] = 1;
-        return values;
-    })();
-
     return ClientServerMessage;
 })();
 
@@ -333,10 +324,10 @@ $root.ClientServer = (function() {
      * @property {ClientServer.MessageType|null} [messageType] ClientServer messageType
      * @property {IHandshake|null} [handshake] ClientServer handshake
      * @property {IPing|null} [ping] ClientServer ping
-     * @property {IPlayerUpdate|null} [playerUpdate] ClientServer playerUpdate
+     * @property {IPlayer|null} [player] ClientServer player
      * @property {IPlayerData|null} [playerData] ClientServer playerData
      * @property {IMetaData|null} [metaData] ClientServer metaData
-     * @property {IChat|null} [chatMessage] ClientServer chatMessage
+     * @property {IChat|null} [chat] ClientServer chat
      */
 
     /**
@@ -360,7 +351,7 @@ $root.ClientServer = (function() {
      * @memberof ClientServer
      * @instance
      */
-    ClientServer.prototype.messageType = 2;
+    ClientServer.prototype.messageType = 0;
 
     /**
      * ClientServer handshake.
@@ -379,12 +370,12 @@ $root.ClientServer = (function() {
     ClientServer.prototype.ping = null;
 
     /**
-     * ClientServer playerUpdate.
-     * @member {IPlayerUpdate|null|undefined} playerUpdate
+     * ClientServer player.
+     * @member {IPlayer|null|undefined} player
      * @memberof ClientServer
      * @instance
      */
-    ClientServer.prototype.playerUpdate = null;
+    ClientServer.prototype.player = null;
 
     /**
      * ClientServer playerData.
@@ -403,24 +394,24 @@ $root.ClientServer = (function() {
     ClientServer.prototype.metaData = null;
 
     /**
-     * ClientServer chatMessage.
-     * @member {IChat|null|undefined} chatMessage
+     * ClientServer chat.
+     * @member {IChat|null|undefined} chat
      * @memberof ClientServer
      * @instance
      */
-    ClientServer.prototype.chatMessage = null;
+    ClientServer.prototype.chat = null;
 
     // OneOf field names bound to virtual getters and setters
     var $oneOfFields;
 
     /**
      * ClientServer message.
-     * @member {"handshake"|"ping"|"playerUpdate"|"playerData"|"metaData"|"chatMessage"|undefined} message
+     * @member {"handshake"|"ping"|"player"|"playerData"|"metaData"|"chat"|undefined} message
      * @memberof ClientServer
      * @instance
      */
     Object.defineProperty(ClientServer.prototype, "message", {
-        get: $util.oneOfGetter($oneOfFields = ["handshake", "ping", "playerUpdate", "playerData", "metaData", "chatMessage"]),
+        get: $util.oneOfGetter($oneOfFields = ["handshake", "ping", "player", "playerData", "metaData", "chat"]),
         set: $util.oneOfSetter($oneOfFields)
     });
 
@@ -454,14 +445,14 @@ $root.ClientServer = (function() {
             $root.Handshake.encode(message.handshake, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
         if (message.ping != null && message.hasOwnProperty("ping"))
             $root.Ping.encode(message.ping, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
-        if (message.playerUpdate != null && message.hasOwnProperty("playerUpdate"))
-            $root.PlayerUpdate.encode(message.playerUpdate, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+        if (message.player != null && message.hasOwnProperty("player"))
+            $root.Player.encode(message.player, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
         if (message.playerData != null && message.hasOwnProperty("playerData"))
             $root.PlayerData.encode(message.playerData, writer.uint32(/* id 128, wireType 2 =*/1026).fork()).ldelim();
         if (message.metaData != null && message.hasOwnProperty("metaData"))
             $root.MetaData.encode(message.metaData, writer.uint32(/* id 129, wireType 2 =*/1034).fork()).ldelim();
-        if (message.chatMessage != null && message.hasOwnProperty("chatMessage"))
-            $root.Chat.encode(message.chatMessage, writer.uint32(/* id 130, wireType 2 =*/1042).fork()).ldelim();
+        if (message.chat != null && message.hasOwnProperty("chat"))
+            $root.Chat.encode(message.chat, writer.uint32(/* id 130, wireType 2 =*/1042).fork()).ldelim();
         return writer;
     };
 
@@ -506,7 +497,7 @@ $root.ClientServer = (function() {
                 message.ping = $root.Ping.decode(reader, reader.uint32());
                 break;
             case 6:
-                message.playerUpdate = $root.PlayerUpdate.decode(reader, reader.uint32());
+                message.player = $root.Player.decode(reader, reader.uint32());
                 break;
             case 128:
                 message.playerData = $root.PlayerData.decode(reader, reader.uint32());
@@ -515,7 +506,7 @@ $root.ClientServer = (function() {
                 message.metaData = $root.MetaData.decode(reader, reader.uint32());
                 break;
             case 130:
-                message.chatMessage = $root.Chat.decode(reader, reader.uint32());
+                message.chat = $root.Chat.decode(reader, reader.uint32());
                 break;
             default:
                 reader.skipType(tag & 7);
@@ -557,6 +548,7 @@ $root.ClientServer = (function() {
             switch (message.messageType) {
             default:
                 return "messageType: enum value expected";
+            case 0:
             case 2:
             case 3:
             case 6:
@@ -583,14 +575,14 @@ $root.ClientServer = (function() {
                     return "ping." + error;
             }
         }
-        if (message.playerUpdate != null && message.hasOwnProperty("playerUpdate")) {
+        if (message.player != null && message.hasOwnProperty("player")) {
             if (properties.message === 1)
                 return "message: multiple values";
             properties.message = 1;
             {
-                var error = $root.PlayerUpdate.verify(message.playerUpdate);
+                var error = $root.Player.verify(message.player);
                 if (error)
-                    return "playerUpdate." + error;
+                    return "player." + error;
             }
         }
         if (message.playerData != null && message.hasOwnProperty("playerData")) {
@@ -613,14 +605,14 @@ $root.ClientServer = (function() {
                     return "metaData." + error;
             }
         }
-        if (message.chatMessage != null && message.hasOwnProperty("chatMessage")) {
+        if (message.chat != null && message.hasOwnProperty("chat")) {
             if (properties.message === 1)
                 return "message: multiple values";
             properties.message = 1;
             {
-                var error = $root.Chat.verify(message.chatMessage);
+                var error = $root.Chat.verify(message.chat);
                 if (error)
-                    return "chatMessage." + error;
+                    return "chat." + error;
             }
         }
         return null;
@@ -639,6 +631,10 @@ $root.ClientServer = (function() {
             return object;
         var message = new $root.ClientServer();
         switch (object.messageType) {
+        case "UNKNOWN":
+        case 0:
+            message.messageType = 0;
+            break;
         case "HANDSHAKE":
         case 2:
             message.messageType = 2;
@@ -659,7 +655,7 @@ $root.ClientServer = (function() {
         case 129:
             message.messageType = 129;
             break;
-        case "CHAT_MESSAGE":
+        case "CHAT":
         case 130:
             message.messageType = 130;
             break;
@@ -674,10 +670,10 @@ $root.ClientServer = (function() {
                 throw TypeError(".ClientServer.ping: object expected");
             message.ping = $root.Ping.fromObject(object.ping);
         }
-        if (object.playerUpdate != null) {
-            if (typeof object.playerUpdate !== "object")
-                throw TypeError(".ClientServer.playerUpdate: object expected");
-            message.playerUpdate = $root.PlayerUpdate.fromObject(object.playerUpdate);
+        if (object.player != null) {
+            if (typeof object.player !== "object")
+                throw TypeError(".ClientServer.player: object expected");
+            message.player = $root.Player.fromObject(object.player);
         }
         if (object.playerData != null) {
             if (typeof object.playerData !== "object")
@@ -689,10 +685,10 @@ $root.ClientServer = (function() {
                 throw TypeError(".ClientServer.metaData: object expected");
             message.metaData = $root.MetaData.fromObject(object.metaData);
         }
-        if (object.chatMessage != null) {
-            if (typeof object.chatMessage !== "object")
-                throw TypeError(".ClientServer.chatMessage: object expected");
-            message.chatMessage = $root.Chat.fromObject(object.chatMessage);
+        if (object.chat != null) {
+            if (typeof object.chat !== "object")
+                throw TypeError(".ClientServer.chat: object expected");
+            message.chat = $root.Chat.fromObject(object.chat);
         }
         return message;
     };
@@ -711,7 +707,7 @@ $root.ClientServer = (function() {
             options = {};
         var object = {};
         if (options.defaults)
-            object.messageType = options.enums === String ? "HANDSHAKE" : 2;
+            object.messageType = options.enums === String ? "UNKNOWN" : 0;
         if (message.messageType != null && message.hasOwnProperty("messageType"))
             object.messageType = options.enums === String ? $root.ClientServer.MessageType[message.messageType] : message.messageType;
         if (message.handshake != null && message.hasOwnProperty("handshake")) {
@@ -724,10 +720,10 @@ $root.ClientServer = (function() {
             if (options.oneofs)
                 object.message = "ping";
         }
-        if (message.playerUpdate != null && message.hasOwnProperty("playerUpdate")) {
-            object.playerUpdate = $root.PlayerUpdate.toObject(message.playerUpdate, options);
+        if (message.player != null && message.hasOwnProperty("player")) {
+            object.player = $root.Player.toObject(message.player, options);
             if (options.oneofs)
-                object.message = "playerUpdate";
+                object.message = "player";
         }
         if (message.playerData != null && message.hasOwnProperty("playerData")) {
             object.playerData = $root.PlayerData.toObject(message.playerData, options);
@@ -739,10 +735,10 @@ $root.ClientServer = (function() {
             if (options.oneofs)
                 object.message = "metaData";
         }
-        if (message.chatMessage != null && message.hasOwnProperty("chatMessage")) {
-            object.chatMessage = $root.Chat.toObject(message.chatMessage, options);
+        if (message.chat != null && message.hasOwnProperty("chat")) {
+            object.chat = $root.Chat.toObject(message.chat, options);
             if (options.oneofs)
-                object.message = "chatMessage";
+                object.message = "chat";
         }
         return object;
     };
@@ -762,21 +758,23 @@ $root.ClientServer = (function() {
      * MessageType enum.
      * @name ClientServer.MessageType
      * @enum {string}
+     * @property {number} UNKNOWN=0 UNKNOWN value
      * @property {number} HANDSHAKE=2 HANDSHAKE value
      * @property {number} PING=3 PING value
      * @property {number} PLAYER_UPDATE=6 PLAYER_UPDATE value
      * @property {number} PLAYER_DATA=128 PLAYER_DATA value
      * @property {number} META_DATA=129 META_DATA value
-     * @property {number} CHAT_MESSAGE=130 CHAT_MESSAGE value
+     * @property {number} CHAT=130 CHAT value
      */
     ClientServer.MessageType = (function() {
         var valuesById = {}, values = Object.create(valuesById);
+        values[valuesById[0] = "UNKNOWN"] = 0;
         values[valuesById[2] = "HANDSHAKE"] = 2;
         values[valuesById[3] = "PING"] = 3;
         values[valuesById[6] = "PLAYER_UPDATE"] = 6;
         values[valuesById[128] = "PLAYER_DATA"] = 128;
         values[valuesById[129] = "META_DATA"] = 129;
-        values[valuesById[130] = "CHAT_MESSAGE"] = 130;
+        values[valuesById[130] = "CHAT"] = 130;
         return values;
     })();
 
@@ -1195,221 +1193,6 @@ $root.Ping = (function() {
     };
 
     return Ping;
-})();
-
-$root.PlayerUpdate = (function() {
-
-    /**
-     * Properties of a PlayerUpdate.
-     * @exports IPlayerUpdate
-     * @interface IPlayerUpdate
-     * @property {number|null} [playerId] PlayerUpdate playerId
-     * @property {IPlayer|null} [player] PlayerUpdate player
-     */
-
-    /**
-     * Constructs a new PlayerUpdate.
-     * @exports PlayerUpdate
-     * @classdesc Represents a PlayerUpdate.
-     * @implements IPlayerUpdate
-     * @constructor
-     * @param {IPlayerUpdate=} [properties] Properties to set
-     */
-    function PlayerUpdate(properties) {
-        if (properties)
-            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                if (properties[keys[i]] != null)
-                    this[keys[i]] = properties[keys[i]];
-    }
-
-    /**
-     * PlayerUpdate playerId.
-     * @member {number} playerId
-     * @memberof PlayerUpdate
-     * @instance
-     */
-    PlayerUpdate.prototype.playerId = 0;
-
-    /**
-     * PlayerUpdate player.
-     * @member {IPlayer|null|undefined} player
-     * @memberof PlayerUpdate
-     * @instance
-     */
-    PlayerUpdate.prototype.player = null;
-
-    /**
-     * Creates a new PlayerUpdate instance using the specified properties.
-     * @function create
-     * @memberof PlayerUpdate
-     * @static
-     * @param {IPlayerUpdate=} [properties] Properties to set
-     * @returns {PlayerUpdate} PlayerUpdate instance
-     */
-    PlayerUpdate.create = function create(properties) {
-        return new PlayerUpdate(properties);
-    };
-
-    /**
-     * Encodes the specified PlayerUpdate message. Does not implicitly {@link PlayerUpdate.verify|verify} messages.
-     * @function encode
-     * @memberof PlayerUpdate
-     * @static
-     * @param {IPlayerUpdate} message PlayerUpdate message or plain object to encode
-     * @param {$protobuf.Writer} [writer] Writer to encode to
-     * @returns {$protobuf.Writer} Writer
-     */
-    PlayerUpdate.encode = function encode(message, writer) {
-        if (!writer)
-            writer = $Writer.create();
-        if (message.playerId != null && message.hasOwnProperty("playerId"))
-            writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.playerId);
-        if (message.player != null && message.hasOwnProperty("player"))
-            $root.Player.encode(message.player, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-        return writer;
-    };
-
-    /**
-     * Encodes the specified PlayerUpdate message, length delimited. Does not implicitly {@link PlayerUpdate.verify|verify} messages.
-     * @function encodeDelimited
-     * @memberof PlayerUpdate
-     * @static
-     * @param {IPlayerUpdate} message PlayerUpdate message or plain object to encode
-     * @param {$protobuf.Writer} [writer] Writer to encode to
-     * @returns {$protobuf.Writer} Writer
-     */
-    PlayerUpdate.encodeDelimited = function encodeDelimited(message, writer) {
-        return this.encode(message, writer).ldelim();
-    };
-
-    /**
-     * Decodes a PlayerUpdate message from the specified reader or buffer.
-     * @function decode
-     * @memberof PlayerUpdate
-     * @static
-     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @param {number} [length] Message length if known beforehand
-     * @returns {PlayerUpdate} PlayerUpdate
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    PlayerUpdate.decode = function decode(reader, length) {
-        if (!(reader instanceof $Reader))
-            reader = $Reader.create(reader);
-        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.PlayerUpdate();
-        while (reader.pos < end) {
-            var tag = reader.uint32();
-            switch (tag >>> 3) {
-            case 1:
-                message.playerId = reader.uint32();
-                break;
-            case 2:
-                message.player = $root.Player.decode(reader, reader.uint32());
-                break;
-            default:
-                reader.skipType(tag & 7);
-                break;
-            }
-        }
-        return message;
-    };
-
-    /**
-     * Decodes a PlayerUpdate message from the specified reader or buffer, length delimited.
-     * @function decodeDelimited
-     * @memberof PlayerUpdate
-     * @static
-     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @returns {PlayerUpdate} PlayerUpdate
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    PlayerUpdate.decodeDelimited = function decodeDelimited(reader) {
-        if (!(reader instanceof $Reader))
-            reader = new $Reader(reader);
-        return this.decode(reader, reader.uint32());
-    };
-
-    /**
-     * Verifies a PlayerUpdate message.
-     * @function verify
-     * @memberof PlayerUpdate
-     * @static
-     * @param {Object.<string,*>} message Plain object to verify
-     * @returns {string|null} `null` if valid, otherwise the reason why it is not
-     */
-    PlayerUpdate.verify = function verify(message) {
-        if (typeof message !== "object" || message === null)
-            return "object expected";
-        if (message.playerId != null && message.hasOwnProperty("playerId"))
-            if (!$util.isInteger(message.playerId))
-                return "playerId: integer expected";
-        if (message.player != null && message.hasOwnProperty("player")) {
-            var error = $root.Player.verify(message.player);
-            if (error)
-                return "player." + error;
-        }
-        return null;
-    };
-
-    /**
-     * Creates a PlayerUpdate message from a plain object. Also converts values to their respective internal types.
-     * @function fromObject
-     * @memberof PlayerUpdate
-     * @static
-     * @param {Object.<string,*>} object Plain object
-     * @returns {PlayerUpdate} PlayerUpdate
-     */
-    PlayerUpdate.fromObject = function fromObject(object) {
-        if (object instanceof $root.PlayerUpdate)
-            return object;
-        var message = new $root.PlayerUpdate();
-        if (object.playerId != null)
-            message.playerId = object.playerId >>> 0;
-        if (object.player != null) {
-            if (typeof object.player !== "object")
-                throw TypeError(".PlayerUpdate.player: object expected");
-            message.player = $root.Player.fromObject(object.player);
-        }
-        return message;
-    };
-
-    /**
-     * Creates a plain object from a PlayerUpdate message. Also converts values to other types if specified.
-     * @function toObject
-     * @memberof PlayerUpdate
-     * @static
-     * @param {PlayerUpdate} message PlayerUpdate
-     * @param {$protobuf.IConversionOptions} [options] Conversion options
-     * @returns {Object.<string,*>} Plain object
-     */
-    PlayerUpdate.toObject = function toObject(message, options) {
-        if (!options)
-            options = {};
-        var object = {};
-        if (options.defaults) {
-            object.playerId = 0;
-            object.player = null;
-        }
-        if (message.playerId != null && message.hasOwnProperty("playerId"))
-            object.playerId = message.playerId;
-        if (message.player != null && message.hasOwnProperty("player"))
-            object.player = $root.Player.toObject(message.player, options);
-        return object;
-    };
-
-    /**
-     * Converts this PlayerUpdate to JSON.
-     * @function toJSON
-     * @memberof PlayerUpdate
-     * @instance
-     * @returns {Object.<string,*>} JSON object
-     */
-    PlayerUpdate.prototype.toJSON = function toJSON() {
-        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-    };
-
-    return PlayerUpdate;
 })();
 
 $root.Player = (function() {
@@ -1835,214 +1618,6 @@ $root.PlayerData = (function() {
     return PlayerData;
 })();
 
-$root.MetaData = (function() {
-
-    /**
-     * Properties of a MetaData.
-     * @exports IMetaData
-     * @interface IMetaData
-     * @property {Array.<IMeta>|null} [metaData] MetaData metaData
-     */
-
-    /**
-     * Constructs a new MetaData.
-     * @exports MetaData
-     * @classdesc Represents a MetaData.
-     * @implements IMetaData
-     * @constructor
-     * @param {IMetaData=} [properties] Properties to set
-     */
-    function MetaData(properties) {
-        this.metaData = [];
-        if (properties)
-            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                if (properties[keys[i]] != null)
-                    this[keys[i]] = properties[keys[i]];
-    }
-
-    /**
-     * MetaData metaData.
-     * @member {Array.<IMeta>} metaData
-     * @memberof MetaData
-     * @instance
-     */
-    MetaData.prototype.metaData = $util.emptyArray;
-
-    /**
-     * Creates a new MetaData instance using the specified properties.
-     * @function create
-     * @memberof MetaData
-     * @static
-     * @param {IMetaData=} [properties] Properties to set
-     * @returns {MetaData} MetaData instance
-     */
-    MetaData.create = function create(properties) {
-        return new MetaData(properties);
-    };
-
-    /**
-     * Encodes the specified MetaData message. Does not implicitly {@link MetaData.verify|verify} messages.
-     * @function encode
-     * @memberof MetaData
-     * @static
-     * @param {IMetaData} message MetaData message or plain object to encode
-     * @param {$protobuf.Writer} [writer] Writer to encode to
-     * @returns {$protobuf.Writer} Writer
-     */
-    MetaData.encode = function encode(message, writer) {
-        if (!writer)
-            writer = $Writer.create();
-        if (message.metaData != null && message.metaData.length)
-            for (var i = 0; i < message.metaData.length; ++i)
-                $root.Meta.encode(message.metaData[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-        return writer;
-    };
-
-    /**
-     * Encodes the specified MetaData message, length delimited. Does not implicitly {@link MetaData.verify|verify} messages.
-     * @function encodeDelimited
-     * @memberof MetaData
-     * @static
-     * @param {IMetaData} message MetaData message or plain object to encode
-     * @param {$protobuf.Writer} [writer] Writer to encode to
-     * @returns {$protobuf.Writer} Writer
-     */
-    MetaData.encodeDelimited = function encodeDelimited(message, writer) {
-        return this.encode(message, writer).ldelim();
-    };
-
-    /**
-     * Decodes a MetaData message from the specified reader or buffer.
-     * @function decode
-     * @memberof MetaData
-     * @static
-     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @param {number} [length] Message length if known beforehand
-     * @returns {MetaData} MetaData
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    MetaData.decode = function decode(reader, length) {
-        if (!(reader instanceof $Reader))
-            reader = $Reader.create(reader);
-        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.MetaData();
-        while (reader.pos < end) {
-            var tag = reader.uint32();
-            switch (tag >>> 3) {
-            case 1:
-                if (!(message.metaData && message.metaData.length))
-                    message.metaData = [];
-                message.metaData.push($root.Meta.decode(reader, reader.uint32()));
-                break;
-            default:
-                reader.skipType(tag & 7);
-                break;
-            }
-        }
-        return message;
-    };
-
-    /**
-     * Decodes a MetaData message from the specified reader or buffer, length delimited.
-     * @function decodeDelimited
-     * @memberof MetaData
-     * @static
-     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @returns {MetaData} MetaData
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    MetaData.decodeDelimited = function decodeDelimited(reader) {
-        if (!(reader instanceof $Reader))
-            reader = new $Reader(reader);
-        return this.decode(reader, reader.uint32());
-    };
-
-    /**
-     * Verifies a MetaData message.
-     * @function verify
-     * @memberof MetaData
-     * @static
-     * @param {Object.<string,*>} message Plain object to verify
-     * @returns {string|null} `null` if valid, otherwise the reason why it is not
-     */
-    MetaData.verify = function verify(message) {
-        if (typeof message !== "object" || message === null)
-            return "object expected";
-        if (message.metaData != null && message.hasOwnProperty("metaData")) {
-            if (!Array.isArray(message.metaData))
-                return "metaData: array expected";
-            for (var i = 0; i < message.metaData.length; ++i) {
-                var error = $root.Meta.verify(message.metaData[i]);
-                if (error)
-                    return "metaData." + error;
-            }
-        }
-        return null;
-    };
-
-    /**
-     * Creates a MetaData message from a plain object. Also converts values to their respective internal types.
-     * @function fromObject
-     * @memberof MetaData
-     * @static
-     * @param {Object.<string,*>} object Plain object
-     * @returns {MetaData} MetaData
-     */
-    MetaData.fromObject = function fromObject(object) {
-        if (object instanceof $root.MetaData)
-            return object;
-        var message = new $root.MetaData();
-        if (object.metaData) {
-            if (!Array.isArray(object.metaData))
-                throw TypeError(".MetaData.metaData: array expected");
-            message.metaData = [];
-            for (var i = 0; i < object.metaData.length; ++i) {
-                if (typeof object.metaData[i] !== "object")
-                    throw TypeError(".MetaData.metaData: object expected");
-                message.metaData[i] = $root.Meta.fromObject(object.metaData[i]);
-            }
-        }
-        return message;
-    };
-
-    /**
-     * Creates a plain object from a MetaData message. Also converts values to other types if specified.
-     * @function toObject
-     * @memberof MetaData
-     * @static
-     * @param {MetaData} message MetaData
-     * @param {$protobuf.IConversionOptions} [options] Conversion options
-     * @returns {Object.<string,*>} Plain object
-     */
-    MetaData.toObject = function toObject(message, options) {
-        if (!options)
-            options = {};
-        var object = {};
-        if (options.arrays || options.defaults)
-            object.metaData = [];
-        if (message.metaData && message.metaData.length) {
-            object.metaData = [];
-            for (var j = 0; j < message.metaData.length; ++j)
-                object.metaData[j] = $root.Meta.toObject(message.metaData[j], options);
-        }
-        return object;
-    };
-
-    /**
-     * Converts this MetaData to JSON.
-     * @function toJSON
-     * @memberof MetaData
-     * @instance
-     * @returns {Object.<string,*>} JSON object
-     */
-    MetaData.prototype.toJSON = function toJSON() {
-        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-    };
-
-    return MetaData;
-})();
-
 $root.Meta = (function() {
 
     /**
@@ -2278,14 +1853,224 @@ $root.Meta = (function() {
     return Meta;
 })();
 
+$root.MetaData = (function() {
+
+    /**
+     * Properties of a MetaData.
+     * @exports IMetaData
+     * @interface IMetaData
+     * @property {Array.<IMeta>|null} [metaData] MetaData metaData
+     */
+
+    /**
+     * Constructs a new MetaData.
+     * @exports MetaData
+     * @classdesc Represents a MetaData.
+     * @implements IMetaData
+     * @constructor
+     * @param {IMetaData=} [properties] Properties to set
+     */
+    function MetaData(properties) {
+        this.metaData = [];
+        if (properties)
+            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                if (properties[keys[i]] != null)
+                    this[keys[i]] = properties[keys[i]];
+    }
+
+    /**
+     * MetaData metaData.
+     * @member {Array.<IMeta>} metaData
+     * @memberof MetaData
+     * @instance
+     */
+    MetaData.prototype.metaData = $util.emptyArray;
+
+    /**
+     * Creates a new MetaData instance using the specified properties.
+     * @function create
+     * @memberof MetaData
+     * @static
+     * @param {IMetaData=} [properties] Properties to set
+     * @returns {MetaData} MetaData instance
+     */
+    MetaData.create = function create(properties) {
+        return new MetaData(properties);
+    };
+
+    /**
+     * Encodes the specified MetaData message. Does not implicitly {@link MetaData.verify|verify} messages.
+     * @function encode
+     * @memberof MetaData
+     * @static
+     * @param {IMetaData} message MetaData message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    MetaData.encode = function encode(message, writer) {
+        if (!writer)
+            writer = $Writer.create();
+        if (message.metaData != null && message.metaData.length)
+            for (var i = 0; i < message.metaData.length; ++i)
+                $root.Meta.encode(message.metaData[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+        return writer;
+    };
+
+    /**
+     * Encodes the specified MetaData message, length delimited. Does not implicitly {@link MetaData.verify|verify} messages.
+     * @function encodeDelimited
+     * @memberof MetaData
+     * @static
+     * @param {IMetaData} message MetaData message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    MetaData.encodeDelimited = function encodeDelimited(message, writer) {
+        return this.encode(message, writer).ldelim();
+    };
+
+    /**
+     * Decodes a MetaData message from the specified reader or buffer.
+     * @function decode
+     * @memberof MetaData
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @param {number} [length] Message length if known beforehand
+     * @returns {MetaData} MetaData
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    MetaData.decode = function decode(reader, length) {
+        if (!(reader instanceof $Reader))
+            reader = $Reader.create(reader);
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.MetaData();
+        while (reader.pos < end) {
+            var tag = reader.uint32();
+            switch (tag >>> 3) {
+            case 1:
+                if (!(message.metaData && message.metaData.length))
+                    message.metaData = [];
+                message.metaData.push($root.Meta.decode(reader, reader.uint32()));
+                break;
+            default:
+                reader.skipType(tag & 7);
+                break;
+            }
+        }
+        return message;
+    };
+
+    /**
+     * Decodes a MetaData message from the specified reader or buffer, length delimited.
+     * @function decodeDelimited
+     * @memberof MetaData
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @returns {MetaData} MetaData
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    MetaData.decodeDelimited = function decodeDelimited(reader) {
+        if (!(reader instanceof $Reader))
+            reader = new $Reader(reader);
+        return this.decode(reader, reader.uint32());
+    };
+
+    /**
+     * Verifies a MetaData message.
+     * @function verify
+     * @memberof MetaData
+     * @static
+     * @param {Object.<string,*>} message Plain object to verify
+     * @returns {string|null} `null` if valid, otherwise the reason why it is not
+     */
+    MetaData.verify = function verify(message) {
+        if (typeof message !== "object" || message === null)
+            return "object expected";
+        if (message.metaData != null && message.hasOwnProperty("metaData")) {
+            if (!Array.isArray(message.metaData))
+                return "metaData: array expected";
+            for (var i = 0; i < message.metaData.length; ++i) {
+                var error = $root.Meta.verify(message.metaData[i]);
+                if (error)
+                    return "metaData." + error;
+            }
+        }
+        return null;
+    };
+
+    /**
+     * Creates a MetaData message from a plain object. Also converts values to their respective internal types.
+     * @function fromObject
+     * @memberof MetaData
+     * @static
+     * @param {Object.<string,*>} object Plain object
+     * @returns {MetaData} MetaData
+     */
+    MetaData.fromObject = function fromObject(object) {
+        if (object instanceof $root.MetaData)
+            return object;
+        var message = new $root.MetaData();
+        if (object.metaData) {
+            if (!Array.isArray(object.metaData))
+                throw TypeError(".MetaData.metaData: array expected");
+            message.metaData = [];
+            for (var i = 0; i < object.metaData.length; ++i) {
+                if (typeof object.metaData[i] !== "object")
+                    throw TypeError(".MetaData.metaData: object expected");
+                message.metaData[i] = $root.Meta.fromObject(object.metaData[i]);
+            }
+        }
+        return message;
+    };
+
+    /**
+     * Creates a plain object from a MetaData message. Also converts values to other types if specified.
+     * @function toObject
+     * @memberof MetaData
+     * @static
+     * @param {MetaData} message MetaData
+     * @param {$protobuf.IConversionOptions} [options] Conversion options
+     * @returns {Object.<string,*>} Plain object
+     */
+    MetaData.toObject = function toObject(message, options) {
+        if (!options)
+            options = {};
+        var object = {};
+        if (options.arrays || options.defaults)
+            object.metaData = [];
+        if (message.metaData && message.metaData.length) {
+            object.metaData = [];
+            for (var j = 0; j < message.metaData.length; ++j)
+                object.metaData[j] = $root.Meta.toObject(message.metaData[j], options);
+        }
+        return object;
+    };
+
+    /**
+     * Converts this MetaData to JSON.
+     * @function toJSON
+     * @memberof MetaData
+     * @instance
+     * @returns {Object.<string,*>} JSON object
+     */
+    MetaData.prototype.toJSON = function toJSON() {
+        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+    };
+
+    return MetaData;
+})();
+
 $root.Chat = (function() {
 
     /**
      * Properties of a Chat.
      * @exports IChat
      * @interface IChat
+     * @property {Chat.ChatType|null} [chatType] Chat chatType
+     * @property {number|null} [senderId] Chat senderId
+     * @property {string|null} [message] Chat message
      * @property {IChatGlobal|null} [global] Chat global
-     * @property {IChatTeam|null} [team] Chat team
      * @property {IChatPrivate|null} ["private"] Chat private
      */
 
@@ -2305,20 +2090,36 @@ $root.Chat = (function() {
     }
 
     /**
+     * Chat chatType.
+     * @member {Chat.ChatType} chatType
+     * @memberof Chat
+     * @instance
+     */
+    Chat.prototype.chatType = 0;
+
+    /**
+     * Chat senderId.
+     * @member {number} senderId
+     * @memberof Chat
+     * @instance
+     */
+    Chat.prototype.senderId = 0;
+
+    /**
+     * Chat message.
+     * @member {string} message
+     * @memberof Chat
+     * @instance
+     */
+    Chat.prototype.message = "";
+
+    /**
      * Chat global.
      * @member {IChatGlobal|null|undefined} global
      * @memberof Chat
      * @instance
      */
     Chat.prototype.global = null;
-
-    /**
-     * Chat team.
-     * @member {IChatTeam|null|undefined} team
-     * @memberof Chat
-     * @instance
-     */
-    Chat.prototype.team = null;
 
     /**
      * Chat private.
@@ -2333,12 +2134,12 @@ $root.Chat = (function() {
 
     /**
      * Chat messageType.
-     * @member {"global"|"team"|"private"|undefined} messageType
+     * @member {"global"|"private"|undefined} messageType
      * @memberof Chat
      * @instance
      */
     Object.defineProperty(Chat.prototype, "messageType", {
-        get: $util.oneOfGetter($oneOfFields = ["global", "team", "private"]),
+        get: $util.oneOfGetter($oneOfFields = ["global", "private"]),
         set: $util.oneOfSetter($oneOfFields)
     });
 
@@ -2366,12 +2167,16 @@ $root.Chat = (function() {
     Chat.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
+        if (message.chatType != null && message.hasOwnProperty("chatType"))
+            writer.uint32(/* id 1, wireType 0 =*/8).int32(message.chatType);
+        if (message.senderId != null && message.hasOwnProperty("senderId"))
+            writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.senderId);
+        if (message.message != null && message.hasOwnProperty("message"))
+            writer.uint32(/* id 3, wireType 2 =*/26).string(message.message);
         if (message.global != null && message.hasOwnProperty("global"))
-            $root.ChatGlobal.encode(message.global, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-        if (message.team != null && message.hasOwnProperty("team"))
-            $root.ChatTeam.encode(message.team, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            $root.ChatGlobal.encode(message.global, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
         if (message["private"] != null && message.hasOwnProperty("private"))
-            $root.ChatPrivate.encode(message["private"], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+            $root.ChatPrivate.encode(message["private"], writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
         return writer;
     };
 
@@ -2407,12 +2212,18 @@ $root.Chat = (function() {
             var tag = reader.uint32();
             switch (tag >>> 3) {
             case 1:
-                message.global = $root.ChatGlobal.decode(reader, reader.uint32());
+                message.chatType = reader.int32();
                 break;
             case 2:
-                message.team = $root.ChatTeam.decode(reader, reader.uint32());
+                message.senderId = reader.uint32();
                 break;
             case 3:
+                message.message = reader.string();
+                break;
+            case 4:
+                message.global = $root.ChatGlobal.decode(reader, reader.uint32());
+                break;
+            case 5:
                 message["private"] = $root.ChatPrivate.decode(reader, reader.uint32());
                 break;
             default:
@@ -2451,22 +2262,26 @@ $root.Chat = (function() {
         if (typeof message !== "object" || message === null)
             return "object expected";
         var properties = {};
+        if (message.chatType != null && message.hasOwnProperty("chatType"))
+            switch (message.chatType) {
+            default:
+                return "chatType: enum value expected";
+            case 0:
+            case 1:
+                break;
+            }
+        if (message.senderId != null && message.hasOwnProperty("senderId"))
+            if (!$util.isInteger(message.senderId))
+                return "senderId: integer expected";
+        if (message.message != null && message.hasOwnProperty("message"))
+            if (!$util.isString(message.message))
+                return "message: string expected";
         if (message.global != null && message.hasOwnProperty("global")) {
             properties.messageType = 1;
             {
                 var error = $root.ChatGlobal.verify(message.global);
                 if (error)
                     return "global." + error;
-            }
-        }
-        if (message.team != null && message.hasOwnProperty("team")) {
-            if (properties.messageType === 1)
-                return "messageType: multiple values";
-            properties.messageType = 1;
-            {
-                var error = $root.ChatTeam.verify(message.team);
-                if (error)
-                    return "team." + error;
             }
         }
         if (message["private"] != null && message.hasOwnProperty("private")) {
@@ -2494,15 +2309,24 @@ $root.Chat = (function() {
         if (object instanceof $root.Chat)
             return object;
         var message = new $root.Chat();
+        switch (object.chatType) {
+        case "CHAT_GLOBAL":
+        case 0:
+            message.chatType = 0;
+            break;
+        case "CHAT_PRIVATE":
+        case 1:
+            message.chatType = 1;
+            break;
+        }
+        if (object.senderId != null)
+            message.senderId = object.senderId >>> 0;
+        if (object.message != null)
+            message.message = String(object.message);
         if (object.global != null) {
             if (typeof object.global !== "object")
                 throw TypeError(".Chat.global: object expected");
             message.global = $root.ChatGlobal.fromObject(object.global);
-        }
-        if (object.team != null) {
-            if (typeof object.team !== "object")
-                throw TypeError(".Chat.team: object expected");
-            message.team = $root.ChatTeam.fromObject(object.team);
         }
         if (object["private"] != null) {
             if (typeof object["private"] !== "object")
@@ -2525,15 +2349,21 @@ $root.Chat = (function() {
         if (!options)
             options = {};
         var object = {};
+        if (options.defaults) {
+            object.chatType = options.enums === String ? "CHAT_GLOBAL" : 0;
+            object.senderId = 0;
+            object.message = "";
+        }
+        if (message.chatType != null && message.hasOwnProperty("chatType"))
+            object.chatType = options.enums === String ? $root.Chat.ChatType[message.chatType] : message.chatType;
+        if (message.senderId != null && message.hasOwnProperty("senderId"))
+            object.senderId = message.senderId;
+        if (message.message != null && message.hasOwnProperty("message"))
+            object.message = message.message;
         if (message.global != null && message.hasOwnProperty("global")) {
             object.global = $root.ChatGlobal.toObject(message.global, options);
             if (options.oneofs)
                 object.messageType = "global";
-        }
-        if (message.team != null && message.hasOwnProperty("team")) {
-            object.team = $root.ChatTeam.toObject(message.team, options);
-            if (options.oneofs)
-                object.messageType = "team";
         }
         if (message["private"] != null && message.hasOwnProperty("private")) {
             object["private"] = $root.ChatPrivate.toObject(message["private"], options);
@@ -2554,6 +2384,20 @@ $root.Chat = (function() {
         return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
     };
 
+    /**
+     * ChatType enum.
+     * @name Chat.ChatType
+     * @enum {string}
+     * @property {number} CHAT_GLOBAL=0 CHAT_GLOBAL value
+     * @property {number} CHAT_PRIVATE=1 CHAT_PRIVATE value
+     */
+    Chat.ChatType = (function() {
+        var valuesById = {}, values = Object.create(valuesById);
+        values[valuesById[0] = "CHAT_GLOBAL"] = 0;
+        values[valuesById[1] = "CHAT_PRIVATE"] = 1;
+        return values;
+    })();
+
     return Chat;
 })();
 
@@ -2563,8 +2407,6 @@ $root.ChatGlobal = (function() {
      * Properties of a ChatGlobal.
      * @exports IChatGlobal
      * @interface IChatGlobal
-     * @property {number|null} [senderId] ChatGlobal senderId
-     * @property {string|null} [message] ChatGlobal message
      */
 
     /**
@@ -2581,22 +2423,6 @@ $root.ChatGlobal = (function() {
                 if (properties[keys[i]] != null)
                     this[keys[i]] = properties[keys[i]];
     }
-
-    /**
-     * ChatGlobal senderId.
-     * @member {number} senderId
-     * @memberof ChatGlobal
-     * @instance
-     */
-    ChatGlobal.prototype.senderId = 0;
-
-    /**
-     * ChatGlobal message.
-     * @member {string} message
-     * @memberof ChatGlobal
-     * @instance
-     */
-    ChatGlobal.prototype.message = "";
 
     /**
      * Creates a new ChatGlobal instance using the specified properties.
@@ -2622,10 +2448,6 @@ $root.ChatGlobal = (function() {
     ChatGlobal.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
-        if (message.senderId != null && message.hasOwnProperty("senderId"))
-            writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.senderId);
-        if (message.message != null && message.hasOwnProperty("message"))
-            writer.uint32(/* id 2, wireType 2 =*/18).string(message.message);
         return writer;
     };
 
@@ -2660,12 +2482,6 @@ $root.ChatGlobal = (function() {
         while (reader.pos < end) {
             var tag = reader.uint32();
             switch (tag >>> 3) {
-            case 1:
-                message.senderId = reader.uint32();
-                break;
-            case 2:
-                message.message = reader.string();
-                break;
             default:
                 reader.skipType(tag & 7);
                 break;
@@ -2701,12 +2517,6 @@ $root.ChatGlobal = (function() {
     ChatGlobal.verify = function verify(message) {
         if (typeof message !== "object" || message === null)
             return "object expected";
-        if (message.senderId != null && message.hasOwnProperty("senderId"))
-            if (!$util.isInteger(message.senderId))
-                return "senderId: integer expected";
-        if (message.message != null && message.hasOwnProperty("message"))
-            if (!$util.isString(message.message))
-                return "message: string expected";
         return null;
     };
 
@@ -2721,12 +2531,7 @@ $root.ChatGlobal = (function() {
     ChatGlobal.fromObject = function fromObject(object) {
         if (object instanceof $root.ChatGlobal)
             return object;
-        var message = new $root.ChatGlobal();
-        if (object.senderId != null)
-            message.senderId = object.senderId >>> 0;
-        if (object.message != null)
-            message.message = String(object.message);
-        return message;
+        return new $root.ChatGlobal();
     };
 
     /**
@@ -2738,19 +2543,8 @@ $root.ChatGlobal = (function() {
      * @param {$protobuf.IConversionOptions} [options] Conversion options
      * @returns {Object.<string,*>} Plain object
      */
-    ChatGlobal.toObject = function toObject(message, options) {
-        if (!options)
-            options = {};
-        var object = {};
-        if (options.defaults) {
-            object.senderId = 0;
-            object.message = "";
-        }
-        if (message.senderId != null && message.hasOwnProperty("senderId"))
-            object.senderId = message.senderId;
-        if (message.message != null && message.hasOwnProperty("message"))
-            object.message = message.message;
-        return object;
+    ChatGlobal.toObject = function toObject() {
+        return {};
     };
 
     /**
@@ -2767,246 +2561,12 @@ $root.ChatGlobal = (function() {
     return ChatGlobal;
 })();
 
-$root.ChatTeam = (function() {
-
-    /**
-     * Properties of a ChatTeam.
-     * @exports IChatTeam
-     * @interface IChatTeam
-     * @property {number|null} [senderId] ChatTeam senderId
-     * @property {string|null} [message] ChatTeam message
-     * @property {number|null} [teamId] ChatTeam teamId
-     */
-
-    /**
-     * Constructs a new ChatTeam.
-     * @exports ChatTeam
-     * @classdesc Represents a ChatTeam.
-     * @implements IChatTeam
-     * @constructor
-     * @param {IChatTeam=} [properties] Properties to set
-     */
-    function ChatTeam(properties) {
-        if (properties)
-            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                if (properties[keys[i]] != null)
-                    this[keys[i]] = properties[keys[i]];
-    }
-
-    /**
-     * ChatTeam senderId.
-     * @member {number} senderId
-     * @memberof ChatTeam
-     * @instance
-     */
-    ChatTeam.prototype.senderId = 0;
-
-    /**
-     * ChatTeam message.
-     * @member {string} message
-     * @memberof ChatTeam
-     * @instance
-     */
-    ChatTeam.prototype.message = "";
-
-    /**
-     * ChatTeam teamId.
-     * @member {number} teamId
-     * @memberof ChatTeam
-     * @instance
-     */
-    ChatTeam.prototype.teamId = 0;
-
-    /**
-     * Creates a new ChatTeam instance using the specified properties.
-     * @function create
-     * @memberof ChatTeam
-     * @static
-     * @param {IChatTeam=} [properties] Properties to set
-     * @returns {ChatTeam} ChatTeam instance
-     */
-    ChatTeam.create = function create(properties) {
-        return new ChatTeam(properties);
-    };
-
-    /**
-     * Encodes the specified ChatTeam message. Does not implicitly {@link ChatTeam.verify|verify} messages.
-     * @function encode
-     * @memberof ChatTeam
-     * @static
-     * @param {IChatTeam} message ChatTeam message or plain object to encode
-     * @param {$protobuf.Writer} [writer] Writer to encode to
-     * @returns {$protobuf.Writer} Writer
-     */
-    ChatTeam.encode = function encode(message, writer) {
-        if (!writer)
-            writer = $Writer.create();
-        if (message.senderId != null && message.hasOwnProperty("senderId"))
-            writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.senderId);
-        if (message.message != null && message.hasOwnProperty("message"))
-            writer.uint32(/* id 2, wireType 2 =*/18).string(message.message);
-        if (message.teamId != null && message.hasOwnProperty("teamId"))
-            writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.teamId);
-        return writer;
-    };
-
-    /**
-     * Encodes the specified ChatTeam message, length delimited. Does not implicitly {@link ChatTeam.verify|verify} messages.
-     * @function encodeDelimited
-     * @memberof ChatTeam
-     * @static
-     * @param {IChatTeam} message ChatTeam message or plain object to encode
-     * @param {$protobuf.Writer} [writer] Writer to encode to
-     * @returns {$protobuf.Writer} Writer
-     */
-    ChatTeam.encodeDelimited = function encodeDelimited(message, writer) {
-        return this.encode(message, writer).ldelim();
-    };
-
-    /**
-     * Decodes a ChatTeam message from the specified reader or buffer.
-     * @function decode
-     * @memberof ChatTeam
-     * @static
-     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @param {number} [length] Message length if known beforehand
-     * @returns {ChatTeam} ChatTeam
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    ChatTeam.decode = function decode(reader, length) {
-        if (!(reader instanceof $Reader))
-            reader = $Reader.create(reader);
-        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.ChatTeam();
-        while (reader.pos < end) {
-            var tag = reader.uint32();
-            switch (tag >>> 3) {
-            case 1:
-                message.senderId = reader.uint32();
-                break;
-            case 2:
-                message.message = reader.string();
-                break;
-            case 3:
-                message.teamId = reader.uint32();
-                break;
-            default:
-                reader.skipType(tag & 7);
-                break;
-            }
-        }
-        return message;
-    };
-
-    /**
-     * Decodes a ChatTeam message from the specified reader or buffer, length delimited.
-     * @function decodeDelimited
-     * @memberof ChatTeam
-     * @static
-     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @returns {ChatTeam} ChatTeam
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    ChatTeam.decodeDelimited = function decodeDelimited(reader) {
-        if (!(reader instanceof $Reader))
-            reader = new $Reader(reader);
-        return this.decode(reader, reader.uint32());
-    };
-
-    /**
-     * Verifies a ChatTeam message.
-     * @function verify
-     * @memberof ChatTeam
-     * @static
-     * @param {Object.<string,*>} message Plain object to verify
-     * @returns {string|null} `null` if valid, otherwise the reason why it is not
-     */
-    ChatTeam.verify = function verify(message) {
-        if (typeof message !== "object" || message === null)
-            return "object expected";
-        if (message.senderId != null && message.hasOwnProperty("senderId"))
-            if (!$util.isInteger(message.senderId))
-                return "senderId: integer expected";
-        if (message.message != null && message.hasOwnProperty("message"))
-            if (!$util.isString(message.message))
-                return "message: string expected";
-        if (message.teamId != null && message.hasOwnProperty("teamId"))
-            if (!$util.isInteger(message.teamId))
-                return "teamId: integer expected";
-        return null;
-    };
-
-    /**
-     * Creates a ChatTeam message from a plain object. Also converts values to their respective internal types.
-     * @function fromObject
-     * @memberof ChatTeam
-     * @static
-     * @param {Object.<string,*>} object Plain object
-     * @returns {ChatTeam} ChatTeam
-     */
-    ChatTeam.fromObject = function fromObject(object) {
-        if (object instanceof $root.ChatTeam)
-            return object;
-        var message = new $root.ChatTeam();
-        if (object.senderId != null)
-            message.senderId = object.senderId >>> 0;
-        if (object.message != null)
-            message.message = String(object.message);
-        if (object.teamId != null)
-            message.teamId = object.teamId >>> 0;
-        return message;
-    };
-
-    /**
-     * Creates a plain object from a ChatTeam message. Also converts values to other types if specified.
-     * @function toObject
-     * @memberof ChatTeam
-     * @static
-     * @param {ChatTeam} message ChatTeam
-     * @param {$protobuf.IConversionOptions} [options] Conversion options
-     * @returns {Object.<string,*>} Plain object
-     */
-    ChatTeam.toObject = function toObject(message, options) {
-        if (!options)
-            options = {};
-        var object = {};
-        if (options.defaults) {
-            object.senderId = 0;
-            object.message = "";
-            object.teamId = 0;
-        }
-        if (message.senderId != null && message.hasOwnProperty("senderId"))
-            object.senderId = message.senderId;
-        if (message.message != null && message.hasOwnProperty("message"))
-            object.message = message.message;
-        if (message.teamId != null && message.hasOwnProperty("teamId"))
-            object.teamId = message.teamId;
-        return object;
-    };
-
-    /**
-     * Converts this ChatTeam to JSON.
-     * @function toJSON
-     * @memberof ChatTeam
-     * @instance
-     * @returns {Object.<string,*>} JSON object
-     */
-    ChatTeam.prototype.toJSON = function toJSON() {
-        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-    };
-
-    return ChatTeam;
-})();
-
 $root.ChatPrivate = (function() {
 
     /**
      * Properties of a ChatPrivate.
      * @exports IChatPrivate
      * @interface IChatPrivate
-     * @property {number|null} [senderId] ChatPrivate senderId
-     * @property {string|null} [message] ChatPrivate message
      * @property {number|null} [receiverId] ChatPrivate receiverId
      */
 
@@ -3024,22 +2584,6 @@ $root.ChatPrivate = (function() {
                 if (properties[keys[i]] != null)
                     this[keys[i]] = properties[keys[i]];
     }
-
-    /**
-     * ChatPrivate senderId.
-     * @member {number} senderId
-     * @memberof ChatPrivate
-     * @instance
-     */
-    ChatPrivate.prototype.senderId = 0;
-
-    /**
-     * ChatPrivate message.
-     * @member {string} message
-     * @memberof ChatPrivate
-     * @instance
-     */
-    ChatPrivate.prototype.message = "";
 
     /**
      * ChatPrivate receiverId.
@@ -3073,12 +2617,8 @@ $root.ChatPrivate = (function() {
     ChatPrivate.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
-        if (message.senderId != null && message.hasOwnProperty("senderId"))
-            writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.senderId);
-        if (message.message != null && message.hasOwnProperty("message"))
-            writer.uint32(/* id 2, wireType 2 =*/18).string(message.message);
         if (message.receiverId != null && message.hasOwnProperty("receiverId"))
-            writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.receiverId);
+            writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.receiverId);
         return writer;
     };
 
@@ -3114,12 +2654,6 @@ $root.ChatPrivate = (function() {
             var tag = reader.uint32();
             switch (tag >>> 3) {
             case 1:
-                message.senderId = reader.uint32();
-                break;
-            case 2:
-                message.message = reader.string();
-                break;
-            case 3:
                 message.receiverId = reader.uint32();
                 break;
             default:
@@ -3157,12 +2691,6 @@ $root.ChatPrivate = (function() {
     ChatPrivate.verify = function verify(message) {
         if (typeof message !== "object" || message === null)
             return "object expected";
-        if (message.senderId != null && message.hasOwnProperty("senderId"))
-            if (!$util.isInteger(message.senderId))
-                return "senderId: integer expected";
-        if (message.message != null && message.hasOwnProperty("message"))
-            if (!$util.isString(message.message))
-                return "message: string expected";
         if (message.receiverId != null && message.hasOwnProperty("receiverId"))
             if (!$util.isInteger(message.receiverId))
                 return "receiverId: integer expected";
@@ -3181,10 +2709,6 @@ $root.ChatPrivate = (function() {
         if (object instanceof $root.ChatPrivate)
             return object;
         var message = new $root.ChatPrivate();
-        if (object.senderId != null)
-            message.senderId = object.senderId >>> 0;
-        if (object.message != null)
-            message.message = String(object.message);
         if (object.receiverId != null)
             message.receiverId = object.receiverId >>> 0;
         return message;
@@ -3203,15 +2727,8 @@ $root.ChatPrivate = (function() {
         if (!options)
             options = {};
         var object = {};
-        if (options.defaults) {
-            object.senderId = 0;
-            object.message = "";
+        if (options.defaults)
             object.receiverId = 0;
-        }
-        if (message.senderId != null && message.hasOwnProperty("senderId"))
-            object.senderId = message.senderId;
-        if (message.message != null && message.hasOwnProperty("message"))
-            object.message = message.message;
         if (message.receiverId != null && message.hasOwnProperty("receiverId"))
             object.receiverId = message.receiverId;
         return object;
@@ -3229,6 +2746,22 @@ $root.ChatPrivate = (function() {
     };
 
     return ChatPrivate;
+})();
+
+/**
+ * Compression enum.
+ * @exports Compression
+ * @enum {string}
+ * @property {number} NONE=0 NONE value
+ * @property {number} ZSTD=1 ZSTD value
+ * @property {number} GZIP=2 GZIP value
+ */
+$root.Compression = (function() {
+    var valuesById = {}, values = Object.create(valuesById);
+    values[valuesById[0] = "NONE"] = 0;
+    values[valuesById[1] = "ZSTD"] = 1;
+    values[valuesById[2] = "GZIP"] = 2;
+    return values;
 })();
 
 module.exports = $root;

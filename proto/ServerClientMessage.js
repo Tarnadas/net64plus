@@ -15,7 +15,7 @@ $root.ServerClientMessage = (function() {
      * Properties of a ServerClientMessage.
      * @exports IServerClientMessage
      * @interface IServerClientMessage
-     * @property {ServerClientMessage.Compression|null} [compression] ServerClientMessage compression
+     * @property {Compression|null} [compression] ServerClientMessage compression
      * @property {number|null} [uncompressedSize] ServerClientMessage uncompressedSize
      * @property {Uint8Array|null} [compressedData] ServerClientMessage compressedData
      * @property {IServerClient|null} [data] ServerClientMessage data
@@ -38,7 +38,7 @@ $root.ServerClientMessage = (function() {
 
     /**
      * ServerClientMessage compression.
-     * @member {ServerClientMessage.Compression} compression
+     * @member {Compression} compression
      * @memberof ServerClientMessage
      * @instance
      */
@@ -202,6 +202,7 @@ $root.ServerClientMessage = (function() {
                 return "compression: enum value expected";
             case 0:
             case 1:
+            case 2:
                 break;
             }
         if (message.uncompressedSize != null && message.hasOwnProperty("uncompressedSize"))
@@ -246,6 +247,10 @@ $root.ServerClientMessage = (function() {
         case 1:
             message.compression = 1;
             break;
+        case "GZIP":
+        case 2:
+            message.compression = 2;
+            break;
         }
         if (object.uncompressedSize != null)
             message.uncompressedSize = object.uncompressedSize >>> 0;
@@ -280,7 +285,7 @@ $root.ServerClientMessage = (function() {
             object.uncompressedSize = 0;
         }
         if (message.compression != null && message.hasOwnProperty("compression"))
-            object.compression = options.enums === String ? $root.ServerClientMessage.Compression[message.compression] : message.compression;
+            object.compression = options.enums === String ? $root.Compression[message.compression] : message.compression;
         if (message.uncompressedSize != null && message.hasOwnProperty("uncompressedSize"))
             object.uncompressedSize = message.uncompressedSize;
         if (message.compressedData != null && message.hasOwnProperty("compressedData")) {
@@ -307,20 +312,6 @@ $root.ServerClientMessage = (function() {
         return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
     };
 
-    /**
-     * Compression enum.
-     * @name ServerClientMessage.Compression
-     * @enum {string}
-     * @property {number} NONE=0 NONE value
-     * @property {number} ZSTD=1 ZSTD value
-     */
-    ServerClientMessage.Compression = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
-        values[valuesById[0] = "NONE"] = 0;
-        values[valuesById[1] = "ZSTD"] = 1;
-        return values;
-    })();
-
     return ServerClientMessage;
 })();
 
@@ -338,7 +329,7 @@ $root.ServerClient = (function() {
      * @property {IPlayerUpdate|null} [playerUpdate] ServerClient playerUpdate
      * @property {IPlayerData|null} [playerData] ServerClient playerData
      * @property {IMetaData|null} [metaData] ServerClient metaData
-     * @property {IChat|null} [chatMessage] ServerClient chatMessage
+     * @property {IChat|null} [chat] ServerClient chat
      */
 
     /**
@@ -362,7 +353,7 @@ $root.ServerClient = (function() {
      * @memberof ServerClient
      * @instance
      */
-    ServerClient.prototype.messageType = 2;
+    ServerClient.prototype.messageType = 0;
 
     /**
      * ServerClient handshake.
@@ -421,24 +412,24 @@ $root.ServerClient = (function() {
     ServerClient.prototype.metaData = null;
 
     /**
-     * ServerClient chatMessage.
-     * @member {IChat|null|undefined} chatMessage
+     * ServerClient chat.
+     * @member {IChat|null|undefined} chat
      * @memberof ServerClient
      * @instance
      */
-    ServerClient.prototype.chatMessage = null;
+    ServerClient.prototype.chat = null;
 
     // OneOf field names bound to virtual getters and setters
     var $oneOfFields;
 
     /**
      * ServerClient message.
-     * @member {"handshake"|"ping"|"serverMessage"|"playerListUpdate"|"playerUpdate"|"playerData"|"metaData"|"chatMessage"|undefined} message
+     * @member {"handshake"|"ping"|"serverMessage"|"playerListUpdate"|"playerUpdate"|"playerData"|"metaData"|"chat"|undefined} message
      * @memberof ServerClient
      * @instance
      */
     Object.defineProperty(ServerClient.prototype, "message", {
-        get: $util.oneOfGetter($oneOfFields = ["handshake", "ping", "serverMessage", "playerListUpdate", "playerUpdate", "playerData", "metaData", "chatMessage"]),
+        get: $util.oneOfGetter($oneOfFields = ["handshake", "ping", "serverMessage", "playerListUpdate", "playerUpdate", "playerData", "metaData", "chat"]),
         set: $util.oneOfSetter($oneOfFields)
     });
 
@@ -482,8 +473,8 @@ $root.ServerClient = (function() {
             $root.PlayerData.encode(message.playerData, writer.uint32(/* id 128, wireType 2 =*/1026).fork()).ldelim();
         if (message.metaData != null && message.hasOwnProperty("metaData"))
             $root.MetaData.encode(message.metaData, writer.uint32(/* id 129, wireType 2 =*/1034).fork()).ldelim();
-        if (message.chatMessage != null && message.hasOwnProperty("chatMessage"))
-            $root.Chat.encode(message.chatMessage, writer.uint32(/* id 130, wireType 2 =*/1042).fork()).ldelim();
+        if (message.chat != null && message.hasOwnProperty("chat"))
+            $root.Chat.encode(message.chat, writer.uint32(/* id 130, wireType 2 =*/1042).fork()).ldelim();
         return writer;
     };
 
@@ -543,7 +534,7 @@ $root.ServerClient = (function() {
                 message.metaData = $root.MetaData.decode(reader, reader.uint32());
                 break;
             case 130:
-                message.chatMessage = $root.Chat.decode(reader, reader.uint32());
+                message.chat = $root.Chat.decode(reader, reader.uint32());
                 break;
             default:
                 reader.skipType(tag & 7);
@@ -585,6 +576,7 @@ $root.ServerClient = (function() {
             switch (message.messageType) {
             default:
                 return "messageType: enum value expected";
+            case 0:
             case 2:
             case 3:
             case 4:
@@ -663,14 +655,14 @@ $root.ServerClient = (function() {
                     return "metaData." + error;
             }
         }
-        if (message.chatMessage != null && message.hasOwnProperty("chatMessage")) {
+        if (message.chat != null && message.hasOwnProperty("chat")) {
             if (properties.message === 1)
                 return "message: multiple values";
             properties.message = 1;
             {
-                var error = $root.Chat.verify(message.chatMessage);
+                var error = $root.Chat.verify(message.chat);
                 if (error)
-                    return "chatMessage." + error;
+                    return "chat." + error;
             }
         }
         return null;
@@ -689,6 +681,10 @@ $root.ServerClient = (function() {
             return object;
         var message = new $root.ServerClient();
         switch (object.messageType) {
+        case "UNKNOWN":
+        case 0:
+            message.messageType = 0;
+            break;
         case "HANDSHAKE":
         case 2:
             message.messageType = 2;
@@ -717,7 +713,7 @@ $root.ServerClient = (function() {
         case 129:
             message.messageType = 129;
             break;
-        case "CHAT_MESSAGE":
+        case "CHAT":
         case 130:
             message.messageType = 130;
             break;
@@ -757,10 +753,10 @@ $root.ServerClient = (function() {
                 throw TypeError(".ServerClient.metaData: object expected");
             message.metaData = $root.MetaData.fromObject(object.metaData);
         }
-        if (object.chatMessage != null) {
-            if (typeof object.chatMessage !== "object")
-                throw TypeError(".ServerClient.chatMessage: object expected");
-            message.chatMessage = $root.Chat.fromObject(object.chatMessage);
+        if (object.chat != null) {
+            if (typeof object.chat !== "object")
+                throw TypeError(".ServerClient.chat: object expected");
+            message.chat = $root.Chat.fromObject(object.chat);
         }
         return message;
     };
@@ -779,7 +775,7 @@ $root.ServerClient = (function() {
             options = {};
         var object = {};
         if (options.defaults)
-            object.messageType = options.enums === String ? "HANDSHAKE" : 2;
+            object.messageType = options.enums === String ? "UNKNOWN" : 0;
         if (message.messageType != null && message.hasOwnProperty("messageType"))
             object.messageType = options.enums === String ? $root.ServerClient.MessageType[message.messageType] : message.messageType;
         if (message.handshake != null && message.hasOwnProperty("handshake")) {
@@ -817,10 +813,10 @@ $root.ServerClient = (function() {
             if (options.oneofs)
                 object.message = "metaData";
         }
-        if (message.chatMessage != null && message.hasOwnProperty("chatMessage")) {
-            object.chatMessage = $root.Chat.toObject(message.chatMessage, options);
+        if (message.chat != null && message.hasOwnProperty("chat")) {
+            object.chat = $root.Chat.toObject(message.chat, options);
             if (options.oneofs)
-                object.message = "chatMessage";
+                object.message = "chat";
         }
         return object;
     };
@@ -840,6 +836,7 @@ $root.ServerClient = (function() {
      * MessageType enum.
      * @name ServerClient.MessageType
      * @enum {string}
+     * @property {number} UNKNOWN=0 UNKNOWN value
      * @property {number} HANDSHAKE=2 HANDSHAKE value
      * @property {number} PING=3 PING value
      * @property {number} SERVER_MESSAGE=4 SERVER_MESSAGE value
@@ -847,10 +844,11 @@ $root.ServerClient = (function() {
      * @property {number} PLAYER_UPDATE=6 PLAYER_UPDATE value
      * @property {number} PLAYER_DATA=128 PLAYER_DATA value
      * @property {number} META_DATA=129 META_DATA value
-     * @property {number} CHAT_MESSAGE=130 CHAT_MESSAGE value
+     * @property {number} CHAT=130 CHAT value
      */
     ServerClient.MessageType = (function() {
         var valuesById = {}, values = Object.create(valuesById);
+        values[valuesById[0] = "UNKNOWN"] = 0;
         values[valuesById[2] = "HANDSHAKE"] = 2;
         values[valuesById[3] = "PING"] = 3;
         values[valuesById[4] = "SERVER_MESSAGE"] = 4;
@@ -858,7 +856,7 @@ $root.ServerClient = (function() {
         values[valuesById[6] = "PLAYER_UPDATE"] = 6;
         values[valuesById[128] = "PLAYER_DATA"] = 128;
         values[valuesById[129] = "META_DATA"] = 129;
-        values[valuesById[130] = "CHAT_MESSAGE"] = 130;
+        values[valuesById[130] = "CHAT"] = 130;
         return values;
     })();
 
@@ -1080,23 +1078,25 @@ $root.Handshake = (function() {
     return Handshake;
 })();
 
-$root.Ping = (function() {
+$root.PlayerUpdate = (function() {
 
     /**
-     * Properties of a Ping.
-     * @exports IPing
-     * @interface IPing
+     * Properties of a PlayerUpdate.
+     * @exports IPlayerUpdate
+     * @interface IPlayerUpdate
+     * @property {number|null} [playerId] PlayerUpdate playerId
+     * @property {IPlayer|null} [player] PlayerUpdate player
      */
 
     /**
-     * Constructs a new Ping.
-     * @exports Ping
-     * @classdesc Represents a Ping.
-     * @implements IPing
+     * Constructs a new PlayerUpdate.
+     * @exports PlayerUpdate
+     * @classdesc Represents a PlayerUpdate.
+     * @implements IPlayerUpdate
      * @constructor
-     * @param {IPing=} [properties] Properties to set
+     * @param {IPlayerUpdate=} [properties] Properties to set
      */
-    function Ping(properties) {
+    function PlayerUpdate(properties) {
         if (properties)
             for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                 if (properties[keys[i]] != null)
@@ -1104,292 +1104,88 @@ $root.Ping = (function() {
     }
 
     /**
-     * Creates a new Ping instance using the specified properties.
-     * @function create
-     * @memberof Ping
-     * @static
-     * @param {IPing=} [properties] Properties to set
-     * @returns {Ping} Ping instance
+     * PlayerUpdate playerId.
+     * @member {number} playerId
+     * @memberof PlayerUpdate
+     * @instance
      */
-    Ping.create = function create(properties) {
-        return new Ping(properties);
+    PlayerUpdate.prototype.playerId = 0;
+
+    /**
+     * PlayerUpdate player.
+     * @member {IPlayer|null|undefined} player
+     * @memberof PlayerUpdate
+     * @instance
+     */
+    PlayerUpdate.prototype.player = null;
+
+    /**
+     * Creates a new PlayerUpdate instance using the specified properties.
+     * @function create
+     * @memberof PlayerUpdate
+     * @static
+     * @param {IPlayerUpdate=} [properties] Properties to set
+     * @returns {PlayerUpdate} PlayerUpdate instance
+     */
+    PlayerUpdate.create = function create(properties) {
+        return new PlayerUpdate(properties);
     };
 
     /**
-     * Encodes the specified Ping message. Does not implicitly {@link Ping.verify|verify} messages.
+     * Encodes the specified PlayerUpdate message. Does not implicitly {@link PlayerUpdate.verify|verify} messages.
      * @function encode
-     * @memberof Ping
+     * @memberof PlayerUpdate
      * @static
-     * @param {IPing} message Ping message or plain object to encode
+     * @param {IPlayerUpdate} message PlayerUpdate message or plain object to encode
      * @param {$protobuf.Writer} [writer] Writer to encode to
      * @returns {$protobuf.Writer} Writer
      */
-    Ping.encode = function encode(message, writer) {
+    PlayerUpdate.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
+        if (message.playerId != null && message.hasOwnProperty("playerId"))
+            writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.playerId);
+        if (message.player != null && message.hasOwnProperty("player"))
+            $root.Player.encode(message.player, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
         return writer;
     };
 
     /**
-     * Encodes the specified Ping message, length delimited. Does not implicitly {@link Ping.verify|verify} messages.
+     * Encodes the specified PlayerUpdate message, length delimited. Does not implicitly {@link PlayerUpdate.verify|verify} messages.
      * @function encodeDelimited
-     * @memberof Ping
+     * @memberof PlayerUpdate
      * @static
-     * @param {IPing} message Ping message or plain object to encode
+     * @param {IPlayerUpdate} message PlayerUpdate message or plain object to encode
      * @param {$protobuf.Writer} [writer] Writer to encode to
      * @returns {$protobuf.Writer} Writer
      */
-    Ping.encodeDelimited = function encodeDelimited(message, writer) {
+    PlayerUpdate.encodeDelimited = function encodeDelimited(message, writer) {
         return this.encode(message, writer).ldelim();
     };
 
     /**
-     * Decodes a Ping message from the specified reader or buffer.
+     * Decodes a PlayerUpdate message from the specified reader or buffer.
      * @function decode
-     * @memberof Ping
+     * @memberof PlayerUpdate
      * @static
      * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
      * @param {number} [length] Message length if known beforehand
-     * @returns {Ping} Ping
+     * @returns {PlayerUpdate} PlayerUpdate
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    Ping.decode = function decode(reader, length) {
+    PlayerUpdate.decode = function decode(reader, length) {
         if (!(reader instanceof $Reader))
             reader = $Reader.create(reader);
-        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Ping();
-        while (reader.pos < end) {
-            var tag = reader.uint32();
-            switch (tag >>> 3) {
-            default:
-                reader.skipType(tag & 7);
-                break;
-            }
-        }
-        return message;
-    };
-
-    /**
-     * Decodes a Ping message from the specified reader or buffer, length delimited.
-     * @function decodeDelimited
-     * @memberof Ping
-     * @static
-     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @returns {Ping} Ping
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    Ping.decodeDelimited = function decodeDelimited(reader) {
-        if (!(reader instanceof $Reader))
-            reader = new $Reader(reader);
-        return this.decode(reader, reader.uint32());
-    };
-
-    /**
-     * Verifies a Ping message.
-     * @function verify
-     * @memberof Ping
-     * @static
-     * @param {Object.<string,*>} message Plain object to verify
-     * @returns {string|null} `null` if valid, otherwise the reason why it is not
-     */
-    Ping.verify = function verify(message) {
-        if (typeof message !== "object" || message === null)
-            return "object expected";
-        return null;
-    };
-
-    /**
-     * Creates a Ping message from a plain object. Also converts values to their respective internal types.
-     * @function fromObject
-     * @memberof Ping
-     * @static
-     * @param {Object.<string,*>} object Plain object
-     * @returns {Ping} Ping
-     */
-    Ping.fromObject = function fromObject(object) {
-        if (object instanceof $root.Ping)
-            return object;
-        return new $root.Ping();
-    };
-
-    /**
-     * Creates a plain object from a Ping message. Also converts values to other types if specified.
-     * @function toObject
-     * @memberof Ping
-     * @static
-     * @param {Ping} message Ping
-     * @param {$protobuf.IConversionOptions} [options] Conversion options
-     * @returns {Object.<string,*>} Plain object
-     */
-    Ping.toObject = function toObject() {
-        return {};
-    };
-
-    /**
-     * Converts this Ping to JSON.
-     * @function toJSON
-     * @memberof Ping
-     * @instance
-     * @returns {Object.<string,*>} JSON object
-     */
-    Ping.prototype.toJSON = function toJSON() {
-        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-    };
-
-    return Ping;
-})();
-
-$root.ServerMessage = (function() {
-
-    /**
-     * Properties of a ServerMessage.
-     * @exports IServerMessage
-     * @interface IServerMessage
-     * @property {ServerMessage.MessageType|null} [messageType] ServerMessage messageType
-     * @property {IConnectionDenied|null} [connectionDenied] ServerMessage connectionDenied
-     * @property {IGameMode|null} [gameMode] ServerMessage gameMode
-     * @property {IServerToken|null} [serverToken] ServerMessage serverToken
-     */
-
-    /**
-     * Constructs a new ServerMessage.
-     * @exports ServerMessage
-     * @classdesc Represents a ServerMessage.
-     * @implements IServerMessage
-     * @constructor
-     * @param {IServerMessage=} [properties] Properties to set
-     */
-    function ServerMessage(properties) {
-        if (properties)
-            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                if (properties[keys[i]] != null)
-                    this[keys[i]] = properties[keys[i]];
-    }
-
-    /**
-     * ServerMessage messageType.
-     * @member {ServerMessage.MessageType} messageType
-     * @memberof ServerMessage
-     * @instance
-     */
-    ServerMessage.prototype.messageType = 1;
-
-    /**
-     * ServerMessage connectionDenied.
-     * @member {IConnectionDenied|null|undefined} connectionDenied
-     * @memberof ServerMessage
-     * @instance
-     */
-    ServerMessage.prototype.connectionDenied = null;
-
-    /**
-     * ServerMessage gameMode.
-     * @member {IGameMode|null|undefined} gameMode
-     * @memberof ServerMessage
-     * @instance
-     */
-    ServerMessage.prototype.gameMode = null;
-
-    /**
-     * ServerMessage serverToken.
-     * @member {IServerToken|null|undefined} serverToken
-     * @memberof ServerMessage
-     * @instance
-     */
-    ServerMessage.prototype.serverToken = null;
-
-    // OneOf field names bound to virtual getters and setters
-    var $oneOfFields;
-
-    /**
-     * ServerMessage message.
-     * @member {"connectionDenied"|"gameMode"|"serverToken"|undefined} message
-     * @memberof ServerMessage
-     * @instance
-     */
-    Object.defineProperty(ServerMessage.prototype, "message", {
-        get: $util.oneOfGetter($oneOfFields = ["connectionDenied", "gameMode", "serverToken"]),
-        set: $util.oneOfSetter($oneOfFields)
-    });
-
-    /**
-     * Creates a new ServerMessage instance using the specified properties.
-     * @function create
-     * @memberof ServerMessage
-     * @static
-     * @param {IServerMessage=} [properties] Properties to set
-     * @returns {ServerMessage} ServerMessage instance
-     */
-    ServerMessage.create = function create(properties) {
-        return new ServerMessage(properties);
-    };
-
-    /**
-     * Encodes the specified ServerMessage message. Does not implicitly {@link ServerMessage.verify|verify} messages.
-     * @function encode
-     * @memberof ServerMessage
-     * @static
-     * @param {IServerMessage} message ServerMessage message or plain object to encode
-     * @param {$protobuf.Writer} [writer] Writer to encode to
-     * @returns {$protobuf.Writer} Writer
-     */
-    ServerMessage.encode = function encode(message, writer) {
-        if (!writer)
-            writer = $Writer.create();
-        if (message.messageType != null && message.hasOwnProperty("messageType"))
-            writer.uint32(/* id 1, wireType 0 =*/8).int32(message.messageType);
-        if (message.connectionDenied != null && message.hasOwnProperty("connectionDenied"))
-            $root.ConnectionDenied.encode(message.connectionDenied, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-        if (message.gameMode != null && message.hasOwnProperty("gameMode"))
-            $root.GameMode.encode(message.gameMode, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
-        if (message.serverToken != null && message.hasOwnProperty("serverToken"))
-            $root.ServerToken.encode(message.serverToken, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
-        return writer;
-    };
-
-    /**
-     * Encodes the specified ServerMessage message, length delimited. Does not implicitly {@link ServerMessage.verify|verify} messages.
-     * @function encodeDelimited
-     * @memberof ServerMessage
-     * @static
-     * @param {IServerMessage} message ServerMessage message or plain object to encode
-     * @param {$protobuf.Writer} [writer] Writer to encode to
-     * @returns {$protobuf.Writer} Writer
-     */
-    ServerMessage.encodeDelimited = function encodeDelimited(message, writer) {
-        return this.encode(message, writer).ldelim();
-    };
-
-    /**
-     * Decodes a ServerMessage message from the specified reader or buffer.
-     * @function decode
-     * @memberof ServerMessage
-     * @static
-     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @param {number} [length] Message length if known beforehand
-     * @returns {ServerMessage} ServerMessage
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    ServerMessage.decode = function decode(reader, length) {
-        if (!(reader instanceof $Reader))
-            reader = $Reader.create(reader);
-        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.ServerMessage();
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.PlayerUpdate();
         while (reader.pos < end) {
             var tag = reader.uint32();
             switch (tag >>> 3) {
             case 1:
-                message.messageType = reader.int32();
+                message.playerId = reader.uint32();
                 break;
             case 2:
-                message.connectionDenied = $root.ConnectionDenied.decode(reader, reader.uint32());
-                break;
-            case 3:
-                message.gameMode = $root.GameMode.decode(reader, reader.uint32());
-                break;
-            case 4:
-                message.serverToken = $root.ServerToken.decode(reader, reader.uint32());
+                message.player = $root.Player.decode(reader, reader.uint32());
                 break;
             default:
                 reader.skipType(tag & 7);
@@ -1400,1266 +1196,101 @@ $root.ServerMessage = (function() {
     };
 
     /**
-     * Decodes a ServerMessage message from the specified reader or buffer, length delimited.
+     * Decodes a PlayerUpdate message from the specified reader or buffer, length delimited.
      * @function decodeDelimited
-     * @memberof ServerMessage
+     * @memberof PlayerUpdate
      * @static
      * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @returns {ServerMessage} ServerMessage
+     * @returns {PlayerUpdate} PlayerUpdate
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    ServerMessage.decodeDelimited = function decodeDelimited(reader) {
+    PlayerUpdate.decodeDelimited = function decodeDelimited(reader) {
         if (!(reader instanceof $Reader))
             reader = new $Reader(reader);
         return this.decode(reader, reader.uint32());
     };
 
     /**
-     * Verifies a ServerMessage message.
+     * Verifies a PlayerUpdate message.
      * @function verify
-     * @memberof ServerMessage
+     * @memberof PlayerUpdate
      * @static
      * @param {Object.<string,*>} message Plain object to verify
      * @returns {string|null} `null` if valid, otherwise the reason why it is not
      */
-    ServerMessage.verify = function verify(message) {
+    PlayerUpdate.verify = function verify(message) {
         if (typeof message !== "object" || message === null)
             return "object expected";
-        var properties = {};
-        if (message.messageType != null && message.hasOwnProperty("messageType"))
-            switch (message.messageType) {
-            default:
-                return "messageType: enum value expected";
-            case 1:
-            case 2:
-            case 3:
-                break;
-            }
-        if (message.connectionDenied != null && message.hasOwnProperty("connectionDenied")) {
-            properties.message = 1;
-            {
-                var error = $root.ConnectionDenied.verify(message.connectionDenied);
-                if (error)
-                    return "connectionDenied." + error;
-            }
-        }
-        if (message.gameMode != null && message.hasOwnProperty("gameMode")) {
-            if (properties.message === 1)
-                return "message: multiple values";
-            properties.message = 1;
-            {
-                var error = $root.GameMode.verify(message.gameMode);
-                if (error)
-                    return "gameMode." + error;
-            }
-        }
-        if (message.serverToken != null && message.hasOwnProperty("serverToken")) {
-            if (properties.message === 1)
-                return "message: multiple values";
-            properties.message = 1;
-            {
-                var error = $root.ServerToken.verify(message.serverToken);
-                if (error)
-                    return "serverToken." + error;
-            }
+        if (message.playerId != null && message.hasOwnProperty("playerId"))
+            if (!$util.isInteger(message.playerId))
+                return "playerId: integer expected";
+        if (message.player != null && message.hasOwnProperty("player")) {
+            var error = $root.Player.verify(message.player);
+            if (error)
+                return "player." + error;
         }
         return null;
     };
 
     /**
-     * Creates a ServerMessage message from a plain object. Also converts values to their respective internal types.
+     * Creates a PlayerUpdate message from a plain object. Also converts values to their respective internal types.
      * @function fromObject
-     * @memberof ServerMessage
+     * @memberof PlayerUpdate
      * @static
      * @param {Object.<string,*>} object Plain object
-     * @returns {ServerMessage} ServerMessage
+     * @returns {PlayerUpdate} PlayerUpdate
      */
-    ServerMessage.fromObject = function fromObject(object) {
-        if (object instanceof $root.ServerMessage)
+    PlayerUpdate.fromObject = function fromObject(object) {
+        if (object instanceof $root.PlayerUpdate)
             return object;
-        var message = new $root.ServerMessage();
-        switch (object.messageType) {
-        case "CONNECTION_DENIED":
-        case 1:
-            message.messageType = 1;
-            break;
-        case "GAME_MODE":
-        case 2:
-            message.messageType = 2;
-            break;
-        case "SERVER_TOKEN":
-        case 3:
-            message.messageType = 3;
-            break;
-        }
-        if (object.connectionDenied != null) {
-            if (typeof object.connectionDenied !== "object")
-                throw TypeError(".ServerMessage.connectionDenied: object expected");
-            message.connectionDenied = $root.ConnectionDenied.fromObject(object.connectionDenied);
-        }
-        if (object.gameMode != null) {
-            if (typeof object.gameMode !== "object")
-                throw TypeError(".ServerMessage.gameMode: object expected");
-            message.gameMode = $root.GameMode.fromObject(object.gameMode);
-        }
-        if (object.serverToken != null) {
-            if (typeof object.serverToken !== "object")
-                throw TypeError(".ServerMessage.serverToken: object expected");
-            message.serverToken = $root.ServerToken.fromObject(object.serverToken);
+        var message = new $root.PlayerUpdate();
+        if (object.playerId != null)
+            message.playerId = object.playerId >>> 0;
+        if (object.player != null) {
+            if (typeof object.player !== "object")
+                throw TypeError(".PlayerUpdate.player: object expected");
+            message.player = $root.Player.fromObject(object.player);
         }
         return message;
     };
 
     /**
-     * Creates a plain object from a ServerMessage message. Also converts values to other types if specified.
+     * Creates a plain object from a PlayerUpdate message. Also converts values to other types if specified.
      * @function toObject
-     * @memberof ServerMessage
+     * @memberof PlayerUpdate
      * @static
-     * @param {ServerMessage} message ServerMessage
+     * @param {PlayerUpdate} message PlayerUpdate
      * @param {$protobuf.IConversionOptions} [options] Conversion options
      * @returns {Object.<string,*>} Plain object
      */
-    ServerMessage.toObject = function toObject(message, options) {
-        if (!options)
-            options = {};
-        var object = {};
-        if (options.defaults)
-            object.messageType = options.enums === String ? "CONNECTION_DENIED" : 1;
-        if (message.messageType != null && message.hasOwnProperty("messageType"))
-            object.messageType = options.enums === String ? $root.ServerMessage.MessageType[message.messageType] : message.messageType;
-        if (message.connectionDenied != null && message.hasOwnProperty("connectionDenied")) {
-            object.connectionDenied = $root.ConnectionDenied.toObject(message.connectionDenied, options);
-            if (options.oneofs)
-                object.message = "connectionDenied";
-        }
-        if (message.gameMode != null && message.hasOwnProperty("gameMode")) {
-            object.gameMode = $root.GameMode.toObject(message.gameMode, options);
-            if (options.oneofs)
-                object.message = "gameMode";
-        }
-        if (message.serverToken != null && message.hasOwnProperty("serverToken")) {
-            object.serverToken = $root.ServerToken.toObject(message.serverToken, options);
-            if (options.oneofs)
-                object.message = "serverToken";
-        }
-        return object;
-    };
-
-    /**
-     * Converts this ServerMessage to JSON.
-     * @function toJSON
-     * @memberof ServerMessage
-     * @instance
-     * @returns {Object.<string,*>} JSON object
-     */
-    ServerMessage.prototype.toJSON = function toJSON() {
-        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-    };
-
-    /**
-     * MessageType enum.
-     * @name ServerMessage.MessageType
-     * @enum {string}
-     * @property {number} CONNECTION_DENIED=1 CONNECTION_DENIED value
-     * @property {number} GAME_MODE=2 GAME_MODE value
-     * @property {number} SERVER_TOKEN=3 SERVER_TOKEN value
-     */
-    ServerMessage.MessageType = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
-        values[valuesById[1] = "CONNECTION_DENIED"] = 1;
-        values[valuesById[2] = "GAME_MODE"] = 2;
-        values[valuesById[3] = "SERVER_TOKEN"] = 3;
-        return values;
-    })();
-
-    return ServerMessage;
-})();
-
-$root.ConnectionDenied = (function() {
-
-    /**
-     * Properties of a ConnectionDenied.
-     * @exports IConnectionDenied
-     * @interface IConnectionDenied
-     * @property {ConnectionDenied.Reason|null} [reason] ConnectionDenied reason
-     * @property {IServerFull|null} [serverFull] ConnectionDenied serverFull
-     * @property {IWrongVersion|null} [wrongVersion] ConnectionDenied wrongVersion
-     */
-
-    /**
-     * Constructs a new ConnectionDenied.
-     * @exports ConnectionDenied
-     * @classdesc Represents a ConnectionDenied.
-     * @implements IConnectionDenied
-     * @constructor
-     * @param {IConnectionDenied=} [properties] Properties to set
-     */
-    function ConnectionDenied(properties) {
-        if (properties)
-            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                if (properties[keys[i]] != null)
-                    this[keys[i]] = properties[keys[i]];
-    }
-
-    /**
-     * ConnectionDenied reason.
-     * @member {ConnectionDenied.Reason} reason
-     * @memberof ConnectionDenied
-     * @instance
-     */
-    ConnectionDenied.prototype.reason = 1;
-
-    /**
-     * ConnectionDenied serverFull.
-     * @member {IServerFull|null|undefined} serverFull
-     * @memberof ConnectionDenied
-     * @instance
-     */
-    ConnectionDenied.prototype.serverFull = null;
-
-    /**
-     * ConnectionDenied wrongVersion.
-     * @member {IWrongVersion|null|undefined} wrongVersion
-     * @memberof ConnectionDenied
-     * @instance
-     */
-    ConnectionDenied.prototype.wrongVersion = null;
-
-    // OneOf field names bound to virtual getters and setters
-    var $oneOfFields;
-
-    /**
-     * ConnectionDenied message.
-     * @member {"serverFull"|"wrongVersion"|undefined} message
-     * @memberof ConnectionDenied
-     * @instance
-     */
-    Object.defineProperty(ConnectionDenied.prototype, "message", {
-        get: $util.oneOfGetter($oneOfFields = ["serverFull", "wrongVersion"]),
-        set: $util.oneOfSetter($oneOfFields)
-    });
-
-    /**
-     * Creates a new ConnectionDenied instance using the specified properties.
-     * @function create
-     * @memberof ConnectionDenied
-     * @static
-     * @param {IConnectionDenied=} [properties] Properties to set
-     * @returns {ConnectionDenied} ConnectionDenied instance
-     */
-    ConnectionDenied.create = function create(properties) {
-        return new ConnectionDenied(properties);
-    };
-
-    /**
-     * Encodes the specified ConnectionDenied message. Does not implicitly {@link ConnectionDenied.verify|verify} messages.
-     * @function encode
-     * @memberof ConnectionDenied
-     * @static
-     * @param {IConnectionDenied} message ConnectionDenied message or plain object to encode
-     * @param {$protobuf.Writer} [writer] Writer to encode to
-     * @returns {$protobuf.Writer} Writer
-     */
-    ConnectionDenied.encode = function encode(message, writer) {
-        if (!writer)
-            writer = $Writer.create();
-        if (message.reason != null && message.hasOwnProperty("reason"))
-            writer.uint32(/* id 1, wireType 0 =*/8).int32(message.reason);
-        if (message.serverFull != null && message.hasOwnProperty("serverFull"))
-            $root.ServerFull.encode(message.serverFull, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-        if (message.wrongVersion != null && message.hasOwnProperty("wrongVersion"))
-            $root.WrongVersion.encode(message.wrongVersion, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
-        return writer;
-    };
-
-    /**
-     * Encodes the specified ConnectionDenied message, length delimited. Does not implicitly {@link ConnectionDenied.verify|verify} messages.
-     * @function encodeDelimited
-     * @memberof ConnectionDenied
-     * @static
-     * @param {IConnectionDenied} message ConnectionDenied message or plain object to encode
-     * @param {$protobuf.Writer} [writer] Writer to encode to
-     * @returns {$protobuf.Writer} Writer
-     */
-    ConnectionDenied.encodeDelimited = function encodeDelimited(message, writer) {
-        return this.encode(message, writer).ldelim();
-    };
-
-    /**
-     * Decodes a ConnectionDenied message from the specified reader or buffer.
-     * @function decode
-     * @memberof ConnectionDenied
-     * @static
-     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @param {number} [length] Message length if known beforehand
-     * @returns {ConnectionDenied} ConnectionDenied
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    ConnectionDenied.decode = function decode(reader, length) {
-        if (!(reader instanceof $Reader))
-            reader = $Reader.create(reader);
-        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.ConnectionDenied();
-        while (reader.pos < end) {
-            var tag = reader.uint32();
-            switch (tag >>> 3) {
-            case 1:
-                message.reason = reader.int32();
-                break;
-            case 2:
-                message.serverFull = $root.ServerFull.decode(reader, reader.uint32());
-                break;
-            case 3:
-                message.wrongVersion = $root.WrongVersion.decode(reader, reader.uint32());
-                break;
-            default:
-                reader.skipType(tag & 7);
-                break;
-            }
-        }
-        return message;
-    };
-
-    /**
-     * Decodes a ConnectionDenied message from the specified reader or buffer, length delimited.
-     * @function decodeDelimited
-     * @memberof ConnectionDenied
-     * @static
-     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @returns {ConnectionDenied} ConnectionDenied
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    ConnectionDenied.decodeDelimited = function decodeDelimited(reader) {
-        if (!(reader instanceof $Reader))
-            reader = new $Reader(reader);
-        return this.decode(reader, reader.uint32());
-    };
-
-    /**
-     * Verifies a ConnectionDenied message.
-     * @function verify
-     * @memberof ConnectionDenied
-     * @static
-     * @param {Object.<string,*>} message Plain object to verify
-     * @returns {string|null} `null` if valid, otherwise the reason why it is not
-     */
-    ConnectionDenied.verify = function verify(message) {
-        if (typeof message !== "object" || message === null)
-            return "object expected";
-        var properties = {};
-        if (message.reason != null && message.hasOwnProperty("reason"))
-            switch (message.reason) {
-            default:
-                return "reason: enum value expected";
-            case 1:
-            case 2:
-                break;
-            }
-        if (message.serverFull != null && message.hasOwnProperty("serverFull")) {
-            properties.message = 1;
-            {
-                var error = $root.ServerFull.verify(message.serverFull);
-                if (error)
-                    return "serverFull." + error;
-            }
-        }
-        if (message.wrongVersion != null && message.hasOwnProperty("wrongVersion")) {
-            if (properties.message === 1)
-                return "message: multiple values";
-            properties.message = 1;
-            {
-                var error = $root.WrongVersion.verify(message.wrongVersion);
-                if (error)
-                    return "wrongVersion." + error;
-            }
-        }
-        return null;
-    };
-
-    /**
-     * Creates a ConnectionDenied message from a plain object. Also converts values to their respective internal types.
-     * @function fromObject
-     * @memberof ConnectionDenied
-     * @static
-     * @param {Object.<string,*>} object Plain object
-     * @returns {ConnectionDenied} ConnectionDenied
-     */
-    ConnectionDenied.fromObject = function fromObject(object) {
-        if (object instanceof $root.ConnectionDenied)
-            return object;
-        var message = new $root.ConnectionDenied();
-        switch (object.reason) {
-        case "SERVER_FULL":
-        case 1:
-            message.reason = 1;
-            break;
-        case "WRONG_VERSION":
-        case 2:
-            message.reason = 2;
-            break;
-        }
-        if (object.serverFull != null) {
-            if (typeof object.serverFull !== "object")
-                throw TypeError(".ConnectionDenied.serverFull: object expected");
-            message.serverFull = $root.ServerFull.fromObject(object.serverFull);
-        }
-        if (object.wrongVersion != null) {
-            if (typeof object.wrongVersion !== "object")
-                throw TypeError(".ConnectionDenied.wrongVersion: object expected");
-            message.wrongVersion = $root.WrongVersion.fromObject(object.wrongVersion);
-        }
-        return message;
-    };
-
-    /**
-     * Creates a plain object from a ConnectionDenied message. Also converts values to other types if specified.
-     * @function toObject
-     * @memberof ConnectionDenied
-     * @static
-     * @param {ConnectionDenied} message ConnectionDenied
-     * @param {$protobuf.IConversionOptions} [options] Conversion options
-     * @returns {Object.<string,*>} Plain object
-     */
-    ConnectionDenied.toObject = function toObject(message, options) {
-        if (!options)
-            options = {};
-        var object = {};
-        if (options.defaults)
-            object.reason = options.enums === String ? "SERVER_FULL" : 1;
-        if (message.reason != null && message.hasOwnProperty("reason"))
-            object.reason = options.enums === String ? $root.ConnectionDenied.Reason[message.reason] : message.reason;
-        if (message.serverFull != null && message.hasOwnProperty("serverFull")) {
-            object.serverFull = $root.ServerFull.toObject(message.serverFull, options);
-            if (options.oneofs)
-                object.message = "serverFull";
-        }
-        if (message.wrongVersion != null && message.hasOwnProperty("wrongVersion")) {
-            object.wrongVersion = $root.WrongVersion.toObject(message.wrongVersion, options);
-            if (options.oneofs)
-                object.message = "wrongVersion";
-        }
-        return object;
-    };
-
-    /**
-     * Converts this ConnectionDenied to JSON.
-     * @function toJSON
-     * @memberof ConnectionDenied
-     * @instance
-     * @returns {Object.<string,*>} JSON object
-     */
-    ConnectionDenied.prototype.toJSON = function toJSON() {
-        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-    };
-
-    /**
-     * Reason enum.
-     * @name ConnectionDenied.Reason
-     * @enum {string}
-     * @property {number} SERVER_FULL=1 SERVER_FULL value
-     * @property {number} WRONG_VERSION=2 WRONG_VERSION value
-     */
-    ConnectionDenied.Reason = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
-        values[valuesById[1] = "SERVER_FULL"] = 1;
-        values[valuesById[2] = "WRONG_VERSION"] = 2;
-        return values;
-    })();
-
-    return ConnectionDenied;
-})();
-
-$root.ServerFull = (function() {
-
-    /**
-     * Properties of a ServerFull.
-     * @exports IServerFull
-     * @interface IServerFull
-     */
-
-    /**
-     * Constructs a new ServerFull.
-     * @exports ServerFull
-     * @classdesc Represents a ServerFull.
-     * @implements IServerFull
-     * @constructor
-     * @param {IServerFull=} [properties] Properties to set
-     */
-    function ServerFull(properties) {
-        if (properties)
-            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                if (properties[keys[i]] != null)
-                    this[keys[i]] = properties[keys[i]];
-    }
-
-    /**
-     * Creates a new ServerFull instance using the specified properties.
-     * @function create
-     * @memberof ServerFull
-     * @static
-     * @param {IServerFull=} [properties] Properties to set
-     * @returns {ServerFull} ServerFull instance
-     */
-    ServerFull.create = function create(properties) {
-        return new ServerFull(properties);
-    };
-
-    /**
-     * Encodes the specified ServerFull message. Does not implicitly {@link ServerFull.verify|verify} messages.
-     * @function encode
-     * @memberof ServerFull
-     * @static
-     * @param {IServerFull} message ServerFull message or plain object to encode
-     * @param {$protobuf.Writer} [writer] Writer to encode to
-     * @returns {$protobuf.Writer} Writer
-     */
-    ServerFull.encode = function encode(message, writer) {
-        if (!writer)
-            writer = $Writer.create();
-        return writer;
-    };
-
-    /**
-     * Encodes the specified ServerFull message, length delimited. Does not implicitly {@link ServerFull.verify|verify} messages.
-     * @function encodeDelimited
-     * @memberof ServerFull
-     * @static
-     * @param {IServerFull} message ServerFull message or plain object to encode
-     * @param {$protobuf.Writer} [writer] Writer to encode to
-     * @returns {$protobuf.Writer} Writer
-     */
-    ServerFull.encodeDelimited = function encodeDelimited(message, writer) {
-        return this.encode(message, writer).ldelim();
-    };
-
-    /**
-     * Decodes a ServerFull message from the specified reader or buffer.
-     * @function decode
-     * @memberof ServerFull
-     * @static
-     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @param {number} [length] Message length if known beforehand
-     * @returns {ServerFull} ServerFull
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    ServerFull.decode = function decode(reader, length) {
-        if (!(reader instanceof $Reader))
-            reader = $Reader.create(reader);
-        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.ServerFull();
-        while (reader.pos < end) {
-            var tag = reader.uint32();
-            switch (tag >>> 3) {
-            default:
-                reader.skipType(tag & 7);
-                break;
-            }
-        }
-        return message;
-    };
-
-    /**
-     * Decodes a ServerFull message from the specified reader or buffer, length delimited.
-     * @function decodeDelimited
-     * @memberof ServerFull
-     * @static
-     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @returns {ServerFull} ServerFull
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    ServerFull.decodeDelimited = function decodeDelimited(reader) {
-        if (!(reader instanceof $Reader))
-            reader = new $Reader(reader);
-        return this.decode(reader, reader.uint32());
-    };
-
-    /**
-     * Verifies a ServerFull message.
-     * @function verify
-     * @memberof ServerFull
-     * @static
-     * @param {Object.<string,*>} message Plain object to verify
-     * @returns {string|null} `null` if valid, otherwise the reason why it is not
-     */
-    ServerFull.verify = function verify(message) {
-        if (typeof message !== "object" || message === null)
-            return "object expected";
-        return null;
-    };
-
-    /**
-     * Creates a ServerFull message from a plain object. Also converts values to their respective internal types.
-     * @function fromObject
-     * @memberof ServerFull
-     * @static
-     * @param {Object.<string,*>} object Plain object
-     * @returns {ServerFull} ServerFull
-     */
-    ServerFull.fromObject = function fromObject(object) {
-        if (object instanceof $root.ServerFull)
-            return object;
-        return new $root.ServerFull();
-    };
-
-    /**
-     * Creates a plain object from a ServerFull message. Also converts values to other types if specified.
-     * @function toObject
-     * @memberof ServerFull
-     * @static
-     * @param {ServerFull} message ServerFull
-     * @param {$protobuf.IConversionOptions} [options] Conversion options
-     * @returns {Object.<string,*>} Plain object
-     */
-    ServerFull.toObject = function toObject() {
-        return {};
-    };
-
-    /**
-     * Converts this ServerFull to JSON.
-     * @function toJSON
-     * @memberof ServerFull
-     * @instance
-     * @returns {Object.<string,*>} JSON object
-     */
-    ServerFull.prototype.toJSON = function toJSON() {
-        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-    };
-
-    return ServerFull;
-})();
-
-$root.WrongVersion = (function() {
-
-    /**
-     * Properties of a WrongVersion.
-     * @exports IWrongVersion
-     * @interface IWrongVersion
-     * @property {string|null} [minVersion] WrongVersion minVersion
-     * @property {string|null} [maxVersion] WrongVersion maxVersion
-     */
-
-    /**
-     * Constructs a new WrongVersion.
-     * @exports WrongVersion
-     * @classdesc Represents a WrongVersion.
-     * @implements IWrongVersion
-     * @constructor
-     * @param {IWrongVersion=} [properties] Properties to set
-     */
-    function WrongVersion(properties) {
-        if (properties)
-            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                if (properties[keys[i]] != null)
-                    this[keys[i]] = properties[keys[i]];
-    }
-
-    /**
-     * WrongVersion minVersion.
-     * @member {string} minVersion
-     * @memberof WrongVersion
-     * @instance
-     */
-    WrongVersion.prototype.minVersion = "";
-
-    /**
-     * WrongVersion maxVersion.
-     * @member {string} maxVersion
-     * @memberof WrongVersion
-     * @instance
-     */
-    WrongVersion.prototype.maxVersion = "";
-
-    /**
-     * Creates a new WrongVersion instance using the specified properties.
-     * @function create
-     * @memberof WrongVersion
-     * @static
-     * @param {IWrongVersion=} [properties] Properties to set
-     * @returns {WrongVersion} WrongVersion instance
-     */
-    WrongVersion.create = function create(properties) {
-        return new WrongVersion(properties);
-    };
-
-    /**
-     * Encodes the specified WrongVersion message. Does not implicitly {@link WrongVersion.verify|verify} messages.
-     * @function encode
-     * @memberof WrongVersion
-     * @static
-     * @param {IWrongVersion} message WrongVersion message or plain object to encode
-     * @param {$protobuf.Writer} [writer] Writer to encode to
-     * @returns {$protobuf.Writer} Writer
-     */
-    WrongVersion.encode = function encode(message, writer) {
-        if (!writer)
-            writer = $Writer.create();
-        if (message.minVersion != null && message.hasOwnProperty("minVersion"))
-            writer.uint32(/* id 1, wireType 2 =*/10).string(message.minVersion);
-        if (message.maxVersion != null && message.hasOwnProperty("maxVersion"))
-            writer.uint32(/* id 2, wireType 2 =*/18).string(message.maxVersion);
-        return writer;
-    };
-
-    /**
-     * Encodes the specified WrongVersion message, length delimited. Does not implicitly {@link WrongVersion.verify|verify} messages.
-     * @function encodeDelimited
-     * @memberof WrongVersion
-     * @static
-     * @param {IWrongVersion} message WrongVersion message or plain object to encode
-     * @param {$protobuf.Writer} [writer] Writer to encode to
-     * @returns {$protobuf.Writer} Writer
-     */
-    WrongVersion.encodeDelimited = function encodeDelimited(message, writer) {
-        return this.encode(message, writer).ldelim();
-    };
-
-    /**
-     * Decodes a WrongVersion message from the specified reader or buffer.
-     * @function decode
-     * @memberof WrongVersion
-     * @static
-     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @param {number} [length] Message length if known beforehand
-     * @returns {WrongVersion} WrongVersion
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    WrongVersion.decode = function decode(reader, length) {
-        if (!(reader instanceof $Reader))
-            reader = $Reader.create(reader);
-        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.WrongVersion();
-        while (reader.pos < end) {
-            var tag = reader.uint32();
-            switch (tag >>> 3) {
-            case 1:
-                message.minVersion = reader.string();
-                break;
-            case 2:
-                message.maxVersion = reader.string();
-                break;
-            default:
-                reader.skipType(tag & 7);
-                break;
-            }
-        }
-        return message;
-    };
-
-    /**
-     * Decodes a WrongVersion message from the specified reader or buffer, length delimited.
-     * @function decodeDelimited
-     * @memberof WrongVersion
-     * @static
-     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @returns {WrongVersion} WrongVersion
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    WrongVersion.decodeDelimited = function decodeDelimited(reader) {
-        if (!(reader instanceof $Reader))
-            reader = new $Reader(reader);
-        return this.decode(reader, reader.uint32());
-    };
-
-    /**
-     * Verifies a WrongVersion message.
-     * @function verify
-     * @memberof WrongVersion
-     * @static
-     * @param {Object.<string,*>} message Plain object to verify
-     * @returns {string|null} `null` if valid, otherwise the reason why it is not
-     */
-    WrongVersion.verify = function verify(message) {
-        if (typeof message !== "object" || message === null)
-            return "object expected";
-        if (message.minVersion != null && message.hasOwnProperty("minVersion"))
-            if (!$util.isString(message.minVersion))
-                return "minVersion: string expected";
-        if (message.maxVersion != null && message.hasOwnProperty("maxVersion"))
-            if (!$util.isString(message.maxVersion))
-                return "maxVersion: string expected";
-        return null;
-    };
-
-    /**
-     * Creates a WrongVersion message from a plain object. Also converts values to their respective internal types.
-     * @function fromObject
-     * @memberof WrongVersion
-     * @static
-     * @param {Object.<string,*>} object Plain object
-     * @returns {WrongVersion} WrongVersion
-     */
-    WrongVersion.fromObject = function fromObject(object) {
-        if (object instanceof $root.WrongVersion)
-            return object;
-        var message = new $root.WrongVersion();
-        if (object.minVersion != null)
-            message.minVersion = String(object.minVersion);
-        if (object.maxVersion != null)
-            message.maxVersion = String(object.maxVersion);
-        return message;
-    };
-
-    /**
-     * Creates a plain object from a WrongVersion message. Also converts values to other types if specified.
-     * @function toObject
-     * @memberof WrongVersion
-     * @static
-     * @param {WrongVersion} message WrongVersion
-     * @param {$protobuf.IConversionOptions} [options] Conversion options
-     * @returns {Object.<string,*>} Plain object
-     */
-    WrongVersion.toObject = function toObject(message, options) {
+    PlayerUpdate.toObject = function toObject(message, options) {
         if (!options)
             options = {};
         var object = {};
         if (options.defaults) {
-            object.minVersion = "";
-            object.maxVersion = "";
+            object.playerId = 0;
+            object.player = null;
         }
-        if (message.minVersion != null && message.hasOwnProperty("minVersion"))
-            object.minVersion = message.minVersion;
-        if (message.maxVersion != null && message.hasOwnProperty("maxVersion"))
-            object.maxVersion = message.maxVersion;
+        if (message.playerId != null && message.hasOwnProperty("playerId"))
+            object.playerId = message.playerId;
+        if (message.player != null && message.hasOwnProperty("player"))
+            object.player = $root.Player.toObject(message.player, options);
         return object;
     };
 
     /**
-     * Converts this WrongVersion to JSON.
+     * Converts this PlayerUpdate to JSON.
      * @function toJSON
-     * @memberof WrongVersion
+     * @memberof PlayerUpdate
      * @instance
      * @returns {Object.<string,*>} JSON object
      */
-    WrongVersion.prototype.toJSON = function toJSON() {
+    PlayerUpdate.prototype.toJSON = function toJSON() {
         return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
     };
 
-    return WrongVersion;
-})();
-
-$root.GameMode = (function() {
-
-    /**
-     * Properties of a GameMode.
-     * @exports IGameMode
-     * @interface IGameMode
-     * @property {GameMode.GameModeType|null} [gameMode] GameMode gameMode
-     */
-
-    /**
-     * Constructs a new GameMode.
-     * @exports GameMode
-     * @classdesc Represents a GameMode.
-     * @implements IGameMode
-     * @constructor
-     * @param {IGameMode=} [properties] Properties to set
-     */
-    function GameMode(properties) {
-        if (properties)
-            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                if (properties[keys[i]] != null)
-                    this[keys[i]] = properties[keys[i]];
-    }
-
-    /**
-     * GameMode gameMode.
-     * @member {GameMode.GameModeType} gameMode
-     * @memberof GameMode
-     * @instance
-     */
-    GameMode.prototype.gameMode = 1;
-
-    /**
-     * Creates a new GameMode instance using the specified properties.
-     * @function create
-     * @memberof GameMode
-     * @static
-     * @param {IGameMode=} [properties] Properties to set
-     * @returns {GameMode} GameMode instance
-     */
-    GameMode.create = function create(properties) {
-        return new GameMode(properties);
-    };
-
-    /**
-     * Encodes the specified GameMode message. Does not implicitly {@link GameMode.verify|verify} messages.
-     * @function encode
-     * @memberof GameMode
-     * @static
-     * @param {IGameMode} message GameMode message or plain object to encode
-     * @param {$protobuf.Writer} [writer] Writer to encode to
-     * @returns {$protobuf.Writer} Writer
-     */
-    GameMode.encode = function encode(message, writer) {
-        if (!writer)
-            writer = $Writer.create();
-        if (message.gameMode != null && message.hasOwnProperty("gameMode"))
-            writer.uint32(/* id 1, wireType 0 =*/8).int32(message.gameMode);
-        return writer;
-    };
-
-    /**
-     * Encodes the specified GameMode message, length delimited. Does not implicitly {@link GameMode.verify|verify} messages.
-     * @function encodeDelimited
-     * @memberof GameMode
-     * @static
-     * @param {IGameMode} message GameMode message or plain object to encode
-     * @param {$protobuf.Writer} [writer] Writer to encode to
-     * @returns {$protobuf.Writer} Writer
-     */
-    GameMode.encodeDelimited = function encodeDelimited(message, writer) {
-        return this.encode(message, writer).ldelim();
-    };
-
-    /**
-     * Decodes a GameMode message from the specified reader or buffer.
-     * @function decode
-     * @memberof GameMode
-     * @static
-     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @param {number} [length] Message length if known beforehand
-     * @returns {GameMode} GameMode
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    GameMode.decode = function decode(reader, length) {
-        if (!(reader instanceof $Reader))
-            reader = $Reader.create(reader);
-        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.GameMode();
-        while (reader.pos < end) {
-            var tag = reader.uint32();
-            switch (tag >>> 3) {
-            case 1:
-                message.gameMode = reader.int32();
-                break;
-            default:
-                reader.skipType(tag & 7);
-                break;
-            }
-        }
-        return message;
-    };
-
-    /**
-     * Decodes a GameMode message from the specified reader or buffer, length delimited.
-     * @function decodeDelimited
-     * @memberof GameMode
-     * @static
-     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @returns {GameMode} GameMode
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    GameMode.decodeDelimited = function decodeDelimited(reader) {
-        if (!(reader instanceof $Reader))
-            reader = new $Reader(reader);
-        return this.decode(reader, reader.uint32());
-    };
-
-    /**
-     * Verifies a GameMode message.
-     * @function verify
-     * @memberof GameMode
-     * @static
-     * @param {Object.<string,*>} message Plain object to verify
-     * @returns {string|null} `null` if valid, otherwise the reason why it is not
-     */
-    GameMode.verify = function verify(message) {
-        if (typeof message !== "object" || message === null)
-            return "object expected";
-        if (message.gameMode != null && message.hasOwnProperty("gameMode"))
-            switch (message.gameMode) {
-            default:
-                return "gameMode: enum value expected";
-            case 1:
-                break;
-            }
-        return null;
-    };
-
-    /**
-     * Creates a GameMode message from a plain object. Also converts values to their respective internal types.
-     * @function fromObject
-     * @memberof GameMode
-     * @static
-     * @param {Object.<string,*>} object Plain object
-     * @returns {GameMode} GameMode
-     */
-    GameMode.fromObject = function fromObject(object) {
-        if (object instanceof $root.GameMode)
-            return object;
-        var message = new $root.GameMode();
-        switch (object.gameMode) {
-        case "DEFAULT":
-        case 1:
-            message.gameMode = 1;
-            break;
-        }
-        return message;
-    };
-
-    /**
-     * Creates a plain object from a GameMode message. Also converts values to other types if specified.
-     * @function toObject
-     * @memberof GameMode
-     * @static
-     * @param {GameMode} message GameMode
-     * @param {$protobuf.IConversionOptions} [options] Conversion options
-     * @returns {Object.<string,*>} Plain object
-     */
-    GameMode.toObject = function toObject(message, options) {
-        if (!options)
-            options = {};
-        var object = {};
-        if (options.defaults)
-            object.gameMode = options.enums === String ? "DEFAULT" : 1;
-        if (message.gameMode != null && message.hasOwnProperty("gameMode"))
-            object.gameMode = options.enums === String ? $root.GameMode.GameModeType[message.gameMode] : message.gameMode;
-        return object;
-    };
-
-    /**
-     * Converts this GameMode to JSON.
-     * @function toJSON
-     * @memberof GameMode
-     * @instance
-     * @returns {Object.<string,*>} JSON object
-     */
-    GameMode.prototype.toJSON = function toJSON() {
-        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-    };
-
-    /**
-     * GameModeType enum.
-     * @name GameMode.GameModeType
-     * @enum {string}
-     * @property {number} DEFAULT=1 DEFAULT value
-     */
-    GameMode.GameModeType = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
-        values[valuesById[1] = "DEFAULT"] = 1;
-        return values;
-    })();
-
-    return GameMode;
-})();
-
-$root.ServerToken = (function() {
-
-    /**
-     * Properties of a ServerToken.
-     * @exports IServerToken
-     * @interface IServerToken
-     * @property {ServerToken.TokenType|null} [tokenType] ServerToken tokenType
-     */
-
-    /**
-     * Constructs a new ServerToken.
-     * @exports ServerToken
-     * @classdesc Represents a ServerToken.
-     * @implements IServerToken
-     * @constructor
-     * @param {IServerToken=} [properties] Properties to set
-     */
-    function ServerToken(properties) {
-        if (properties)
-            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                if (properties[keys[i]] != null)
-                    this[keys[i]] = properties[keys[i]];
-    }
-
-    /**
-     * ServerToken tokenType.
-     * @member {ServerToken.TokenType} tokenType
-     * @memberof ServerToken
-     * @instance
-     */
-    ServerToken.prototype.tokenType = 1;
-
-    /**
-     * Creates a new ServerToken instance using the specified properties.
-     * @function create
-     * @memberof ServerToken
-     * @static
-     * @param {IServerToken=} [properties] Properties to set
-     * @returns {ServerToken} ServerToken instance
-     */
-    ServerToken.create = function create(properties) {
-        return new ServerToken(properties);
-    };
-
-    /**
-     * Encodes the specified ServerToken message. Does not implicitly {@link ServerToken.verify|verify} messages.
-     * @function encode
-     * @memberof ServerToken
-     * @static
-     * @param {IServerToken} message ServerToken message or plain object to encode
-     * @param {$protobuf.Writer} [writer] Writer to encode to
-     * @returns {$protobuf.Writer} Writer
-     */
-    ServerToken.encode = function encode(message, writer) {
-        if (!writer)
-            writer = $Writer.create();
-        if (message.tokenType != null && message.hasOwnProperty("tokenType"))
-            writer.uint32(/* id 1, wireType 0 =*/8).int32(message.tokenType);
-        return writer;
-    };
-
-    /**
-     * Encodes the specified ServerToken message, length delimited. Does not implicitly {@link ServerToken.verify|verify} messages.
-     * @function encodeDelimited
-     * @memberof ServerToken
-     * @static
-     * @param {IServerToken} message ServerToken message or plain object to encode
-     * @param {$protobuf.Writer} [writer] Writer to encode to
-     * @returns {$protobuf.Writer} Writer
-     */
-    ServerToken.encodeDelimited = function encodeDelimited(message, writer) {
-        return this.encode(message, writer).ldelim();
-    };
-
-    /**
-     * Decodes a ServerToken message from the specified reader or buffer.
-     * @function decode
-     * @memberof ServerToken
-     * @static
-     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @param {number} [length] Message length if known beforehand
-     * @returns {ServerToken} ServerToken
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    ServerToken.decode = function decode(reader, length) {
-        if (!(reader instanceof $Reader))
-            reader = $Reader.create(reader);
-        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.ServerToken();
-        while (reader.pos < end) {
-            var tag = reader.uint32();
-            switch (tag >>> 3) {
-            case 1:
-                message.tokenType = reader.int32();
-                break;
-            default:
-                reader.skipType(tag & 7);
-                break;
-            }
-        }
-        return message;
-    };
-
-    /**
-     * Decodes a ServerToken message from the specified reader or buffer, length delimited.
-     * @function decodeDelimited
-     * @memberof ServerToken
-     * @static
-     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @returns {ServerToken} ServerToken
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    ServerToken.decodeDelimited = function decodeDelimited(reader) {
-        if (!(reader instanceof $Reader))
-            reader = new $Reader(reader);
-        return this.decode(reader, reader.uint32());
-    };
-
-    /**
-     * Verifies a ServerToken message.
-     * @function verify
-     * @memberof ServerToken
-     * @static
-     * @param {Object.<string,*>} message Plain object to verify
-     * @returns {string|null} `null` if valid, otherwise the reason why it is not
-     */
-    ServerToken.verify = function verify(message) {
-        if (typeof message !== "object" || message === null)
-            return "object expected";
-        if (message.tokenType != null && message.hasOwnProperty("tokenType"))
-            switch (message.tokenType) {
-            default:
-                return "tokenType: enum value expected";
-            case 1:
-            case 2:
-                break;
-            }
-        return null;
-    };
-
-    /**
-     * Creates a ServerToken message from a plain object. Also converts values to their respective internal types.
-     * @function fromObject
-     * @memberof ServerToken
-     * @static
-     * @param {Object.<string,*>} object Plain object
-     * @returns {ServerToken} ServerToken
-     */
-    ServerToken.fromObject = function fromObject(object) {
-        if (object instanceof $root.ServerToken)
-            return object;
-        var message = new $root.ServerToken();
-        switch (object.tokenType) {
-        case "GRANT":
-        case 1:
-            message.tokenType = 1;
-            break;
-        case "LOSE":
-        case 2:
-            message.tokenType = 2;
-            break;
-        }
-        return message;
-    };
-
-    /**
-     * Creates a plain object from a ServerToken message. Also converts values to other types if specified.
-     * @function toObject
-     * @memberof ServerToken
-     * @static
-     * @param {ServerToken} message ServerToken
-     * @param {$protobuf.IConversionOptions} [options] Conversion options
-     * @returns {Object.<string,*>} Plain object
-     */
-    ServerToken.toObject = function toObject(message, options) {
-        if (!options)
-            options = {};
-        var object = {};
-        if (options.defaults)
-            object.tokenType = options.enums === String ? "GRANT" : 1;
-        if (message.tokenType != null && message.hasOwnProperty("tokenType"))
-            object.tokenType = options.enums === String ? $root.ServerToken.TokenType[message.tokenType] : message.tokenType;
-        return object;
-    };
-
-    /**
-     * Converts this ServerToken to JSON.
-     * @function toJSON
-     * @memberof ServerToken
-     * @instance
-     * @returns {Object.<string,*>} JSON object
-     */
-    ServerToken.prototype.toJSON = function toJSON() {
-        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-    };
-
-    /**
-     * TokenType enum.
-     * @name ServerToken.TokenType
-     * @enum {string}
-     * @property {number} GRANT=1 GRANT value
-     * @property {number} LOSE=2 LOSE value
-     */
-    ServerToken.TokenType = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
-        values[valuesById[1] = "GRANT"] = 1;
-        values[valuesById[2] = "LOSE"] = 2;
-        return values;
-    })();
-
-    return ServerToken;
+    return PlayerUpdate;
 })();
 
 $root.PlayerListUpdate = (function() {
@@ -2668,7 +1299,7 @@ $root.PlayerListUpdate = (function() {
      * Properties of a PlayerListUpdate.
      * @exports IPlayerListUpdate
      * @interface IPlayerListUpdate
-     * @property {Array.<IPlayer>|null} [players] PlayerListUpdate players
+     * @property {Array.<IPlayerUpdate>|null} [playerUpdates] PlayerListUpdate playerUpdates
      */
 
     /**
@@ -2680,7 +1311,7 @@ $root.PlayerListUpdate = (function() {
      * @param {IPlayerListUpdate=} [properties] Properties to set
      */
     function PlayerListUpdate(properties) {
-        this.players = [];
+        this.playerUpdates = [];
         if (properties)
             for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                 if (properties[keys[i]] != null)
@@ -2688,12 +1319,12 @@ $root.PlayerListUpdate = (function() {
     }
 
     /**
-     * PlayerListUpdate players.
-     * @member {Array.<IPlayer>} players
+     * PlayerListUpdate playerUpdates.
+     * @member {Array.<IPlayerUpdate>} playerUpdates
      * @memberof PlayerListUpdate
      * @instance
      */
-    PlayerListUpdate.prototype.players = $util.emptyArray;
+    PlayerListUpdate.prototype.playerUpdates = $util.emptyArray;
 
     /**
      * Creates a new PlayerListUpdate instance using the specified properties.
@@ -2719,9 +1350,9 @@ $root.PlayerListUpdate = (function() {
     PlayerListUpdate.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
-        if (message.players != null && message.players.length)
-            for (var i = 0; i < message.players.length; ++i)
-                $root.Player.encode(message.players[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+        if (message.playerUpdates != null && message.playerUpdates.length)
+            for (var i = 0; i < message.playerUpdates.length; ++i)
+                $root.PlayerUpdate.encode(message.playerUpdates[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
         return writer;
     };
 
@@ -2757,9 +1388,9 @@ $root.PlayerListUpdate = (function() {
             var tag = reader.uint32();
             switch (tag >>> 3) {
             case 1:
-                if (!(message.players && message.players.length))
-                    message.players = [];
-                message.players.push($root.Player.decode(reader, reader.uint32()));
+                if (!(message.playerUpdates && message.playerUpdates.length))
+                    message.playerUpdates = [];
+                message.playerUpdates.push($root.PlayerUpdate.decode(reader, reader.uint32()));
                 break;
             default:
                 reader.skipType(tag & 7);
@@ -2796,13 +1427,13 @@ $root.PlayerListUpdate = (function() {
     PlayerListUpdate.verify = function verify(message) {
         if (typeof message !== "object" || message === null)
             return "object expected";
-        if (message.players != null && message.hasOwnProperty("players")) {
-            if (!Array.isArray(message.players))
-                return "players: array expected";
-            for (var i = 0; i < message.players.length; ++i) {
-                var error = $root.Player.verify(message.players[i]);
+        if (message.playerUpdates != null && message.hasOwnProperty("playerUpdates")) {
+            if (!Array.isArray(message.playerUpdates))
+                return "playerUpdates: array expected";
+            for (var i = 0; i < message.playerUpdates.length; ++i) {
+                var error = $root.PlayerUpdate.verify(message.playerUpdates[i]);
                 if (error)
-                    return "players." + error;
+                    return "playerUpdates." + error;
             }
         }
         return null;
@@ -2820,14 +1451,14 @@ $root.PlayerListUpdate = (function() {
         if (object instanceof $root.PlayerListUpdate)
             return object;
         var message = new $root.PlayerListUpdate();
-        if (object.players) {
-            if (!Array.isArray(object.players))
-                throw TypeError(".PlayerListUpdate.players: array expected");
-            message.players = [];
-            for (var i = 0; i < object.players.length; ++i) {
-                if (typeof object.players[i] !== "object")
-                    throw TypeError(".PlayerListUpdate.players: object expected");
-                message.players[i] = $root.Player.fromObject(object.players[i]);
+        if (object.playerUpdates) {
+            if (!Array.isArray(object.playerUpdates))
+                throw TypeError(".PlayerListUpdate.playerUpdates: array expected");
+            message.playerUpdates = [];
+            for (var i = 0; i < object.playerUpdates.length; ++i) {
+                if (typeof object.playerUpdates[i] !== "object")
+                    throw TypeError(".PlayerListUpdate.playerUpdates: object expected");
+                message.playerUpdates[i] = $root.PlayerUpdate.fromObject(object.playerUpdates[i]);
             }
         }
         return message;
@@ -2847,11 +1478,11 @@ $root.PlayerListUpdate = (function() {
             options = {};
         var object = {};
         if (options.arrays || options.defaults)
-            object.players = [];
-        if (message.players && message.players.length) {
-            object.players = [];
-            for (var j = 0; j < message.players.length; ++j)
-                object.players[j] = $root.Player.toObject(message.players[j], options);
+            object.playerUpdates = [];
+        if (message.playerUpdates && message.playerUpdates.length) {
+            object.playerUpdates = [];
+            for (var j = 0; j < message.playerUpdates.length; ++j)
+                object.playerUpdates[j] = $root.PlayerUpdate.toObject(message.playerUpdates[j], options);
         }
         return object;
     };
@@ -3080,25 +1711,23 @@ $root.Player = (function() {
     return Player;
 })();
 
-$root.PlayerUpdate = (function() {
+$root.Ping = (function() {
 
     /**
-     * Properties of a PlayerUpdate.
-     * @exports IPlayerUpdate
-     * @interface IPlayerUpdate
-     * @property {number|null} [playerId] PlayerUpdate playerId
-     * @property {IPlayer|null} [player] PlayerUpdate player
+     * Properties of a Ping.
+     * @exports IPing
+     * @interface IPing
      */
 
     /**
-     * Constructs a new PlayerUpdate.
-     * @exports PlayerUpdate
-     * @classdesc Represents a PlayerUpdate.
-     * @implements IPlayerUpdate
+     * Constructs a new Ping.
+     * @exports Ping
+     * @classdesc Represents a Ping.
+     * @implements IPing
      * @constructor
-     * @param {IPlayerUpdate=} [properties] Properties to set
+     * @param {IPing=} [properties] Properties to set
      */
-    function PlayerUpdate(properties) {
+    function Ping(properties) {
         if (properties)
             for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                 if (properties[keys[i]] != null)
@@ -3106,88 +1735,292 @@ $root.PlayerUpdate = (function() {
     }
 
     /**
-     * PlayerUpdate playerId.
-     * @member {number} playerId
-     * @memberof PlayerUpdate
-     * @instance
-     */
-    PlayerUpdate.prototype.playerId = 0;
-
-    /**
-     * PlayerUpdate player.
-     * @member {IPlayer|null|undefined} player
-     * @memberof PlayerUpdate
-     * @instance
-     */
-    PlayerUpdate.prototype.player = null;
-
-    /**
-     * Creates a new PlayerUpdate instance using the specified properties.
+     * Creates a new Ping instance using the specified properties.
      * @function create
-     * @memberof PlayerUpdate
+     * @memberof Ping
      * @static
-     * @param {IPlayerUpdate=} [properties] Properties to set
-     * @returns {PlayerUpdate} PlayerUpdate instance
+     * @param {IPing=} [properties] Properties to set
+     * @returns {Ping} Ping instance
      */
-    PlayerUpdate.create = function create(properties) {
-        return new PlayerUpdate(properties);
+    Ping.create = function create(properties) {
+        return new Ping(properties);
     };
 
     /**
-     * Encodes the specified PlayerUpdate message. Does not implicitly {@link PlayerUpdate.verify|verify} messages.
+     * Encodes the specified Ping message. Does not implicitly {@link Ping.verify|verify} messages.
      * @function encode
-     * @memberof PlayerUpdate
+     * @memberof Ping
      * @static
-     * @param {IPlayerUpdate} message PlayerUpdate message or plain object to encode
+     * @param {IPing} message Ping message or plain object to encode
      * @param {$protobuf.Writer} [writer] Writer to encode to
      * @returns {$protobuf.Writer} Writer
      */
-    PlayerUpdate.encode = function encode(message, writer) {
+    Ping.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
-        if (message.playerId != null && message.hasOwnProperty("playerId"))
-            writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.playerId);
-        if (message.player != null && message.hasOwnProperty("player"))
-            $root.Player.encode(message.player, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
         return writer;
     };
 
     /**
-     * Encodes the specified PlayerUpdate message, length delimited. Does not implicitly {@link PlayerUpdate.verify|verify} messages.
+     * Encodes the specified Ping message, length delimited. Does not implicitly {@link Ping.verify|verify} messages.
      * @function encodeDelimited
-     * @memberof PlayerUpdate
+     * @memberof Ping
      * @static
-     * @param {IPlayerUpdate} message PlayerUpdate message or plain object to encode
+     * @param {IPing} message Ping message or plain object to encode
      * @param {$protobuf.Writer} [writer] Writer to encode to
      * @returns {$protobuf.Writer} Writer
      */
-    PlayerUpdate.encodeDelimited = function encodeDelimited(message, writer) {
+    Ping.encodeDelimited = function encodeDelimited(message, writer) {
         return this.encode(message, writer).ldelim();
     };
 
     /**
-     * Decodes a PlayerUpdate message from the specified reader or buffer.
+     * Decodes a Ping message from the specified reader or buffer.
      * @function decode
-     * @memberof PlayerUpdate
+     * @memberof Ping
      * @static
      * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
      * @param {number} [length] Message length if known beforehand
-     * @returns {PlayerUpdate} PlayerUpdate
+     * @returns {Ping} Ping
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    PlayerUpdate.decode = function decode(reader, length) {
+    Ping.decode = function decode(reader, length) {
         if (!(reader instanceof $Reader))
             reader = $Reader.create(reader);
-        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.PlayerUpdate();
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Ping();
+        while (reader.pos < end) {
+            var tag = reader.uint32();
+            switch (tag >>> 3) {
+            default:
+                reader.skipType(tag & 7);
+                break;
+            }
+        }
+        return message;
+    };
+
+    /**
+     * Decodes a Ping message from the specified reader or buffer, length delimited.
+     * @function decodeDelimited
+     * @memberof Ping
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @returns {Ping} Ping
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    Ping.decodeDelimited = function decodeDelimited(reader) {
+        if (!(reader instanceof $Reader))
+            reader = new $Reader(reader);
+        return this.decode(reader, reader.uint32());
+    };
+
+    /**
+     * Verifies a Ping message.
+     * @function verify
+     * @memberof Ping
+     * @static
+     * @param {Object.<string,*>} message Plain object to verify
+     * @returns {string|null} `null` if valid, otherwise the reason why it is not
+     */
+    Ping.verify = function verify(message) {
+        if (typeof message !== "object" || message === null)
+            return "object expected";
+        return null;
+    };
+
+    /**
+     * Creates a Ping message from a plain object. Also converts values to their respective internal types.
+     * @function fromObject
+     * @memberof Ping
+     * @static
+     * @param {Object.<string,*>} object Plain object
+     * @returns {Ping} Ping
+     */
+    Ping.fromObject = function fromObject(object) {
+        if (object instanceof $root.Ping)
+            return object;
+        return new $root.Ping();
+    };
+
+    /**
+     * Creates a plain object from a Ping message. Also converts values to other types if specified.
+     * @function toObject
+     * @memberof Ping
+     * @static
+     * @param {Ping} message Ping
+     * @param {$protobuf.IConversionOptions} [options] Conversion options
+     * @returns {Object.<string,*>} Plain object
+     */
+    Ping.toObject = function toObject() {
+        return {};
+    };
+
+    /**
+     * Converts this Ping to JSON.
+     * @function toJSON
+     * @memberof Ping
+     * @instance
+     * @returns {Object.<string,*>} JSON object
+     */
+    Ping.prototype.toJSON = function toJSON() {
+        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+    };
+
+    return Ping;
+})();
+
+$root.ServerMessage = (function() {
+
+    /**
+     * Properties of a ServerMessage.
+     * @exports IServerMessage
+     * @interface IServerMessage
+     * @property {ServerMessage.MessageType|null} [messageType] ServerMessage messageType
+     * @property {IConnectionDenied|null} [connectionDenied] ServerMessage connectionDenied
+     * @property {IGameMode|null} [gameMode] ServerMessage gameMode
+     * @property {IServerToken|null} [serverToken] ServerMessage serverToken
+     */
+
+    /**
+     * Constructs a new ServerMessage.
+     * @exports ServerMessage
+     * @classdesc Represents a ServerMessage.
+     * @implements IServerMessage
+     * @constructor
+     * @param {IServerMessage=} [properties] Properties to set
+     */
+    function ServerMessage(properties) {
+        if (properties)
+            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                if (properties[keys[i]] != null)
+                    this[keys[i]] = properties[keys[i]];
+    }
+
+    /**
+     * ServerMessage messageType.
+     * @member {ServerMessage.MessageType} messageType
+     * @memberof ServerMessage
+     * @instance
+     */
+    ServerMessage.prototype.messageType = 0;
+
+    /**
+     * ServerMessage connectionDenied.
+     * @member {IConnectionDenied|null|undefined} connectionDenied
+     * @memberof ServerMessage
+     * @instance
+     */
+    ServerMessage.prototype.connectionDenied = null;
+
+    /**
+     * ServerMessage gameMode.
+     * @member {IGameMode|null|undefined} gameMode
+     * @memberof ServerMessage
+     * @instance
+     */
+    ServerMessage.prototype.gameMode = null;
+
+    /**
+     * ServerMessage serverToken.
+     * @member {IServerToken|null|undefined} serverToken
+     * @memberof ServerMessage
+     * @instance
+     */
+    ServerMessage.prototype.serverToken = null;
+
+    // OneOf field names bound to virtual getters and setters
+    var $oneOfFields;
+
+    /**
+     * ServerMessage message.
+     * @member {"connectionDenied"|"gameMode"|"serverToken"|undefined} message
+     * @memberof ServerMessage
+     * @instance
+     */
+    Object.defineProperty(ServerMessage.prototype, "message", {
+        get: $util.oneOfGetter($oneOfFields = ["connectionDenied", "gameMode", "serverToken"]),
+        set: $util.oneOfSetter($oneOfFields)
+    });
+
+    /**
+     * Creates a new ServerMessage instance using the specified properties.
+     * @function create
+     * @memberof ServerMessage
+     * @static
+     * @param {IServerMessage=} [properties] Properties to set
+     * @returns {ServerMessage} ServerMessage instance
+     */
+    ServerMessage.create = function create(properties) {
+        return new ServerMessage(properties);
+    };
+
+    /**
+     * Encodes the specified ServerMessage message. Does not implicitly {@link ServerMessage.verify|verify} messages.
+     * @function encode
+     * @memberof ServerMessage
+     * @static
+     * @param {IServerMessage} message ServerMessage message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    ServerMessage.encode = function encode(message, writer) {
+        if (!writer)
+            writer = $Writer.create();
+        if (message.messageType != null && message.hasOwnProperty("messageType"))
+            writer.uint32(/* id 1, wireType 0 =*/8).int32(message.messageType);
+        if (message.connectionDenied != null && message.hasOwnProperty("connectionDenied"))
+            $root.ConnectionDenied.encode(message.connectionDenied, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+        if (message.gameMode != null && message.hasOwnProperty("gameMode"))
+            $root.GameMode.encode(message.gameMode, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+        if (message.serverToken != null && message.hasOwnProperty("serverToken"))
+            $root.ServerToken.encode(message.serverToken, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+        return writer;
+    };
+
+    /**
+     * Encodes the specified ServerMessage message, length delimited. Does not implicitly {@link ServerMessage.verify|verify} messages.
+     * @function encodeDelimited
+     * @memberof ServerMessage
+     * @static
+     * @param {IServerMessage} message ServerMessage message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    ServerMessage.encodeDelimited = function encodeDelimited(message, writer) {
+        return this.encode(message, writer).ldelim();
+    };
+
+    /**
+     * Decodes a ServerMessage message from the specified reader or buffer.
+     * @function decode
+     * @memberof ServerMessage
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @param {number} [length] Message length if known beforehand
+     * @returns {ServerMessage} ServerMessage
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    ServerMessage.decode = function decode(reader, length) {
+        if (!(reader instanceof $Reader))
+            reader = $Reader.create(reader);
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.ServerMessage();
         while (reader.pos < end) {
             var tag = reader.uint32();
             switch (tag >>> 3) {
             case 1:
-                message.playerId = reader.uint32();
+                message.messageType = reader.int32();
                 break;
             case 2:
-                message.player = $root.Player.decode(reader, reader.uint32());
+                message.connectionDenied = $root.ConnectionDenied.decode(reader, reader.uint32());
+                break;
+            case 3:
+                message.gameMode = $root.GameMode.decode(reader, reader.uint32());
+                break;
+            case 4:
+                message.serverToken = $root.ServerToken.decode(reader, reader.uint32());
                 break;
             default:
                 reader.skipType(tag & 7);
@@ -3198,101 +2031,1365 @@ $root.PlayerUpdate = (function() {
     };
 
     /**
-     * Decodes a PlayerUpdate message from the specified reader or buffer, length delimited.
+     * Decodes a ServerMessage message from the specified reader or buffer, length delimited.
      * @function decodeDelimited
-     * @memberof PlayerUpdate
+     * @memberof ServerMessage
      * @static
      * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @returns {PlayerUpdate} PlayerUpdate
+     * @returns {ServerMessage} ServerMessage
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    PlayerUpdate.decodeDelimited = function decodeDelimited(reader) {
+    ServerMessage.decodeDelimited = function decodeDelimited(reader) {
         if (!(reader instanceof $Reader))
             reader = new $Reader(reader);
         return this.decode(reader, reader.uint32());
     };
 
     /**
-     * Verifies a PlayerUpdate message.
+     * Verifies a ServerMessage message.
      * @function verify
-     * @memberof PlayerUpdate
+     * @memberof ServerMessage
      * @static
      * @param {Object.<string,*>} message Plain object to verify
      * @returns {string|null} `null` if valid, otherwise the reason why it is not
      */
-    PlayerUpdate.verify = function verify(message) {
+    ServerMessage.verify = function verify(message) {
         if (typeof message !== "object" || message === null)
             return "object expected";
-        if (message.playerId != null && message.hasOwnProperty("playerId"))
-            if (!$util.isInteger(message.playerId))
-                return "playerId: integer expected";
-        if (message.player != null && message.hasOwnProperty("player")) {
-            var error = $root.Player.verify(message.player);
-            if (error)
-                return "player." + error;
+        var properties = {};
+        if (message.messageType != null && message.hasOwnProperty("messageType"))
+            switch (message.messageType) {
+            default:
+                return "messageType: enum value expected";
+            case 0:
+            case 1:
+            case 2:
+                break;
+            }
+        if (message.connectionDenied != null && message.hasOwnProperty("connectionDenied")) {
+            properties.message = 1;
+            {
+                var error = $root.ConnectionDenied.verify(message.connectionDenied);
+                if (error)
+                    return "connectionDenied." + error;
+            }
+        }
+        if (message.gameMode != null && message.hasOwnProperty("gameMode")) {
+            if (properties.message === 1)
+                return "message: multiple values";
+            properties.message = 1;
+            {
+                var error = $root.GameMode.verify(message.gameMode);
+                if (error)
+                    return "gameMode." + error;
+            }
+        }
+        if (message.serverToken != null && message.hasOwnProperty("serverToken")) {
+            if (properties.message === 1)
+                return "message: multiple values";
+            properties.message = 1;
+            {
+                var error = $root.ServerToken.verify(message.serverToken);
+                if (error)
+                    return "serverToken." + error;
+            }
         }
         return null;
     };
 
     /**
-     * Creates a PlayerUpdate message from a plain object. Also converts values to their respective internal types.
+     * Creates a ServerMessage message from a plain object. Also converts values to their respective internal types.
      * @function fromObject
-     * @memberof PlayerUpdate
+     * @memberof ServerMessage
      * @static
      * @param {Object.<string,*>} object Plain object
-     * @returns {PlayerUpdate} PlayerUpdate
+     * @returns {ServerMessage} ServerMessage
      */
-    PlayerUpdate.fromObject = function fromObject(object) {
-        if (object instanceof $root.PlayerUpdate)
+    ServerMessage.fromObject = function fromObject(object) {
+        if (object instanceof $root.ServerMessage)
             return object;
-        var message = new $root.PlayerUpdate();
-        if (object.playerId != null)
-            message.playerId = object.playerId >>> 0;
-        if (object.player != null) {
-            if (typeof object.player !== "object")
-                throw TypeError(".PlayerUpdate.player: object expected");
-            message.player = $root.Player.fromObject(object.player);
+        var message = new $root.ServerMessage();
+        switch (object.messageType) {
+        case "CONNECTION_DENIED":
+        case 0:
+            message.messageType = 0;
+            break;
+        case "GAME_MODE":
+        case 1:
+            message.messageType = 1;
+            break;
+        case "SERVER_TOKEN":
+        case 2:
+            message.messageType = 2;
+            break;
+        }
+        if (object.connectionDenied != null) {
+            if (typeof object.connectionDenied !== "object")
+                throw TypeError(".ServerMessage.connectionDenied: object expected");
+            message.connectionDenied = $root.ConnectionDenied.fromObject(object.connectionDenied);
+        }
+        if (object.gameMode != null) {
+            if (typeof object.gameMode !== "object")
+                throw TypeError(".ServerMessage.gameMode: object expected");
+            message.gameMode = $root.GameMode.fromObject(object.gameMode);
+        }
+        if (object.serverToken != null) {
+            if (typeof object.serverToken !== "object")
+                throw TypeError(".ServerMessage.serverToken: object expected");
+            message.serverToken = $root.ServerToken.fromObject(object.serverToken);
         }
         return message;
     };
 
     /**
-     * Creates a plain object from a PlayerUpdate message. Also converts values to other types if specified.
+     * Creates a plain object from a ServerMessage message. Also converts values to other types if specified.
      * @function toObject
-     * @memberof PlayerUpdate
+     * @memberof ServerMessage
      * @static
-     * @param {PlayerUpdate} message PlayerUpdate
+     * @param {ServerMessage} message ServerMessage
      * @param {$protobuf.IConversionOptions} [options] Conversion options
      * @returns {Object.<string,*>} Plain object
      */
-    PlayerUpdate.toObject = function toObject(message, options) {
+    ServerMessage.toObject = function toObject(message, options) {
         if (!options)
             options = {};
         var object = {};
-        if (options.defaults) {
-            object.playerId = 0;
-            object.player = null;
+        if (options.defaults)
+            object.messageType = options.enums === String ? "CONNECTION_DENIED" : 0;
+        if (message.messageType != null && message.hasOwnProperty("messageType"))
+            object.messageType = options.enums === String ? $root.ServerMessage.MessageType[message.messageType] : message.messageType;
+        if (message.connectionDenied != null && message.hasOwnProperty("connectionDenied")) {
+            object.connectionDenied = $root.ConnectionDenied.toObject(message.connectionDenied, options);
+            if (options.oneofs)
+                object.message = "connectionDenied";
         }
-        if (message.playerId != null && message.hasOwnProperty("playerId"))
-            object.playerId = message.playerId;
-        if (message.player != null && message.hasOwnProperty("player"))
-            object.player = $root.Player.toObject(message.player, options);
+        if (message.gameMode != null && message.hasOwnProperty("gameMode")) {
+            object.gameMode = $root.GameMode.toObject(message.gameMode, options);
+            if (options.oneofs)
+                object.message = "gameMode";
+        }
+        if (message.serverToken != null && message.hasOwnProperty("serverToken")) {
+            object.serverToken = $root.ServerToken.toObject(message.serverToken, options);
+            if (options.oneofs)
+                object.message = "serverToken";
+        }
         return object;
     };
 
     /**
-     * Converts this PlayerUpdate to JSON.
+     * Converts this ServerMessage to JSON.
      * @function toJSON
-     * @memberof PlayerUpdate
+     * @memberof ServerMessage
      * @instance
      * @returns {Object.<string,*>} JSON object
      */
-    PlayerUpdate.prototype.toJSON = function toJSON() {
+    ServerMessage.prototype.toJSON = function toJSON() {
         return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
     };
 
-    return PlayerUpdate;
+    /**
+     * MessageType enum.
+     * @name ServerMessage.MessageType
+     * @enum {string}
+     * @property {number} CONNECTION_DENIED=0 CONNECTION_DENIED value
+     * @property {number} GAME_MODE=1 GAME_MODE value
+     * @property {number} SERVER_TOKEN=2 SERVER_TOKEN value
+     */
+    ServerMessage.MessageType = (function() {
+        var valuesById = {}, values = Object.create(valuesById);
+        values[valuesById[0] = "CONNECTION_DENIED"] = 0;
+        values[valuesById[1] = "GAME_MODE"] = 1;
+        values[valuesById[2] = "SERVER_TOKEN"] = 2;
+        return values;
+    })();
+
+    return ServerMessage;
+})();
+
+$root.GameMode = (function() {
+
+    /**
+     * Properties of a GameMode.
+     * @exports IGameMode
+     * @interface IGameMode
+     * @property {GameMode.GameModeType|null} [gameMode] GameMode gameMode
+     */
+
+    /**
+     * Constructs a new GameMode.
+     * @exports GameMode
+     * @classdesc Represents a GameMode.
+     * @implements IGameMode
+     * @constructor
+     * @param {IGameMode=} [properties] Properties to set
+     */
+    function GameMode(properties) {
+        if (properties)
+            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                if (properties[keys[i]] != null)
+                    this[keys[i]] = properties[keys[i]];
+    }
+
+    /**
+     * GameMode gameMode.
+     * @member {GameMode.GameModeType} gameMode
+     * @memberof GameMode
+     * @instance
+     */
+    GameMode.prototype.gameMode = 0;
+
+    /**
+     * Creates a new GameMode instance using the specified properties.
+     * @function create
+     * @memberof GameMode
+     * @static
+     * @param {IGameMode=} [properties] Properties to set
+     * @returns {GameMode} GameMode instance
+     */
+    GameMode.create = function create(properties) {
+        return new GameMode(properties);
+    };
+
+    /**
+     * Encodes the specified GameMode message. Does not implicitly {@link GameMode.verify|verify} messages.
+     * @function encode
+     * @memberof GameMode
+     * @static
+     * @param {IGameMode} message GameMode message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    GameMode.encode = function encode(message, writer) {
+        if (!writer)
+            writer = $Writer.create();
+        if (message.gameMode != null && message.hasOwnProperty("gameMode"))
+            writer.uint32(/* id 1, wireType 0 =*/8).int32(message.gameMode);
+        return writer;
+    };
+
+    /**
+     * Encodes the specified GameMode message, length delimited. Does not implicitly {@link GameMode.verify|verify} messages.
+     * @function encodeDelimited
+     * @memberof GameMode
+     * @static
+     * @param {IGameMode} message GameMode message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    GameMode.encodeDelimited = function encodeDelimited(message, writer) {
+        return this.encode(message, writer).ldelim();
+    };
+
+    /**
+     * Decodes a GameMode message from the specified reader or buffer.
+     * @function decode
+     * @memberof GameMode
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @param {number} [length] Message length if known beforehand
+     * @returns {GameMode} GameMode
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    GameMode.decode = function decode(reader, length) {
+        if (!(reader instanceof $Reader))
+            reader = $Reader.create(reader);
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.GameMode();
+        while (reader.pos < end) {
+            var tag = reader.uint32();
+            switch (tag >>> 3) {
+            case 1:
+                message.gameMode = reader.int32();
+                break;
+            default:
+                reader.skipType(tag & 7);
+                break;
+            }
+        }
+        return message;
+    };
+
+    /**
+     * Decodes a GameMode message from the specified reader or buffer, length delimited.
+     * @function decodeDelimited
+     * @memberof GameMode
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @returns {GameMode} GameMode
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    GameMode.decodeDelimited = function decodeDelimited(reader) {
+        if (!(reader instanceof $Reader))
+            reader = new $Reader(reader);
+        return this.decode(reader, reader.uint32());
+    };
+
+    /**
+     * Verifies a GameMode message.
+     * @function verify
+     * @memberof GameMode
+     * @static
+     * @param {Object.<string,*>} message Plain object to verify
+     * @returns {string|null} `null` if valid, otherwise the reason why it is not
+     */
+    GameMode.verify = function verify(message) {
+        if (typeof message !== "object" || message === null)
+            return "object expected";
+        if (message.gameMode != null && message.hasOwnProperty("gameMode"))
+            switch (message.gameMode) {
+            default:
+                return "gameMode: enum value expected";
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 8:
+                break;
+            }
+        return null;
+    };
+
+    /**
+     * Creates a GameMode message from a plain object. Also converts values to their respective internal types.
+     * @function fromObject
+     * @memberof GameMode
+     * @static
+     * @param {Object.<string,*>} object Plain object
+     * @returns {GameMode} GameMode
+     */
+    GameMode.fromObject = function fromObject(object) {
+        if (object instanceof $root.GameMode)
+            return object;
+        var message = new $root.GameMode();
+        switch (object.gameMode) {
+        case "NONE":
+        case 0:
+            message.gameMode = 0;
+            break;
+        case "DEFAULT":
+        case 1:
+            message.gameMode = 1;
+            break;
+        case "THIRD_PERSON_SHOOTER":
+        case 2:
+            message.gameMode = 2;
+            break;
+        case "INTERACTIONLESS":
+        case 3:
+            message.gameMode = 3;
+            break;
+        case "PROP_HUNT":
+        case 4:
+            message.gameMode = 4;
+            break;
+        case "BOSS_RUSH":
+        case 5:
+            message.gameMode = 5;
+            break;
+        case "TAG":
+        case 6:
+            message.gameMode = 6;
+            break;
+        case "WARIO_WARE":
+        case 8:
+            message.gameMode = 8;
+            break;
+        }
+        return message;
+    };
+
+    /**
+     * Creates a plain object from a GameMode message. Also converts values to other types if specified.
+     * @function toObject
+     * @memberof GameMode
+     * @static
+     * @param {GameMode} message GameMode
+     * @param {$protobuf.IConversionOptions} [options] Conversion options
+     * @returns {Object.<string,*>} Plain object
+     */
+    GameMode.toObject = function toObject(message, options) {
+        if (!options)
+            options = {};
+        var object = {};
+        if (options.defaults)
+            object.gameMode = options.enums === String ? "NONE" : 0;
+        if (message.gameMode != null && message.hasOwnProperty("gameMode"))
+            object.gameMode = options.enums === String ? $root.GameMode.GameModeType[message.gameMode] : message.gameMode;
+        return object;
+    };
+
+    /**
+     * Converts this GameMode to JSON.
+     * @function toJSON
+     * @memberof GameMode
+     * @instance
+     * @returns {Object.<string,*>} JSON object
+     */
+    GameMode.prototype.toJSON = function toJSON() {
+        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+    };
+
+    /**
+     * GameModeType enum.
+     * @name GameMode.GameModeType
+     * @enum {string}
+     * @property {number} NONE=0 NONE value
+     * @property {number} DEFAULT=1 DEFAULT value
+     * @property {number} THIRD_PERSON_SHOOTER=2 THIRD_PERSON_SHOOTER value
+     * @property {number} INTERACTIONLESS=3 INTERACTIONLESS value
+     * @property {number} PROP_HUNT=4 PROP_HUNT value
+     * @property {number} BOSS_RUSH=5 BOSS_RUSH value
+     * @property {number} TAG=6 TAG value
+     * @property {number} WARIO_WARE=8 WARIO_WARE value
+     */
+    GameMode.GameModeType = (function() {
+        var valuesById = {}, values = Object.create(valuesById);
+        values[valuesById[0] = "NONE"] = 0;
+        values[valuesById[1] = "DEFAULT"] = 1;
+        values[valuesById[2] = "THIRD_PERSON_SHOOTER"] = 2;
+        values[valuesById[3] = "INTERACTIONLESS"] = 3;
+        values[valuesById[4] = "PROP_HUNT"] = 4;
+        values[valuesById[5] = "BOSS_RUSH"] = 5;
+        values[valuesById[6] = "TAG"] = 6;
+        values[valuesById[8] = "WARIO_WARE"] = 8;
+        return values;
+    })();
+
+    return GameMode;
+})();
+
+$root.ServerToken = (function() {
+
+    /**
+     * Properties of a ServerToken.
+     * @exports IServerToken
+     * @interface IServerToken
+     * @property {ServerToken.TokenType|null} [tokenType] ServerToken tokenType
+     * @property {string|null} [signature] ServerToken signature
+     */
+
+    /**
+     * Constructs a new ServerToken.
+     * @exports ServerToken
+     * @classdesc Represents a ServerToken.
+     * @implements IServerToken
+     * @constructor
+     * @param {IServerToken=} [properties] Properties to set
+     */
+    function ServerToken(properties) {
+        if (properties)
+            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                if (properties[keys[i]] != null)
+                    this[keys[i]] = properties[keys[i]];
+    }
+
+    /**
+     * ServerToken tokenType.
+     * @member {ServerToken.TokenType} tokenType
+     * @memberof ServerToken
+     * @instance
+     */
+    ServerToken.prototype.tokenType = 0;
+
+    /**
+     * ServerToken signature.
+     * @member {string} signature
+     * @memberof ServerToken
+     * @instance
+     */
+    ServerToken.prototype.signature = "";
+
+    /**
+     * Creates a new ServerToken instance using the specified properties.
+     * @function create
+     * @memberof ServerToken
+     * @static
+     * @param {IServerToken=} [properties] Properties to set
+     * @returns {ServerToken} ServerToken instance
+     */
+    ServerToken.create = function create(properties) {
+        return new ServerToken(properties);
+    };
+
+    /**
+     * Encodes the specified ServerToken message. Does not implicitly {@link ServerToken.verify|verify} messages.
+     * @function encode
+     * @memberof ServerToken
+     * @static
+     * @param {IServerToken} message ServerToken message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    ServerToken.encode = function encode(message, writer) {
+        if (!writer)
+            writer = $Writer.create();
+        if (message.tokenType != null && message.hasOwnProperty("tokenType"))
+            writer.uint32(/* id 1, wireType 0 =*/8).int32(message.tokenType);
+        if (message.signature != null && message.hasOwnProperty("signature"))
+            writer.uint32(/* id 2, wireType 2 =*/18).string(message.signature);
+        return writer;
+    };
+
+    /**
+     * Encodes the specified ServerToken message, length delimited. Does not implicitly {@link ServerToken.verify|verify} messages.
+     * @function encodeDelimited
+     * @memberof ServerToken
+     * @static
+     * @param {IServerToken} message ServerToken message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    ServerToken.encodeDelimited = function encodeDelimited(message, writer) {
+        return this.encode(message, writer).ldelim();
+    };
+
+    /**
+     * Decodes a ServerToken message from the specified reader or buffer.
+     * @function decode
+     * @memberof ServerToken
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @param {number} [length] Message length if known beforehand
+     * @returns {ServerToken} ServerToken
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    ServerToken.decode = function decode(reader, length) {
+        if (!(reader instanceof $Reader))
+            reader = $Reader.create(reader);
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.ServerToken();
+        while (reader.pos < end) {
+            var tag = reader.uint32();
+            switch (tag >>> 3) {
+            case 1:
+                message.tokenType = reader.int32();
+                break;
+            case 2:
+                message.signature = reader.string();
+                break;
+            default:
+                reader.skipType(tag & 7);
+                break;
+            }
+        }
+        return message;
+    };
+
+    /**
+     * Decodes a ServerToken message from the specified reader or buffer, length delimited.
+     * @function decodeDelimited
+     * @memberof ServerToken
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @returns {ServerToken} ServerToken
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    ServerToken.decodeDelimited = function decodeDelimited(reader) {
+        if (!(reader instanceof $Reader))
+            reader = new $Reader(reader);
+        return this.decode(reader, reader.uint32());
+    };
+
+    /**
+     * Verifies a ServerToken message.
+     * @function verify
+     * @memberof ServerToken
+     * @static
+     * @param {Object.<string,*>} message Plain object to verify
+     * @returns {string|null} `null` if valid, otherwise the reason why it is not
+     */
+    ServerToken.verify = function verify(message) {
+        if (typeof message !== "object" || message === null)
+            return "object expected";
+        if (message.tokenType != null && message.hasOwnProperty("tokenType"))
+            switch (message.tokenType) {
+            default:
+                return "tokenType: enum value expected";
+            case 0:
+            case 1:
+                break;
+            }
+        if (message.signature != null && message.hasOwnProperty("signature"))
+            if (!$util.isString(message.signature))
+                return "signature: string expected";
+        return null;
+    };
+
+    /**
+     * Creates a ServerToken message from a plain object. Also converts values to their respective internal types.
+     * @function fromObject
+     * @memberof ServerToken
+     * @static
+     * @param {Object.<string,*>} object Plain object
+     * @returns {ServerToken} ServerToken
+     */
+    ServerToken.fromObject = function fromObject(object) {
+        if (object instanceof $root.ServerToken)
+            return object;
+        var message = new $root.ServerToken();
+        switch (object.tokenType) {
+        case "GRANT":
+        case 0:
+            message.tokenType = 0;
+            break;
+        case "LOSE":
+        case 1:
+            message.tokenType = 1;
+            break;
+        }
+        if (object.signature != null)
+            message.signature = String(object.signature);
+        return message;
+    };
+
+    /**
+     * Creates a plain object from a ServerToken message. Also converts values to other types if specified.
+     * @function toObject
+     * @memberof ServerToken
+     * @static
+     * @param {ServerToken} message ServerToken
+     * @param {$protobuf.IConversionOptions} [options] Conversion options
+     * @returns {Object.<string,*>} Plain object
+     */
+    ServerToken.toObject = function toObject(message, options) {
+        if (!options)
+            options = {};
+        var object = {};
+        if (options.defaults) {
+            object.tokenType = options.enums === String ? "GRANT" : 0;
+            object.signature = "";
+        }
+        if (message.tokenType != null && message.hasOwnProperty("tokenType"))
+            object.tokenType = options.enums === String ? $root.ServerToken.TokenType[message.tokenType] : message.tokenType;
+        if (message.signature != null && message.hasOwnProperty("signature"))
+            object.signature = message.signature;
+        return object;
+    };
+
+    /**
+     * Converts this ServerToken to JSON.
+     * @function toJSON
+     * @memberof ServerToken
+     * @instance
+     * @returns {Object.<string,*>} JSON object
+     */
+    ServerToken.prototype.toJSON = function toJSON() {
+        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+    };
+
+    /**
+     * TokenType enum.
+     * @name ServerToken.TokenType
+     * @enum {string}
+     * @property {number} GRANT=0 GRANT value
+     * @property {number} LOSE=1 LOSE value
+     */
+    ServerToken.TokenType = (function() {
+        var valuesById = {}, values = Object.create(valuesById);
+        values[valuesById[0] = "GRANT"] = 0;
+        values[valuesById[1] = "LOSE"] = 1;
+        return values;
+    })();
+
+    return ServerToken;
+})();
+
+$root.ConnectionDenied = (function() {
+
+    /**
+     * Properties of a ConnectionDenied.
+     * @exports IConnectionDenied
+     * @interface IConnectionDenied
+     * @property {ConnectionDenied.Reason|null} [reason] ConnectionDenied reason
+     * @property {IServerFull|null} [serverFull] ConnectionDenied serverFull
+     * @property {IWrongVersion|null} [wrongVersion] ConnectionDenied wrongVersion
+     */
+
+    /**
+     * Constructs a new ConnectionDenied.
+     * @exports ConnectionDenied
+     * @classdesc Represents a ConnectionDenied.
+     * @implements IConnectionDenied
+     * @constructor
+     * @param {IConnectionDenied=} [properties] Properties to set
+     */
+    function ConnectionDenied(properties) {
+        if (properties)
+            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                if (properties[keys[i]] != null)
+                    this[keys[i]] = properties[keys[i]];
+    }
+
+    /**
+     * ConnectionDenied reason.
+     * @member {ConnectionDenied.Reason} reason
+     * @memberof ConnectionDenied
+     * @instance
+     */
+    ConnectionDenied.prototype.reason = 0;
+
+    /**
+     * ConnectionDenied serverFull.
+     * @member {IServerFull|null|undefined} serverFull
+     * @memberof ConnectionDenied
+     * @instance
+     */
+    ConnectionDenied.prototype.serverFull = null;
+
+    /**
+     * ConnectionDenied wrongVersion.
+     * @member {IWrongVersion|null|undefined} wrongVersion
+     * @memberof ConnectionDenied
+     * @instance
+     */
+    ConnectionDenied.prototype.wrongVersion = null;
+
+    // OneOf field names bound to virtual getters and setters
+    var $oneOfFields;
+
+    /**
+     * ConnectionDenied message.
+     * @member {"serverFull"|"wrongVersion"|undefined} message
+     * @memberof ConnectionDenied
+     * @instance
+     */
+    Object.defineProperty(ConnectionDenied.prototype, "message", {
+        get: $util.oneOfGetter($oneOfFields = ["serverFull", "wrongVersion"]),
+        set: $util.oneOfSetter($oneOfFields)
+    });
+
+    /**
+     * Creates a new ConnectionDenied instance using the specified properties.
+     * @function create
+     * @memberof ConnectionDenied
+     * @static
+     * @param {IConnectionDenied=} [properties] Properties to set
+     * @returns {ConnectionDenied} ConnectionDenied instance
+     */
+    ConnectionDenied.create = function create(properties) {
+        return new ConnectionDenied(properties);
+    };
+
+    /**
+     * Encodes the specified ConnectionDenied message. Does not implicitly {@link ConnectionDenied.verify|verify} messages.
+     * @function encode
+     * @memberof ConnectionDenied
+     * @static
+     * @param {IConnectionDenied} message ConnectionDenied message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    ConnectionDenied.encode = function encode(message, writer) {
+        if (!writer)
+            writer = $Writer.create();
+        if (message.reason != null && message.hasOwnProperty("reason"))
+            writer.uint32(/* id 1, wireType 0 =*/8).int32(message.reason);
+        if (message.serverFull != null && message.hasOwnProperty("serverFull"))
+            $root.ServerFull.encode(message.serverFull, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+        if (message.wrongVersion != null && message.hasOwnProperty("wrongVersion"))
+            $root.WrongVersion.encode(message.wrongVersion, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+        return writer;
+    };
+
+    /**
+     * Encodes the specified ConnectionDenied message, length delimited. Does not implicitly {@link ConnectionDenied.verify|verify} messages.
+     * @function encodeDelimited
+     * @memberof ConnectionDenied
+     * @static
+     * @param {IConnectionDenied} message ConnectionDenied message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    ConnectionDenied.encodeDelimited = function encodeDelimited(message, writer) {
+        return this.encode(message, writer).ldelim();
+    };
+
+    /**
+     * Decodes a ConnectionDenied message from the specified reader or buffer.
+     * @function decode
+     * @memberof ConnectionDenied
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @param {number} [length] Message length if known beforehand
+     * @returns {ConnectionDenied} ConnectionDenied
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    ConnectionDenied.decode = function decode(reader, length) {
+        if (!(reader instanceof $Reader))
+            reader = $Reader.create(reader);
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.ConnectionDenied();
+        while (reader.pos < end) {
+            var tag = reader.uint32();
+            switch (tag >>> 3) {
+            case 1:
+                message.reason = reader.int32();
+                break;
+            case 2:
+                message.serverFull = $root.ServerFull.decode(reader, reader.uint32());
+                break;
+            case 3:
+                message.wrongVersion = $root.WrongVersion.decode(reader, reader.uint32());
+                break;
+            default:
+                reader.skipType(tag & 7);
+                break;
+            }
+        }
+        return message;
+    };
+
+    /**
+     * Decodes a ConnectionDenied message from the specified reader or buffer, length delimited.
+     * @function decodeDelimited
+     * @memberof ConnectionDenied
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @returns {ConnectionDenied} ConnectionDenied
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    ConnectionDenied.decodeDelimited = function decodeDelimited(reader) {
+        if (!(reader instanceof $Reader))
+            reader = new $Reader(reader);
+        return this.decode(reader, reader.uint32());
+    };
+
+    /**
+     * Verifies a ConnectionDenied message.
+     * @function verify
+     * @memberof ConnectionDenied
+     * @static
+     * @param {Object.<string,*>} message Plain object to verify
+     * @returns {string|null} `null` if valid, otherwise the reason why it is not
+     */
+    ConnectionDenied.verify = function verify(message) {
+        if (typeof message !== "object" || message === null)
+            return "object expected";
+        var properties = {};
+        if (message.reason != null && message.hasOwnProperty("reason"))
+            switch (message.reason) {
+            default:
+                return "reason: enum value expected";
+            case 0:
+            case 1:
+                break;
+            }
+        if (message.serverFull != null && message.hasOwnProperty("serverFull")) {
+            properties.message = 1;
+            {
+                var error = $root.ServerFull.verify(message.serverFull);
+                if (error)
+                    return "serverFull." + error;
+            }
+        }
+        if (message.wrongVersion != null && message.hasOwnProperty("wrongVersion")) {
+            if (properties.message === 1)
+                return "message: multiple values";
+            properties.message = 1;
+            {
+                var error = $root.WrongVersion.verify(message.wrongVersion);
+                if (error)
+                    return "wrongVersion." + error;
+            }
+        }
+        return null;
+    };
+
+    /**
+     * Creates a ConnectionDenied message from a plain object. Also converts values to their respective internal types.
+     * @function fromObject
+     * @memberof ConnectionDenied
+     * @static
+     * @param {Object.<string,*>} object Plain object
+     * @returns {ConnectionDenied} ConnectionDenied
+     */
+    ConnectionDenied.fromObject = function fromObject(object) {
+        if (object instanceof $root.ConnectionDenied)
+            return object;
+        var message = new $root.ConnectionDenied();
+        switch (object.reason) {
+        case "SERVER_FULL":
+        case 0:
+            message.reason = 0;
+            break;
+        case "WRONG_VERSION":
+        case 1:
+            message.reason = 1;
+            break;
+        }
+        if (object.serverFull != null) {
+            if (typeof object.serverFull !== "object")
+                throw TypeError(".ConnectionDenied.serverFull: object expected");
+            message.serverFull = $root.ServerFull.fromObject(object.serverFull);
+        }
+        if (object.wrongVersion != null) {
+            if (typeof object.wrongVersion !== "object")
+                throw TypeError(".ConnectionDenied.wrongVersion: object expected");
+            message.wrongVersion = $root.WrongVersion.fromObject(object.wrongVersion);
+        }
+        return message;
+    };
+
+    /**
+     * Creates a plain object from a ConnectionDenied message. Also converts values to other types if specified.
+     * @function toObject
+     * @memberof ConnectionDenied
+     * @static
+     * @param {ConnectionDenied} message ConnectionDenied
+     * @param {$protobuf.IConversionOptions} [options] Conversion options
+     * @returns {Object.<string,*>} Plain object
+     */
+    ConnectionDenied.toObject = function toObject(message, options) {
+        if (!options)
+            options = {};
+        var object = {};
+        if (options.defaults)
+            object.reason = options.enums === String ? "SERVER_FULL" : 0;
+        if (message.reason != null && message.hasOwnProperty("reason"))
+            object.reason = options.enums === String ? $root.ConnectionDenied.Reason[message.reason] : message.reason;
+        if (message.serverFull != null && message.hasOwnProperty("serverFull")) {
+            object.serverFull = $root.ServerFull.toObject(message.serverFull, options);
+            if (options.oneofs)
+                object.message = "serverFull";
+        }
+        if (message.wrongVersion != null && message.hasOwnProperty("wrongVersion")) {
+            object.wrongVersion = $root.WrongVersion.toObject(message.wrongVersion, options);
+            if (options.oneofs)
+                object.message = "wrongVersion";
+        }
+        return object;
+    };
+
+    /**
+     * Converts this ConnectionDenied to JSON.
+     * @function toJSON
+     * @memberof ConnectionDenied
+     * @instance
+     * @returns {Object.<string,*>} JSON object
+     */
+    ConnectionDenied.prototype.toJSON = function toJSON() {
+        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+    };
+
+    /**
+     * Reason enum.
+     * @name ConnectionDenied.Reason
+     * @enum {string}
+     * @property {number} SERVER_FULL=0 SERVER_FULL value
+     * @property {number} WRONG_VERSION=1 WRONG_VERSION value
+     */
+    ConnectionDenied.Reason = (function() {
+        var valuesById = {}, values = Object.create(valuesById);
+        values[valuesById[0] = "SERVER_FULL"] = 0;
+        values[valuesById[1] = "WRONG_VERSION"] = 1;
+        return values;
+    })();
+
+    return ConnectionDenied;
+})();
+
+$root.ServerFull = (function() {
+
+    /**
+     * Properties of a ServerFull.
+     * @exports IServerFull
+     * @interface IServerFull
+     * @property {number|null} [maxPlayers] ServerFull maxPlayers
+     */
+
+    /**
+     * Constructs a new ServerFull.
+     * @exports ServerFull
+     * @classdesc Represents a ServerFull.
+     * @implements IServerFull
+     * @constructor
+     * @param {IServerFull=} [properties] Properties to set
+     */
+    function ServerFull(properties) {
+        if (properties)
+            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                if (properties[keys[i]] != null)
+                    this[keys[i]] = properties[keys[i]];
+    }
+
+    /**
+     * ServerFull maxPlayers.
+     * @member {number} maxPlayers
+     * @memberof ServerFull
+     * @instance
+     */
+    ServerFull.prototype.maxPlayers = 0;
+
+    /**
+     * Creates a new ServerFull instance using the specified properties.
+     * @function create
+     * @memberof ServerFull
+     * @static
+     * @param {IServerFull=} [properties] Properties to set
+     * @returns {ServerFull} ServerFull instance
+     */
+    ServerFull.create = function create(properties) {
+        return new ServerFull(properties);
+    };
+
+    /**
+     * Encodes the specified ServerFull message. Does not implicitly {@link ServerFull.verify|verify} messages.
+     * @function encode
+     * @memberof ServerFull
+     * @static
+     * @param {IServerFull} message ServerFull message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    ServerFull.encode = function encode(message, writer) {
+        if (!writer)
+            writer = $Writer.create();
+        if (message.maxPlayers != null && message.hasOwnProperty("maxPlayers"))
+            writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.maxPlayers);
+        return writer;
+    };
+
+    /**
+     * Encodes the specified ServerFull message, length delimited. Does not implicitly {@link ServerFull.verify|verify} messages.
+     * @function encodeDelimited
+     * @memberof ServerFull
+     * @static
+     * @param {IServerFull} message ServerFull message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    ServerFull.encodeDelimited = function encodeDelimited(message, writer) {
+        return this.encode(message, writer).ldelim();
+    };
+
+    /**
+     * Decodes a ServerFull message from the specified reader or buffer.
+     * @function decode
+     * @memberof ServerFull
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @param {number} [length] Message length if known beforehand
+     * @returns {ServerFull} ServerFull
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    ServerFull.decode = function decode(reader, length) {
+        if (!(reader instanceof $Reader))
+            reader = $Reader.create(reader);
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.ServerFull();
+        while (reader.pos < end) {
+            var tag = reader.uint32();
+            switch (tag >>> 3) {
+            case 1:
+                message.maxPlayers = reader.uint32();
+                break;
+            default:
+                reader.skipType(tag & 7);
+                break;
+            }
+        }
+        return message;
+    };
+
+    /**
+     * Decodes a ServerFull message from the specified reader or buffer, length delimited.
+     * @function decodeDelimited
+     * @memberof ServerFull
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @returns {ServerFull} ServerFull
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    ServerFull.decodeDelimited = function decodeDelimited(reader) {
+        if (!(reader instanceof $Reader))
+            reader = new $Reader(reader);
+        return this.decode(reader, reader.uint32());
+    };
+
+    /**
+     * Verifies a ServerFull message.
+     * @function verify
+     * @memberof ServerFull
+     * @static
+     * @param {Object.<string,*>} message Plain object to verify
+     * @returns {string|null} `null` if valid, otherwise the reason why it is not
+     */
+    ServerFull.verify = function verify(message) {
+        if (typeof message !== "object" || message === null)
+            return "object expected";
+        if (message.maxPlayers != null && message.hasOwnProperty("maxPlayers"))
+            if (!$util.isInteger(message.maxPlayers))
+                return "maxPlayers: integer expected";
+        return null;
+    };
+
+    /**
+     * Creates a ServerFull message from a plain object. Also converts values to their respective internal types.
+     * @function fromObject
+     * @memberof ServerFull
+     * @static
+     * @param {Object.<string,*>} object Plain object
+     * @returns {ServerFull} ServerFull
+     */
+    ServerFull.fromObject = function fromObject(object) {
+        if (object instanceof $root.ServerFull)
+            return object;
+        var message = new $root.ServerFull();
+        if (object.maxPlayers != null)
+            message.maxPlayers = object.maxPlayers >>> 0;
+        return message;
+    };
+
+    /**
+     * Creates a plain object from a ServerFull message. Also converts values to other types if specified.
+     * @function toObject
+     * @memberof ServerFull
+     * @static
+     * @param {ServerFull} message ServerFull
+     * @param {$protobuf.IConversionOptions} [options] Conversion options
+     * @returns {Object.<string,*>} Plain object
+     */
+    ServerFull.toObject = function toObject(message, options) {
+        if (!options)
+            options = {};
+        var object = {};
+        if (options.defaults)
+            object.maxPlayers = 0;
+        if (message.maxPlayers != null && message.hasOwnProperty("maxPlayers"))
+            object.maxPlayers = message.maxPlayers;
+        return object;
+    };
+
+    /**
+     * Converts this ServerFull to JSON.
+     * @function toJSON
+     * @memberof ServerFull
+     * @instance
+     * @returns {Object.<string,*>} JSON object
+     */
+    ServerFull.prototype.toJSON = function toJSON() {
+        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+    };
+
+    return ServerFull;
+})();
+
+$root.WrongVersion = (function() {
+
+    /**
+     * Properties of a WrongVersion.
+     * @exports IWrongVersion
+     * @interface IWrongVersion
+     * @property {string|null} [majorVersion] WrongVersion majorVersion
+     * @property {string|null} [minorVersion] WrongVersion minorVersion
+     */
+
+    /**
+     * Constructs a new WrongVersion.
+     * @exports WrongVersion
+     * @classdesc Represents a WrongVersion.
+     * @implements IWrongVersion
+     * @constructor
+     * @param {IWrongVersion=} [properties] Properties to set
+     */
+    function WrongVersion(properties) {
+        if (properties)
+            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                if (properties[keys[i]] != null)
+                    this[keys[i]] = properties[keys[i]];
+    }
+
+    /**
+     * WrongVersion majorVersion.
+     * @member {string} majorVersion
+     * @memberof WrongVersion
+     * @instance
+     */
+    WrongVersion.prototype.majorVersion = "";
+
+    /**
+     * WrongVersion minorVersion.
+     * @member {string} minorVersion
+     * @memberof WrongVersion
+     * @instance
+     */
+    WrongVersion.prototype.minorVersion = "";
+
+    /**
+     * Creates a new WrongVersion instance using the specified properties.
+     * @function create
+     * @memberof WrongVersion
+     * @static
+     * @param {IWrongVersion=} [properties] Properties to set
+     * @returns {WrongVersion} WrongVersion instance
+     */
+    WrongVersion.create = function create(properties) {
+        return new WrongVersion(properties);
+    };
+
+    /**
+     * Encodes the specified WrongVersion message. Does not implicitly {@link WrongVersion.verify|verify} messages.
+     * @function encode
+     * @memberof WrongVersion
+     * @static
+     * @param {IWrongVersion} message WrongVersion message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    WrongVersion.encode = function encode(message, writer) {
+        if (!writer)
+            writer = $Writer.create();
+        if (message.majorVersion != null && message.hasOwnProperty("majorVersion"))
+            writer.uint32(/* id 1, wireType 2 =*/10).string(message.majorVersion);
+        if (message.minorVersion != null && message.hasOwnProperty("minorVersion"))
+            writer.uint32(/* id 2, wireType 2 =*/18).string(message.minorVersion);
+        return writer;
+    };
+
+    /**
+     * Encodes the specified WrongVersion message, length delimited. Does not implicitly {@link WrongVersion.verify|verify} messages.
+     * @function encodeDelimited
+     * @memberof WrongVersion
+     * @static
+     * @param {IWrongVersion} message WrongVersion message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    WrongVersion.encodeDelimited = function encodeDelimited(message, writer) {
+        return this.encode(message, writer).ldelim();
+    };
+
+    /**
+     * Decodes a WrongVersion message from the specified reader or buffer.
+     * @function decode
+     * @memberof WrongVersion
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @param {number} [length] Message length if known beforehand
+     * @returns {WrongVersion} WrongVersion
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    WrongVersion.decode = function decode(reader, length) {
+        if (!(reader instanceof $Reader))
+            reader = $Reader.create(reader);
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.WrongVersion();
+        while (reader.pos < end) {
+            var tag = reader.uint32();
+            switch (tag >>> 3) {
+            case 1:
+                message.majorVersion = reader.string();
+                break;
+            case 2:
+                message.minorVersion = reader.string();
+                break;
+            default:
+                reader.skipType(tag & 7);
+                break;
+            }
+        }
+        return message;
+    };
+
+    /**
+     * Decodes a WrongVersion message from the specified reader or buffer, length delimited.
+     * @function decodeDelimited
+     * @memberof WrongVersion
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @returns {WrongVersion} WrongVersion
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    WrongVersion.decodeDelimited = function decodeDelimited(reader) {
+        if (!(reader instanceof $Reader))
+            reader = new $Reader(reader);
+        return this.decode(reader, reader.uint32());
+    };
+
+    /**
+     * Verifies a WrongVersion message.
+     * @function verify
+     * @memberof WrongVersion
+     * @static
+     * @param {Object.<string,*>} message Plain object to verify
+     * @returns {string|null} `null` if valid, otherwise the reason why it is not
+     */
+    WrongVersion.verify = function verify(message) {
+        if (typeof message !== "object" || message === null)
+            return "object expected";
+        if (message.majorVersion != null && message.hasOwnProperty("majorVersion"))
+            if (!$util.isString(message.majorVersion))
+                return "majorVersion: string expected";
+        if (message.minorVersion != null && message.hasOwnProperty("minorVersion"))
+            if (!$util.isString(message.minorVersion))
+                return "minorVersion: string expected";
+        return null;
+    };
+
+    /**
+     * Creates a WrongVersion message from a plain object. Also converts values to their respective internal types.
+     * @function fromObject
+     * @memberof WrongVersion
+     * @static
+     * @param {Object.<string,*>} object Plain object
+     * @returns {WrongVersion} WrongVersion
+     */
+    WrongVersion.fromObject = function fromObject(object) {
+        if (object instanceof $root.WrongVersion)
+            return object;
+        var message = new $root.WrongVersion();
+        if (object.majorVersion != null)
+            message.majorVersion = String(object.majorVersion);
+        if (object.minorVersion != null)
+            message.minorVersion = String(object.minorVersion);
+        return message;
+    };
+
+    /**
+     * Creates a plain object from a WrongVersion message. Also converts values to other types if specified.
+     * @function toObject
+     * @memberof WrongVersion
+     * @static
+     * @param {WrongVersion} message WrongVersion
+     * @param {$protobuf.IConversionOptions} [options] Conversion options
+     * @returns {Object.<string,*>} Plain object
+     */
+    WrongVersion.toObject = function toObject(message, options) {
+        if (!options)
+            options = {};
+        var object = {};
+        if (options.defaults) {
+            object.majorVersion = "";
+            object.minorVersion = "";
+        }
+        if (message.majorVersion != null && message.hasOwnProperty("majorVersion"))
+            object.majorVersion = message.majorVersion;
+        if (message.minorVersion != null && message.hasOwnProperty("minorVersion"))
+            object.minorVersion = message.minorVersion;
+        return object;
+    };
+
+    /**
+     * Converts this WrongVersion to JSON.
+     * @function toJSON
+     * @memberof WrongVersion
+     * @instance
+     * @returns {Object.<string,*>} JSON object
+     */
+    WrongVersion.prototype.toJSON = function toJSON() {
+        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+    };
+
+    return WrongVersion;
 })();
 
 $root.PlayerData = (function() {
@@ -3530,214 +3627,6 @@ $root.PlayerData = (function() {
     return PlayerData;
 })();
 
-$root.MetaData = (function() {
-
-    /**
-     * Properties of a MetaData.
-     * @exports IMetaData
-     * @interface IMetaData
-     * @property {Array.<IMeta>|null} [metaData] MetaData metaData
-     */
-
-    /**
-     * Constructs a new MetaData.
-     * @exports MetaData
-     * @classdesc Represents a MetaData.
-     * @implements IMetaData
-     * @constructor
-     * @param {IMetaData=} [properties] Properties to set
-     */
-    function MetaData(properties) {
-        this.metaData = [];
-        if (properties)
-            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                if (properties[keys[i]] != null)
-                    this[keys[i]] = properties[keys[i]];
-    }
-
-    /**
-     * MetaData metaData.
-     * @member {Array.<IMeta>} metaData
-     * @memberof MetaData
-     * @instance
-     */
-    MetaData.prototype.metaData = $util.emptyArray;
-
-    /**
-     * Creates a new MetaData instance using the specified properties.
-     * @function create
-     * @memberof MetaData
-     * @static
-     * @param {IMetaData=} [properties] Properties to set
-     * @returns {MetaData} MetaData instance
-     */
-    MetaData.create = function create(properties) {
-        return new MetaData(properties);
-    };
-
-    /**
-     * Encodes the specified MetaData message. Does not implicitly {@link MetaData.verify|verify} messages.
-     * @function encode
-     * @memberof MetaData
-     * @static
-     * @param {IMetaData} message MetaData message or plain object to encode
-     * @param {$protobuf.Writer} [writer] Writer to encode to
-     * @returns {$protobuf.Writer} Writer
-     */
-    MetaData.encode = function encode(message, writer) {
-        if (!writer)
-            writer = $Writer.create();
-        if (message.metaData != null && message.metaData.length)
-            for (var i = 0; i < message.metaData.length; ++i)
-                $root.Meta.encode(message.metaData[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-        return writer;
-    };
-
-    /**
-     * Encodes the specified MetaData message, length delimited. Does not implicitly {@link MetaData.verify|verify} messages.
-     * @function encodeDelimited
-     * @memberof MetaData
-     * @static
-     * @param {IMetaData} message MetaData message or plain object to encode
-     * @param {$protobuf.Writer} [writer] Writer to encode to
-     * @returns {$protobuf.Writer} Writer
-     */
-    MetaData.encodeDelimited = function encodeDelimited(message, writer) {
-        return this.encode(message, writer).ldelim();
-    };
-
-    /**
-     * Decodes a MetaData message from the specified reader or buffer.
-     * @function decode
-     * @memberof MetaData
-     * @static
-     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @param {number} [length] Message length if known beforehand
-     * @returns {MetaData} MetaData
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    MetaData.decode = function decode(reader, length) {
-        if (!(reader instanceof $Reader))
-            reader = $Reader.create(reader);
-        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.MetaData();
-        while (reader.pos < end) {
-            var tag = reader.uint32();
-            switch (tag >>> 3) {
-            case 1:
-                if (!(message.metaData && message.metaData.length))
-                    message.metaData = [];
-                message.metaData.push($root.Meta.decode(reader, reader.uint32()));
-                break;
-            default:
-                reader.skipType(tag & 7);
-                break;
-            }
-        }
-        return message;
-    };
-
-    /**
-     * Decodes a MetaData message from the specified reader or buffer, length delimited.
-     * @function decodeDelimited
-     * @memberof MetaData
-     * @static
-     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @returns {MetaData} MetaData
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    MetaData.decodeDelimited = function decodeDelimited(reader) {
-        if (!(reader instanceof $Reader))
-            reader = new $Reader(reader);
-        return this.decode(reader, reader.uint32());
-    };
-
-    /**
-     * Verifies a MetaData message.
-     * @function verify
-     * @memberof MetaData
-     * @static
-     * @param {Object.<string,*>} message Plain object to verify
-     * @returns {string|null} `null` if valid, otherwise the reason why it is not
-     */
-    MetaData.verify = function verify(message) {
-        if (typeof message !== "object" || message === null)
-            return "object expected";
-        if (message.metaData != null && message.hasOwnProperty("metaData")) {
-            if (!Array.isArray(message.metaData))
-                return "metaData: array expected";
-            for (var i = 0; i < message.metaData.length; ++i) {
-                var error = $root.Meta.verify(message.metaData[i]);
-                if (error)
-                    return "metaData." + error;
-            }
-        }
-        return null;
-    };
-
-    /**
-     * Creates a MetaData message from a plain object. Also converts values to their respective internal types.
-     * @function fromObject
-     * @memberof MetaData
-     * @static
-     * @param {Object.<string,*>} object Plain object
-     * @returns {MetaData} MetaData
-     */
-    MetaData.fromObject = function fromObject(object) {
-        if (object instanceof $root.MetaData)
-            return object;
-        var message = new $root.MetaData();
-        if (object.metaData) {
-            if (!Array.isArray(object.metaData))
-                throw TypeError(".MetaData.metaData: array expected");
-            message.metaData = [];
-            for (var i = 0; i < object.metaData.length; ++i) {
-                if (typeof object.metaData[i] !== "object")
-                    throw TypeError(".MetaData.metaData: object expected");
-                message.metaData[i] = $root.Meta.fromObject(object.metaData[i]);
-            }
-        }
-        return message;
-    };
-
-    /**
-     * Creates a plain object from a MetaData message. Also converts values to other types if specified.
-     * @function toObject
-     * @memberof MetaData
-     * @static
-     * @param {MetaData} message MetaData
-     * @param {$protobuf.IConversionOptions} [options] Conversion options
-     * @returns {Object.<string,*>} Plain object
-     */
-    MetaData.toObject = function toObject(message, options) {
-        if (!options)
-            options = {};
-        var object = {};
-        if (options.arrays || options.defaults)
-            object.metaData = [];
-        if (message.metaData && message.metaData.length) {
-            object.metaData = [];
-            for (var j = 0; j < message.metaData.length; ++j)
-                object.metaData[j] = $root.Meta.toObject(message.metaData[j], options);
-        }
-        return object;
-    };
-
-    /**
-     * Converts this MetaData to JSON.
-     * @function toJSON
-     * @memberof MetaData
-     * @instance
-     * @returns {Object.<string,*>} JSON object
-     */
-    MetaData.prototype.toJSON = function toJSON() {
-        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-    };
-
-    return MetaData;
-})();
-
 $root.Meta = (function() {
 
     /**
@@ -3973,14 +3862,224 @@ $root.Meta = (function() {
     return Meta;
 })();
 
+$root.MetaData = (function() {
+
+    /**
+     * Properties of a MetaData.
+     * @exports IMetaData
+     * @interface IMetaData
+     * @property {Array.<IMeta>|null} [metaData] MetaData metaData
+     */
+
+    /**
+     * Constructs a new MetaData.
+     * @exports MetaData
+     * @classdesc Represents a MetaData.
+     * @implements IMetaData
+     * @constructor
+     * @param {IMetaData=} [properties] Properties to set
+     */
+    function MetaData(properties) {
+        this.metaData = [];
+        if (properties)
+            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                if (properties[keys[i]] != null)
+                    this[keys[i]] = properties[keys[i]];
+    }
+
+    /**
+     * MetaData metaData.
+     * @member {Array.<IMeta>} metaData
+     * @memberof MetaData
+     * @instance
+     */
+    MetaData.prototype.metaData = $util.emptyArray;
+
+    /**
+     * Creates a new MetaData instance using the specified properties.
+     * @function create
+     * @memberof MetaData
+     * @static
+     * @param {IMetaData=} [properties] Properties to set
+     * @returns {MetaData} MetaData instance
+     */
+    MetaData.create = function create(properties) {
+        return new MetaData(properties);
+    };
+
+    /**
+     * Encodes the specified MetaData message. Does not implicitly {@link MetaData.verify|verify} messages.
+     * @function encode
+     * @memberof MetaData
+     * @static
+     * @param {IMetaData} message MetaData message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    MetaData.encode = function encode(message, writer) {
+        if (!writer)
+            writer = $Writer.create();
+        if (message.metaData != null && message.metaData.length)
+            for (var i = 0; i < message.metaData.length; ++i)
+                $root.Meta.encode(message.metaData[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+        return writer;
+    };
+
+    /**
+     * Encodes the specified MetaData message, length delimited. Does not implicitly {@link MetaData.verify|verify} messages.
+     * @function encodeDelimited
+     * @memberof MetaData
+     * @static
+     * @param {IMetaData} message MetaData message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    MetaData.encodeDelimited = function encodeDelimited(message, writer) {
+        return this.encode(message, writer).ldelim();
+    };
+
+    /**
+     * Decodes a MetaData message from the specified reader or buffer.
+     * @function decode
+     * @memberof MetaData
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @param {number} [length] Message length if known beforehand
+     * @returns {MetaData} MetaData
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    MetaData.decode = function decode(reader, length) {
+        if (!(reader instanceof $Reader))
+            reader = $Reader.create(reader);
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.MetaData();
+        while (reader.pos < end) {
+            var tag = reader.uint32();
+            switch (tag >>> 3) {
+            case 1:
+                if (!(message.metaData && message.metaData.length))
+                    message.metaData = [];
+                message.metaData.push($root.Meta.decode(reader, reader.uint32()));
+                break;
+            default:
+                reader.skipType(tag & 7);
+                break;
+            }
+        }
+        return message;
+    };
+
+    /**
+     * Decodes a MetaData message from the specified reader or buffer, length delimited.
+     * @function decodeDelimited
+     * @memberof MetaData
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @returns {MetaData} MetaData
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    MetaData.decodeDelimited = function decodeDelimited(reader) {
+        if (!(reader instanceof $Reader))
+            reader = new $Reader(reader);
+        return this.decode(reader, reader.uint32());
+    };
+
+    /**
+     * Verifies a MetaData message.
+     * @function verify
+     * @memberof MetaData
+     * @static
+     * @param {Object.<string,*>} message Plain object to verify
+     * @returns {string|null} `null` if valid, otherwise the reason why it is not
+     */
+    MetaData.verify = function verify(message) {
+        if (typeof message !== "object" || message === null)
+            return "object expected";
+        if (message.metaData != null && message.hasOwnProperty("metaData")) {
+            if (!Array.isArray(message.metaData))
+                return "metaData: array expected";
+            for (var i = 0; i < message.metaData.length; ++i) {
+                var error = $root.Meta.verify(message.metaData[i]);
+                if (error)
+                    return "metaData." + error;
+            }
+        }
+        return null;
+    };
+
+    /**
+     * Creates a MetaData message from a plain object. Also converts values to their respective internal types.
+     * @function fromObject
+     * @memberof MetaData
+     * @static
+     * @param {Object.<string,*>} object Plain object
+     * @returns {MetaData} MetaData
+     */
+    MetaData.fromObject = function fromObject(object) {
+        if (object instanceof $root.MetaData)
+            return object;
+        var message = new $root.MetaData();
+        if (object.metaData) {
+            if (!Array.isArray(object.metaData))
+                throw TypeError(".MetaData.metaData: array expected");
+            message.metaData = [];
+            for (var i = 0; i < object.metaData.length; ++i) {
+                if (typeof object.metaData[i] !== "object")
+                    throw TypeError(".MetaData.metaData: object expected");
+                message.metaData[i] = $root.Meta.fromObject(object.metaData[i]);
+            }
+        }
+        return message;
+    };
+
+    /**
+     * Creates a plain object from a MetaData message. Also converts values to other types if specified.
+     * @function toObject
+     * @memberof MetaData
+     * @static
+     * @param {MetaData} message MetaData
+     * @param {$protobuf.IConversionOptions} [options] Conversion options
+     * @returns {Object.<string,*>} Plain object
+     */
+    MetaData.toObject = function toObject(message, options) {
+        if (!options)
+            options = {};
+        var object = {};
+        if (options.arrays || options.defaults)
+            object.metaData = [];
+        if (message.metaData && message.metaData.length) {
+            object.metaData = [];
+            for (var j = 0; j < message.metaData.length; ++j)
+                object.metaData[j] = $root.Meta.toObject(message.metaData[j], options);
+        }
+        return object;
+    };
+
+    /**
+     * Converts this MetaData to JSON.
+     * @function toJSON
+     * @memberof MetaData
+     * @instance
+     * @returns {Object.<string,*>} JSON object
+     */
+    MetaData.prototype.toJSON = function toJSON() {
+        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+    };
+
+    return MetaData;
+})();
+
 $root.Chat = (function() {
 
     /**
      * Properties of a Chat.
      * @exports IChat
      * @interface IChat
+     * @property {Chat.ChatType|null} [chatType] Chat chatType
+     * @property {number|null} [senderId] Chat senderId
+     * @property {string|null} [message] Chat message
      * @property {IChatGlobal|null} [global] Chat global
-     * @property {IChatTeam|null} [team] Chat team
      * @property {IChatPrivate|null} ["private"] Chat private
      */
 
@@ -4000,20 +4099,36 @@ $root.Chat = (function() {
     }
 
     /**
+     * Chat chatType.
+     * @member {Chat.ChatType} chatType
+     * @memberof Chat
+     * @instance
+     */
+    Chat.prototype.chatType = 0;
+
+    /**
+     * Chat senderId.
+     * @member {number} senderId
+     * @memberof Chat
+     * @instance
+     */
+    Chat.prototype.senderId = 0;
+
+    /**
+     * Chat message.
+     * @member {string} message
+     * @memberof Chat
+     * @instance
+     */
+    Chat.prototype.message = "";
+
+    /**
      * Chat global.
      * @member {IChatGlobal|null|undefined} global
      * @memberof Chat
      * @instance
      */
     Chat.prototype.global = null;
-
-    /**
-     * Chat team.
-     * @member {IChatTeam|null|undefined} team
-     * @memberof Chat
-     * @instance
-     */
-    Chat.prototype.team = null;
 
     /**
      * Chat private.
@@ -4028,12 +4143,12 @@ $root.Chat = (function() {
 
     /**
      * Chat messageType.
-     * @member {"global"|"team"|"private"|undefined} messageType
+     * @member {"global"|"private"|undefined} messageType
      * @memberof Chat
      * @instance
      */
     Object.defineProperty(Chat.prototype, "messageType", {
-        get: $util.oneOfGetter($oneOfFields = ["global", "team", "private"]),
+        get: $util.oneOfGetter($oneOfFields = ["global", "private"]),
         set: $util.oneOfSetter($oneOfFields)
     });
 
@@ -4061,12 +4176,16 @@ $root.Chat = (function() {
     Chat.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
+        if (message.chatType != null && message.hasOwnProperty("chatType"))
+            writer.uint32(/* id 1, wireType 0 =*/8).int32(message.chatType);
+        if (message.senderId != null && message.hasOwnProperty("senderId"))
+            writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.senderId);
+        if (message.message != null && message.hasOwnProperty("message"))
+            writer.uint32(/* id 3, wireType 2 =*/26).string(message.message);
         if (message.global != null && message.hasOwnProperty("global"))
-            $root.ChatGlobal.encode(message.global, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-        if (message.team != null && message.hasOwnProperty("team"))
-            $root.ChatTeam.encode(message.team, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            $root.ChatGlobal.encode(message.global, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
         if (message["private"] != null && message.hasOwnProperty("private"))
-            $root.ChatPrivate.encode(message["private"], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+            $root.ChatPrivate.encode(message["private"], writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
         return writer;
     };
 
@@ -4102,12 +4221,18 @@ $root.Chat = (function() {
             var tag = reader.uint32();
             switch (tag >>> 3) {
             case 1:
-                message.global = $root.ChatGlobal.decode(reader, reader.uint32());
+                message.chatType = reader.int32();
                 break;
             case 2:
-                message.team = $root.ChatTeam.decode(reader, reader.uint32());
+                message.senderId = reader.uint32();
                 break;
             case 3:
+                message.message = reader.string();
+                break;
+            case 4:
+                message.global = $root.ChatGlobal.decode(reader, reader.uint32());
+                break;
+            case 5:
                 message["private"] = $root.ChatPrivate.decode(reader, reader.uint32());
                 break;
             default:
@@ -4146,22 +4271,26 @@ $root.Chat = (function() {
         if (typeof message !== "object" || message === null)
             return "object expected";
         var properties = {};
+        if (message.chatType != null && message.hasOwnProperty("chatType"))
+            switch (message.chatType) {
+            default:
+                return "chatType: enum value expected";
+            case 0:
+            case 1:
+                break;
+            }
+        if (message.senderId != null && message.hasOwnProperty("senderId"))
+            if (!$util.isInteger(message.senderId))
+                return "senderId: integer expected";
+        if (message.message != null && message.hasOwnProperty("message"))
+            if (!$util.isString(message.message))
+                return "message: string expected";
         if (message.global != null && message.hasOwnProperty("global")) {
             properties.messageType = 1;
             {
                 var error = $root.ChatGlobal.verify(message.global);
                 if (error)
                     return "global." + error;
-            }
-        }
-        if (message.team != null && message.hasOwnProperty("team")) {
-            if (properties.messageType === 1)
-                return "messageType: multiple values";
-            properties.messageType = 1;
-            {
-                var error = $root.ChatTeam.verify(message.team);
-                if (error)
-                    return "team." + error;
             }
         }
         if (message["private"] != null && message.hasOwnProperty("private")) {
@@ -4189,15 +4318,24 @@ $root.Chat = (function() {
         if (object instanceof $root.Chat)
             return object;
         var message = new $root.Chat();
+        switch (object.chatType) {
+        case "CHAT_GLOBAL":
+        case 0:
+            message.chatType = 0;
+            break;
+        case "CHAT_PRIVATE":
+        case 1:
+            message.chatType = 1;
+            break;
+        }
+        if (object.senderId != null)
+            message.senderId = object.senderId >>> 0;
+        if (object.message != null)
+            message.message = String(object.message);
         if (object.global != null) {
             if (typeof object.global !== "object")
                 throw TypeError(".Chat.global: object expected");
             message.global = $root.ChatGlobal.fromObject(object.global);
-        }
-        if (object.team != null) {
-            if (typeof object.team !== "object")
-                throw TypeError(".Chat.team: object expected");
-            message.team = $root.ChatTeam.fromObject(object.team);
         }
         if (object["private"] != null) {
             if (typeof object["private"] !== "object")
@@ -4220,15 +4358,21 @@ $root.Chat = (function() {
         if (!options)
             options = {};
         var object = {};
+        if (options.defaults) {
+            object.chatType = options.enums === String ? "CHAT_GLOBAL" : 0;
+            object.senderId = 0;
+            object.message = "";
+        }
+        if (message.chatType != null && message.hasOwnProperty("chatType"))
+            object.chatType = options.enums === String ? $root.Chat.ChatType[message.chatType] : message.chatType;
+        if (message.senderId != null && message.hasOwnProperty("senderId"))
+            object.senderId = message.senderId;
+        if (message.message != null && message.hasOwnProperty("message"))
+            object.message = message.message;
         if (message.global != null && message.hasOwnProperty("global")) {
             object.global = $root.ChatGlobal.toObject(message.global, options);
             if (options.oneofs)
                 object.messageType = "global";
-        }
-        if (message.team != null && message.hasOwnProperty("team")) {
-            object.team = $root.ChatTeam.toObject(message.team, options);
-            if (options.oneofs)
-                object.messageType = "team";
         }
         if (message["private"] != null && message.hasOwnProperty("private")) {
             object["private"] = $root.ChatPrivate.toObject(message["private"], options);
@@ -4249,6 +4393,20 @@ $root.Chat = (function() {
         return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
     };
 
+    /**
+     * ChatType enum.
+     * @name Chat.ChatType
+     * @enum {string}
+     * @property {number} CHAT_GLOBAL=0 CHAT_GLOBAL value
+     * @property {number} CHAT_PRIVATE=1 CHAT_PRIVATE value
+     */
+    Chat.ChatType = (function() {
+        var valuesById = {}, values = Object.create(valuesById);
+        values[valuesById[0] = "CHAT_GLOBAL"] = 0;
+        values[valuesById[1] = "CHAT_PRIVATE"] = 1;
+        return values;
+    })();
+
     return Chat;
 })();
 
@@ -4258,8 +4416,6 @@ $root.ChatGlobal = (function() {
      * Properties of a ChatGlobal.
      * @exports IChatGlobal
      * @interface IChatGlobal
-     * @property {number|null} [senderId] ChatGlobal senderId
-     * @property {string|null} [message] ChatGlobal message
      */
 
     /**
@@ -4276,22 +4432,6 @@ $root.ChatGlobal = (function() {
                 if (properties[keys[i]] != null)
                     this[keys[i]] = properties[keys[i]];
     }
-
-    /**
-     * ChatGlobal senderId.
-     * @member {number} senderId
-     * @memberof ChatGlobal
-     * @instance
-     */
-    ChatGlobal.prototype.senderId = 0;
-
-    /**
-     * ChatGlobal message.
-     * @member {string} message
-     * @memberof ChatGlobal
-     * @instance
-     */
-    ChatGlobal.prototype.message = "";
 
     /**
      * Creates a new ChatGlobal instance using the specified properties.
@@ -4317,10 +4457,6 @@ $root.ChatGlobal = (function() {
     ChatGlobal.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
-        if (message.senderId != null && message.hasOwnProperty("senderId"))
-            writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.senderId);
-        if (message.message != null && message.hasOwnProperty("message"))
-            writer.uint32(/* id 2, wireType 2 =*/18).string(message.message);
         return writer;
     };
 
@@ -4355,12 +4491,6 @@ $root.ChatGlobal = (function() {
         while (reader.pos < end) {
             var tag = reader.uint32();
             switch (tag >>> 3) {
-            case 1:
-                message.senderId = reader.uint32();
-                break;
-            case 2:
-                message.message = reader.string();
-                break;
             default:
                 reader.skipType(tag & 7);
                 break;
@@ -4396,12 +4526,6 @@ $root.ChatGlobal = (function() {
     ChatGlobal.verify = function verify(message) {
         if (typeof message !== "object" || message === null)
             return "object expected";
-        if (message.senderId != null && message.hasOwnProperty("senderId"))
-            if (!$util.isInteger(message.senderId))
-                return "senderId: integer expected";
-        if (message.message != null && message.hasOwnProperty("message"))
-            if (!$util.isString(message.message))
-                return "message: string expected";
         return null;
     };
 
@@ -4416,12 +4540,7 @@ $root.ChatGlobal = (function() {
     ChatGlobal.fromObject = function fromObject(object) {
         if (object instanceof $root.ChatGlobal)
             return object;
-        var message = new $root.ChatGlobal();
-        if (object.senderId != null)
-            message.senderId = object.senderId >>> 0;
-        if (object.message != null)
-            message.message = String(object.message);
-        return message;
+        return new $root.ChatGlobal();
     };
 
     /**
@@ -4433,19 +4552,8 @@ $root.ChatGlobal = (function() {
      * @param {$protobuf.IConversionOptions} [options] Conversion options
      * @returns {Object.<string,*>} Plain object
      */
-    ChatGlobal.toObject = function toObject(message, options) {
-        if (!options)
-            options = {};
-        var object = {};
-        if (options.defaults) {
-            object.senderId = 0;
-            object.message = "";
-        }
-        if (message.senderId != null && message.hasOwnProperty("senderId"))
-            object.senderId = message.senderId;
-        if (message.message != null && message.hasOwnProperty("message"))
-            object.message = message.message;
-        return object;
+    ChatGlobal.toObject = function toObject() {
+        return {};
     };
 
     /**
@@ -4462,246 +4570,12 @@ $root.ChatGlobal = (function() {
     return ChatGlobal;
 })();
 
-$root.ChatTeam = (function() {
-
-    /**
-     * Properties of a ChatTeam.
-     * @exports IChatTeam
-     * @interface IChatTeam
-     * @property {number|null} [senderId] ChatTeam senderId
-     * @property {string|null} [message] ChatTeam message
-     * @property {number|null} [teamId] ChatTeam teamId
-     */
-
-    /**
-     * Constructs a new ChatTeam.
-     * @exports ChatTeam
-     * @classdesc Represents a ChatTeam.
-     * @implements IChatTeam
-     * @constructor
-     * @param {IChatTeam=} [properties] Properties to set
-     */
-    function ChatTeam(properties) {
-        if (properties)
-            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                if (properties[keys[i]] != null)
-                    this[keys[i]] = properties[keys[i]];
-    }
-
-    /**
-     * ChatTeam senderId.
-     * @member {number} senderId
-     * @memberof ChatTeam
-     * @instance
-     */
-    ChatTeam.prototype.senderId = 0;
-
-    /**
-     * ChatTeam message.
-     * @member {string} message
-     * @memberof ChatTeam
-     * @instance
-     */
-    ChatTeam.prototype.message = "";
-
-    /**
-     * ChatTeam teamId.
-     * @member {number} teamId
-     * @memberof ChatTeam
-     * @instance
-     */
-    ChatTeam.prototype.teamId = 0;
-
-    /**
-     * Creates a new ChatTeam instance using the specified properties.
-     * @function create
-     * @memberof ChatTeam
-     * @static
-     * @param {IChatTeam=} [properties] Properties to set
-     * @returns {ChatTeam} ChatTeam instance
-     */
-    ChatTeam.create = function create(properties) {
-        return new ChatTeam(properties);
-    };
-
-    /**
-     * Encodes the specified ChatTeam message. Does not implicitly {@link ChatTeam.verify|verify} messages.
-     * @function encode
-     * @memberof ChatTeam
-     * @static
-     * @param {IChatTeam} message ChatTeam message or plain object to encode
-     * @param {$protobuf.Writer} [writer] Writer to encode to
-     * @returns {$protobuf.Writer} Writer
-     */
-    ChatTeam.encode = function encode(message, writer) {
-        if (!writer)
-            writer = $Writer.create();
-        if (message.senderId != null && message.hasOwnProperty("senderId"))
-            writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.senderId);
-        if (message.message != null && message.hasOwnProperty("message"))
-            writer.uint32(/* id 2, wireType 2 =*/18).string(message.message);
-        if (message.teamId != null && message.hasOwnProperty("teamId"))
-            writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.teamId);
-        return writer;
-    };
-
-    /**
-     * Encodes the specified ChatTeam message, length delimited. Does not implicitly {@link ChatTeam.verify|verify} messages.
-     * @function encodeDelimited
-     * @memberof ChatTeam
-     * @static
-     * @param {IChatTeam} message ChatTeam message or plain object to encode
-     * @param {$protobuf.Writer} [writer] Writer to encode to
-     * @returns {$protobuf.Writer} Writer
-     */
-    ChatTeam.encodeDelimited = function encodeDelimited(message, writer) {
-        return this.encode(message, writer).ldelim();
-    };
-
-    /**
-     * Decodes a ChatTeam message from the specified reader or buffer.
-     * @function decode
-     * @memberof ChatTeam
-     * @static
-     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @param {number} [length] Message length if known beforehand
-     * @returns {ChatTeam} ChatTeam
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    ChatTeam.decode = function decode(reader, length) {
-        if (!(reader instanceof $Reader))
-            reader = $Reader.create(reader);
-        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.ChatTeam();
-        while (reader.pos < end) {
-            var tag = reader.uint32();
-            switch (tag >>> 3) {
-            case 1:
-                message.senderId = reader.uint32();
-                break;
-            case 2:
-                message.message = reader.string();
-                break;
-            case 3:
-                message.teamId = reader.uint32();
-                break;
-            default:
-                reader.skipType(tag & 7);
-                break;
-            }
-        }
-        return message;
-    };
-
-    /**
-     * Decodes a ChatTeam message from the specified reader or buffer, length delimited.
-     * @function decodeDelimited
-     * @memberof ChatTeam
-     * @static
-     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @returns {ChatTeam} ChatTeam
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    ChatTeam.decodeDelimited = function decodeDelimited(reader) {
-        if (!(reader instanceof $Reader))
-            reader = new $Reader(reader);
-        return this.decode(reader, reader.uint32());
-    };
-
-    /**
-     * Verifies a ChatTeam message.
-     * @function verify
-     * @memberof ChatTeam
-     * @static
-     * @param {Object.<string,*>} message Plain object to verify
-     * @returns {string|null} `null` if valid, otherwise the reason why it is not
-     */
-    ChatTeam.verify = function verify(message) {
-        if (typeof message !== "object" || message === null)
-            return "object expected";
-        if (message.senderId != null && message.hasOwnProperty("senderId"))
-            if (!$util.isInteger(message.senderId))
-                return "senderId: integer expected";
-        if (message.message != null && message.hasOwnProperty("message"))
-            if (!$util.isString(message.message))
-                return "message: string expected";
-        if (message.teamId != null && message.hasOwnProperty("teamId"))
-            if (!$util.isInteger(message.teamId))
-                return "teamId: integer expected";
-        return null;
-    };
-
-    /**
-     * Creates a ChatTeam message from a plain object. Also converts values to their respective internal types.
-     * @function fromObject
-     * @memberof ChatTeam
-     * @static
-     * @param {Object.<string,*>} object Plain object
-     * @returns {ChatTeam} ChatTeam
-     */
-    ChatTeam.fromObject = function fromObject(object) {
-        if (object instanceof $root.ChatTeam)
-            return object;
-        var message = new $root.ChatTeam();
-        if (object.senderId != null)
-            message.senderId = object.senderId >>> 0;
-        if (object.message != null)
-            message.message = String(object.message);
-        if (object.teamId != null)
-            message.teamId = object.teamId >>> 0;
-        return message;
-    };
-
-    /**
-     * Creates a plain object from a ChatTeam message. Also converts values to other types if specified.
-     * @function toObject
-     * @memberof ChatTeam
-     * @static
-     * @param {ChatTeam} message ChatTeam
-     * @param {$protobuf.IConversionOptions} [options] Conversion options
-     * @returns {Object.<string,*>} Plain object
-     */
-    ChatTeam.toObject = function toObject(message, options) {
-        if (!options)
-            options = {};
-        var object = {};
-        if (options.defaults) {
-            object.senderId = 0;
-            object.message = "";
-            object.teamId = 0;
-        }
-        if (message.senderId != null && message.hasOwnProperty("senderId"))
-            object.senderId = message.senderId;
-        if (message.message != null && message.hasOwnProperty("message"))
-            object.message = message.message;
-        if (message.teamId != null && message.hasOwnProperty("teamId"))
-            object.teamId = message.teamId;
-        return object;
-    };
-
-    /**
-     * Converts this ChatTeam to JSON.
-     * @function toJSON
-     * @memberof ChatTeam
-     * @instance
-     * @returns {Object.<string,*>} JSON object
-     */
-    ChatTeam.prototype.toJSON = function toJSON() {
-        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-    };
-
-    return ChatTeam;
-})();
-
 $root.ChatPrivate = (function() {
 
     /**
      * Properties of a ChatPrivate.
      * @exports IChatPrivate
      * @interface IChatPrivate
-     * @property {number|null} [senderId] ChatPrivate senderId
-     * @property {string|null} [message] ChatPrivate message
      * @property {number|null} [receiverId] ChatPrivate receiverId
      */
 
@@ -4719,22 +4593,6 @@ $root.ChatPrivate = (function() {
                 if (properties[keys[i]] != null)
                     this[keys[i]] = properties[keys[i]];
     }
-
-    /**
-     * ChatPrivate senderId.
-     * @member {number} senderId
-     * @memberof ChatPrivate
-     * @instance
-     */
-    ChatPrivate.prototype.senderId = 0;
-
-    /**
-     * ChatPrivate message.
-     * @member {string} message
-     * @memberof ChatPrivate
-     * @instance
-     */
-    ChatPrivate.prototype.message = "";
 
     /**
      * ChatPrivate receiverId.
@@ -4768,12 +4626,8 @@ $root.ChatPrivate = (function() {
     ChatPrivate.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
-        if (message.senderId != null && message.hasOwnProperty("senderId"))
-            writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.senderId);
-        if (message.message != null && message.hasOwnProperty("message"))
-            writer.uint32(/* id 2, wireType 2 =*/18).string(message.message);
         if (message.receiverId != null && message.hasOwnProperty("receiverId"))
-            writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.receiverId);
+            writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.receiverId);
         return writer;
     };
 
@@ -4809,12 +4663,6 @@ $root.ChatPrivate = (function() {
             var tag = reader.uint32();
             switch (tag >>> 3) {
             case 1:
-                message.senderId = reader.uint32();
-                break;
-            case 2:
-                message.message = reader.string();
-                break;
-            case 3:
                 message.receiverId = reader.uint32();
                 break;
             default:
@@ -4852,12 +4700,6 @@ $root.ChatPrivate = (function() {
     ChatPrivate.verify = function verify(message) {
         if (typeof message !== "object" || message === null)
             return "object expected";
-        if (message.senderId != null && message.hasOwnProperty("senderId"))
-            if (!$util.isInteger(message.senderId))
-                return "senderId: integer expected";
-        if (message.message != null && message.hasOwnProperty("message"))
-            if (!$util.isString(message.message))
-                return "message: string expected";
         if (message.receiverId != null && message.hasOwnProperty("receiverId"))
             if (!$util.isInteger(message.receiverId))
                 return "receiverId: integer expected";
@@ -4876,10 +4718,6 @@ $root.ChatPrivate = (function() {
         if (object instanceof $root.ChatPrivate)
             return object;
         var message = new $root.ChatPrivate();
-        if (object.senderId != null)
-            message.senderId = object.senderId >>> 0;
-        if (object.message != null)
-            message.message = String(object.message);
         if (object.receiverId != null)
             message.receiverId = object.receiverId >>> 0;
         return message;
@@ -4898,15 +4736,8 @@ $root.ChatPrivate = (function() {
         if (!options)
             options = {};
         var object = {};
-        if (options.defaults) {
-            object.senderId = 0;
-            object.message = "";
+        if (options.defaults)
             object.receiverId = 0;
-        }
-        if (message.senderId != null && message.hasOwnProperty("senderId"))
-            object.senderId = message.senderId;
-        if (message.message != null && message.hasOwnProperty("message"))
-            object.message = message.message;
         if (message.receiverId != null && message.hasOwnProperty("receiverId"))
             object.receiverId = message.receiverId;
         return object;
@@ -4924,6 +4755,22 @@ $root.ChatPrivate = (function() {
     };
 
     return ChatPrivate;
+})();
+
+/**
+ * Compression enum.
+ * @exports Compression
+ * @enum {string}
+ * @property {number} NONE=0 NONE value
+ * @property {number} ZSTD=1 ZSTD value
+ * @property {number} GZIP=2 GZIP value
+ */
+$root.Compression = (function() {
+    var valuesById = {}, values = Object.create(valuesById);
+    values[valuesById[0] = "NONE"] = 0;
+    values[valuesById[1] = "ZSTD"] = 1;
+    values[valuesById[2] = "GZIP"] = 2;
+    return values;
 })();
 
 module.exports = $root;

@@ -1,0 +1,22 @@
+syntax = 'proto3';
+
+message Chat {
+  enum ChatType {
+    CHAT_GLOBAL = 0;
+    CHAT_PRIVATE = 1;
+  }
+  ChatType chat_type = 1;
+  uint32 sender_id = 2;
+  string message = 3;
+  oneof message_type {
+    ChatGlobal global = 4;
+    ChatPrivate private = 5;
+  }
+}
+
+message ChatGlobal {
+}
+
+message ChatPrivate {
+  uint32 receiver_id = 1;
+}

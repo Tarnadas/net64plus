@@ -4,7 +4,7 @@ import * as $protobuf from "protobufjs";
 export interface IClientServerMessage {
 
     /** ClientServerMessage compression */
-    compression?: (ClientServerMessage.Compression|null);
+    compression?: (Compression|null);
 
     /** ClientServerMessage uncompressedSize */
     uncompressedSize?: (number|null);
@@ -26,7 +26,7 @@ export class ClientServerMessage implements IClientServerMessage {
     constructor(properties?: IClientServerMessage);
 
     /** ClientServerMessage compression. */
-    public compression: ClientServerMessage.Compression;
+    public compression: Compression;
 
     /** ClientServerMessage uncompressedSize. */
     public uncompressedSize: number;
@@ -111,15 +111,6 @@ export class ClientServerMessage implements IClientServerMessage {
     public toJSON(): { [k: string]: any };
 }
 
-export namespace ClientServerMessage {
-
-    /** Compression enum. */
-    enum Compression {
-        NONE = 0,
-        ZSTD = 1
-    }
-}
-
 /** Properties of a ClientServer. */
 export interface IClientServer {
 
@@ -132,8 +123,8 @@ export interface IClientServer {
     /** ClientServer ping */
     ping?: (IPing|null);
 
-    /** ClientServer playerUpdate */
-    playerUpdate?: (IPlayerUpdate|null);
+    /** ClientServer player */
+    player?: (IPlayer|null);
 
     /** ClientServer playerData */
     playerData?: (IPlayerData|null);
@@ -141,8 +132,8 @@ export interface IClientServer {
     /** ClientServer metaData */
     metaData?: (IMetaData|null);
 
-    /** ClientServer chatMessage */
-    chatMessage?: (IChat|null);
+    /** ClientServer chat */
+    chat?: (IChat|null);
 }
 
 /** Represents a ClientServer. */
@@ -163,8 +154,8 @@ export class ClientServer implements IClientServer {
     /** ClientServer ping. */
     public ping?: (IPing|null);
 
-    /** ClientServer playerUpdate. */
-    public playerUpdate?: (IPlayerUpdate|null);
+    /** ClientServer player. */
+    public player?: (IPlayer|null);
 
     /** ClientServer playerData. */
     public playerData?: (IPlayerData|null);
@@ -172,11 +163,11 @@ export class ClientServer implements IClientServer {
     /** ClientServer metaData. */
     public metaData?: (IMetaData|null);
 
-    /** ClientServer chatMessage. */
-    public chatMessage?: (IChat|null);
+    /** ClientServer chat. */
+    public chat?: (IChat|null);
 
     /** ClientServer message. */
-    public message?: ("handshake"|"ping"|"playerUpdate"|"playerData"|"metaData"|"chatMessage");
+    public message?: ("handshake"|"ping"|"player"|"playerData"|"metaData"|"chat");
 
     /**
      * Creates a new ClientServer instance using the specified properties.
@@ -253,12 +244,13 @@ export namespace ClientServer {
 
     /** MessageType enum. */
     enum MessageType {
+        UNKNOWN = 0,
         HANDSHAKE = 2,
         PING = 3,
         PLAYER_UPDATE = 6,
         PLAYER_DATA = 128,
         META_DATA = 129,
-        CHAT_MESSAGE = 130
+        CHAT = 130
     }
 }
 
@@ -449,102 +441,6 @@ export class Ping implements IPing {
 
     /**
      * Converts this Ping to JSON.
-     * @returns JSON object
-     */
-    public toJSON(): { [k: string]: any };
-}
-
-/** Properties of a PlayerUpdate. */
-export interface IPlayerUpdate {
-
-    /** PlayerUpdate playerId */
-    playerId?: (number|null);
-
-    /** PlayerUpdate player */
-    player?: (IPlayer|null);
-}
-
-/** Represents a PlayerUpdate. */
-export class PlayerUpdate implements IPlayerUpdate {
-
-    /**
-     * Constructs a new PlayerUpdate.
-     * @param [properties] Properties to set
-     */
-    constructor(properties?: IPlayerUpdate);
-
-    /** PlayerUpdate playerId. */
-    public playerId: number;
-
-    /** PlayerUpdate player. */
-    public player?: (IPlayer|null);
-
-    /**
-     * Creates a new PlayerUpdate instance using the specified properties.
-     * @param [properties] Properties to set
-     * @returns PlayerUpdate instance
-     */
-    public static create(properties?: IPlayerUpdate): PlayerUpdate;
-
-    /**
-     * Encodes the specified PlayerUpdate message. Does not implicitly {@link PlayerUpdate.verify|verify} messages.
-     * @param message PlayerUpdate message or plain object to encode
-     * @param [writer] Writer to encode to
-     * @returns Writer
-     */
-    public static encode(message: IPlayerUpdate, writer?: $protobuf.Writer): $protobuf.Writer;
-
-    /**
-     * Encodes the specified PlayerUpdate message, length delimited. Does not implicitly {@link PlayerUpdate.verify|verify} messages.
-     * @param message PlayerUpdate message or plain object to encode
-     * @param [writer] Writer to encode to
-     * @returns Writer
-     */
-    public static encodeDelimited(message: IPlayerUpdate, writer?: $protobuf.Writer): $protobuf.Writer;
-
-    /**
-     * Decodes a PlayerUpdate message from the specified reader or buffer.
-     * @param reader Reader or buffer to decode from
-     * @param [length] Message length if known beforehand
-     * @returns PlayerUpdate
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): PlayerUpdate;
-
-    /**
-     * Decodes a PlayerUpdate message from the specified reader or buffer, length delimited.
-     * @param reader Reader or buffer to decode from
-     * @returns PlayerUpdate
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): PlayerUpdate;
-
-    /**
-     * Verifies a PlayerUpdate message.
-     * @param message Plain object to verify
-     * @returns `null` if valid, otherwise the reason why it is not
-     */
-    public static verify(message: { [k: string]: any }): (string|null);
-
-    /**
-     * Creates a PlayerUpdate message from a plain object. Also converts values to their respective internal types.
-     * @param object Plain object
-     * @returns PlayerUpdate
-     */
-    public static fromObject(object: { [k: string]: any }): PlayerUpdate;
-
-    /**
-     * Creates a plain object from a PlayerUpdate message. Also converts values to other types if specified.
-     * @param message PlayerUpdate
-     * @param [options] Conversion options
-     * @returns Plain object
-     */
-    public static toObject(message: PlayerUpdate, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-    /**
-     * Converts this PlayerUpdate to JSON.
      * @returns JSON object
      */
     public toJSON(): { [k: string]: any };
@@ -742,96 +638,6 @@ export class PlayerData implements IPlayerData {
     public toJSON(): { [k: string]: any };
 }
 
-/** Properties of a MetaData. */
-export interface IMetaData {
-
-    /** MetaData metaData */
-    metaData?: (IMeta[]|null);
-}
-
-/** Represents a MetaData. */
-export class MetaData implements IMetaData {
-
-    /**
-     * Constructs a new MetaData.
-     * @param [properties] Properties to set
-     */
-    constructor(properties?: IMetaData);
-
-    /** MetaData metaData. */
-    public metaData: IMeta[];
-
-    /**
-     * Creates a new MetaData instance using the specified properties.
-     * @param [properties] Properties to set
-     * @returns MetaData instance
-     */
-    public static create(properties?: IMetaData): MetaData;
-
-    /**
-     * Encodes the specified MetaData message. Does not implicitly {@link MetaData.verify|verify} messages.
-     * @param message MetaData message or plain object to encode
-     * @param [writer] Writer to encode to
-     * @returns Writer
-     */
-    public static encode(message: IMetaData, writer?: $protobuf.Writer): $protobuf.Writer;
-
-    /**
-     * Encodes the specified MetaData message, length delimited. Does not implicitly {@link MetaData.verify|verify} messages.
-     * @param message MetaData message or plain object to encode
-     * @param [writer] Writer to encode to
-     * @returns Writer
-     */
-    public static encodeDelimited(message: IMetaData, writer?: $protobuf.Writer): $protobuf.Writer;
-
-    /**
-     * Decodes a MetaData message from the specified reader or buffer.
-     * @param reader Reader or buffer to decode from
-     * @param [length] Message length if known beforehand
-     * @returns MetaData
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): MetaData;
-
-    /**
-     * Decodes a MetaData message from the specified reader or buffer, length delimited.
-     * @param reader Reader or buffer to decode from
-     * @returns MetaData
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): MetaData;
-
-    /**
-     * Verifies a MetaData message.
-     * @param message Plain object to verify
-     * @returns `null` if valid, otherwise the reason why it is not
-     */
-    public static verify(message: { [k: string]: any }): (string|null);
-
-    /**
-     * Creates a MetaData message from a plain object. Also converts values to their respective internal types.
-     * @param object Plain object
-     * @returns MetaData
-     */
-    public static fromObject(object: { [k: string]: any }): MetaData;
-
-    /**
-     * Creates a plain object from a MetaData message. Also converts values to other types if specified.
-     * @param message MetaData
-     * @param [options] Conversion options
-     * @returns Plain object
-     */
-    public static toObject(message: MetaData, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-    /**
-     * Converts this MetaData to JSON.
-     * @returns JSON object
-     */
-    public toJSON(): { [k: string]: any };
-}
-
 /** Properties of a Meta. */
 export interface IMeta {
 
@@ -934,14 +740,110 @@ export class Meta implements IMeta {
     public toJSON(): { [k: string]: any };
 }
 
+/** Properties of a MetaData. */
+export interface IMetaData {
+
+    /** MetaData metaData */
+    metaData?: (IMeta[]|null);
+}
+
+/** Represents a MetaData. */
+export class MetaData implements IMetaData {
+
+    /**
+     * Constructs a new MetaData.
+     * @param [properties] Properties to set
+     */
+    constructor(properties?: IMetaData);
+
+    /** MetaData metaData. */
+    public metaData: IMeta[];
+
+    /**
+     * Creates a new MetaData instance using the specified properties.
+     * @param [properties] Properties to set
+     * @returns MetaData instance
+     */
+    public static create(properties?: IMetaData): MetaData;
+
+    /**
+     * Encodes the specified MetaData message. Does not implicitly {@link MetaData.verify|verify} messages.
+     * @param message MetaData message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encode(message: IMetaData, writer?: $protobuf.Writer): $protobuf.Writer;
+
+    /**
+     * Encodes the specified MetaData message, length delimited. Does not implicitly {@link MetaData.verify|verify} messages.
+     * @param message MetaData message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encodeDelimited(message: IMetaData, writer?: $protobuf.Writer): $protobuf.Writer;
+
+    /**
+     * Decodes a MetaData message from the specified reader or buffer.
+     * @param reader Reader or buffer to decode from
+     * @param [length] Message length if known beforehand
+     * @returns MetaData
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): MetaData;
+
+    /**
+     * Decodes a MetaData message from the specified reader or buffer, length delimited.
+     * @param reader Reader or buffer to decode from
+     * @returns MetaData
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): MetaData;
+
+    /**
+     * Verifies a MetaData message.
+     * @param message Plain object to verify
+     * @returns `null` if valid, otherwise the reason why it is not
+     */
+    public static verify(message: { [k: string]: any }): (string|null);
+
+    /**
+     * Creates a MetaData message from a plain object. Also converts values to their respective internal types.
+     * @param object Plain object
+     * @returns MetaData
+     */
+    public static fromObject(object: { [k: string]: any }): MetaData;
+
+    /**
+     * Creates a plain object from a MetaData message. Also converts values to other types if specified.
+     * @param message MetaData
+     * @param [options] Conversion options
+     * @returns Plain object
+     */
+    public static toObject(message: MetaData, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+    /**
+     * Converts this MetaData to JSON.
+     * @returns JSON object
+     */
+    public toJSON(): { [k: string]: any };
+}
+
 /** Properties of a Chat. */
 export interface IChat {
 
+    /** Chat chatType */
+    chatType?: (Chat.ChatType|null);
+
+    /** Chat senderId */
+    senderId?: (number|null);
+
+    /** Chat message */
+    message?: (string|null);
+
     /** Chat global */
     global?: (IChatGlobal|null);
-
-    /** Chat team */
-    team?: (IChatTeam|null);
 
     /** Chat private */
     "private"?: (IChatPrivate|null);
@@ -956,17 +858,23 @@ export class Chat implements IChat {
      */
     constructor(properties?: IChat);
 
+    /** Chat chatType. */
+    public chatType: Chat.ChatType;
+
+    /** Chat senderId. */
+    public senderId: number;
+
+    /** Chat message. */
+    public message: string;
+
     /** Chat global. */
     public global?: (IChatGlobal|null);
-
-    /** Chat team. */
-    public team?: (IChatTeam|null);
 
     /** Chat private. */
     public private?: (IChatPrivate|null);
 
     /** Chat messageType. */
-    public messageType?: ("global"|"team"|"private");
+    public messageType?: ("global"|"private");
 
     /**
      * Creates a new Chat instance using the specified properties.
@@ -1039,14 +947,17 @@ export class Chat implements IChat {
     public toJSON(): { [k: string]: any };
 }
 
+export namespace Chat {
+
+    /** ChatType enum. */
+    enum ChatType {
+        CHAT_GLOBAL = 0,
+        CHAT_PRIVATE = 1
+    }
+}
+
 /** Properties of a ChatGlobal. */
 export interface IChatGlobal {
-
-    /** ChatGlobal senderId */
-    senderId?: (number|null);
-
-    /** ChatGlobal message */
-    message?: (string|null);
 }
 
 /** Represents a ChatGlobal. */
@@ -1057,12 +968,6 @@ export class ChatGlobal implements IChatGlobal {
      * @param [properties] Properties to set
      */
     constructor(properties?: IChatGlobal);
-
-    /** ChatGlobal senderId. */
-    public senderId: number;
-
-    /** ChatGlobal message. */
-    public message: string;
 
     /**
      * Creates a new ChatGlobal instance using the specified properties.
@@ -1135,116 +1040,8 @@ export class ChatGlobal implements IChatGlobal {
     public toJSON(): { [k: string]: any };
 }
 
-/** Properties of a ChatTeam. */
-export interface IChatTeam {
-
-    /** ChatTeam senderId */
-    senderId?: (number|null);
-
-    /** ChatTeam message */
-    message?: (string|null);
-
-    /** ChatTeam teamId */
-    teamId?: (number|null);
-}
-
-/** Represents a ChatTeam. */
-export class ChatTeam implements IChatTeam {
-
-    /**
-     * Constructs a new ChatTeam.
-     * @param [properties] Properties to set
-     */
-    constructor(properties?: IChatTeam);
-
-    /** ChatTeam senderId. */
-    public senderId: number;
-
-    /** ChatTeam message. */
-    public message: string;
-
-    /** ChatTeam teamId. */
-    public teamId: number;
-
-    /**
-     * Creates a new ChatTeam instance using the specified properties.
-     * @param [properties] Properties to set
-     * @returns ChatTeam instance
-     */
-    public static create(properties?: IChatTeam): ChatTeam;
-
-    /**
-     * Encodes the specified ChatTeam message. Does not implicitly {@link ChatTeam.verify|verify} messages.
-     * @param message ChatTeam message or plain object to encode
-     * @param [writer] Writer to encode to
-     * @returns Writer
-     */
-    public static encode(message: IChatTeam, writer?: $protobuf.Writer): $protobuf.Writer;
-
-    /**
-     * Encodes the specified ChatTeam message, length delimited. Does not implicitly {@link ChatTeam.verify|verify} messages.
-     * @param message ChatTeam message or plain object to encode
-     * @param [writer] Writer to encode to
-     * @returns Writer
-     */
-    public static encodeDelimited(message: IChatTeam, writer?: $protobuf.Writer): $protobuf.Writer;
-
-    /**
-     * Decodes a ChatTeam message from the specified reader or buffer.
-     * @param reader Reader or buffer to decode from
-     * @param [length] Message length if known beforehand
-     * @returns ChatTeam
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): ChatTeam;
-
-    /**
-     * Decodes a ChatTeam message from the specified reader or buffer, length delimited.
-     * @param reader Reader or buffer to decode from
-     * @returns ChatTeam
-     * @throws {Error} If the payload is not a reader or valid buffer
-     * @throws {$protobuf.util.ProtocolError} If required fields are missing
-     */
-    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): ChatTeam;
-
-    /**
-     * Verifies a ChatTeam message.
-     * @param message Plain object to verify
-     * @returns `null` if valid, otherwise the reason why it is not
-     */
-    public static verify(message: { [k: string]: any }): (string|null);
-
-    /**
-     * Creates a ChatTeam message from a plain object. Also converts values to their respective internal types.
-     * @param object Plain object
-     * @returns ChatTeam
-     */
-    public static fromObject(object: { [k: string]: any }): ChatTeam;
-
-    /**
-     * Creates a plain object from a ChatTeam message. Also converts values to other types if specified.
-     * @param message ChatTeam
-     * @param [options] Conversion options
-     * @returns Plain object
-     */
-    public static toObject(message: ChatTeam, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-    /**
-     * Converts this ChatTeam to JSON.
-     * @returns JSON object
-     */
-    public toJSON(): { [k: string]: any };
-}
-
 /** Properties of a ChatPrivate. */
 export interface IChatPrivate {
-
-    /** ChatPrivate senderId */
-    senderId?: (number|null);
-
-    /** ChatPrivate message */
-    message?: (string|null);
 
     /** ChatPrivate receiverId */
     receiverId?: (number|null);
@@ -1258,12 +1055,6 @@ export class ChatPrivate implements IChatPrivate {
      * @param [properties] Properties to set
      */
     constructor(properties?: IChatPrivate);
-
-    /** ChatPrivate senderId. */
-    public senderId: number;
-
-    /** ChatPrivate message. */
-    public message: string;
 
     /** ChatPrivate receiverId. */
     public receiverId: number;
@@ -1337,4 +1128,11 @@ export class ChatPrivate implements IChatPrivate {
      * @returns JSON object
      */
     public toJSON(): { [k: string]: any };
+}
+
+/** Compression enum. */
+export enum Compression {
+    NONE = 0,
+    ZSTD = 1,
+    GZIP = 2
 }
