@@ -1,6 +1,8 @@
-syntax = 'proto3'; 
+syntax = "proto3";
 
 import "shared/player-update/Player.proto";
+
+package net64.server;
 
 message PlayerUpdate { 
   uint32 player_id = 1; 

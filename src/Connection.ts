@@ -5,8 +5,16 @@ import { addGlobalMessage, clearGlobalMessages } from './Chat'
 import { store } from './renderer'
 import { disconnect, setConnectionError, setPlayer, setPlayers } from './actions/connection'
 import { Server, Player } from './models/Server.model'
-import { Compression, ClientServerMessage, IClientServerMessage, ClientServer, Chat } from '../proto/ClientServerMessage.js'
-import { ServerClientMessage, ServerClient, ServerMessage, ConnectionDenied, GameMode, IServerClient, IServerMessage, IConnectionDenied } from '../proto/ServerClientMessage.js'
+import * as ClientProto from '../proto/ClientServerMessage'
+import * as ServerProto from '../proto/ServerClientMessage'
+// import { Compression, ClientServerMessage, IClientServerMessage, ClientServer, Chat } from '../proto/ClientServerMessage.js'
+// import { ServerClientMessage, ServerClient, ServerMessage, ConnectionDenied, GameMode, IServerClient, IServerMessage, IConnectionDenied } from '../proto/ServerClientMessage.js'
+
+const { ClientServerMessage } = ClientProto.net64
+const { Compression, Chat } = ClientProto.net64.shared
+const { ClientServer } = ClientProto.net64.client
+const { ServerClientMessage } = ServerProto.net64
+const { ServerClient, ServerMessage, ConnectionDenied, GameMode } = ServerProto.net64.server
 
 const UPDATE_INTERVAL = 32
 const DECODER = new TextDecoder('utf-8')
@@ -85,7 +93,7 @@ export class Connection {
    */
   private onOpen (characterId: number, username: string, onConnect: () => void): void {
     onConnect()
-    const handshake: IClientServerMessage = {
+    const handshake: ClientProto.net64.IClientServerMessage = {
       compression: Compression.NONE,
       data: {
         messageType: ClientServer.MessageType.HANDSHAKE,
@@ -175,7 +183,7 @@ export class Connection {
    *
    * @param {IServerClient} messageData - The decoded message
    */
-  private onHandshake (messageData: IServerClient): void {
+  private onHandshake (messageData: ServerProto.net64.server.IServerClient): void {
     const handshake = messageData.handshake
     if (!handshake || !handshake.playerId) return
     this.playerId = handshake.playerId
@@ -194,7 +202,7 @@ export class Connection {
    *
    * @param {IServerClient} messageData - The decoded message
    */
-  private onPing (messageData: IServerClient): void {
+  private onPing (messageData: ServerProto.net64.server.IServerClient): void {
     // TODO
   }
 
@@ -203,7 +211,7 @@ export class Connection {
    *
    * @param {IServerClient} messageData - The decoded message
    */
-  private onServerMessage (messageData: IServerClient): void {
+  private onServerMessage (messageData: ServerProto.net64.server.IServerClient): void {
     if (!messageData.serverMessage) return
     const serverMessage = messageData.serverMessage
     switch (serverMessage.messageType) {
@@ -224,7 +232,7 @@ export class Connection {
    *
    * @param {IServerMessage} serverMessage - The decoded message
    */
-  private onConnectionDenied (serverMessage: IServerMessage): void {
+  private onConnectionDenied (serverMessage: ServerProto.net64.server.IServerMessage): void {
     const connectionDenied = serverMessage.connectionDenied
     if (!connectionDenied) return
     switch (connectionDenied.reason) {
@@ -243,7 +251,7 @@ export class Connection {
    *
    * @param {IConnectionDenied} connectionDenied - The decoded message
    */
-  private onServerFull (connectionDenied: IConnectionDenied): void {
+  private onServerFull (connectionDenied: ServerProto.net64.server.IConnectionDenied): void {
     const serverFull = connectionDenied.serverFull
     if (!serverFull) return
     store.dispatch(setConnectionError(`Server is full`))
@@ -254,7 +262,7 @@ export class Connection {
    *
    * @param {IConnectionDenied} connectionDenied - The decoded message
    */
-  private onWrongVersion (connectionDenied: IConnectionDenied): void {
+  private onWrongVersion (connectionDenied: ServerProto.net64.server.IConnectionDenied): void {
     const wrongVersion = connectionDenied.wrongVersion
     if (!wrongVersion) return
     store.dispatch(setConnectionError(`The server's network API version (${wrongVersion.majorVersion}.${wrongVersion.minorVersion}) is incompatible with your client version`))
@@ -266,7 +274,7 @@ export class Connection {
    *
    * @param {IServerMessage} serverMessage - The decoded message
    */
-  private onGameMode (serverMessage: IServerMessage): void {
+  private onGameMode (serverMessage: ServerProto.net64.server.IServerMessage): void {
     const gameMode = serverMessage.gameMode
     if (!gameMode || !gameMode.gameMode) return
     const gameModeBuffer = Buffer.from(new Uint8Array([gameMode.gameMode]).buffer as ArrayBuffer)
@@ -278,7 +286,7 @@ export class Connection {
    *
    * @param {IServerClient} serverMessage - The decoded message
    */
-  private onServerToken (serverMessage: IServerMessage): void {
+  private onServerToken (serverMessage: ServerProto.net64.server.IServerMessage): void {
     // TODO
   }
 
@@ -287,7 +295,7 @@ export class Connection {
    *
    * @param {IServerClient} messageData - The decoded message
    */
-  private onPlayerListUpdate (messageData: IServerClient): void {
+  private onPlayerListUpdate (messageData: ServerProto.net64.server.IServerClient): void {
     if (!messageData.playerListUpdate) return
     const players = messageData.playerListUpdate.playerUpdates as Player[]
     if (!players) return
@@ -299,7 +307,7 @@ export class Connection {
    *
    * @param {IServerClient} messageData - The decoded message
    */
-  private onPlayerUpdate (messageData: IServerClient): void {
+  private onPlayerUpdate (messageData: ServerProto.net64.server.IServerClient): void {
     if (!messageData.playerUpdate || !messageData.playerUpdate.playerId || !messageData.playerUpdate.player) return
     const player = messageData.playerUpdate.player as Player
     store.dispatch(setPlayer(messageData.playerUpdate.playerId, player))
@@ -310,7 +318,7 @@ export class Connection {
    *
    * @param {IServerClient} messageData - The decoded message
    */
-  private onPlayerData (messageData: IServerClient): void {
+  private onPlayerData (messageData: ServerProto.net64.server.IServerClient): void {
     const playerData = messageData.playerData
     if (!playerData || !playerData.dataLength || !playerData.playerData || !playerData.playerLength) return
     const payload = playerData.playerData
@@ -328,7 +336,7 @@ export class Connection {
    *
    * @param {IServerClient} messageData - The decoded message
    */
-  private onMetaData (messageData: IServerClient): void {
+  private onMetaData (messageData: ServerProto.net64.server.IServerClient): void {
     if (!messageData.metaData) return
     const metaData = messageData.metaData.metaData
     if (!metaData) return
@@ -346,7 +354,7 @@ export class Connection {
    *
    * @param {IServerClient} messageData - The decoded message
    */
-  private onChatMessage (messageData: IServerClient): void {
+  private onChatMessage (messageData: ServerProto.net64.server.IServerClient): void {
     const chat = messageData.chat
     if (!chat) return
     const message = chat.message
@@ -382,7 +390,7 @@ export class Connection {
     const playerDataBuffer = this.emulator.readMemory(0xFF7700, 0x1C)
     if (playerDataBuffer[0xF] !== 0) {
       try {
-        const playerData: IClientServerMessage = {
+        const playerData: ClientProto.net64.IClientServerMessage = {
           compression: Compression.NONE,
           data: {
             messageType: ClientServer.MessageType.PLAYER_DATA,
@@ -410,7 +418,7 @@ export class Connection {
   private sendMetaData (): void {
     try {
       const self = this
-      const metaData: IClientServerMessage = {
+      const metaData: ClientProto.net64.IClientServerMessage = {
         compression: Compression.NONE,
         data: {
           messageType: ClientServer.MessageType.META_DATA,
@@ -451,7 +459,7 @@ export class Connection {
    * @param {string} message - The message to send
    */
   public sendChatMessage (message: string): void {
-    const chat: IClientServerMessage = {
+    const chat: ClientProto.net64.IClientServerMessage = {
       compression: Compression.NONE,
       data: {
         messageType: ClientServer.MessageType.CHAT,
@@ -473,7 +481,7 @@ export class Connection {
    * @param {number} args.characterId - Character ID to change to
    */
   public sendPlayerUpdate ({username, characterId}: {username: string, characterId: number}): void {
-    const playerUpdate: IClientServerMessage = {
+    const playerUpdate: ClientProto.net64.IClientServerMessage = {
       compression: Compression.NONE,
       data: {
         messageType: ClientServer.MessageType.PLAYER_UPDATE,

@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package net64.client;
+
 message Handshake {
   uint32 major = 1;
   uint32 minor = 2;

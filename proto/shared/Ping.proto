@@ -1,3 +1,5 @@
 syntax = "proto3";
 
+package net64.shared;
+
 message Ping {}

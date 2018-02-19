@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package net64.client;
+
 message PlayerData {
   uint32 data_length = 2;
   bytes player_data = 3;

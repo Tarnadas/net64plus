@@ -3,6 +3,8 @@ syntax = "proto3";
 import "server-client/ServerClient.proto";
 import "shared/Compression.proto";
 
+package net64;
+
 message ServerClientMessage {
   Compression compression = 1;
   uint32 uncompressed_size = 2;

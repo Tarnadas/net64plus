@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package net64.shared;
+
 enum Compression {
   NONE = 0;
   ZSTD = 1;

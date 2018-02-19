@@ -2,6 +2,8 @@ syntax = "proto3";
 
 import "server-client/PlayerUpdate.proto";
 
+package net64.server;
+
 message Handshake {
   uint32 player_id = 1;
   PlayerListUpdate player_list = 2;

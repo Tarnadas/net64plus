@@ -7,6 +7,8 @@ import "client-server/PlayerData.proto";
 import "shared/MetaData.proto";
 import "shared/Chat.proto";
 
+package net64.client;
+
 message ClientServer {
   enum MessageType {
     UNKNOWN = 0;
