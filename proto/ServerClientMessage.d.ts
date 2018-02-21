@@ -1095,10 +1095,10 @@ export namespace net64 {
         interface IWrongVersion {
 
             /** WrongVersion majorVersion */
-            majorVersion?: (string|null);
+            majorVersion?: (number|null);
 
             /** WrongVersion minorVersion */
-            minorVersion?: (string|null);
+            minorVersion?: (number|null);
         }
 
         /** Represents a WrongVersion. */
@@ -1111,10 +1111,10 @@ export namespace net64 {
             constructor(properties?: net64.server.IWrongVersion);
 
             /** WrongVersion majorVersion. */
-            public majorVersion: string;
+            public majorVersion: number;
 
             /** WrongVersion minorVersion. */
-            public minorVersion: string;
+            public minorVersion: number;
 
             /**
              * Creates a new WrongVersion instance using the specified properties.

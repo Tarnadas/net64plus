@@ -19,6 +19,6 @@ message ServerFull {
 }
 
 message WrongVersion {
-  string major_version = 1;
-  string minor_version = 2;
+  uint32 major_version = 1;
+  uint32 minor_version = 2;
 }

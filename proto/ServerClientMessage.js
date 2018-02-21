@@ -2836,8 +2836,8 @@ $root.net64 = (function() {
              * Properties of a WrongVersion.
              * @memberof net64.server
              * @interface IWrongVersion
-             * @property {string|null} [majorVersion] WrongVersion majorVersion
-             * @property {string|null} [minorVersion] WrongVersion minorVersion
+             * @property {number|null} [majorVersion] WrongVersion majorVersion
+             * @property {number|null} [minorVersion] WrongVersion minorVersion
              */
 
             /**
@@ -2857,19 +2857,19 @@ $root.net64 = (function() {
 
             /**
              * WrongVersion majorVersion.
-             * @member {string} majorVersion
+             * @member {number} majorVersion
              * @memberof net64.server.WrongVersion
              * @instance
              */
-            WrongVersion.prototype.majorVersion = "";
+            WrongVersion.prototype.majorVersion = 0;
 
             /**
              * WrongVersion minorVersion.
-             * @member {string} minorVersion
+             * @member {number} minorVersion
              * @memberof net64.server.WrongVersion
              * @instance
              */
-            WrongVersion.prototype.minorVersion = "";
+            WrongVersion.prototype.minorVersion = 0;
 
             /**
              * Creates a new WrongVersion instance using the specified properties.
@@ -2896,9 +2896,9 @@ $root.net64 = (function() {
                 if (!writer)
                     writer = $Writer.create();
                 if (message.majorVersion != null && message.hasOwnProperty("majorVersion"))
-                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.majorVersion);
+                    writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.majorVersion);
                 if (message.minorVersion != null && message.hasOwnProperty("minorVersion"))
-                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.minorVersion);
+                    writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.minorVersion);
                 return writer;
             };
 
@@ -2934,10 +2934,10 @@ $root.net64 = (function() {
                     var tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
-                        message.majorVersion = reader.string();
+                        message.majorVersion = reader.uint32();
                         break;
                     case 2:
-                        message.minorVersion = reader.string();
+                        message.minorVersion = reader.uint32();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -2975,11 +2975,11 @@ $root.net64 = (function() {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
                 if (message.majorVersion != null && message.hasOwnProperty("majorVersion"))
-                    if (!$util.isString(message.majorVersion))
-                        return "majorVersion: string expected";
+                    if (!$util.isInteger(message.majorVersion))
+                        return "majorVersion: integer expected";
                 if (message.minorVersion != null && message.hasOwnProperty("minorVersion"))
-                    if (!$util.isString(message.minorVersion))
-                        return "minorVersion: string expected";
+                    if (!$util.isInteger(message.minorVersion))
+                        return "minorVersion: integer expected";
                 return null;
             };
 
@@ -2996,9 +2996,9 @@ $root.net64 = (function() {
                     return object;
                 var message = new $root.net64.server.WrongVersion();
                 if (object.majorVersion != null)
-                    message.majorVersion = String(object.majorVersion);
+                    message.majorVersion = object.majorVersion >>> 0;
                 if (object.minorVersion != null)
-                    message.minorVersion = String(object.minorVersion);
+                    message.minorVersion = object.minorVersion >>> 0;
                 return message;
             };
 
@@ -3016,8 +3016,8 @@ $root.net64 = (function() {
                     options = {};
                 var object = {};
                 if (options.defaults) {
-                    object.majorVersion = "";
-                    object.minorVersion = "";
+                    object.majorVersion = 0;
+                    object.minorVersion = 0;
                 }
                 if (message.majorVersion != null && message.hasOwnProperty("majorVersion"))
                     object.majorVersion = message.majorVersion;
