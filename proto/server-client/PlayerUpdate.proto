@@ -6,7 +6,7 @@ package net64.server;
 
 message PlayerUpdate {
   uint32 player_id = 1; 
-  Player player = 2; 
+  net64.shared.Player player = 2; 
 }
 
 message PlayerListUpdate {

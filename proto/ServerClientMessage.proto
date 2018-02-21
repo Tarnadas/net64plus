@@ -6,10 +6,10 @@ import "shared/Compression.proto";
 package net64;
 
 message ServerClientMessage {
-  Compression compression = 1;
+  net64.shared.Compression compression = 1;
   uint32 uncompressed_size = 2;
   oneof message {
     bytes compressed_data = 3;
-    ServerClient data = 4;
+    net64.server.ServerClient data = 4;
   }
 }

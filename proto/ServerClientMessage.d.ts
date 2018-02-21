@@ -280,6 +280,9 @@ export namespace net64 {
             /** Handshake playerId */
             playerId?: (number|null);
 
+            /** Handshake gameMode */
+            gameMode?: (net64.shared.IGameMode|null);
+
             /** Handshake playerList */
             playerList?: (net64.server.IPlayerListUpdate|null);
         }
@@ -295,6 +298,9 @@ export namespace net64 {
 
             /** Handshake playerId. */
             public playerId: number;
+
+            /** Handshake gameMode. */
+            public gameMode?: (net64.shared.IGameMode|null);
 
             /** Handshake playerList. */
             public playerList?: (net64.server.IPlayerListUpdate|null);
@@ -566,7 +572,7 @@ export namespace net64 {
             connectionDenied?: (net64.server.IConnectionDenied|null);
 
             /** ServerMessage gameMode */
-            gameMode?: (net64.server.IGameMode|null);
+            gameMode?: (net64.shared.IGameMode|null);
 
             /** ServerMessage serverToken */
             serverToken?: (net64.server.IServerToken|null);
@@ -588,7 +594,7 @@ export namespace net64 {
             public connectionDenied?: (net64.server.IConnectionDenied|null);
 
             /** ServerMessage gameMode. */
-            public gameMode?: (net64.server.IGameMode|null);
+            public gameMode?: (net64.shared.IGameMode|null);
 
             /** ServerMessage serverToken. */
             public serverToken?: (net64.server.IServerToken|null);
@@ -674,111 +680,6 @@ export namespace net64 {
                 CONNECTION_DENIED = 0,
                 GAME_MODE = 1,
                 SERVER_TOKEN = 2
-            }
-        }
-
-        /** Properties of a GameMode. */
-        interface IGameMode {
-
-            /** GameMode gameMode */
-            gameMode?: (net64.server.GameMode.GameModeType|null);
-        }
-
-        /** Represents a GameMode. */
-        class GameMode implements IGameMode {
-
-            /**
-             * Constructs a new GameMode.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: net64.server.IGameMode);
-
-            /** GameMode gameMode. */
-            public gameMode: net64.server.GameMode.GameModeType;
-
-            /**
-             * Creates a new GameMode instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns GameMode instance
-             */
-            public static create(properties?: net64.server.IGameMode): net64.server.GameMode;
-
-            /**
-             * Encodes the specified GameMode message. Does not implicitly {@link net64.server.GameMode.verify|verify} messages.
-             * @param message GameMode message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: net64.server.IGameMode, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified GameMode message, length delimited. Does not implicitly {@link net64.server.GameMode.verify|verify} messages.
-             * @param message GameMode message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: net64.server.IGameMode, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a GameMode message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns GameMode
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): net64.server.GameMode;
-
-            /**
-             * Decodes a GameMode message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns GameMode
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): net64.server.GameMode;
-
-            /**
-             * Verifies a GameMode message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates a GameMode message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns GameMode
-             */
-            public static fromObject(object: { [k: string]: any }): net64.server.GameMode;
-
-            /**
-             * Creates a plain object from a GameMode message. Also converts values to other types if specified.
-             * @param message GameMode
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: net64.server.GameMode, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this GameMode to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-        }
-
-        namespace GameMode {
-
-            /** GameModeType enum. */
-            enum GameModeType {
-                NONE = 0,
-                DEFAULT = 1,
-                THIRD_PERSON_SHOOTER = 2,
-                INTERACTIONLESS = 3,
-                PROP_HUNT = 4,
-                BOSS_RUSH = 5,
-                TAG = 6,
-                WARIO_WARE = 8
             }
         }
 
@@ -1292,6 +1193,111 @@ export namespace net64 {
 
     /** Namespace shared. */
     namespace shared {
+
+        /** Properties of a GameMode. */
+        interface IGameMode {
+
+            /** GameMode gameMode */
+            gameMode?: (net64.shared.GameMode.GameModeType|null);
+        }
+
+        /** Represents a GameMode. */
+        class GameMode implements IGameMode {
+
+            /**
+             * Constructs a new GameMode.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: net64.shared.IGameMode);
+
+            /** GameMode gameMode. */
+            public gameMode: net64.shared.GameMode.GameModeType;
+
+            /**
+             * Creates a new GameMode instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns GameMode instance
+             */
+            public static create(properties?: net64.shared.IGameMode): net64.shared.GameMode;
+
+            /**
+             * Encodes the specified GameMode message. Does not implicitly {@link net64.shared.GameMode.verify|verify} messages.
+             * @param message GameMode message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: net64.shared.IGameMode, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified GameMode message, length delimited. Does not implicitly {@link net64.shared.GameMode.verify|verify} messages.
+             * @param message GameMode message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: net64.shared.IGameMode, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a GameMode message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns GameMode
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): net64.shared.GameMode;
+
+            /**
+             * Decodes a GameMode message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns GameMode
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): net64.shared.GameMode;
+
+            /**
+             * Verifies a GameMode message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a GameMode message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns GameMode
+             */
+            public static fromObject(object: { [k: string]: any }): net64.shared.GameMode;
+
+            /**
+             * Creates a plain object from a GameMode message. Also converts values to other types if specified.
+             * @param message GameMode
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: net64.shared.GameMode, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this GameMode to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+        }
+
+        namespace GameMode {
+
+            /** GameModeType enum. */
+            enum GameModeType {
+                NONE = 0,
+                DEFAULT = 1,
+                THIRD_PERSON_SHOOTER = 2,
+                INTERACTIONLESS = 3,
+                PROP_HUNT = 4,
+                BOSS_RUSH = 5,
+                TAG = 6,
+                WARIO_WARE = 8
+            }
+        }
 
         /** Properties of a Player. */
         interface IPlayer {

@@ -25,12 +25,12 @@ message ServerClient {
   MessageType message_type = 1;
   oneof message {
     Handshake handshake = 2;
-    Ping ping = 3;
+    net64.shared.Ping ping = 3;
     ServerMessage server_message = 4;
     PlayerListUpdate player_list_update = 5;
     PlayerUpdate player_update = 6;
     PlayerData player_data = 128;
-    MetaData meta_data = 129;
-    Chat chat = 130;
+    net64.shared.MetaData meta_data = 129;
+    net64.shared.Chat chat = 130;
   }
 }

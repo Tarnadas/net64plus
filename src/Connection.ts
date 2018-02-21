@@ -14,7 +14,8 @@ const { ClientServerMessage } = ClientProto.net64
 const { Compression, Chat } = ClientProto.net64.shared
 const { ClientServer } = ClientProto.net64.client
 const { ServerClientMessage } = ServerProto.net64
-const { ServerClient, ServerMessage, ConnectionDenied, GameMode } = ServerProto.net64.server
+const { ServerClient, ServerMessage, ConnectionDenied } = ServerProto.net64.server
+const { GameMode } = ServerProto.net64.shared
 
 const UPDATE_INTERVAL = 32
 const DECODER = new TextDecoder('utf-8')

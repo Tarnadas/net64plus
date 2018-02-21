@@ -888,6 +888,7 @@ $root.net64 = (function() {
              * @memberof net64.server
              * @interface IHandshake
              * @property {number|null} [playerId] Handshake playerId
+             * @property {net64.shared.IGameMode|null} [gameMode] Handshake gameMode
              * @property {net64.server.IPlayerListUpdate|null} [playerList] Handshake playerList
              */
 
@@ -913,6 +914,14 @@ $root.net64 = (function() {
              * @instance
              */
             Handshake.prototype.playerId = 0;
+
+            /**
+             * Handshake gameMode.
+             * @member {net64.shared.IGameMode|null|undefined} gameMode
+             * @memberof net64.server.Handshake
+             * @instance
+             */
+            Handshake.prototype.gameMode = null;
 
             /**
              * Handshake playerList.
@@ -948,8 +957,10 @@ $root.net64 = (function() {
                     writer = $Writer.create();
                 if (message.playerId != null && message.hasOwnProperty("playerId"))
                     writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.playerId);
+                if (message.gameMode != null && message.hasOwnProperty("gameMode"))
+                    $root.net64.shared.GameMode.encode(message.gameMode, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                 if (message.playerList != null && message.hasOwnProperty("playerList"))
-                    $root.net64.server.PlayerListUpdate.encode(message.playerList, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    $root.net64.server.PlayerListUpdate.encode(message.playerList, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                 return writer;
             };
 
@@ -988,6 +999,9 @@ $root.net64 = (function() {
                         message.playerId = reader.uint32();
                         break;
                     case 2:
+                        message.gameMode = $root.net64.shared.GameMode.decode(reader, reader.uint32());
+                        break;
+                    case 3:
                         message.playerList = $root.net64.server.PlayerListUpdate.decode(reader, reader.uint32());
                         break;
                     default:
@@ -1028,6 +1042,11 @@ $root.net64 = (function() {
                 if (message.playerId != null && message.hasOwnProperty("playerId"))
                     if (!$util.isInteger(message.playerId))
                         return "playerId: integer expected";
+                if (message.gameMode != null && message.hasOwnProperty("gameMode")) {
+                    var error = $root.net64.shared.GameMode.verify(message.gameMode);
+                    if (error)
+                        return "gameMode." + error;
+                }
                 if (message.playerList != null && message.hasOwnProperty("playerList")) {
                     var error = $root.net64.server.PlayerListUpdate.verify(message.playerList);
                     if (error)
@@ -1050,6 +1069,11 @@ $root.net64 = (function() {
                 var message = new $root.net64.server.Handshake();
                 if (object.playerId != null)
                     message.playerId = object.playerId >>> 0;
+                if (object.gameMode != null) {
+                    if (typeof object.gameMode !== "object")
+                        throw TypeError(".net64.server.Handshake.gameMode: object expected");
+                    message.gameMode = $root.net64.shared.GameMode.fromObject(object.gameMode);
+                }
                 if (object.playerList != null) {
                     if (typeof object.playerList !== "object")
                         throw TypeError(".net64.server.Handshake.playerList: object expected");
@@ -1073,10 +1097,13 @@ $root.net64 = (function() {
                 var object = {};
                 if (options.defaults) {
                     object.playerId = 0;
+                    object.gameMode = null;
                     object.playerList = null;
                 }
                 if (message.playerId != null && message.hasOwnProperty("playerId"))
                     object.playerId = message.playerId;
+                if (message.gameMode != null && message.hasOwnProperty("gameMode"))
+                    object.gameMode = $root.net64.shared.GameMode.toObject(message.gameMode, options);
                 if (message.playerList != null && message.hasOwnProperty("playerList"))
                     object.playerList = $root.net64.server.PlayerListUpdate.toObject(message.playerList, options);
                 return object;
@@ -1527,7 +1554,7 @@ $root.net64 = (function() {
              * @interface IServerMessage
              * @property {net64.server.ServerMessage.MessageType|null} [messageType] ServerMessage messageType
              * @property {net64.server.IConnectionDenied|null} [connectionDenied] ServerMessage connectionDenied
-             * @property {net64.server.IGameMode|null} [gameMode] ServerMessage gameMode
+             * @property {net64.shared.IGameMode|null} [gameMode] ServerMessage gameMode
              * @property {net64.server.IServerToken|null} [serverToken] ServerMessage serverToken
              */
 
@@ -1564,7 +1591,7 @@ $root.net64 = (function() {
 
             /**
              * ServerMessage gameMode.
-             * @member {net64.server.IGameMode|null|undefined} gameMode
+             * @member {net64.shared.IGameMode|null|undefined} gameMode
              * @memberof net64.server.ServerMessage
              * @instance
              */
@@ -1621,7 +1648,7 @@ $root.net64 = (function() {
                 if (message.connectionDenied != null && message.hasOwnProperty("connectionDenied"))
                     $root.net64.server.ConnectionDenied.encode(message.connectionDenied, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                 if (message.gameMode != null && message.hasOwnProperty("gameMode"))
-                    $root.net64.server.GameMode.encode(message.gameMode, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    $root.net64.shared.GameMode.encode(message.gameMode, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                 if (message.serverToken != null && message.hasOwnProperty("serverToken"))
                     $root.net64.server.ServerToken.encode(message.serverToken, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                 return writer;
@@ -1665,7 +1692,7 @@ $root.net64 = (function() {
                         message.connectionDenied = $root.net64.server.ConnectionDenied.decode(reader, reader.uint32());
                         break;
                     case 3:
-                        message.gameMode = $root.net64.server.GameMode.decode(reader, reader.uint32());
+                        message.gameMode = $root.net64.shared.GameMode.decode(reader, reader.uint32());
                         break;
                     case 4:
                         message.serverToken = $root.net64.server.ServerToken.decode(reader, reader.uint32());
@@ -1728,7 +1755,7 @@ $root.net64 = (function() {
                         return "message: multiple values";
                     properties.message = 1;
                     {
-                        var error = $root.net64.server.GameMode.verify(message.gameMode);
+                        var error = $root.net64.shared.GameMode.verify(message.gameMode);
                         if (error)
                             return "gameMode." + error;
                     }
@@ -1780,7 +1807,7 @@ $root.net64 = (function() {
                 if (object.gameMode != null) {
                     if (typeof object.gameMode !== "object")
                         throw TypeError(".net64.server.ServerMessage.gameMode: object expected");
-                    message.gameMode = $root.net64.server.GameMode.fromObject(object.gameMode);
+                    message.gameMode = $root.net64.shared.GameMode.fromObject(object.gameMode);
                 }
                 if (object.serverToken != null) {
                     if (typeof object.serverToken !== "object")
@@ -1813,7 +1840,7 @@ $root.net64 = (function() {
                         object.message = "connectionDenied";
                 }
                 if (message.gameMode != null && message.hasOwnProperty("gameMode")) {
-                    object.gameMode = $root.net64.server.GameMode.toObject(message.gameMode, options);
+                    object.gameMode = $root.net64.shared.GameMode.toObject(message.gameMode, options);
                     if (options.oneofs)
                         object.message = "gameMode";
                 }
@@ -1853,262 +1880,6 @@ $root.net64 = (function() {
             })();
 
             return ServerMessage;
-        })();
-
-        server.GameMode = (function() {
-
-            /**
-             * Properties of a GameMode.
-             * @memberof net64.server
-             * @interface IGameMode
-             * @property {net64.server.GameMode.GameModeType|null} [gameMode] GameMode gameMode
-             */
-
-            /**
-             * Constructs a new GameMode.
-             * @memberof net64.server
-             * @classdesc Represents a GameMode.
-             * @implements IGameMode
-             * @constructor
-             * @param {net64.server.IGameMode=} [properties] Properties to set
-             */
-            function GameMode(properties) {
-                if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
-                            this[keys[i]] = properties[keys[i]];
-            }
-
-            /**
-             * GameMode gameMode.
-             * @member {net64.server.GameMode.GameModeType} gameMode
-             * @memberof net64.server.GameMode
-             * @instance
-             */
-            GameMode.prototype.gameMode = 0;
-
-            /**
-             * Creates a new GameMode instance using the specified properties.
-             * @function create
-             * @memberof net64.server.GameMode
-             * @static
-             * @param {net64.server.IGameMode=} [properties] Properties to set
-             * @returns {net64.server.GameMode} GameMode instance
-             */
-            GameMode.create = function create(properties) {
-                return new GameMode(properties);
-            };
-
-            /**
-             * Encodes the specified GameMode message. Does not implicitly {@link net64.server.GameMode.verify|verify} messages.
-             * @function encode
-             * @memberof net64.server.GameMode
-             * @static
-             * @param {net64.server.IGameMode} message GameMode message or plain object to encode
-             * @param {$protobuf.Writer} [writer] Writer to encode to
-             * @returns {$protobuf.Writer} Writer
-             */
-            GameMode.encode = function encode(message, writer) {
-                if (!writer)
-                    writer = $Writer.create();
-                if (message.gameMode != null && message.hasOwnProperty("gameMode"))
-                    writer.uint32(/* id 1, wireType 0 =*/8).int32(message.gameMode);
-                return writer;
-            };
-
-            /**
-             * Encodes the specified GameMode message, length delimited. Does not implicitly {@link net64.server.GameMode.verify|verify} messages.
-             * @function encodeDelimited
-             * @memberof net64.server.GameMode
-             * @static
-             * @param {net64.server.IGameMode} message GameMode message or plain object to encode
-             * @param {$protobuf.Writer} [writer] Writer to encode to
-             * @returns {$protobuf.Writer} Writer
-             */
-            GameMode.encodeDelimited = function encodeDelimited(message, writer) {
-                return this.encode(message, writer).ldelim();
-            };
-
-            /**
-             * Decodes a GameMode message from the specified reader or buffer.
-             * @function decode
-             * @memberof net64.server.GameMode
-             * @static
-             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-             * @param {number} [length] Message length if known beforehand
-             * @returns {net64.server.GameMode} GameMode
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            GameMode.decode = function decode(reader, length) {
-                if (!(reader instanceof $Reader))
-                    reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.net64.server.GameMode();
-                while (reader.pos < end) {
-                    var tag = reader.uint32();
-                    switch (tag >>> 3) {
-                    case 1:
-                        message.gameMode = reader.int32();
-                        break;
-                    default:
-                        reader.skipType(tag & 7);
-                        break;
-                    }
-                }
-                return message;
-            };
-
-            /**
-             * Decodes a GameMode message from the specified reader or buffer, length delimited.
-             * @function decodeDelimited
-             * @memberof net64.server.GameMode
-             * @static
-             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-             * @returns {net64.server.GameMode} GameMode
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            GameMode.decodeDelimited = function decodeDelimited(reader) {
-                if (!(reader instanceof $Reader))
-                    reader = new $Reader(reader);
-                return this.decode(reader, reader.uint32());
-            };
-
-            /**
-             * Verifies a GameMode message.
-             * @function verify
-             * @memberof net64.server.GameMode
-             * @static
-             * @param {Object.<string,*>} message Plain object to verify
-             * @returns {string|null} `null` if valid, otherwise the reason why it is not
-             */
-            GameMode.verify = function verify(message) {
-                if (typeof message !== "object" || message === null)
-                    return "object expected";
-                if (message.gameMode != null && message.hasOwnProperty("gameMode"))
-                    switch (message.gameMode) {
-                    default:
-                        return "gameMode: enum value expected";
-                    case 0:
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                    case 5:
-                    case 6:
-                    case 8:
-                        break;
-                    }
-                return null;
-            };
-
-            /**
-             * Creates a GameMode message from a plain object. Also converts values to their respective internal types.
-             * @function fromObject
-             * @memberof net64.server.GameMode
-             * @static
-             * @param {Object.<string,*>} object Plain object
-             * @returns {net64.server.GameMode} GameMode
-             */
-            GameMode.fromObject = function fromObject(object) {
-                if (object instanceof $root.net64.server.GameMode)
-                    return object;
-                var message = new $root.net64.server.GameMode();
-                switch (object.gameMode) {
-                case "NONE":
-                case 0:
-                    message.gameMode = 0;
-                    break;
-                case "DEFAULT":
-                case 1:
-                    message.gameMode = 1;
-                    break;
-                case "THIRD_PERSON_SHOOTER":
-                case 2:
-                    message.gameMode = 2;
-                    break;
-                case "INTERACTIONLESS":
-                case 3:
-                    message.gameMode = 3;
-                    break;
-                case "PROP_HUNT":
-                case 4:
-                    message.gameMode = 4;
-                    break;
-                case "BOSS_RUSH":
-                case 5:
-                    message.gameMode = 5;
-                    break;
-                case "TAG":
-                case 6:
-                    message.gameMode = 6;
-                    break;
-                case "WARIO_WARE":
-                case 8:
-                    message.gameMode = 8;
-                    break;
-                }
-                return message;
-            };
-
-            /**
-             * Creates a plain object from a GameMode message. Also converts values to other types if specified.
-             * @function toObject
-             * @memberof net64.server.GameMode
-             * @static
-             * @param {net64.server.GameMode} message GameMode
-             * @param {$protobuf.IConversionOptions} [options] Conversion options
-             * @returns {Object.<string,*>} Plain object
-             */
-            GameMode.toObject = function toObject(message, options) {
-                if (!options)
-                    options = {};
-                var object = {};
-                if (options.defaults)
-                    object.gameMode = options.enums === String ? "NONE" : 0;
-                if (message.gameMode != null && message.hasOwnProperty("gameMode"))
-                    object.gameMode = options.enums === String ? $root.net64.server.GameMode.GameModeType[message.gameMode] : message.gameMode;
-                return object;
-            };
-
-            /**
-             * Converts this GameMode to JSON.
-             * @function toJSON
-             * @memberof net64.server.GameMode
-             * @instance
-             * @returns {Object.<string,*>} JSON object
-             */
-            GameMode.prototype.toJSON = function toJSON() {
-                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-            };
-
-            /**
-             * GameModeType enum.
-             * @name net64.server.GameMode.GameModeType
-             * @enum {string}
-             * @property {number} NONE=0 NONE value
-             * @property {number} DEFAULT=1 DEFAULT value
-             * @property {number} THIRD_PERSON_SHOOTER=2 THIRD_PERSON_SHOOTER value
-             * @property {number} INTERACTIONLESS=3 INTERACTIONLESS value
-             * @property {number} PROP_HUNT=4 PROP_HUNT value
-             * @property {number} BOSS_RUSH=5 BOSS_RUSH value
-             * @property {number} TAG=6 TAG value
-             * @property {number} WARIO_WARE=8 WARIO_WARE value
-             */
-            GameMode.GameModeType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
-                values[valuesById[0] = "NONE"] = 0;
-                values[valuesById[1] = "DEFAULT"] = 1;
-                values[valuesById[2] = "THIRD_PERSON_SHOOTER"] = 2;
-                values[valuesById[3] = "INTERACTIONLESS"] = 3;
-                values[valuesById[4] = "PROP_HUNT"] = 4;
-                values[valuesById[5] = "BOSS_RUSH"] = 5;
-                values[valuesById[6] = "TAG"] = 6;
-                values[valuesById[8] = "WARIO_WARE"] = 8;
-                return values;
-            })();
-
-            return GameMode;
         })();
 
         server.ServerToken = (function() {
@@ -3286,6 +3057,262 @@ $root.net64 = (function() {
          * @namespace
          */
         var shared = {};
+
+        shared.GameMode = (function() {
+
+            /**
+             * Properties of a GameMode.
+             * @memberof net64.shared
+             * @interface IGameMode
+             * @property {net64.shared.GameMode.GameModeType|null} [gameMode] GameMode gameMode
+             */
+
+            /**
+             * Constructs a new GameMode.
+             * @memberof net64.shared
+             * @classdesc Represents a GameMode.
+             * @implements IGameMode
+             * @constructor
+             * @param {net64.shared.IGameMode=} [properties] Properties to set
+             */
+            function GameMode(properties) {
+                if (properties)
+                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * GameMode gameMode.
+             * @member {net64.shared.GameMode.GameModeType} gameMode
+             * @memberof net64.shared.GameMode
+             * @instance
+             */
+            GameMode.prototype.gameMode = 0;
+
+            /**
+             * Creates a new GameMode instance using the specified properties.
+             * @function create
+             * @memberof net64.shared.GameMode
+             * @static
+             * @param {net64.shared.IGameMode=} [properties] Properties to set
+             * @returns {net64.shared.GameMode} GameMode instance
+             */
+            GameMode.create = function create(properties) {
+                return new GameMode(properties);
+            };
+
+            /**
+             * Encodes the specified GameMode message. Does not implicitly {@link net64.shared.GameMode.verify|verify} messages.
+             * @function encode
+             * @memberof net64.shared.GameMode
+             * @static
+             * @param {net64.shared.IGameMode} message GameMode message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            GameMode.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.gameMode != null && message.hasOwnProperty("gameMode"))
+                    writer.uint32(/* id 1, wireType 0 =*/8).int32(message.gameMode);
+                return writer;
+            };
+
+            /**
+             * Encodes the specified GameMode message, length delimited. Does not implicitly {@link net64.shared.GameMode.verify|verify} messages.
+             * @function encodeDelimited
+             * @memberof net64.shared.GameMode
+             * @static
+             * @param {net64.shared.IGameMode} message GameMode message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            GameMode.encodeDelimited = function encodeDelimited(message, writer) {
+                return this.encode(message, writer).ldelim();
+            };
+
+            /**
+             * Decodes a GameMode message from the specified reader or buffer.
+             * @function decode
+             * @memberof net64.shared.GameMode
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {net64.shared.GameMode} GameMode
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            GameMode.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.net64.shared.GameMode();
+                while (reader.pos < end) {
+                    var tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.gameMode = reader.int32();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Decodes a GameMode message from the specified reader or buffer, length delimited.
+             * @function decodeDelimited
+             * @memberof net64.shared.GameMode
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @returns {net64.shared.GameMode} GameMode
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            GameMode.decodeDelimited = function decodeDelimited(reader) {
+                if (!(reader instanceof $Reader))
+                    reader = new $Reader(reader);
+                return this.decode(reader, reader.uint32());
+            };
+
+            /**
+             * Verifies a GameMode message.
+             * @function verify
+             * @memberof net64.shared.GameMode
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            GameMode.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.gameMode != null && message.hasOwnProperty("gameMode"))
+                    switch (message.gameMode) {
+                    default:
+                        return "gameMode: enum value expected";
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 8:
+                        break;
+                    }
+                return null;
+            };
+
+            /**
+             * Creates a GameMode message from a plain object. Also converts values to their respective internal types.
+             * @function fromObject
+             * @memberof net64.shared.GameMode
+             * @static
+             * @param {Object.<string,*>} object Plain object
+             * @returns {net64.shared.GameMode} GameMode
+             */
+            GameMode.fromObject = function fromObject(object) {
+                if (object instanceof $root.net64.shared.GameMode)
+                    return object;
+                var message = new $root.net64.shared.GameMode();
+                switch (object.gameMode) {
+                case "NONE":
+                case 0:
+                    message.gameMode = 0;
+                    break;
+                case "DEFAULT":
+                case 1:
+                    message.gameMode = 1;
+                    break;
+                case "THIRD_PERSON_SHOOTER":
+                case 2:
+                    message.gameMode = 2;
+                    break;
+                case "INTERACTIONLESS":
+                case 3:
+                    message.gameMode = 3;
+                    break;
+                case "PROP_HUNT":
+                case 4:
+                    message.gameMode = 4;
+                    break;
+                case "BOSS_RUSH":
+                case 5:
+                    message.gameMode = 5;
+                    break;
+                case "TAG":
+                case 6:
+                    message.gameMode = 6;
+                    break;
+                case "WARIO_WARE":
+                case 8:
+                    message.gameMode = 8;
+                    break;
+                }
+                return message;
+            };
+
+            /**
+             * Creates a plain object from a GameMode message. Also converts values to other types if specified.
+             * @function toObject
+             * @memberof net64.shared.GameMode
+             * @static
+             * @param {net64.shared.GameMode} message GameMode
+             * @param {$protobuf.IConversionOptions} [options] Conversion options
+             * @returns {Object.<string,*>} Plain object
+             */
+            GameMode.toObject = function toObject(message, options) {
+                if (!options)
+                    options = {};
+                var object = {};
+                if (options.defaults)
+                    object.gameMode = options.enums === String ? "NONE" : 0;
+                if (message.gameMode != null && message.hasOwnProperty("gameMode"))
+                    object.gameMode = options.enums === String ? $root.net64.shared.GameMode.GameModeType[message.gameMode] : message.gameMode;
+                return object;
+            };
+
+            /**
+             * Converts this GameMode to JSON.
+             * @function toJSON
+             * @memberof net64.shared.GameMode
+             * @instance
+             * @returns {Object.<string,*>} JSON object
+             */
+            GameMode.prototype.toJSON = function toJSON() {
+                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            };
+
+            /**
+             * GameModeType enum.
+             * @name net64.shared.GameMode.GameModeType
+             * @enum {string}
+             * @property {number} NONE=0 NONE value
+             * @property {number} DEFAULT=1 DEFAULT value
+             * @property {number} THIRD_PERSON_SHOOTER=2 THIRD_PERSON_SHOOTER value
+             * @property {number} INTERACTIONLESS=3 INTERACTIONLESS value
+             * @property {number} PROP_HUNT=4 PROP_HUNT value
+             * @property {number} BOSS_RUSH=5 BOSS_RUSH value
+             * @property {number} TAG=6 TAG value
+             * @property {number} WARIO_WARE=8 WARIO_WARE value
+             */
+            GameMode.GameModeType = (function() {
+                var valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "NONE"] = 0;
+                values[valuesById[1] = "DEFAULT"] = 1;
+                values[valuesById[2] = "THIRD_PERSON_SHOOTER"] = 2;
+                values[valuesById[3] = "INTERACTIONLESS"] = 3;
+                values[valuesById[4] = "PROP_HUNT"] = 4;
+                values[valuesById[5] = "BOSS_RUSH"] = 5;
+                values[valuesById[6] = "TAG"] = 6;
+                values[valuesById[8] = "WARIO_WARE"] = 8;
+                return values;
+            })();
+
+            return GameMode;
+        })();
 
         shared.Player = (function() {
 

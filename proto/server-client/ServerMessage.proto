@@ -1,6 +1,7 @@
 syntax = "proto3";
 
-import "server-client/connection-denied/ConnectionDenied.proto";
+import "shared/GameMode.proto";
+import "server-client/ConnectionDenied.proto";
 
 package net64.server;
 
@@ -13,23 +14,9 @@ message ServerMessage {
   MessageType message_type = 1;
   oneof message {
     ConnectionDenied connection_denied = 2;
-    GameMode game_mode = 3;
+    net64.shared.GameMode game_mode = 3;
     ServerToken server_token = 4;
   }
-}
-
-message GameMode {
-  enum GameModeType {
-    NONE = 0;
-    DEFAULT = 1;
-    THIRD_PERSON_SHOOTER = 2;
-    INTERACTIONLESS = 3;
-    PROP_HUNT = 4;
-    BOSS_RUSH = 5;
-    TAG = 6;
-    WARIO_WARE = 8;
-  }
-  GameModeType game_mode = 1;
 }
 
 message ServerToken {
