@@ -2340,11 +2340,11 @@ $root.net64 = (function() {
                     return object;
                 var message = new $root.net64.shared.Chat();
                 switch (object.chatType) {
-                case "CHAT_GLOBAL":
+                case "GLOBAL":
                 case 0:
                     message.chatType = 0;
                     break;
-                case "CHAT_PRIVATE":
+                case "PRIVATE":
                 case 1:
                     message.chatType = 1;
                     break;
@@ -2380,7 +2380,7 @@ $root.net64 = (function() {
                     options = {};
                 var object = {};
                 if (options.defaults) {
-                    object.chatType = options.enums === String ? "CHAT_GLOBAL" : 0;
+                    object.chatType = options.enums === String ? "GLOBAL" : 0;
                     object.senderId = 0;
                     object.message = "";
                 }
@@ -2418,13 +2418,13 @@ $root.net64 = (function() {
              * ChatType enum.
              * @name net64.shared.Chat.ChatType
              * @enum {string}
-             * @property {number} CHAT_GLOBAL=0 CHAT_GLOBAL value
-             * @property {number} CHAT_PRIVATE=1 CHAT_PRIVATE value
+             * @property {number} GLOBAL=0 GLOBAL value
+             * @property {number} PRIVATE=1 PRIVATE value
              */
             Chat.ChatType = (function() {
                 var valuesById = {}, values = Object.create(valuesById);
-                values[valuesById[0] = "CHAT_GLOBAL"] = 0;
-                values[valuesById[1] = "CHAT_PRIVATE"] = 1;
+                values[valuesById[0] = "GLOBAL"] = 0;
+                values[valuesById[1] = "PRIVATE"] = 1;
                 return values;
             })();
 

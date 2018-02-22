@@ -961,8 +961,8 @@ export namespace net64 {
 
             /** ChatType enum. */
             enum ChatType {
-                CHAT_GLOBAL = 0,
-                CHAT_PRIVATE = 1
+                GLOBAL = 0,
+                PRIVATE = 1
             }
         }
 

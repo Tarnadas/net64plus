@@ -362,7 +362,7 @@ export class Connection {
     const senderId = chat.senderId
     if (!message || senderId == null) return
     switch (chat.chatType) {
-      case Chat.ChatType.CHAT_GLOBAL:
+      case Chat.ChatType.GLOBAL:
         if (store.getState().save.appSaveData.emuChat) {
           this.emulator.displayChatMessage(message)
         }
@@ -370,7 +370,7 @@ export class Connection {
         const username = this.server.players[senderId].username
         addGlobalMessage(message, username)
         break
-      case Chat.ChatType.CHAT_PRIVATE:
+      case Chat.ChatType.PRIVATE:
         // TODO
         break
     }
@@ -465,7 +465,7 @@ export class Connection {
       data: {
         messageType: ClientServer.MessageType.CHAT,
         chat: {
-          chatType: Chat.ChatType.CHAT_GLOBAL,
+          chatType: Chat.ChatType.GLOBAL,
           message
         }
       }
