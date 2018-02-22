@@ -1556,6 +1556,7 @@ $root.net64 = (function() {
              * @property {net64.server.IConnectionDenied|null} [connectionDenied] ServerMessage connectionDenied
              * @property {net64.shared.IGameMode|null} [gameMode] ServerMessage gameMode
              * @property {net64.server.IServerToken|null} [serverToken] ServerMessage serverToken
+             * @property {net64.server.IError|null} [error] ServerMessage error
              */
 
             /**
@@ -1605,17 +1606,25 @@ $root.net64 = (function() {
              */
             ServerMessage.prototype.serverToken = null;
 
+            /**
+             * ServerMessage error.
+             * @member {net64.server.IError|null|undefined} error
+             * @memberof net64.server.ServerMessage
+             * @instance
+             */
+            ServerMessage.prototype.error = null;
+
             // OneOf field names bound to virtual getters and setters
             var $oneOfFields;
 
             /**
              * ServerMessage message.
-             * @member {"connectionDenied"|"gameMode"|"serverToken"|undefined} message
+             * @member {"connectionDenied"|"gameMode"|"serverToken"|"error"|undefined} message
              * @memberof net64.server.ServerMessage
              * @instance
              */
             Object.defineProperty(ServerMessage.prototype, "message", {
-                get: $util.oneOfGetter($oneOfFields = ["connectionDenied", "gameMode", "serverToken"]),
+                get: $util.oneOfGetter($oneOfFields = ["connectionDenied", "gameMode", "serverToken", "error"]),
                 set: $util.oneOfSetter($oneOfFields)
             });
 
@@ -1651,6 +1660,8 @@ $root.net64 = (function() {
                     $root.net64.shared.GameMode.encode(message.gameMode, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                 if (message.serverToken != null && message.hasOwnProperty("serverToken"))
                     $root.net64.server.ServerToken.encode(message.serverToken, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                if (message.error != null && message.hasOwnProperty("error"))
+                    $root.net64.server.Error.encode(message.error, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                 return writer;
             };
 
@@ -1697,6 +1708,9 @@ $root.net64 = (function() {
                     case 4:
                         message.serverToken = $root.net64.server.ServerToken.decode(reader, reader.uint32());
                         break;
+                    case 5:
+                        message.error = $root.net64.server.Error.decode(reader, reader.uint32());
+                        break;
                     default:
                         reader.skipType(tag & 7);
                         break;
@@ -1740,6 +1754,7 @@ $root.net64 = (function() {
                     case 0:
                     case 1:
                     case 2:
+                    case 3:
                         break;
                     }
                 if (message.connectionDenied != null && message.hasOwnProperty("connectionDenied")) {
@@ -1770,6 +1785,16 @@ $root.net64 = (function() {
                             return "serverToken." + error;
                     }
                 }
+                if (message.error != null && message.hasOwnProperty("error")) {
+                    if (properties.message === 1)
+                        return "message: multiple values";
+                    properties.message = 1;
+                    {
+                        var error = $root.net64.server.Error.verify(message.error);
+                        if (error)
+                            return "error." + error;
+                    }
+                }
                 return null;
             };
 
@@ -1798,6 +1823,10 @@ $root.net64 = (function() {
                 case 2:
                     message.messageType = 2;
                     break;
+                case "ERROR":
+                case 3:
+                    message.messageType = 3;
+                    break;
                 }
                 if (object.connectionDenied != null) {
                     if (typeof object.connectionDenied !== "object")
@@ -1813,6 +1842,11 @@ $root.net64 = (function() {
                     if (typeof object.serverToken !== "object")
                         throw TypeError(".net64.server.ServerMessage.serverToken: object expected");
                     message.serverToken = $root.net64.server.ServerToken.fromObject(object.serverToken);
+                }
+                if (object.error != null) {
+                    if (typeof object.error !== "object")
+                        throw TypeError(".net64.server.ServerMessage.error: object expected");
+                    message.error = $root.net64.server.Error.fromObject(object.error);
                 }
                 return message;
             };
@@ -1849,6 +1883,11 @@ $root.net64 = (function() {
                     if (options.oneofs)
                         object.message = "serverToken";
                 }
+                if (message.error != null && message.hasOwnProperty("error")) {
+                    object.error = $root.net64.server.Error.toObject(message.error, options);
+                    if (options.oneofs)
+                        object.message = "error";
+                }
                 return object;
             };
 
@@ -1870,12 +1909,14 @@ $root.net64 = (function() {
              * @property {number} CONNECTION_DENIED=0 CONNECTION_DENIED value
              * @property {number} GAME_MODE=1 GAME_MODE value
              * @property {number} SERVER_TOKEN=2 SERVER_TOKEN value
+             * @property {number} ERROR=3 ERROR value
              */
             ServerMessage.MessageType = (function() {
                 var valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "CONNECTION_DENIED"] = 0;
                 values[valuesById[1] = "GAME_MODE"] = 1;
                 values[valuesById[2] = "SERVER_TOKEN"] = 2;
+                values[valuesById[3] = "ERROR"] = 3;
                 return values;
             })();
 
@@ -2117,6 +2158,264 @@ $root.net64 = (function() {
             })();
 
             return ServerToken;
+        })();
+
+        server.Error = (function() {
+
+            /**
+             * Properties of an Error.
+             * @memberof net64.server
+             * @interface IError
+             * @property {net64.server.Error.ErrorType|null} [errorType] Error errorType
+             * @property {string|null} [message] Error message
+             */
+
+            /**
+             * Constructs a new Error.
+             * @memberof net64.server
+             * @classdesc Represents an Error.
+             * @implements IError
+             * @constructor
+             * @param {net64.server.IError=} [properties] Properties to set
+             */
+            function Error(properties) {
+                if (properties)
+                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * Error errorType.
+             * @member {net64.server.Error.ErrorType} errorType
+             * @memberof net64.server.Error
+             * @instance
+             */
+            Error.prototype.errorType = 0;
+
+            /**
+             * Error message.
+             * @member {string} message
+             * @memberof net64.server.Error
+             * @instance
+             */
+            Error.prototype.message = "";
+
+            /**
+             * Creates a new Error instance using the specified properties.
+             * @function create
+             * @memberof net64.server.Error
+             * @static
+             * @param {net64.server.IError=} [properties] Properties to set
+             * @returns {net64.server.Error} Error instance
+             */
+            Error.create = function create(properties) {
+                return new Error(properties);
+            };
+
+            /**
+             * Encodes the specified Error message. Does not implicitly {@link net64.server.Error.verify|verify} messages.
+             * @function encode
+             * @memberof net64.server.Error
+             * @static
+             * @param {net64.server.IError} message Error message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            Error.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.errorType != null && message.hasOwnProperty("errorType"))
+                    writer.uint32(/* id 1, wireType 0 =*/8).int32(message.errorType);
+                if (message.message != null && message.hasOwnProperty("message"))
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.message);
+                return writer;
+            };
+
+            /**
+             * Encodes the specified Error message, length delimited. Does not implicitly {@link net64.server.Error.verify|verify} messages.
+             * @function encodeDelimited
+             * @memberof net64.server.Error
+             * @static
+             * @param {net64.server.IError} message Error message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            Error.encodeDelimited = function encodeDelimited(message, writer) {
+                return this.encode(message, writer).ldelim();
+            };
+
+            /**
+             * Decodes an Error message from the specified reader or buffer.
+             * @function decode
+             * @memberof net64.server.Error
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {net64.server.Error} Error
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            Error.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.net64.server.Error();
+                while (reader.pos < end) {
+                    var tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.errorType = reader.int32();
+                        break;
+                    case 2:
+                        message.message = reader.string();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Decodes an Error message from the specified reader or buffer, length delimited.
+             * @function decodeDelimited
+             * @memberof net64.server.Error
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @returns {net64.server.Error} Error
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            Error.decodeDelimited = function decodeDelimited(reader) {
+                if (!(reader instanceof $Reader))
+                    reader = new $Reader(reader);
+                return this.decode(reader, reader.uint32());
+            };
+
+            /**
+             * Verifies an Error message.
+             * @function verify
+             * @memberof net64.server.Error
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            Error.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.errorType != null && message.hasOwnProperty("errorType"))
+                    switch (message.errorType) {
+                    default:
+                        return "errorType: enum value expected";
+                    case 0:
+                    case 400:
+                    case 401:
+                    case 429:
+                    case 500:
+                        break;
+                    }
+                if (message.message != null && message.hasOwnProperty("message"))
+                    if (!$util.isString(message.message))
+                        return "message: string expected";
+                return null;
+            };
+
+            /**
+             * Creates an Error message from a plain object. Also converts values to their respective internal types.
+             * @function fromObject
+             * @memberof net64.server.Error
+             * @static
+             * @param {Object.<string,*>} object Plain object
+             * @returns {net64.server.Error} Error
+             */
+            Error.fromObject = function fromObject(object) {
+                if (object instanceof $root.net64.server.Error)
+                    return object;
+                var message = new $root.net64.server.Error();
+                switch (object.errorType) {
+                case "UNKNOWN":
+                case 0:
+                    message.errorType = 0;
+                    break;
+                case "BAD_REQUEST":
+                case 400:
+                    message.errorType = 400;
+                    break;
+                case "UNAUTHORIZED":
+                case 401:
+                    message.errorType = 401;
+                    break;
+                case "TOO_MANY_REQUESTS":
+                case 429:
+                    message.errorType = 429;
+                    break;
+                case "INTERNAL_SERVER_ERROR":
+                case 500:
+                    message.errorType = 500;
+                    break;
+                }
+                if (object.message != null)
+                    message.message = String(object.message);
+                return message;
+            };
+
+            /**
+             * Creates a plain object from an Error message. Also converts values to other types if specified.
+             * @function toObject
+             * @memberof net64.server.Error
+             * @static
+             * @param {net64.server.Error} message Error
+             * @param {$protobuf.IConversionOptions} [options] Conversion options
+             * @returns {Object.<string,*>} Plain object
+             */
+            Error.toObject = function toObject(message, options) {
+                if (!options)
+                    options = {};
+                var object = {};
+                if (options.defaults) {
+                    object.errorType = options.enums === String ? "UNKNOWN" : 0;
+                    object.message = "";
+                }
+                if (message.errorType != null && message.hasOwnProperty("errorType"))
+                    object.errorType = options.enums === String ? $root.net64.server.Error.ErrorType[message.errorType] : message.errorType;
+                if (message.message != null && message.hasOwnProperty("message"))
+                    object.message = message.message;
+                return object;
+            };
+
+            /**
+             * Converts this Error to JSON.
+             * @function toJSON
+             * @memberof net64.server.Error
+             * @instance
+             * @returns {Object.<string,*>} JSON object
+             */
+            Error.prototype.toJSON = function toJSON() {
+                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            };
+
+            /**
+             * ErrorType enum.
+             * @name net64.server.Error.ErrorType
+             * @enum {string}
+             * @property {number} UNKNOWN=0 UNKNOWN value
+             * @property {number} BAD_REQUEST=400 BAD_REQUEST value
+             * @property {number} UNAUTHORIZED=401 UNAUTHORIZED value
+             * @property {number} TOO_MANY_REQUESTS=429 TOO_MANY_REQUESTS value
+             * @property {number} INTERNAL_SERVER_ERROR=500 INTERNAL_SERVER_ERROR value
+             */
+            Error.ErrorType = (function() {
+                var valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "UNKNOWN"] = 0;
+                values[valuesById[400] = "BAD_REQUEST"] = 400;
+                values[valuesById[401] = "UNAUTHORIZED"] = 401;
+                values[valuesById[429] = "TOO_MANY_REQUESTS"] = 429;
+                values[valuesById[500] = "INTERNAL_SERVER_ERROR"] = 500;
+                return values;
+            })();
+
+            return Error;
         })();
 
         server.ConnectionDenied = (function() {

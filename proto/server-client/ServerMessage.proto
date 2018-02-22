@@ -10,12 +10,14 @@ message ServerMessage {
     CONNECTION_DENIED = 0;
     GAME_MODE = 1;
     SERVER_TOKEN = 2;
+    ERROR = 3;
   }
   MessageType message_type = 1;
   oneof message {
     ConnectionDenied connection_denied = 2;
     net64.shared.GameMode game_mode = 3;
     ServerToken server_token = 4;
+    Error error = 5;
   }
 }
 
@@ -26,4 +28,16 @@ message ServerToken {
   }
   TokenType token_type = 1;
   string signature = 2;
+}
+
+message Error {
+  enum ErrorType {
+    UNKNOWN = 0;
+    BAD_REQUEST = 400;
+    UNAUTHORIZED = 401;
+    TOO_MANY_REQUESTS = 429;
+    INTERNAL_SERVER_ERROR = 500;
+  }
+  ErrorType error_type = 1;
+  string message = 2;
 }
