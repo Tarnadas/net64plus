@@ -1,17 +1,22 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { connect, Dispatch } from 'react-redux'
 
 import { ConnectionArea } from '../areas/ConnectionArea'
 import { Net64ServerArea } from '../areas/Net64ServerArea'
 import { State } from '../../models/State.model'
 import { Connection } from '../../Connection'
+import { setConnectionError } from '../../actions/connection'
 
 interface BrowseViewProps {
+  dispatch: Dispatch<State>
   connection: Connection
   connectionError: string
 }
 
 class View extends React.PureComponent<BrowseViewProps> {
+  componentWillMount () {
+    this.props.dispatch(setConnectionError(''))
+  }
   render () {
     const connection = this.props.connection
     const connectionError = this.props.connectionError

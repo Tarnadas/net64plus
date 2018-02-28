@@ -130,7 +130,7 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
       if (emulator.baseAddress !== -1) {
         this.props.dispatch(setEmulator(emulator))
         this.props.dispatch(push('/browse'))
-        emulator.displayChatMessage('- Net64 connected -', 19)
+        emulator.displayChatMessage('- Net64 connected -')
       }
     }, 10)
     setTimeout(() => {
@@ -151,7 +151,8 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
       borderRadius: '6px',
       backgroundColor: 'rgb(212, 221, 165)',
       display: 'flex',
-      justifyContent: 'space-between'
+      justifyContent: 'space-between',
+      alignItems: 'center'
     }
     const onSelect = this.onSelectEmulator
     return emulators.map(

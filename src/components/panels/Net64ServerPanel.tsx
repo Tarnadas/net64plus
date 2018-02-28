@@ -83,7 +83,7 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
         characterId: this.props.characterId,
         onConnect: () => {
           this.props.dispatch(setConnection(connection))
-          this.props.emulator.displayChatMessage('- connected to server -', 23)
+          this.props.emulator.displayChatMessage('- connected to server -')
         },
         onError: (err: Error) => {
           let warning: string = String(err)

@@ -1,17 +1,22 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { connect, Dispatch } from 'react-redux'
 
 import { ConnectionArea } from '../areas/ConnectionArea'
 import { ConnectArea } from '../areas/ConnectArea'
 import { Connection } from '../../Connection'
+import { setConnectionError } from '../../actions/connection'
 import { State } from '../../models/State.model'
 
 interface ConnectViewProps {
+  dispatch: Dispatch<State>
   connection: Connection
   connectionError: string
 }
 
 class View extends React.PureComponent<ConnectViewProps> {
+  componentWillMount () {
+    this.props.dispatch(setConnectionError(''))
+  }
   render () {
     const connection = this.props.connection
     const connectionError = this.props.connectionError
