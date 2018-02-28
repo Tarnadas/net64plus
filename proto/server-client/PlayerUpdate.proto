@@ -2,11 +2,9 @@ syntax = "proto3";
 
 import "shared/Player.proto";
 
-package net64.server;
-
 message PlayerUpdate {
   uint32 player_id = 1; 
-  net64.shared.Player player = 2; 
+  Player player = 2; 
 }
 
 message PlayerListUpdate {

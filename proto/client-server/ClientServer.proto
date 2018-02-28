@@ -1,13 +1,11 @@
 syntax = "proto3";
 
-import "client-server/Handshake.proto";
+import "client-server/ClientHandshake.proto";
 import "shared/Ping.proto";
 import "shared/Player.proto";
-import "client-server/PlayerData.proto";
+import "shared/PlayerData.proto";
 import "shared/MetaData.proto";
 import "shared/Chat.proto";
-
-package net64.client;
 
 message ClientServer {
   enum MessageType {
@@ -21,11 +19,11 @@ message ClientServer {
   }
   MessageType message_type = 1;
   oneof message {
-    Handshake handshake = 2;
-    net64.shared.Ping ping = 3;
-    net64.shared.Player player = 6;
+    ClientHandshake handshake = 2;
+    Ping ping = 3;
+    Player player = 6;
     PlayerData player_data = 128;
-    net64.shared.MetaData meta_data = 129;
-    net64.shared.Chat chat = 130;
+    MetaData meta_data = 129;
+    Chat chat = 130;
   }
 }

@@ -1,6 +1,4 @@
 syntax = "proto3";
-
-package net64.shared;
  
 message Player { 
   string username = 1; 

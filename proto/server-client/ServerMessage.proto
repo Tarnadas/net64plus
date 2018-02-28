@@ -3,8 +3,6 @@ syntax = "proto3";
 import "shared/GameMode.proto";
 import "server-client/ConnectionDenied.proto";
 
-package net64.server;
-
 message ServerMessage {
   enum MessageType {
     CONNECTION_DENIED = 0;
@@ -15,7 +13,7 @@ message ServerMessage {
   MessageType message_type = 1;
   oneof message {
     ConnectionDenied connection_denied = 2;
-    net64.shared.GameMode game_mode = 3;
+    GameMode game_mode = 3;
     ServerToken server_token = 4;
     Error error = 5;
   }
@@ -27,7 +25,6 @@ message ServerToken {
     LOSE = 1;
   }
   TokenType token_type = 1;
-  string signature = 2;
 }
 
 message Error {

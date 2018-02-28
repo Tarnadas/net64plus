@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package net64.shared;
-
 message Chat {
   enum ChatType {
     GLOBAL = 0;

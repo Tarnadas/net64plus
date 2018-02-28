@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package net64.shared;
-
 message GameMode {
   enum GameModeType {
     NONE = 0;
