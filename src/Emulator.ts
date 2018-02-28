@@ -99,10 +99,12 @@ export class Emulator {
    * Write server flag to memory.
    * There must always be one user in charge of various decisions for minigames.
    *
-   * @param {Buffer} isServer - Server flag to write
+   * @param {boolean} hasToken - Whether player is server token holder
    */
-  public setServerFlag (isServer: Buffer): void {
-    this.writeMemory(0xFF5FFC, isServer)
+  public setServerFlag (hasToken: boolean): void {
+    const tokenBuffer = Buffer.allocUnsafe(1)
+    tokenBuffer.writeUInt8(+hasToken, 0)
+    this.writeMemory(0xFF5FFC, tokenBuffer)
   }
 
   /**

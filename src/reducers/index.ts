@@ -39,6 +39,7 @@ export function initReducer (history: History, electronSave: SaveState): Store<S
     },
     connection: {
       connection: null,
+      hasToken: false,
       error: ''
     },
     chat: {

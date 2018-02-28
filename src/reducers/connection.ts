@@ -14,9 +14,6 @@ export const connection = (state: ConnectionState = initialState.connection, act
       case 'SET_CONNECTION_ERROR':
         draft.error = action.error
         break
-      case 'DISCONNECT':
-        draft.connection = null
-        break
       case 'SET_PLAYERS':
         if (!draft.connection) return
         draft.connection.server.players = action.players
@@ -25,5 +22,12 @@ export const connection = (state: ConnectionState = initialState.connection, act
         if (!draft.connection) return
         if (!draft.connection.server.players) draft.connection.server.players = []
         draft.connection.server.players[action.playerId] = action.player
+        break
+      case 'HAS_TOKEN':
+        draft.hasToken = action.hasToken
+        break
+      case 'DISCONNECT':
+        draft.connection = null
+        break
     }
   })

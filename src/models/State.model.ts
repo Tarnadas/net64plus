@@ -35,6 +35,7 @@ export type EmulatorState = Readonly<EmulatorStateDraft>
 
 export interface ConnectionStateDraft {
   connection: Connection | null
+  hasToken: boolean
   error: string
 }
 export type ConnectionState = Readonly<ConnectionStateDraft>

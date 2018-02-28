@@ -2,9 +2,10 @@ import { Connection } from '../Connection'
 import {
   SetConnectionAction,
   SetConnectionErrorAction,
-  DisconnectAction,
   SetPlayersAction,
-  SetPlayerAction
+  SetPlayerAction,
+  HasTokenAction,
+  DisconnectAction
 } from './models/connection.model'
 import { Player } from '../models/Server.model'
 
@@ -22,12 +23,6 @@ export function setConnectionError (error: string): SetConnectionErrorAction {
   }
 }
 
-export function disconnect (): DisconnectAction {
-  return {
-    type: 'DISCONNECT'
-  }
-}
-
 export function setPlayers (players: Player[]): SetPlayersAction {
   return {
     type: 'SET_PLAYERS',
@@ -40,5 +35,18 @@ export function setPlayer (playerId: number, player: Player): SetPlayerAction {
     type: 'SET_PLAYER',
     playerId,
     player
+  }
+}
+
+export function hasToken (hasToken: boolean): HasTokenAction {
+  return {
+    type: 'HAS_TOKEN',
+    hasToken
+  }
+}
+
+export function disconnect (): DisconnectAction {
+  return {
+    type: 'DISCONNECT'
   }
 }

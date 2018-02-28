@@ -20,11 +20,16 @@ export interface SetPlayerAction extends Action {
   player: Player
 }
 
+export interface HasTokenAction extends Action {
+  hasToken: boolean
+}
+
 export type DisconnectAction = Action
 
 export type ConnectionAction =
   SetConnectionAction
   & SetConnectionErrorAction
-  & DisconnectAction
   & SetPlayersAction
   & SetPlayerAction
+  & HasTokenAction
+  & DisconnectAction
