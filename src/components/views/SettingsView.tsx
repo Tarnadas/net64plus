@@ -15,6 +15,7 @@ interface SettingsViewProps {
   saveData: ElectronSaveData
   emulator: Emulator
   connection: Connection
+  connectionError: string
 }
 
 interface SettingsViewState {
@@ -80,6 +81,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
   }
   render () {
     const warning = this.state.warning
+    const connectionError = this.props.connectionError
     const styles: React.CSSProperties = {
       view: {
         display: 'flex',
@@ -117,6 +119,10 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
           warning &&
           <WarningPanel warning={warning} />
         }
+        {
+          connectionError &&
+          <WarningPanel warning={connectionError} />
+        }
         <div style={styles.setting}>
           <div style={styles.label}>Username:</div>
           <input style={styles.input} value={this.state.username} onChange={this.onUsernameChange} />
@@ -132,9 +138,11 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
             <option value='5'>Toad</option>
             <option value='6'>Waluigi</option>
             <option value='7'>Rosalina</option>
-            <option value='8'>Sonic</option>
-            <option value='11'>Goomba</option>
-            <option value='12'>Kirby</option>
+            <option value='8'>9</option>
+            <option value='9'>10</option>
+            <option value='10'>11</option>
+            <option value='11'>12</option>
+            <option value='12'>13</option>
           </select>
         </div>
         <div style={styles.setting}>
@@ -169,5 +177,6 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
 export const SettingsView = connect((state: State) => ({
   saveData: state.save.appSaveData,
   emulator: state.emulator.instance,
-  connection: state.connection.connection
+  connection: state.connection.connection,
+  connectionError: state.connection.error
 }))(View)

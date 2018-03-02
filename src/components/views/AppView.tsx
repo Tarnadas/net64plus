@@ -47,9 +47,8 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
     }
   }
   componentWillReceiveProps (nextProps: AppViewProps) {
-    if (nextProps.location.pathname !== this.props.location.pathname) {
-      this.forcePath(nextProps)
-    }
+    if (nextProps.location.pathname === this.props.location.pathname && nextProps.emulator === this.props.emulator) return
+    this.forcePath(nextProps)
   }
   async updateCheck () {
     const version: string = process.env.VERSION || ''

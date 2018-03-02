@@ -1,7 +1,7 @@
 /.idea/
 /node_modules/
 /build/*
-!/build/patches/
+#!/build/patches/
 !/build/winprocess/
 !/build/img/
 !/build/styles/

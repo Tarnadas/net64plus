@@ -49,6 +49,8 @@ export class Connection {
 
   private hasError: boolean = false
 
+  private timer = Date.now()
+
   /**
    * Connection constructor.
    *
@@ -73,6 +75,7 @@ export class Connection {
    * Actively disconnect WebSocket connection.
    */
   public disconnect (): void {
+    this.onClose(0)
     this.ws.close()
   }
 
@@ -235,7 +238,7 @@ export class Connection {
         this.onWrongVersion(connectionDenied)
         break
     }
-    this.ws.close()
+    this.disconnect()
   }
 
   /**
@@ -384,8 +387,32 @@ export class Connection {
    * Send all packets to connected server.
    */
   private sendAll (): void {
-    this.sendPlayerData()
-    this.sendMetaData()
+    try {
+      this.sendPlayerData()
+      this.sendMetaData()
+      if (process.env.NODE_ENV === 'development') {
+        this.printPlayerData()
+      }
+    } catch (err) {
+      // Emulator might have been closed
+      this.disconnect()
+      this.emulator.disconnect()
+    }
+  }
+
+  private printPlayerData (): void {
+    if (Date.now() - this.timer < 10000) return
+    const buffers = []
+    for (let i = 0; i < 24; i++) {
+      buffers.push(this.buf2hex(this.emulator.readMemory(0xFF7700 + i * 0x100, 0x1C)))
+    }
+    console.info('Player Buffers:', buffers.reduce((prev, current) => prev + '\n' + current, ''))
+    console.info('0xFF5FF0: ', this.buf2hex(this.emulator.readMemory(0xFF5FF0, 0x10)))
+    this.timer = Date.now()
+  }
+
+  private buf2hex (buffer: Uint8Array): string {
+    return Array.prototype.map.call(buffer, (x: any) => ('00' + x.toString(16)).slice(-2)).join(' ')
   }
 
   /**
@@ -410,9 +437,8 @@ export class Connection {
       } catch (err) {
         if (process.env.NODE_ENV === 'development') {
           console.error(err)
-        } else {
-          // TODO global error handler
         }
+        throw err
       }
     }
   }
@@ -452,9 +478,8 @@ export class Connection {
     } catch (err) {
       if (process.env.NODE_ENV === 'development') {
         console.error(err)
-      } else {
-        // TODO global error handler
       }
+      throw err
     }
   }
 

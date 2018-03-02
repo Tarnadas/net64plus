@@ -23,28 +23,30 @@ interface Global extends NodeJS.Global {
     appSavePath
   }
   if (fs.existsSync(path.join(appSavePath, 'save.json'))) {
-    const appSaveData = JSON.parse(fs.readFileSync(path.join(appSavePath, 'save.json'), {
-      encoding: 'utf8'
-    }))
-    if (appSaveData == null) {
-      await new Promise(resolve => {
-        rimraf(appSavePath, err => {
-          if (err) {
-            console.error(err)
-          } else {
-            fs.mkdirSync(appSavePath)
-          }
-          resolve()
+    try {
+      const appSaveData = JSON.parse(fs.readFileSync(path.join(appSavePath, 'save.json'), {
+        encoding: 'utf8'
+      }))
+      if (appSaveData == null) {
+        await new Promise(resolve => {
+          rimraf(appSavePath, err => {
+            if (err) {
+              console.error(err)
+            } else {
+              fs.mkdirSync(appSavePath)
+            }
+            resolve()
+          })
         })
-      })
-    } else {
-      (global as Global).save.appSaveData = appSaveData
-    }
+      } else {
+        (global as Global).save.appSaveData = appSaveData
+      }
+    } catch (err) {}
   }
 
   const onReady = () => {
     mainWindow = new BrowserWindow({
-      width: process.env.NODE_ENV === 'development' ? 1100 : 670,
+      width: process.env.NODE_ENV === 'development' ? 1400 : 670,
       height: 840,
       icon: path.join(__dirname, 'img/icon.png'),
       title: `Net64+ ${process.env.VERSION}`,

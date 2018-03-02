@@ -3,6 +3,10 @@ import winProcess, { Process } from 'winprocess'
 import * as fs from 'fs'
 import * as path from 'path'
 
+import { store } from './renderer'
+import { setConnectionError } from './actions/connection'
+import { setEmulator } from './actions/emulator'
+
 /**
  * An Emulator object represents the connection
  * to the loaded emulator.
@@ -63,6 +67,12 @@ export class Emulator {
     this.writeMemory(0xFF5FF3, b) // character ID
     b.writeUInt8(0, 0)
     this.writeMemory(0xFF5FFC, b) // isServer flag
+    // this.writeMemory(0xFF7703, b)
+  }
+
+  public disconnect (): void {
+    store.dispatch(setEmulator(null))
+    store.dispatch(setConnectionError('Emulator disconnected or closed'))
   }
 
   /**
