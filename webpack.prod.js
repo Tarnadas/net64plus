@@ -42,11 +42,8 @@ module.exports = [
         keepFnName: true
       })
     ],
-    externals: {
-      winprocess: 'require(require("path").resolve(__dirname, "winprocess"))'
-    },
     resolve: {
-      extensions: [ '.js', '.jsx', '.json' ]
+      extensions: [ '.ts', '.tsx', '.js', '.jsx', '.json' ]
     },
     module: {
       loaders: [
@@ -89,13 +86,22 @@ module.exports = [
     plugins: [
       new webpack.EnvironmentPlugin({
         NODE_ENV: 'production',
-        VERSION: process.env.npm_package_version.slice(-2) === '.0' ? process.env.npm_package_version.slice(0, process.env.npm_package_version.length - 2) : process.env.npm_package_version
+        VERSION: process.env.npm_package_version.slice(-2) === '.0' ? process.env.npm_package_version.slice(0, process.env.npm_package_version.length - 2) : process.env.npm_package_version,
+        MAJOR: major,
+        MINOR: minor,
+        PATCH: patch
       }),
       new webpack.optimize.ModuleConcatenationPlugin(),
       new BabiliPlugin({
         keepFnName: true
       })
     ],
+    externals: {
+      winprocess: 'require(require("path").resolve(__dirname, "winprocess"))'
+    },
+    resolve: {
+      extensions: [ '.ts', '.js', '.json' ]
+    },
     module: {
       loaders: [
         {

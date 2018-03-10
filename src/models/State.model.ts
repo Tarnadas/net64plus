@@ -1,8 +1,7 @@
 import { RouterState as ReactRouterState } from 'react-router-redux'
 import { Dispatch } from 'redux'
 
-import { Emulator } from '../Emulator'
-import { Connection } from '../Connection'
+import { Server } from '../models/Server.model'
 
 export interface ElectronSaveDataDraft {
   apiKey: string
@@ -24,17 +23,9 @@ export type SaveState = Readonly<SaveStateDraft<ElectronSaveData>>
 export type RouterStateDraft = ReactRouterState
 export type RouterState = Readonly<RouterStateDraft>
 
-/* export interface AccountState {
-
-} */
-
-export interface EmulatorStateDraft {
-  instance: Emulator | null
-}
-export type EmulatorState = Readonly<EmulatorStateDraft>
-
 export interface ConnectionStateDraft {
-  connection: Connection | null
+  isConnectedToEmulator: boolean
+  server: Server | null
   hasToken: boolean
   error: string
 }
@@ -55,8 +46,6 @@ export type ChatState = Readonly<ChatStateDraft>
 export interface State {
   readonly save: SaveState
   readonly router: RouterState
-  // readonly account: AccountState
-  readonly emulator: EmulatorState
   readonly connection: ConnectionState
   readonly chat: ChatState
 }

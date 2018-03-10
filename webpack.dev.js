@@ -10,7 +10,7 @@ module.exports = [
   {
     target: 'electron-renderer',
     entry: {
-      renderer: path.join(__dirname, 'src/renderer.tsx')
+      renderer: path.join(__dirname, 'src/renderer/index.tsx')
     },
     output: {
       filename: 'renderer.js',
@@ -35,14 +35,11 @@ module.exports = [
       }),
       new HtmlWebpackPlugin({
         filename: 'index.html',
-        template: 'src/template.html'
+        template: 'src/renderer/template.html'
       }),
       new CheckerPlugin(),
       new webpack.optimize.ModuleConcatenationPlugin()
     ],
-    externals: {
-      winprocess: 'require(require("path").resolve(__dirname, "winprocess"))'
-    },
     resolve: {
       extensions: [ '.ts', '.tsx', '.js', '.jsx', '.json' ]
     },
@@ -78,7 +75,7 @@ module.exports = [
   },
   {
     target: 'electron',
-    entry: path.join(__dirname, 'src/index.ts'),
+    entry: path.join(__dirname, 'src/main/index.ts'),
     output: {
       filename: 'index.js',
       path: path.join(__dirname, 'build')
@@ -91,9 +88,18 @@ module.exports = [
     plugins: [
       new webpack.EnvironmentPlugin({
         NODE_ENV: 'development',
-        VERSION: process.env.npm_package_version.slice(-2) === '.0' ? process.env.npm_package_version.slice(0, process.env.npm_package_version.length - 2) : process.env.npm_package_version
+        VERSION: process.env.npm_package_version.slice(-2) === '.0' ? process.env.npm_package_version.slice(0, process.env.npm_package_version.length - 2) : process.env.npm_package_version,
+        MAJOR: major,
+        MINOR: minor,
+        PATCH: patch
       })
     ],
+    externals: {
+      winprocess: 'require(require("path").resolve(__dirname, "winprocess"))'
+    },
+    resolve: {
+      extensions: [ '.ts', '.js', '.json' ]
+    },
     module: {
       loaders: [
         {
