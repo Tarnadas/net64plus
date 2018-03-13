@@ -9,6 +9,7 @@ import { spawn } from 'child_process'
 import { connector } from '../..'
 import { SMMButton } from '../buttons/SMMButton'
 import { WarningPanel } from '../panels/WarningPanel'
+import { isConnectedToEmulator } from '../../actions/connection'
 import { State } from '../../../models/State.model'
 
 const TIMEOUT = 1000
@@ -128,6 +129,7 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
         characterId: this.props.characterId,
         inGameChatEnabled: false
       })
+      this.props.dispatch(isConnectedToEmulator(true))
       this.props.dispatch(push('/browse'))
     }, 10)
     setTimeout(() => {

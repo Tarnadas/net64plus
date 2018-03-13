@@ -1411,9 +1411,8 @@ $root.PlayerData = (function() {
      * Properties of a PlayerData.
      * @exports IPlayerData
      * @interface IPlayerData
-     * @property {number|null} [playerLength] PlayerData playerLength
      * @property {number|null} [dataLength] PlayerData dataLength
-     * @property {Uint8Array|null} [playerData] PlayerData playerData
+     * @property {Array.<IPlayerBytes>|null} [playerBytes] PlayerData playerBytes
      */
 
     /**
@@ -1425,19 +1424,12 @@ $root.PlayerData = (function() {
      * @param {IPlayerData=} [properties] Properties to set
      */
     function PlayerData(properties) {
+        this.playerBytes = [];
         if (properties)
             for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                 if (properties[keys[i]] != null)
                     this[keys[i]] = properties[keys[i]];
     }
-
-    /**
-     * PlayerData playerLength.
-     * @member {number} playerLength
-     * @memberof PlayerData
-     * @instance
-     */
-    PlayerData.prototype.playerLength = 0;
 
     /**
      * PlayerData dataLength.
@@ -1448,12 +1440,12 @@ $root.PlayerData = (function() {
     PlayerData.prototype.dataLength = 0;
 
     /**
-     * PlayerData playerData.
-     * @member {Uint8Array} playerData
+     * PlayerData playerBytes.
+     * @member {Array.<IPlayerBytes>} playerBytes
      * @memberof PlayerData
      * @instance
      */
-    PlayerData.prototype.playerData = $util.newBuffer([]);
+    PlayerData.prototype.playerBytes = $util.emptyArray;
 
     /**
      * Creates a new PlayerData instance using the specified properties.
@@ -1479,12 +1471,11 @@ $root.PlayerData = (function() {
     PlayerData.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
-        if (message.playerLength != null && message.hasOwnProperty("playerLength"))
-            writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.playerLength);
         if (message.dataLength != null && message.hasOwnProperty("dataLength"))
-            writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.dataLength);
-        if (message.playerData != null && message.hasOwnProperty("playerData"))
-            writer.uint32(/* id 3, wireType 2 =*/26).bytes(message.playerData);
+            writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.dataLength);
+        if (message.playerBytes != null && message.playerBytes.length)
+            for (var i = 0; i < message.playerBytes.length; ++i)
+                $root.PlayerBytes.encode(message.playerBytes[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
         return writer;
     };
 
@@ -1520,13 +1511,12 @@ $root.PlayerData = (function() {
             var tag = reader.uint32();
             switch (tag >>> 3) {
             case 1:
-                message.playerLength = reader.uint32();
-                break;
-            case 2:
                 message.dataLength = reader.uint32();
                 break;
-            case 3:
-                message.playerData = reader.bytes();
+            case 2:
+                if (!(message.playerBytes && message.playerBytes.length))
+                    message.playerBytes = [];
+                message.playerBytes.push($root.PlayerBytes.decode(reader, reader.uint32()));
                 break;
             default:
                 reader.skipType(tag & 7);
@@ -1563,15 +1553,18 @@ $root.PlayerData = (function() {
     PlayerData.verify = function verify(message) {
         if (typeof message !== "object" || message === null)
             return "object expected";
-        if (message.playerLength != null && message.hasOwnProperty("playerLength"))
-            if (!$util.isInteger(message.playerLength))
-                return "playerLength: integer expected";
         if (message.dataLength != null && message.hasOwnProperty("dataLength"))
             if (!$util.isInteger(message.dataLength))
                 return "dataLength: integer expected";
-        if (message.playerData != null && message.hasOwnProperty("playerData"))
-            if (!(message.playerData && typeof message.playerData.length === "number" || $util.isString(message.playerData)))
-                return "playerData: buffer expected";
+        if (message.playerBytes != null && message.hasOwnProperty("playerBytes")) {
+            if (!Array.isArray(message.playerBytes))
+                return "playerBytes: array expected";
+            for (var i = 0; i < message.playerBytes.length; ++i) {
+                var error = $root.PlayerBytes.verify(message.playerBytes[i]);
+                if (error)
+                    return "playerBytes." + error;
+            }
+        }
         return null;
     };
 
@@ -1587,15 +1580,18 @@ $root.PlayerData = (function() {
         if (object instanceof $root.PlayerData)
             return object;
         var message = new $root.PlayerData();
-        if (object.playerLength != null)
-            message.playerLength = object.playerLength >>> 0;
         if (object.dataLength != null)
             message.dataLength = object.dataLength >>> 0;
-        if (object.playerData != null)
-            if (typeof object.playerData === "string")
-                $util.base64.decode(object.playerData, message.playerData = $util.newBuffer($util.base64.length(object.playerData)), 0);
-            else if (object.playerData.length)
-                message.playerData = object.playerData;
+        if (object.playerBytes) {
+            if (!Array.isArray(object.playerBytes))
+                throw TypeError(".PlayerData.playerBytes: array expected");
+            message.playerBytes = [];
+            for (var i = 0; i < object.playerBytes.length; ++i) {
+                if (typeof object.playerBytes[i] !== "object")
+                    throw TypeError(".PlayerData.playerBytes: object expected");
+                message.playerBytes[i] = $root.PlayerBytes.fromObject(object.playerBytes[i]);
+            }
+        }
         return message;
     };
 
@@ -1612,17 +1608,17 @@ $root.PlayerData = (function() {
         if (!options)
             options = {};
         var object = {};
-        if (options.defaults) {
-            object.playerLength = 0;
+        if (options.arrays || options.defaults)
+            object.playerBytes = [];
+        if (options.defaults)
             object.dataLength = 0;
-            object.playerData = options.bytes === String ? "" : [];
-        }
-        if (message.playerLength != null && message.hasOwnProperty("playerLength"))
-            object.playerLength = message.playerLength;
         if (message.dataLength != null && message.hasOwnProperty("dataLength"))
             object.dataLength = message.dataLength;
-        if (message.playerData != null && message.hasOwnProperty("playerData"))
-            object.playerData = options.bytes === String ? $util.base64.encode(message.playerData, 0, message.playerData.length) : options.bytes === Array ? Array.prototype.slice.call(message.playerData) : message.playerData;
+        if (message.playerBytes && message.playerBytes.length) {
+            object.playerBytes = [];
+            for (var j = 0; j < message.playerBytes.length; ++j)
+                object.playerBytes[j] = $root.PlayerBytes.toObject(message.playerBytes[j], options);
+        }
         return object;
     };
 
@@ -1638,6 +1634,219 @@ $root.PlayerData = (function() {
     };
 
     return PlayerData;
+})();
+
+$root.PlayerBytes = (function() {
+
+    /**
+     * Properties of a PlayerBytes.
+     * @exports IPlayerBytes
+     * @interface IPlayerBytes
+     * @property {number|null} [playerId] PlayerBytes playerId
+     * @property {Uint8Array|null} [playerData] PlayerBytes playerData
+     */
+
+    /**
+     * Constructs a new PlayerBytes.
+     * @exports PlayerBytes
+     * @classdesc Represents a PlayerBytes.
+     * @implements IPlayerBytes
+     * @constructor
+     * @param {IPlayerBytes=} [properties] Properties to set
+     */
+    function PlayerBytes(properties) {
+        if (properties)
+            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                if (properties[keys[i]] != null)
+                    this[keys[i]] = properties[keys[i]];
+    }
+
+    /**
+     * PlayerBytes playerId.
+     * @member {number} playerId
+     * @memberof PlayerBytes
+     * @instance
+     */
+    PlayerBytes.prototype.playerId = 0;
+
+    /**
+     * PlayerBytes playerData.
+     * @member {Uint8Array} playerData
+     * @memberof PlayerBytes
+     * @instance
+     */
+    PlayerBytes.prototype.playerData = $util.newBuffer([]);
+
+    /**
+     * Creates a new PlayerBytes instance using the specified properties.
+     * @function create
+     * @memberof PlayerBytes
+     * @static
+     * @param {IPlayerBytes=} [properties] Properties to set
+     * @returns {PlayerBytes} PlayerBytes instance
+     */
+    PlayerBytes.create = function create(properties) {
+        return new PlayerBytes(properties);
+    };
+
+    /**
+     * Encodes the specified PlayerBytes message. Does not implicitly {@link PlayerBytes.verify|verify} messages.
+     * @function encode
+     * @memberof PlayerBytes
+     * @static
+     * @param {IPlayerBytes} message PlayerBytes message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    PlayerBytes.encode = function encode(message, writer) {
+        if (!writer)
+            writer = $Writer.create();
+        if (message.playerId != null && message.hasOwnProperty("playerId"))
+            writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.playerId);
+        if (message.playerData != null && message.hasOwnProperty("playerData"))
+            writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.playerData);
+        return writer;
+    };
+
+    /**
+     * Encodes the specified PlayerBytes message, length delimited. Does not implicitly {@link PlayerBytes.verify|verify} messages.
+     * @function encodeDelimited
+     * @memberof PlayerBytes
+     * @static
+     * @param {IPlayerBytes} message PlayerBytes message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    PlayerBytes.encodeDelimited = function encodeDelimited(message, writer) {
+        return this.encode(message, writer).ldelim();
+    };
+
+    /**
+     * Decodes a PlayerBytes message from the specified reader or buffer.
+     * @function decode
+     * @memberof PlayerBytes
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @param {number} [length] Message length if known beforehand
+     * @returns {PlayerBytes} PlayerBytes
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    PlayerBytes.decode = function decode(reader, length) {
+        if (!(reader instanceof $Reader))
+            reader = $Reader.create(reader);
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.PlayerBytes();
+        while (reader.pos < end) {
+            var tag = reader.uint32();
+            switch (tag >>> 3) {
+            case 1:
+                message.playerId = reader.uint32();
+                break;
+            case 2:
+                message.playerData = reader.bytes();
+                break;
+            default:
+                reader.skipType(tag & 7);
+                break;
+            }
+        }
+        return message;
+    };
+
+    /**
+     * Decodes a PlayerBytes message from the specified reader or buffer, length delimited.
+     * @function decodeDelimited
+     * @memberof PlayerBytes
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @returns {PlayerBytes} PlayerBytes
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    PlayerBytes.decodeDelimited = function decodeDelimited(reader) {
+        if (!(reader instanceof $Reader))
+            reader = new $Reader(reader);
+        return this.decode(reader, reader.uint32());
+    };
+
+    /**
+     * Verifies a PlayerBytes message.
+     * @function verify
+     * @memberof PlayerBytes
+     * @static
+     * @param {Object.<string,*>} message Plain object to verify
+     * @returns {string|null} `null` if valid, otherwise the reason why it is not
+     */
+    PlayerBytes.verify = function verify(message) {
+        if (typeof message !== "object" || message === null)
+            return "object expected";
+        if (message.playerId != null && message.hasOwnProperty("playerId"))
+            if (!$util.isInteger(message.playerId))
+                return "playerId: integer expected";
+        if (message.playerData != null && message.hasOwnProperty("playerData"))
+            if (!(message.playerData && typeof message.playerData.length === "number" || $util.isString(message.playerData)))
+                return "playerData: buffer expected";
+        return null;
+    };
+
+    /**
+     * Creates a PlayerBytes message from a plain object. Also converts values to their respective internal types.
+     * @function fromObject
+     * @memberof PlayerBytes
+     * @static
+     * @param {Object.<string,*>} object Plain object
+     * @returns {PlayerBytes} PlayerBytes
+     */
+    PlayerBytes.fromObject = function fromObject(object) {
+        if (object instanceof $root.PlayerBytes)
+            return object;
+        var message = new $root.PlayerBytes();
+        if (object.playerId != null)
+            message.playerId = object.playerId >>> 0;
+        if (object.playerData != null)
+            if (typeof object.playerData === "string")
+                $util.base64.decode(object.playerData, message.playerData = $util.newBuffer($util.base64.length(object.playerData)), 0);
+            else if (object.playerData.length)
+                message.playerData = object.playerData;
+        return message;
+    };
+
+    /**
+     * Creates a plain object from a PlayerBytes message. Also converts values to other types if specified.
+     * @function toObject
+     * @memberof PlayerBytes
+     * @static
+     * @param {PlayerBytes} message PlayerBytes
+     * @param {$protobuf.IConversionOptions} [options] Conversion options
+     * @returns {Object.<string,*>} Plain object
+     */
+    PlayerBytes.toObject = function toObject(message, options) {
+        if (!options)
+            options = {};
+        var object = {};
+        if (options.defaults) {
+            object.playerId = 0;
+            object.playerData = options.bytes === String ? "" : [];
+        }
+        if (message.playerId != null && message.hasOwnProperty("playerId"))
+            object.playerId = message.playerId;
+        if (message.playerData != null && message.hasOwnProperty("playerData"))
+            object.playerData = options.bytes === String ? $util.base64.encode(message.playerData, 0, message.playerData.length) : options.bytes === Array ? Array.prototype.slice.call(message.playerData) : message.playerData;
+        return object;
+    };
+
+    /**
+     * Converts this PlayerBytes to JSON.
+     * @function toJSON
+     * @memberof PlayerBytes
+     * @instance
+     * @returns {Object.<string,*>} JSON object
+     */
+    PlayerBytes.prototype.toJSON = function toJSON() {
+        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+    };
+
+    return PlayerBytes;
 })();
 
 $root.Meta = (function() {

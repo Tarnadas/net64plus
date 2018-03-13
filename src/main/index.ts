@@ -42,6 +42,7 @@ export const createConnection = (
 }
 
 export const deleteConnection = () => {
+  if (connection) connection.disconnect()
   connection = undefined
 }
 

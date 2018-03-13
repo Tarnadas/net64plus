@@ -274,11 +274,29 @@ export interface IServerHandshake {
     /** ServerHandshake playerId */
     playerId?: (number|null);
 
-    /** ServerHandshake gameMode */
-    gameMode?: (IGameMode|null);
+    /** ServerHandshake ip */
+    ip?: (string|null);
+
+    /** ServerHandshake port */
+    port?: (number|null);
+
+    /** ServerHandshake domain */
+    domain?: (string|null);
+
+    /** ServerHandshake name */
+    name?: (string|null);
+
+    /** ServerHandshake description */
+    description?: (string|null);
 
     /** ServerHandshake playerList */
     playerList?: (IPlayerListUpdate|null);
+
+    /** ServerHandshake countryCode */
+    countryCode?: (string|null);
+
+    /** ServerHandshake gameMode */
+    gameMode?: (GameModeType|null);
 }
 
 /** Represents a ServerHandshake. */
@@ -293,11 +311,29 @@ export class ServerHandshake implements IServerHandshake {
     /** ServerHandshake playerId. */
     public playerId: number;
 
-    /** ServerHandshake gameMode. */
-    public gameMode?: (IGameMode|null);
+    /** ServerHandshake ip. */
+    public ip: string;
+
+    /** ServerHandshake port. */
+    public port: number;
+
+    /** ServerHandshake domain. */
+    public domain: string;
+
+    /** ServerHandshake name. */
+    public name: string;
+
+    /** ServerHandshake description. */
+    public description: string;
 
     /** ServerHandshake playerList. */
     public playerList?: (IPlayerListUpdate|null);
+
+    /** ServerHandshake countryCode. */
+    public countryCode: string;
+
+    /** ServerHandshake gameMode. */
+    public gameMode: GameModeType;
 
     /**
      * Creates a new ServerHandshake instance using the specified properties.
@@ -374,7 +410,7 @@ export class ServerHandshake implements IServerHandshake {
 export interface IGameMode {
 
     /** GameMode gameMode */
-    gameMode?: (GameMode.GameModeType|null);
+    gameMode?: (GameModeType|null);
 }
 
 /** Represents a GameMode. */
@@ -387,7 +423,7 @@ export class GameMode implements IGameMode {
     constructor(properties?: IGameMode);
 
     /** GameMode gameMode. */
-    public gameMode: GameMode.GameModeType;
+    public gameMode: GameModeType;
 
     /**
      * Creates a new GameMode instance using the specified properties.
@@ -460,19 +496,16 @@ export class GameMode implements IGameMode {
     public toJSON(): { [k: string]: any };
 }
 
-export namespace GameMode {
-
-    /** GameModeType enum. */
-    enum GameModeType {
-        NONE = 0,
-        DEFAULT = 1,
-        THIRD_PERSON_SHOOTER = 2,
-        INTERACTIONLESS = 3,
-        PROP_HUNT = 4,
-        BOSS_RUSH = 5,
-        TAG = 6,
-        WARIO_WARE = 8
-    }
+/** GameModeType enum. */
+export enum GameModeType {
+    NONE = 0,
+    DEFAULT = 1,
+    THIRD_PERSON_SHOOTER = 2,
+    INTERACTIONLESS = 3,
+    PROP_HUNT = 4,
+    BOSS_RUSH = 5,
+    TAG = 6,
+    WARIO_WARE = 8
 }
 
 /** Properties of a PlayerUpdate. */
@@ -1479,14 +1512,11 @@ export class WrongVersion implements IWrongVersion {
 /** Properties of a PlayerData. */
 export interface IPlayerData {
 
-    /** PlayerData playerLength */
-    playerLength?: (number|null);
-
     /** PlayerData dataLength */
     dataLength?: (number|null);
 
-    /** PlayerData playerData */
-    playerData?: (Uint8Array|null);
+    /** PlayerData playerBytes */
+    playerBytes?: (IPlayerBytes[]|null);
 }
 
 /** Represents a PlayerData. */
@@ -1498,14 +1528,11 @@ export class PlayerData implements IPlayerData {
      */
     constructor(properties?: IPlayerData);
 
-    /** PlayerData playerLength. */
-    public playerLength: number;
-
     /** PlayerData dataLength. */
     public dataLength: number;
 
-    /** PlayerData playerData. */
-    public playerData: Uint8Array;
+    /** PlayerData playerBytes. */
+    public playerBytes: IPlayerBytes[];
 
     /**
      * Creates a new PlayerData instance using the specified properties.
@@ -1573,6 +1600,102 @@ export class PlayerData implements IPlayerData {
 
     /**
      * Converts this PlayerData to JSON.
+     * @returns JSON object
+     */
+    public toJSON(): { [k: string]: any };
+}
+
+/** Properties of a PlayerBytes. */
+export interface IPlayerBytes {
+
+    /** PlayerBytes playerId */
+    playerId?: (number|null);
+
+    /** PlayerBytes playerData */
+    playerData?: (Uint8Array|null);
+}
+
+/** Represents a PlayerBytes. */
+export class PlayerBytes implements IPlayerBytes {
+
+    /**
+     * Constructs a new PlayerBytes.
+     * @param [properties] Properties to set
+     */
+    constructor(properties?: IPlayerBytes);
+
+    /** PlayerBytes playerId. */
+    public playerId: number;
+
+    /** PlayerBytes playerData. */
+    public playerData: Uint8Array;
+
+    /**
+     * Creates a new PlayerBytes instance using the specified properties.
+     * @param [properties] Properties to set
+     * @returns PlayerBytes instance
+     */
+    public static create(properties?: IPlayerBytes): PlayerBytes;
+
+    /**
+     * Encodes the specified PlayerBytes message. Does not implicitly {@link PlayerBytes.verify|verify} messages.
+     * @param message PlayerBytes message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encode(message: IPlayerBytes, writer?: $protobuf.Writer): $protobuf.Writer;
+
+    /**
+     * Encodes the specified PlayerBytes message, length delimited. Does not implicitly {@link PlayerBytes.verify|verify} messages.
+     * @param message PlayerBytes message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encodeDelimited(message: IPlayerBytes, writer?: $protobuf.Writer): $protobuf.Writer;
+
+    /**
+     * Decodes a PlayerBytes message from the specified reader or buffer.
+     * @param reader Reader or buffer to decode from
+     * @param [length] Message length if known beforehand
+     * @returns PlayerBytes
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): PlayerBytes;
+
+    /**
+     * Decodes a PlayerBytes message from the specified reader or buffer, length delimited.
+     * @param reader Reader or buffer to decode from
+     * @returns PlayerBytes
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): PlayerBytes;
+
+    /**
+     * Verifies a PlayerBytes message.
+     * @param message Plain object to verify
+     * @returns `null` if valid, otherwise the reason why it is not
+     */
+    public static verify(message: { [k: string]: any }): (string|null);
+
+    /**
+     * Creates a PlayerBytes message from a plain object. Also converts values to their respective internal types.
+     * @param object Plain object
+     * @returns PlayerBytes
+     */
+    public static fromObject(object: { [k: string]: any }): PlayerBytes;
+
+    /**
+     * Creates a plain object from a PlayerBytes message. Also converts values to other types if specified.
+     * @param message PlayerBytes
+     * @param [options] Conversion options
+     * @returns Plain object
+     */
+    public static toObject(message: PlayerBytes, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+    /**
+     * Converts this PlayerBytes to JSON.
      * @returns JSON object
      */
     public toJSON(): { [k: string]: any };

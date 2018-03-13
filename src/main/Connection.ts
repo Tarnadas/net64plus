@@ -186,14 +186,39 @@ export class Connection {
    */
   private onHandshake (messageData: IServerClient): void {
     const handshake = messageData.handshake
-    if (!handshake || !handshake.playerId) return
+    if (
+      !handshake ||
+      handshake.playerId == null ||
+      handshake.ip == null ||
+      handshake.port == null || 
+      handshake.domain == null ||
+      handshake.name == null ||
+      handshake.description == null ||
+      handshake.countryCode == null ||
+      handshake.gameMode == null
+    ) return
     this.playerId = handshake.playerId
     if (handshake.playerList) {
-      const players = handshake.playerList.playerUpdates
-      if (!players) return
-      connector.setPlayers(players)
+      const playerUpdates = handshake.playerList.playerUpdates
+      if (!playerUpdates) return
+      const players = new Array(25).fill(null)
+      for (const player of playerUpdates) {
+        if (!player.player || player.playerId == null) continue
+        players[player.playerId] = player.player
+      }
+      connector.setServer({
+        ip: handshake.ip,
+        port: handshake.port,
+        domain: handshake.domain,
+        name: handshake.name,
+        description: handshake.description,
+        countryCode: handshake.countryCode,
+        gameMode: handshake.gameMode,
+        players
+      })
     }
     emulator!.setPlayerId(this.playerId)
+    emulator!.setConnectionFlag(2)
     connector.setPlayerId(this.playerId)
     this.loop = setInterval(this.sendAll, UPDATE_INTERVAL)
   }
@@ -302,7 +327,7 @@ export class Connection {
     if (process.env.NODE_ENV === 'development') {
       connector.consoleInfo(`${tokenType ? 'Granted' : 'Lost'} server token`)
     }
-    emulator!.setServerFlag(tokenType)
+    emulator!.setConnectionFlag(1)
   }
 
   /**
@@ -337,14 +362,14 @@ export class Connection {
    */
   private onPlayerData (messageData: IServerClient): void {
     const playerData = messageData.playerData
-    if (!playerData || !playerData.dataLength || !playerData.playerData || !playerData.playerLength) return
-    const payload = playerData.playerData
-    if (!payload) return
-    // TODO playerLength?
-    for (let i = 0, j = 0; i < payload.length; i += playerData.dataLength, j++) {
-      // ignore own player data
-      if (this.playerId === payload[i + 3]) continue
-      emulator!.writeMemory(0xFF7800 + 0x100 * j, Buffer.from(payload.buffer.slice(i, i + 0x1C) as ArrayBuffer))
+    if (!playerData || !playerData.dataLength || !playerData.playerBytes) return
+    const playerBytes = playerData.playerBytes
+    const dataLength = playerData.dataLength
+    for (const player of playerBytes) {
+      const playerId = player.playerId
+      const playerData = player.playerData
+      if (playerId == null || !playerData) continue
+      emulator!.writeMemory(0xFF7700 + 0x100 * playerId, playerData as Buffer)
     }
   }
 
@@ -362,7 +387,7 @@ export class Connection {
       const address = meta.address
       const data = meta.data
       if (!length || !address || !data) continue
-      emulator!.writeMemory(address, Buffer.from(data.buffer as ArrayBuffer))
+      emulator!.writeMemory(address, data as Buffer)
     }
   }
 
@@ -439,7 +464,9 @@ export class Connection {
             messageType: ClientServer.MessageType.PLAYER_DATA,
             playerData: {
               dataLength: 0x1C,
-              playerData: playerDataBuffer
+              playerBytes: [{
+                playerData: playerDataBuffer
+              }]
             }
           }
         }
@@ -458,28 +485,30 @@ export class Connection {
    * Send all meta data to connected server.
    */
   private sendMetaData (): void {
+    const metaDataArray = []
+    for (let baseAdr = 0xFF7400, offset = 0; offset < 0x240; offset += 12) {
+      const readFrom = emulator!.readMemory(baseAdr + offset, 4).readUInt32LE(0) - 0x80000000
+      if (readFrom === -0x80000000) break
+      // TODO @Kaze: this should be handled in assembly
+      // we don't want to send player data as meta data
+      if (readFrom >= 0xFF7700 && readFrom < 0xFF9100) {
+        continue
+      }
+      const length = emulator!.readMemory(baseAdr + offset + 4, 4).readUInt32LE(0)
+      const writeTo = emulator!.readMemory(baseAdr + offset, 8).readUInt32LE(0) - 0x80000000
+      metaDataArray.push({
+        length,
+        address: writeTo,
+        data: emulator!.readMemory(readFrom, length)
+      })
+    }
     try {
       const metaData: IClientServerMessage = {
         compression: Compression.NONE,
         data: {
           messageType: ClientServer.MessageType.META_DATA,
           metaData: {
-            metaData: Array.from((function * () {
-              for (let baseAdr = 0xFF7400, offset = 0; offset < 0x240; offset += 12) {
-                const readFrom = emulator!.readMemory(baseAdr + offset, 4).readInt32BE(0)
-                // TODO @Kaze: this should be handled in assembly
-                // we don't want to send player data as meta data
-                if (readFrom >= 0xFF7700 && readFrom < 0xFF9100) {
-                  continue
-                }
-                const length = emulator!.readMemory(baseAdr + offset + 4, 4).readInt32BE(0)
-                yield {
-                  length,
-                  address: readFrom,
-                  data: emulator!.readMemory(readFrom, length)
-                }
-              }
-            })())
+            metaData: metaDataArray
           }
         }
       }

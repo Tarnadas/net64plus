@@ -10,7 +10,7 @@ module.exports = [
   {
     target: 'electron-renderer',
     entry: {
-      renderer: path.join(__dirname, 'src/renderer.tsx')
+      renderer: path.join(__dirname, 'src/renderer/index.tsx')
     },
     output: {
       filename: 'renderer.js',
@@ -35,7 +35,7 @@ module.exports = [
       }),
       new HtmlWebpackPlugin({
         filename: 'index.html',
-        template: 'src/template.html'
+        template: 'src/renderer/template.html'
       }),
       new webpack.optimize.ModuleConcatenationPlugin(),
       new BabiliPlugin({
@@ -73,7 +73,7 @@ module.exports = [
   },
   {
     target: 'electron',
-    entry: path.join(__dirname, 'src/index.ts'),
+    entry: path.join(__dirname, 'src/main/index.ts'),
     output: {
       filename: 'index.js',
       path: path.join(__dirname, 'build')

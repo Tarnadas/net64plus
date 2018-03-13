@@ -8,6 +8,9 @@ import { IPlayer } from '../../../proto/ServerClientMessage'
 export const connection = (state: ConnectionState = initialState.connection, action: ConnectionAction) =>
   produce<ConnectionState>(state, (draft: ConnectionStateDraft) => {
     switch (action.type) {
+      case ConnectionActionType.IS_CONNECTED_TO_EMULATOR:
+        draft.isConnectedToEmulator = action.isConnectedToEmulator
+        break
       case ConnectionActionType.SET_SERVER:
         draft.server = action.server
         draft.error = ''
@@ -18,7 +21,7 @@ export const connection = (state: ConnectionState = initialState.connection, act
       case ConnectionActionType.SET_PLAYERS:
         if (!draft.server) return
         const players: IPlayer[] = []
-        for (let player of action.players) {
+        for (const player of action.players) {
           if (!player.player || player.playerId == null) continue
           players[player.playerId] = {
             username: player.player.username,

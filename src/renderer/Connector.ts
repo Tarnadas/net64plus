@@ -2,20 +2,23 @@ import { ipcRenderer } from 'electron'
 
 import { store } from '.'
 import { addGlobalMessage, clearGlobalMessages } from './utils/chat.util'
-import { isConnectedToEmulator, disconnect, setConnectionError, setPlayer, setPlayers } from './actions/connection'
+import { isConnectedToEmulator, disconnect, setConnectionError, setPlayer, setPlayers, setServer } from './actions/connection'
 import { MainMessage, RendererMessage } from '../models/Message.model'
+import { Server } from '../models/Server.model'
 import { IPlayer, IPlayerUpdate } from '../../proto/ServerClientMessage'
 
 export class Connector {
   constructor () {
     ipcRenderer.on(MainMessage.WEBSOCKET_CLOSE, this.onWebSocketClose)
     ipcRenderer.on(MainMessage.EMULATOR_DISCONNECT, this.onEmulatorDisconnect)
+    ipcRenderer.on(MainMessage.SET_SERVER, this.onSetServer)
     ipcRenderer.on(MainMessage.SET_PLAYERS, this.onSetPlayers)
     ipcRenderer.on(MainMessage.SET_PLAYER_ID, this.onSetPlayerId)
     ipcRenderer.on(MainMessage.SERVER_FULL, this.onServerFull)
     ipcRenderer.on(MainMessage.WRONG_VERSION, this.onWrongVersion)
     ipcRenderer.on(MainMessage.CHAT_MESSAGE, this.onChatMessage)
     ipcRenderer.on(MainMessage.SET_CONNECTION_ERROR, this.onConnectionError)
+    ipcRenderer.on(MainMessage.CONSOLE_INFO, this.onConsoleInfo)
   }
 
   private onWebSocketClose = (event: Electron.Event, { code, hasError }: { code: number, hasError: boolean }) => {
@@ -31,6 +34,13 @@ export class Connector {
     store.dispatch(setConnectionError('Emulator disconnected or closed'))
   }
 
+  private onSetServer = (event: Electron.Event, server: Server) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.info('CONNECTED TO SERVER', server)
+    }
+    store.dispatch(setServer(server))
+  }
+
   private onSetPlayers = (event: Electron.Event, players: IPlayerUpdate[]) => {
     store.dispatch(setPlayers(players))
   }
@@ -39,7 +49,7 @@ export class Connector {
     store.dispatch(setPlayer(playerId, player))
   }
 
-  private onSetPlayerId = (playerId: number) => {
+  private onSetPlayerId = (event: Electron.Event, playerId: number) => {
     addGlobalMessage(`Your player ID is ${playerId}`, '[SERVER]')
   }
 
@@ -58,7 +68,7 @@ export class Connector {
   private onChatMessage = (event: Electron.Event, { message, senderId }: { message: string, senderId: number }) => {
     const server = store.getState().connection.server
     if (!server || !server.players) return
-    const username = server.players[senderId].username
+    const username = server.players[senderId] && server.players[senderId].username
     addGlobalMessage(message, username || '?')
   }
 

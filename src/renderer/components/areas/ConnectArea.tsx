@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 import { connector } from '../..'
 import { SMMButton } from '../buttons/SMMButton'
 import { WarningPanel } from '../panels/WarningPanel'
-import { setServer } from '../../actions/connection'
 import { State } from '../../../models/State.model'
 
 interface ConnectAreaProps {

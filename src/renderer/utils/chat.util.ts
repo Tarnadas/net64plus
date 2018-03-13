@@ -2,8 +2,6 @@ import { store } from '..'
 import { addGlobalChatMessage, clearGlobalChatMessages } from '../actions/chat'
 import { ChatMessage } from '../../models/State.model'
 
-const HISTORY_LENGTH = 100
-
 export function addGlobalMessage (message: string, username: string) {
   const date = new Date()
   const chatMessage: ChatMessage = {

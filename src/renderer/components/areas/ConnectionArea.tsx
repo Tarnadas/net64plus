@@ -27,10 +27,7 @@ export class ConnectionArea extends React.PureComponent<ConnectionAreaProps, {}>
     }
     return (
       <div className='scroll' style={styles.area}>
-        {
-          server &&
-          <Net64ServerPanel server={server} isConnected />
-        }
+        <Net64ServerPanel server={server} isConnected />
         <ChatArea />
       </div>
     )

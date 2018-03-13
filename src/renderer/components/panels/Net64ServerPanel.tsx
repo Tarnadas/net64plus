@@ -19,12 +19,12 @@ interface Net64ServerPanelProps {
   username: string
   characterId: number
   connectionError: string
+  onConnect?: () => void
   isConnected?: boolean
 }
 
 interface Net64ServerPanelState {
   display: boolean
-  loading: boolean
   warning: string
 }
 
@@ -39,7 +39,6 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
     super(props)
     this.state = {
       display: !!props.isConnected,
-      loading: false,
       warning: ''
     }
     this.onToggle = this.onToggle.bind(this)
@@ -71,9 +70,7 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
     }))
   }
   onConnect () {
-    this.setState({
-      loading: true
-    })
+    if (this.props.onConnect) this.props.onConnect()
     const server = this.props.server
     connector.createConnection({
       domain: server.domain,
@@ -84,10 +81,8 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
     })
   }
   onDisconnect () {
-    this.setState({
-      loading: false
-    })
     this.props.dispatch(disconnect())
+    connector.disconnect()
   }
   renderPlayers (players: IPlayer[]) {
     const style = {
@@ -95,23 +90,22 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
       borderTop: '1px solid black',
       display: 'flex'
     }
-    return players.map(
-      (player, index) =>
-        player
-          ? <div style={style} key={index}>
-              <img src={`img/${CHARACTER_IMAGES[player.characterId || 0]}`} />
-              <div>
-                { player.username }
-              </div>
+    return players
+      .filter(player => player)
+      .map(
+        (player, index) =>
+          <div style={style} key={index}>
+            <img src={`img/${CHARACTER_IMAGES[player.characterId || 0]}`} />
+            <div>
+              { player.username }
             </div>
-          : <div key={index} />
-    )
+          </div>
+      )
   }
   render () {
     const server = this.props.server
     const players = server.players || []
     const isConnected = this.props.isConnected
-    const loading = this.state.loading
     const warning = this.state.warning
     const styles: React.CSSProperties = {
       panel: {
@@ -166,28 +160,10 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
       },
       el: {
         margin: '6px'
-      },
-      loading: {
-        display: 'flex',
-        position: 'fixed',
-        zIndex: '100',
-        backgroundColor: 'rgba(0,0,0,0.6)',
-        top: '0',
-        left: '0',
-        width: '100%',
-        height: '100%',
-        alignItems: 'center',
-        justifyContent: 'center'
       }
     }
     return (
       <div style={styles.panel}>
-        {
-          loading &&
-          <div style={styles.loading}>
-            <img src='img/load.gif' />
-          </div>
-        }
         <div style={styles.header} onClick={this.onToggle}>
           <div style={{ flex: '0 0 40px' }}>
             { server.countryCode || '' }
@@ -196,7 +172,7 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
             { server.name || `${server.ip}:${server.port}` }
           </div>
           <div style={styles.players}>
-            { players.length } / 24
+            { players.filter(player => player).length } / 24
           </div>
         </div>
         <div style={styles.details}>

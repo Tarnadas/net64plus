@@ -5,6 +5,12 @@ import "server-client/PlayerUpdate.proto";
 
 message ServerHandshake {
   uint32 player_id = 1;
-  GameMode game_mode = 2;
-  PlayerListUpdate player_list = 3;
+  string ip = 2;
+  uint32 port = 3;
+  string domain = 4;
+  string name = 5;
+  string description = 6;
+  PlayerListUpdate player_list = 7;
+  string countryCode = 8;
+  GameModeType game_mode = 9;
 }

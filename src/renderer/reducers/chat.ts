@@ -10,7 +10,7 @@ export const chat = (state: ChatState = initialState.chat, action: ChatAction) =
   produce<ChatState>(state, (draft: ChatStateDraft) => {
     switch (action.type) {
       case 'ADD_GLOBAL_CHAT_MESSAGE':
-        draft.global = [...draft.global, action.chatMessage]
+        draft.global = [...state.global, action.chatMessage]
         if (draft.global.length > HISTORY_LENGTH) {
           draft.global = draft.global.slice(1)
         }

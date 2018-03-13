@@ -23,9 +23,11 @@ interface AppViewProps {
   location: Location
   username: string
   route: Readonly<RouterState>
+  isConnectedToEmulator: boolean
 }
 
 interface AppViewState {
+  requestedPath: string
   newVersionUrl?: string
   patchNotes?: string
 }
@@ -33,7 +35,9 @@ interface AppViewState {
 class View extends React.PureComponent<AppViewProps, AppViewState> {
   constructor (public props: AppViewProps) {
     super(props)
-    this.state = {}
+    this.state = {
+      requestedPath: ''
+    }
     this.updateCheck = this.updateCheck.bind(this)
     this.forcePath = this.forcePath.bind(this)
     this.onClosePatchNotes = this.onClosePatchNotes.bind(this)
@@ -45,7 +49,7 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
     }
   }
   componentWillReceiveProps (nextProps: AppViewProps) {
-    if (nextProps.location.pathname === this.props.location.pathname/* && nextProps.emulator === this.props.emulator */) return
+    if (nextProps.location.pathname === this.props.location.pathname && nextProps.isConnectedToEmulator === this.props.isConnectedToEmulator ) return
     this.forcePath(nextProps)
   }
   async updateCheck () {
@@ -96,9 +100,9 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
     if (pathName !== '/' && pathName !== '/about' && pathName !== '/faq') {
       if (!props.username) {
         props.dispatch(push('/settings'))
-      }/* else if (!props.emulator && pathName !== '/settings') {
+      } else if (!props.isConnectedToEmulator && pathName !== '/settings') {
         props.dispatch(push('/emulator'))
-      } */ // TODO
+      }
     }
   }
   onClosePatchNotes () {
@@ -197,5 +201,6 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
 export const AppView = connect((state: State) => ({
   username: state.save.appSaveData.username,
   version: state.save.appSaveData.version,
-  route: state.router
+  route: state.router,
+  isConnectedToEmulator: state.connection.isConnectedToEmulator
 }))(View)

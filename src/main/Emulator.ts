@@ -5,6 +5,12 @@ import * as path from 'path'
 
 import { connector } from '.'
 
+enum ConnectionFlag {
+  IS_DISCONNECTED = 0,
+  IS_SERVER = 1,
+  IS_CONNECTED = 2
+}
+
 /**
  * An Emulator object represents the connection
  * to the loaded emulator.
@@ -102,15 +108,9 @@ export class Emulator {
     this.writeMemory(0xFF7703, playerIdBuffer)
   }
 
-  /**
-   * Write server flag to memory.
-   * There must always be one user in charge of various decisions for minigames.
-   *
-   * @param {boolean} hasToken - Whether player is server token holder
-   */
-  public setServerFlag (hasToken: boolean): void {
+  public setConnectionFlag (connectionFlag: ConnectionFlag): void {
     const tokenBuffer = Buffer.allocUnsafe(1)
-    tokenBuffer.writeUInt8(+hasToken, 0)
+    tokenBuffer.writeUInt8(connectionFlag, 0)
     this.writeMemory(0xFF5FFC, tokenBuffer)
   }
 

@@ -27,6 +27,7 @@ export class Net64ServerArea extends React.PureComponent<Net64ServerAreaProps, N
       warning: '',
       loading: false
     }
+    this.onConnect = this.onConnect.bind(this)
     this.updateServers = this.updateServers.bind(this)
     this.renderServers = this.renderServers.bind(this)
   }
@@ -44,6 +45,11 @@ export class Net64ServerArea extends React.PureComponent<Net64ServerAreaProps, N
       loading: false
     })
   }
+  onConnect () {
+    this.setState({
+      loading: true
+    })
+  }
   async updateServers () {
     if (!this.mounted) return
     try {
@@ -59,11 +65,12 @@ export class Net64ServerArea extends React.PureComponent<Net64ServerAreaProps, N
   }
   renderServers (servers: Server[]) {
     return servers.map(
-      server => <Net64ServerPanel key={server.id} server={server} />
+      server => <Net64ServerPanel key={server.id} server={server} onConnect={this.onConnect} />
     )
   }
   render () {
     const servers = this.state.servers
+    const loading = this.state.loading
     const warning = this.state.warning
     const styles: React.CSSProperties = {
       list: {
@@ -72,10 +79,28 @@ export class Net64ServerArea extends React.PureComponent<Net64ServerAreaProps, N
         display: 'flex',
         flexDirection: 'column',
         width: '100%'
+      },
+      loading: {
+        display: 'flex',
+        position: 'fixed',
+        zIndex: '100',
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        top: '0',
+        left: '0',
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+        justifyContent: 'center'
       }
     }
     return (
       <div className='scroll' style={styles.list}>
+        {
+          loading &&
+          <div style={styles.loading}>
+            <img src='img/load.gif' />
+          </div>
+        }
         {
           warning &&
           <WarningPanel warning={warning} />

@@ -4,6 +4,7 @@ import { emulator, createEmulator, deleteEmulator, connection, createConnection,
 import { Emulator } from './Emulator'
 import { MainMessage, RendererMessage } from '../models/Message.model'
 import { IPlayerUpdate, IPlayer } from '../../proto/ServerClientMessage'
+import { Server } from '../models/Server.model';
 
 export class Connector {
   constructor (private window: Electron.BrowserWindow) {
@@ -58,6 +59,10 @@ export class Connector {
   public disconnectEmulator (): void {
     this.window.webContents.send(MainMessage.EMULATOR_DISCONNECT)
     deleteEmulator()
+  }
+
+  public setServer (server: Server): void {
+    this.window.webContents.send(MainMessage.SET_SERVER, server)
   }
 
   public setPlayers (players: IPlayerUpdate[]): void {
