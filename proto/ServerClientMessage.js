@@ -4763,6 +4763,7 @@ $root.Chat = (function() {
      * @property {string|null} [message] Chat message
      * @property {IChatGlobal|null} [global] Chat global
      * @property {IChatPrivate|null} ["private"] Chat private
+     * @property {IChatCommand|null} [command] Chat command
      */
 
     /**
@@ -4820,17 +4821,25 @@ $root.Chat = (function() {
      */
     Chat.prototype["private"] = null;
 
+    /**
+     * Chat command.
+     * @member {IChatCommand|null|undefined} command
+     * @memberof Chat
+     * @instance
+     */
+    Chat.prototype.command = null;
+
     // OneOf field names bound to virtual getters and setters
     var $oneOfFields;
 
     /**
      * Chat messageType.
-     * @member {"global"|"private"|undefined} messageType
+     * @member {"global"|"private"|"command"|undefined} messageType
      * @memberof Chat
      * @instance
      */
     Object.defineProperty(Chat.prototype, "messageType", {
-        get: $util.oneOfGetter($oneOfFields = ["global", "private"]),
+        get: $util.oneOfGetter($oneOfFields = ["global", "private", "command"]),
         set: $util.oneOfSetter($oneOfFields)
     });
 
@@ -4868,6 +4877,8 @@ $root.Chat = (function() {
             $root.ChatGlobal.encode(message.global, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
         if (message["private"] != null && message.hasOwnProperty("private"))
             $root.ChatPrivate.encode(message["private"], writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+        if (message.command != null && message.hasOwnProperty("command"))
+            $root.ChatCommand.encode(message.command, writer.uint32(/* id 255, wireType 2 =*/2042).fork()).ldelim();
         return writer;
     };
 
@@ -4917,6 +4928,9 @@ $root.Chat = (function() {
             case 5:
                 message["private"] = $root.ChatPrivate.decode(reader, reader.uint32());
                 break;
+            case 255:
+                message.command = $root.ChatCommand.decode(reader, reader.uint32());
+                break;
             default:
                 reader.skipType(tag & 7);
                 break;
@@ -4959,6 +4973,7 @@ $root.Chat = (function() {
                 return "chatType: enum value expected";
             case 0:
             case 1:
+            case 255:
                 break;
             }
         if (message.senderId != null && message.hasOwnProperty("senderId"))
@@ -4985,6 +5000,16 @@ $root.Chat = (function() {
                     return "private." + error;
             }
         }
+        if (message.command != null && message.hasOwnProperty("command")) {
+            if (properties.messageType === 1)
+                return "messageType: multiple values";
+            properties.messageType = 1;
+            {
+                var error = $root.ChatCommand.verify(message.command);
+                if (error)
+                    return "command." + error;
+            }
+        }
         return null;
     };
 
@@ -5009,6 +5034,10 @@ $root.Chat = (function() {
         case 1:
             message.chatType = 1;
             break;
+        case "COMMAND":
+        case 255:
+            message.chatType = 255;
+            break;
         }
         if (object.senderId != null)
             message.senderId = object.senderId >>> 0;
@@ -5023,6 +5052,11 @@ $root.Chat = (function() {
             if (typeof object["private"] !== "object")
                 throw TypeError(".Chat.private: object expected");
             message["private"] = $root.ChatPrivate.fromObject(object["private"]);
+        }
+        if (object.command != null) {
+            if (typeof object.command !== "object")
+                throw TypeError(".Chat.command: object expected");
+            message.command = $root.ChatCommand.fromObject(object.command);
         }
         return message;
     };
@@ -5061,6 +5095,11 @@ $root.Chat = (function() {
             if (options.oneofs)
                 object.messageType = "private";
         }
+        if (message.command != null && message.hasOwnProperty("command")) {
+            object.command = $root.ChatCommand.toObject(message.command, options);
+            if (options.oneofs)
+                object.messageType = "command";
+        }
         return object;
     };
 
@@ -5081,11 +5120,13 @@ $root.Chat = (function() {
      * @enum {string}
      * @property {number} GLOBAL=0 GLOBAL value
      * @property {number} PRIVATE=1 PRIVATE value
+     * @property {number} COMMAND=255 COMMAND value
      */
     Chat.ChatType = (function() {
         var valuesById = {}, values = Object.create(valuesById);
         values[valuesById[0] = "GLOBAL"] = 0;
         values[valuesById[1] = "PRIVATE"] = 1;
+        values[valuesById[255] = "COMMAND"] = 255;
         return values;
     })();
 
@@ -5437,6 +5478,209 @@ $root.ChatPrivate = (function() {
     };
 
     return ChatPrivate;
+})();
+
+$root.ChatCommand = (function() {
+
+    /**
+     * Properties of a ChatCommand.
+     * @exports IChatCommand
+     * @interface IChatCommand
+     * @property {Array.<string>|null} ["arguments"] ChatCommand arguments
+     */
+
+    /**
+     * Constructs a new ChatCommand.
+     * @exports ChatCommand
+     * @classdesc Represents a ChatCommand.
+     * @implements IChatCommand
+     * @constructor
+     * @param {IChatCommand=} [properties] Properties to set
+     */
+    function ChatCommand(properties) {
+        this["arguments"] = [];
+        if (properties)
+            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                if (properties[keys[i]] != null)
+                    this[keys[i]] = properties[keys[i]];
+    }
+
+    /**
+     * ChatCommand arguments.
+     * @member {Array.<string>} arguments
+     * @memberof ChatCommand
+     * @instance
+     */
+    ChatCommand.prototype["arguments"] = $util.emptyArray;
+
+    /**
+     * Creates a new ChatCommand instance using the specified properties.
+     * @function create
+     * @memberof ChatCommand
+     * @static
+     * @param {IChatCommand=} [properties] Properties to set
+     * @returns {ChatCommand} ChatCommand instance
+     */
+    ChatCommand.create = function create(properties) {
+        return new ChatCommand(properties);
+    };
+
+    /**
+     * Encodes the specified ChatCommand message. Does not implicitly {@link ChatCommand.verify|verify} messages.
+     * @function encode
+     * @memberof ChatCommand
+     * @static
+     * @param {IChatCommand} message ChatCommand message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    ChatCommand.encode = function encode(message, writer) {
+        if (!writer)
+            writer = $Writer.create();
+        if (message["arguments"] != null && message["arguments"].length)
+            for (var i = 0; i < message["arguments"].length; ++i)
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message["arguments"][i]);
+        return writer;
+    };
+
+    /**
+     * Encodes the specified ChatCommand message, length delimited. Does not implicitly {@link ChatCommand.verify|verify} messages.
+     * @function encodeDelimited
+     * @memberof ChatCommand
+     * @static
+     * @param {IChatCommand} message ChatCommand message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    ChatCommand.encodeDelimited = function encodeDelimited(message, writer) {
+        return this.encode(message, writer).ldelim();
+    };
+
+    /**
+     * Decodes a ChatCommand message from the specified reader or buffer.
+     * @function decode
+     * @memberof ChatCommand
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @param {number} [length] Message length if known beforehand
+     * @returns {ChatCommand} ChatCommand
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    ChatCommand.decode = function decode(reader, length) {
+        if (!(reader instanceof $Reader))
+            reader = $Reader.create(reader);
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.ChatCommand();
+        while (reader.pos < end) {
+            var tag = reader.uint32();
+            switch (tag >>> 3) {
+            case 1:
+                if (!(message["arguments"] && message["arguments"].length))
+                    message["arguments"] = [];
+                message["arguments"].push(reader.string());
+                break;
+            default:
+                reader.skipType(tag & 7);
+                break;
+            }
+        }
+        return message;
+    };
+
+    /**
+     * Decodes a ChatCommand message from the specified reader or buffer, length delimited.
+     * @function decodeDelimited
+     * @memberof ChatCommand
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @returns {ChatCommand} ChatCommand
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    ChatCommand.decodeDelimited = function decodeDelimited(reader) {
+        if (!(reader instanceof $Reader))
+            reader = new $Reader(reader);
+        return this.decode(reader, reader.uint32());
+    };
+
+    /**
+     * Verifies a ChatCommand message.
+     * @function verify
+     * @memberof ChatCommand
+     * @static
+     * @param {Object.<string,*>} message Plain object to verify
+     * @returns {string|null} `null` if valid, otherwise the reason why it is not
+     */
+    ChatCommand.verify = function verify(message) {
+        if (typeof message !== "object" || message === null)
+            return "object expected";
+        if (message["arguments"] != null && message.hasOwnProperty("arguments")) {
+            if (!Array.isArray(message["arguments"]))
+                return "arguments: array expected";
+            for (var i = 0; i < message["arguments"].length; ++i)
+                if (!$util.isString(message["arguments"][i]))
+                    return "arguments: string[] expected";
+        }
+        return null;
+    };
+
+    /**
+     * Creates a ChatCommand message from a plain object. Also converts values to their respective internal types.
+     * @function fromObject
+     * @memberof ChatCommand
+     * @static
+     * @param {Object.<string,*>} object Plain object
+     * @returns {ChatCommand} ChatCommand
+     */
+    ChatCommand.fromObject = function fromObject(object) {
+        if (object instanceof $root.ChatCommand)
+            return object;
+        var message = new $root.ChatCommand();
+        if (object["arguments"]) {
+            if (!Array.isArray(object["arguments"]))
+                throw TypeError(".ChatCommand.arguments: array expected");
+            message["arguments"] = [];
+            for (var i = 0; i < object["arguments"].length; ++i)
+                message["arguments"][i] = String(object["arguments"][i]);
+        }
+        return message;
+    };
+
+    /**
+     * Creates a plain object from a ChatCommand message. Also converts values to other types if specified.
+     * @function toObject
+     * @memberof ChatCommand
+     * @static
+     * @param {ChatCommand} message ChatCommand
+     * @param {$protobuf.IConversionOptions} [options] Conversion options
+     * @returns {Object.<string,*>} Plain object
+     */
+    ChatCommand.toObject = function toObject(message, options) {
+        if (!options)
+            options = {};
+        var object = {};
+        if (options.arrays || options.defaults)
+            object["arguments"] = [];
+        if (message["arguments"] && message["arguments"].length) {
+            object["arguments"] = [];
+            for (var j = 0; j < message["arguments"].length; ++j)
+                object["arguments"][j] = message["arguments"][j];
+        }
+        return object;
+    };
+
+    /**
+     * Converts this ChatCommand to JSON.
+     * @function toJSON
+     * @memberof ChatCommand
+     * @instance
+     * @returns {Object.<string,*>} JSON object
+     */
+    ChatCommand.prototype.toJSON = function toJSON() {
+        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+    };
+
+    return ChatCommand;
 })();
 
 /**

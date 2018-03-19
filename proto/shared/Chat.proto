@@ -4,6 +4,7 @@ message Chat {
   enum ChatType {
     GLOBAL = 0;
     PRIVATE = 1;
+    COMMAND = 255;
   }
   ChatType chat_type = 1;
   uint32 sender_id = 2;
@@ -11,6 +12,7 @@ message Chat {
   oneof message_type {
     ChatGlobal global = 4;
     ChatPrivate private = 5;
+    ChatCommand command = 255;
   }
 }
 
@@ -19,4 +21,8 @@ message ChatGlobal {
 
 message ChatPrivate {
   uint32 receiver_id = 1;
+}
+
+message ChatCommand {
+  repeated string arguments = 1;
 }
