@@ -1,8 +1,9 @@
 import * as WS from 'ws'
 
-import { connector, emulator } from '.'
+import { connector, emulator, deleteConnection } from '.'
 import { Emulator } from './Emulator'
 import { Server } from '../models/Server.model'
+import { buf2hex } from '../utils/Buffer.util'
 import {
   Compression,
   ClientServerMessage,
@@ -72,6 +73,8 @@ export class Connection {
   public disconnect (): void {
     this.onClose(0)
     this.ws.close()
+    emulator!.setConnectionFlag(0)
+    emulator!.setGameMode(1)
   }
 
   /**
@@ -190,7 +193,7 @@ export class Connection {
       !handshake ||
       handshake.playerId == null ||
       handshake.ip == null ||
-      handshake.port == null || 
+      handshake.port == null ||
       handshake.domain == null ||
       handshake.name == null ||
       handshake.description == null ||
@@ -219,6 +222,7 @@ export class Connection {
     }
     emulator!.setPlayerId(this.playerId)
     emulator!.setConnectionFlag(2)
+    emulator!.setGameMode(handshake.gameMode)
     connector.setPlayerId(this.playerId)
     this.loop = setInterval(this.sendAll, UPDATE_INTERVAL)
   }
@@ -302,8 +306,8 @@ export class Connection {
   private onGameMode (serverMessage: IServerMessage): void {
     const gameMode = serverMessage.gameMode
     if (!gameMode || !gameMode.gameMode) return
-    const gameModeBuffer = Buffer.from(new Uint8Array([gameMode.gameMode]).buffer as ArrayBuffer)
-    emulator!.writeMemory(0xFF5FF7, gameModeBuffer)
+    emulator!.setGameMode(gameMode.gameMode)
+    connector.commandMessage(`Gamemode changed to ${gameMode.gameMode}`)
   }
 
   /**
@@ -407,11 +411,13 @@ export class Connection {
         if (emulator!.inGameChatEnabled) {
           emulator!.displayChatMessage(message)
         }
-        connector.chatMessage(message, senderId)
+        connector.globalChatMessage(message, senderId)
         break
       case Chat.ChatType.PRIVATE:
         // TODO
         break
+      case Chat.ChatType.COMMAND:
+        connector.commandMessage(message)
     }
   }
 
@@ -440,15 +446,11 @@ export class Connection {
     if (Date.now() - this.timer < 10000) return
     const buffers = []
     for (let i = 0; i < 24; i++) {
-      buffers.push(this.buf2hex(emulator!.readMemory(0xFF7700 + i * 0x100, 0x1C)))
+      buffers.push(buf2hex(emulator!.readMemory(0xFF7700 + i * 0x100, 0x1C)))
     }
     connector.consoleInfo('Player Buffers:', buffers.reduce((prev, current) => prev + '\n' + current, ''))
-    connector.consoleInfo('0xFF5FF0: ', this.buf2hex(emulator!.readMemory(0xFF5FF0, 0x10)))
+    connector.consoleInfo('0xFF5FF0: ', buf2hex(emulator!.readMemory(0xFF5FF0, 0x10)))
     this.timer = Date.now()
-  }
-
-  private buf2hex (buffer: Uint8Array): string {
-    return Array.prototype.map.call(buffer, (x: any) => ('00' + x.toString(16)).slice(-2)).join(' ')
   }
 
   /**
@@ -523,11 +525,11 @@ export class Connection {
   }
 
   /**
-   * Send chat message to server.
+   * Send global chat message to server.
    *
    * @param {string} message - The message to send
    */
-  public sendChatMessage (message: string): void {
+  public sendGlobalChatMessage (message: string): void {
     const chat: IClientServerMessage = {
       compression: Compression.NONE,
       data: {
@@ -535,6 +537,30 @@ export class Connection {
         chat: {
           chatType: Chat.ChatType.GLOBAL,
           message
+        }
+      }
+    }
+    const chatMessage = ClientServerMessage.encode(ClientServerMessage.fromObject(chat)).finish()
+    this.ws.send(chatMessage)
+  }
+
+  /**
+   * Send command to server.
+   *
+   * @param {string} message - The message to send
+   * @param {string[]} args - The command's arguments
+   */
+  public sendCommandMessage (message: string, args: string[]): void {
+    const chat: IClientServerMessage = {
+      compression: Compression.NONE,
+      data: {
+        messageType: ClientServer.MessageType.CHAT,
+        chat: {
+          chatType: Chat.ChatType.COMMAND,
+          message,
+          command: {
+            arguments: args
+          }
         }
       }
     }

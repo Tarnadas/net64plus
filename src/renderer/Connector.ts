@@ -16,7 +16,8 @@ export class Connector {
     ipcRenderer.on(MainMessage.SET_PLAYER_ID, this.onSetPlayerId)
     ipcRenderer.on(MainMessage.SERVER_FULL, this.onServerFull)
     ipcRenderer.on(MainMessage.WRONG_VERSION, this.onWrongVersion)
-    ipcRenderer.on(MainMessage.CHAT_MESSAGE, this.onChatMessage)
+    ipcRenderer.on(MainMessage.CHAT_GLOBAL, this.onGlobalChatMessage)
+    ipcRenderer.on(MainMessage.CHAT_COMMAND, this.onCommandMessage)
     ipcRenderer.on(MainMessage.SET_CONNECTION_ERROR, this.onConnectionError)
     ipcRenderer.on(MainMessage.CONSOLE_INFO, this.onConsoleInfo)
   }
@@ -65,11 +66,15 @@ export class Connector {
     // TODO add server version -> client version mapping
   }
 
-  private onChatMessage = (event: Electron.Event, { message, senderId }: { message: string, senderId: number }) => {
+  private onGlobalChatMessage = (event: Electron.Event, { message, senderId }: { message: string, senderId: number }) => {
     const server = store.getState().connection.server
     if (!server || !server.players) return
     const username = server.players[senderId] && server.players[senderId].username
     addGlobalMessage(message, username || '?')
+  }
+
+  private onCommandMessage = (event: Electron.Event, { message }: { message: string }) => {
+    addGlobalMessage(message, '[SERVER]')
   }
 
   private onConnectionError = (event: Electron.Event, message: string) => {
@@ -108,7 +113,11 @@ export class Connector {
     ipcRenderer.send(RendererMessage.CHANGE_CHARACTER, characterId)
   }
 
-  public sendChatMessage (message: string): void {
-    ipcRenderer.send(RendererMessage.CHAT_MESSAGE, message)
+  public sendGlobalChatMessage (message: string): void {
+    ipcRenderer.send(RendererMessage.CHAT_GLOBAL, message)
+  }
+
+  public sendCommandMessage (message: string, args: string[]): void {
+    ipcRenderer.send(RendererMessage.CHAT_COMMAND, { message, args })
   }
 }

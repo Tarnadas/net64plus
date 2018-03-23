@@ -42,22 +42,24 @@ class Area extends React.PureComponent<ChatAreaProps, ChatAreaState> {
     })
   }
   onKeyPress (e: React.KeyboardEvent<any>) {
-    if (e.key === 'Enter') {
-      if (this.state.message) {
-        connector.sendChatMessage(this.state.message)
-        this.setState({
-          message: ''
-        })
-      }
-    }
+    if (e.key !== 'Enter') return
+    if (!this.state.message) return
+    this.sendChatMessage(this.state.message)
   }
   onSend () {
-    if (this.state.message) {
-      connector.sendChatMessage(this.state.message)
-      this.setState({
-        message: ''
-      })
+    if (!this.state.message) return
+    this.sendChatMessage(this.state.message)
+  }
+  private sendChatMessage (message: string): void {
+    if (message[0] === '/') {
+      const [ command, ...args ] = message.substr(1).split(' ')
+      connector.sendCommandMessage(command, args)
+    } else {
+      connector.sendGlobalChatMessage(this.state.message)
     }
+    this.setState({
+      message: ''
+    })
   }
   renderChatMessages (chat: ChatMessage[]) {
     return chat.map(
@@ -92,7 +94,7 @@ class Area extends React.PureComponent<ChatAreaProps, ChatAreaState> {
         overflowX: 'hidden',
         flexDirection: 'column',
         backgroundColor: '#fff',
-        flex: '1 0 150px',
+        flex: '1 0 250px',
         width: '100%',
         fontFamily: 'arial'
       },

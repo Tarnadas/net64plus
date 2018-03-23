@@ -4,6 +4,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 
 import { connector } from '.'
+import { buf2hex } from '../utils/Buffer.util'
 
 enum ConnectionFlag {
   IS_DISCONNECTED = 0,
@@ -70,12 +71,9 @@ export class Emulator {
       this.writeMemory(patchBuffer.patchId, patchBuffer.data)
     }
 
-    const b = Buffer.allocUnsafe(1)
-    b.writeUInt8(characterId + 1, 0)
-    this.writeMemory(0xFF5FF3, b) // character ID
-    b.writeUInt8(0, 0)
-    this.writeMemory(0xFF5FFC, b) // isServer flag
-    // this.writeMemory(0xFF7703, b)
+    this.changeCharacter(characterId)
+    this.setGameMode(1)
+    this.setConnectionFlag(0)
   }
 
   /**
@@ -112,6 +110,12 @@ export class Emulator {
     const tokenBuffer = Buffer.allocUnsafe(1)
     tokenBuffer.writeUInt8(connectionFlag, 0)
     this.writeMemory(0xFF5FFC, tokenBuffer)
+  }
+
+  public setGameMode (gameMode: number): void {
+    const gameModeBuffer = Buffer.from(new Uint8Array([0, 0, 0, gameMode]).buffer as ArrayBuffer)
+    this.writeMemory(0xFF5FF4, gameModeBuffer)
+    connector.consoleInfo('Changed Gamemode. 0xFF5FF0: ', buf2hex(this.readMemory(0xFF5FF0, 0x10)))
   }
 
   /**

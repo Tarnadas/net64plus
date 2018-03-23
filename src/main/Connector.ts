@@ -3,8 +3,8 @@ import { BrowserWindow, ipcMain } from 'electron'
 import { emulator, createEmulator, deleteEmulator, connection, createConnection, deleteConnection } from '.'
 import { Emulator } from './Emulator'
 import { MainMessage, RendererMessage } from '../models/Message.model'
+import { Server } from '../models/Server.model'
 import { IPlayerUpdate, IPlayer } from '../../proto/ServerClientMessage'
-import { Server } from '../models/Server.model';
 
 export class Connector {
   constructor (private window: Electron.BrowserWindow) {
@@ -13,7 +13,8 @@ export class Connector {
     ipcMain.on(RendererMessage.CREATE_EMULATOR_CONNECTION, this.onCreateEmulatorConnection)
     ipcMain.on(RendererMessage.DISCONNECT_EMULATOR, this.onDisconnectEmulator)
     ipcMain.on(RendererMessage.CHANGE_CHARACTER, this.onChangeCharacter)
-    ipcMain.on(RendererMessage.CHAT_MESSAGE, this.onSendChatMessage)
+    ipcMain.on(RendererMessage.CHAT_GLOBAL, this.onSendGlobalChatMessage)
+    ipcMain.on(RendererMessage.CHAT_COMMAND, this.onSendCommandMessage)
   }
 
   private onCreateConnection = (
@@ -47,9 +48,14 @@ export class Connector {
     emulator.changeCharacter(characterId)
   }
 
-  private onSendChatMessage = (event: Electron.Event, message: string) => {
+  private onSendGlobalChatMessage = (event: Electron.Event, message: string) => {
     if (!connection) return
-    connection.sendChatMessage(message)
+    connection.sendGlobalChatMessage(message)
+  }
+
+  private onSendCommandMessage = (event: Electron.Event, { message, args }: { message: string, args: string[] }) => {
+    if (!connection) return
+    connection.sendCommandMessage(message, args)
   }
 
   public closeWebSocket (code: number, hasError: boolean): void {
@@ -85,8 +91,12 @@ export class Connector {
     this.window.webContents.send(MainMessage.WRONG_VERSION, { majorVersion, minorVersion })
   }
 
-  public chatMessage (message: string, senderId: number): void {
-    this.window.webContents.send(MainMessage.CHAT_MESSAGE, { message, senderId })
+  public globalChatMessage (message: string, senderId: number): void {
+    this.window.webContents.send(MainMessage.CHAT_GLOBAL, { message, senderId })
+  }
+
+  public commandMessage (message: string): void {
+    this.window.webContents.send(MainMessage.CHAT_COMMAND, { message })
   }
 
   public setConnectionError (message: string): void {
