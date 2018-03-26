@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
+import * as marked from 'marked'
+import { emojify } from 'node-emoji'
 
 import { connector } from '../..'
 import { SMMButton } from '../buttons/SMMButton'
@@ -63,12 +65,18 @@ class Area extends React.PureComponent<ChatAreaProps, ChatAreaState> {
   }
   renderChatMessages (chat: ChatMessage[]) {
     return chat.map(
-      message =>
-        <div key={message.key}>
-          {
-            `[${message.time}] ${message.username}: ${message.message}`
-          }
-        </div>
+      message => {
+        const html = emojify(marked(`[${message.time}] ${message.username}: ${message.message}`))
+          .replace('<p>', '<p class="header">')
+        return (
+          <div
+            key={message.key}
+            dangerouslySetInnerHTML={{
+              __html: html
+            }}
+          />
+        )
+      }
     )
   }
   render () {
@@ -109,7 +117,7 @@ class Area extends React.PureComponent<ChatAreaProps, ChatAreaState> {
           <input style={styles.input} value={this.state.message} onChange={this.onMessageChange} onKeyPress={this.onKeyPress} />
           <SMMButton text='Send' iconSrc='img/submit.png' onClick={this.onSend} />
         </div>
-        <div className='scroll' style={styles.chat} ref={x => { this.chat = x }}>
+        <div className='chat scroll' style={styles.chat} ref={x => { this.chat = x }}>
           {
             this.renderChatMessages(this.props.chat)
           }
