@@ -1,3 +1,5 @@
+import './Net64ServerPanel.scss'
+
 import * as React from 'react'
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
@@ -25,6 +27,7 @@ interface Net64ServerPanelProps {
 
 interface Net64ServerPanelState {
   display: boolean
+  displayDescription: boolean
   warning: string
 }
 
@@ -33,23 +36,24 @@ const CHARACTER_IMAGES = [
 ]
 
 class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelState> {
-  private description: HTMLElement | null = null
-
   constructor (public props: Net64ServerPanelProps) {
     super(props)
     this.state = {
       display: !!props.isConnected,
+      displayDescription: true,
       warning: ''
     }
     this.onToggle = this.onToggle.bind(this)
+    this.handleDescriptionToggle = this.handleDescriptionToggle.bind(this)
     this.onConnect = this.onConnect.bind(this)
     this.onDisconnect = this.onDisconnect.bind(this)
     this.renderPlayers = this.renderPlayers.bind(this)
   }
-  componentDidMount () {
-    if (!this.props.server.description || !this.description) return
-    this.description.innerHTML = emojify(marked(this.props.server.description))
-    const links: NodeListOf<HTMLElement> = this.description.querySelectorAll('.markdown a')
+  getDescription = () => {
+    if (!this.props.server.description) return ''
+    let description = emojify(marked(this.props.server.description))
+    const document: Document = new DOMParser().parseFromString(description, 'text/html')
+    const links: NodeListOf<HTMLElement> = document.querySelectorAll('.markdown a')
     for (let i = 0; i < links.length; i++) {
       const href = links[i].getAttribute('href')
       links[i].removeAttribute('href')
@@ -58,15 +62,18 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
         shell.openExternal(href)
       }
     }
-  }
-  componentWillUpdate (nextProps: Net64ServerPanelProps) {
-    if (!nextProps.server.description || nextProps.server.description === this.props.server.description || !this.description) return
-    this.description.innerHTML = emojify(marked(nextProps.server.description))
+    description = document.body.outerHTML
+    return description
   }
   onToggle () {
     if (this.props.isConnected) return
     this.setState(prevState => ({
       display: !prevState.display
+    }))
+  }
+  handleDescriptionToggle () {
+    this.setState(prevState => ({
+      displayDescription: !prevState.displayDescription
     }))
   }
   onConnect () {
@@ -85,16 +92,15 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
     connector.disconnect()
   }
   renderPlayers (players: IPlayer[]) {
-    const style = {
-      borderBottom: '1px solid black',
-      borderTop: '1px solid black',
-      display: 'flex'
-    }
     return players
       .filter(player => player)
+      .flatMap(a => [ a, a, a, a, a, a, a, a, a, a, a, a, a, a ])
       .map(
         (player, index) =>
-          <div style={style} key={index}>
+          <div
+            key={index}
+            className='net64-server-panel-player'
+          >
             <img src={`img/${CHARACTER_IMAGES[player.characterId || 0]}`} />
             <div>
               { player.username }
@@ -103,10 +109,9 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
       )
   }
   render () {
-    const server = this.props.server
+    const { server, isConnected } = this.props
+    const { display, displayDescription, warning } = this.state
     const players = server.players || []
-    const isConnected = this.props.isConnected
-    const warning = this.state.warning
     const styles: React.CSSProperties = {
       panel: {
         fontSize: '18px',
@@ -134,7 +139,7 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
         textAlign: 'right'
       },
       details: {
-        display: this.state.display ? 'flex' : 'none',
+        display: display ? 'flex' : 'none',
         margin: '4px 10px 0 10px',
         width: 'calc(100% - 20px)',
         backgroundColor: 'rgba(255,255,255,0.3)',
@@ -143,20 +148,21 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
       },
       left: {
         display: 'flex',
-        flexDirection: 'column',
-        width: '50%',
-        flex: '1 0 auto',
-        minWidth: '300px',
+        minWidth: displayDescription ? '300px' : undefined,
+        width: displayDescription ? '50%' : undefined,
         wordWrap: 'break-word'
       },
       right: {
         display: 'flex',
         flexDirection: 'column',
-        width: '50%',
-        padding: '6px',
+        flexWrap: 'wrap',
+        alignItems: 'stretch',
         flex: '1 0 auto',
+        padding: '6px',
+        width: '50%',
         minWidth: '300px',
-        maxWidth: '500px'
+        maxHeight: '340px',
+        overflow: 'hidden'
       },
       el: {
         margin: '6px'
@@ -181,10 +187,24 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
             <WarningPanel warning={warning} />
           }
           <div style={styles.left}>
-            <div style={styles.el}>
-              { server.domain || server.ip }:{ server.port }
+            <div
+              className={`net64-server-panel-description-toggle${!displayDescription ? ' net64-server-panel-description-toggle-inactive' : ''}`}
+              onClick={this.handleDescriptionToggle}
+            >
+              <img src='img/arrow.svg' style={{ width: '100%' }} />
             </div>
-            <div className='markdown' style={styles.el} ref={x => { this.description = x }} />
+            <div
+              className={`net64-server-panel-description${!displayDescription ? ' net64-server-panel-description-inactive' : ''}`}
+            >
+              <div style={styles.el}>
+                { server.domain || server.ip }:{ server.port }
+              </div>
+              <div
+                className='markdown'
+                style={styles.el}
+                dangerouslySetInnerHTML={{ __html: this.getDescription() }}
+              />
+            </div>
           </div>
           <div style={styles.right}>
             {

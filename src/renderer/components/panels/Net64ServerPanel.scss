@@ -1,0 +1,36 @@
+.net64-server-panel {
+  &-description {
+    &-inactive {
+      display: none;
+    }
+
+    &-toggle {
+      display: flex;
+      align-items: center;
+      min-width: 24px;
+      max-width: 24px;
+      min-height: 50px;
+      max-height: 100%;
+      cursor: pointer;
+      border-radius: 4px;
+      background-color: rgba(255,255,255,0.1);
+  
+      & > img {
+        transition: 0.3s linear transform;
+      }
+      &-inactive > img {
+        transform: rotate(180deg);
+      }
+  
+      &:hover {
+        background-color: rgba(255,255,255,0.3);
+      }
+    }
+  }
+
+  &-player {
+    display: flex;
+    border-bottom: 1px solid black;
+    border-top: 1px solid black;
+  }
+}

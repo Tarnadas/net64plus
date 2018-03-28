@@ -5,6 +5,7 @@
 !/build/winprocess/
 !/build/img/
 !/build/styles/
+/build/styles/renderer.*
 !/build/winprocess.node
 /release/
 yarn-error.log
