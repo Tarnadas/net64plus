@@ -7,7 +7,7 @@ Here are some rules and guidelines for contributing.
 ## Make an issue
 
 You should always use GitHub issues to talk about things that you want to be implemented or bugs that you found.
-If you are just writing in some chat app like Discord, it is very likely that noone who is responsible for the code will ever see it, so please use GitHub as a discussion platform.
+If you are just writing in some chat app like Discord, it is very likely that no-one who is responsible for the code will ever see it, so please use GitHub as a discussion platform.
 
 #### Did you find a bug?
 
