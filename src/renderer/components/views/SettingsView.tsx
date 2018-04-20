@@ -133,11 +133,10 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
             <option value='5'>Toad</option>
             <option value='6'>Waluigi</option>
             <option value='7'>Rosalina</option>
-            <option value='8'>9</option>
-            <option value='9'>10</option>
-            <option value='10'>11</option>
-            <option value='11'>12</option>
-            <option value='12'>13</option>
+            <option value='8'>Sonic</option>
+            <option value='9'>Knuckles</option>
+            <option value='10'>Goomba</option>
+            <option value='11'>Kirby</option>
           </select>
         </div>
         <div style={styles.setting}>
