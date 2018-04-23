@@ -113,8 +113,10 @@ export class Emulator {
   }
 
   public setGameMode (gameMode: number): void {
-    const gameModeBuffer = Buffer.from(new Uint8Array([0, 0, 0, gameMode]).buffer as ArrayBuffer)
-    this.writeMemory(0xFF5FF4, gameModeBuffer)
+    const gameModeBuffer = Buffer.from(new Uint8Array([gameMode]).buffer as ArrayBuffer)
+    this.writeMemory(0xFF5FF7, gameModeBuffer)
+    this.writeMemory(0xFF7716, gameModeBuffer)
+    this.writeMemory(0xFF7816, gameModeBuffer)
     connector.consoleInfo('Changed Gamemode. 0xFF5FF0: ', buf2hex(this.readMemory(0xFF5FF0, 0x10)))
   }
 
