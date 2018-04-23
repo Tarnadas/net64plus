@@ -94,7 +94,6 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
   renderPlayers (players: IPlayer[]) {
     return players
       .filter(player => player)
-      .flatMap(a => [ a, a, a, a, a, a, a, a, a, a, a, a, a, a ])
       .map(
         (player, index) =>
           <div
