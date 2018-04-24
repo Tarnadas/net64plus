@@ -162,31 +162,35 @@ export class Connection {
         messageData = message.data
     }
     if (!messageData) return
-    switch (messageData.messageType) {
-      case ServerClient.MessageType.HANDSHAKE:
-        this.onHandshake(messageData)
-        break
-      case ServerClient.MessageType.PING:
-        this.onPing(messageData)
-        break
-      case ServerClient.MessageType.SERVER_MESSAGE:
-        this.onServerMessage(messageData)
-        break
-      case ServerClient.MessageType.PLAYER_LIST_UPDATE:
-        this.onPlayerListUpdate(messageData)
-        break
-      case ServerClient.MessageType.PLAYER_UPDATE:
-        this.onPlayerUpdate(messageData)
-        break
-      case ServerClient.MessageType.PLAYER_DATA:
-        this.onPlayerData(messageData)
-        break
-      case ServerClient.MessageType.META_DATA:
-        this.onMetaData(messageData)
-        break
-      case ServerClient.MessageType.CHAT:
-        this.onChatMessage(messageData)
-        break
+    try {
+      switch (messageData.messageType) {
+        case ServerClient.MessageType.HANDSHAKE:
+          this.onHandshake(messageData)
+          break
+        case ServerClient.MessageType.PING:
+          this.onPing(messageData)
+          break
+        case ServerClient.MessageType.SERVER_MESSAGE:
+          this.onServerMessage(messageData)
+          break
+        case ServerClient.MessageType.PLAYER_LIST_UPDATE:
+          this.onPlayerListUpdate(messageData)
+          break
+        case ServerClient.MessageType.PLAYER_UPDATE:
+          this.onPlayerUpdate(messageData)
+          break
+        case ServerClient.MessageType.PLAYER_DATA:
+          this.onPlayerData(messageData)
+          break
+        case ServerClient.MessageType.META_DATA:
+          this.onMetaData(messageData)
+          break
+        case ServerClient.MessageType.CHAT:
+          this.onChatMessage(messageData)
+          break
+      }
+    } catch (err) {
+      this.catchError()
     }
   }
 
@@ -454,10 +458,14 @@ export class Connection {
         this.printPlayerData()
       }
     } catch (err) {
-      // Emulator might have been closed
-      this.disconnect()
-      connector.disconnectEmulator()
+      this.catchError()
     }
+  }
+
+  private catchError (): void {
+    // Emulator might have been closed
+    this.disconnect()
+    connector.disconnectEmulator()
   }
 
   private printPlayerData (): void {
@@ -516,7 +524,7 @@ export class Connection {
       }
       const length = emulator!.readMemory(baseAdr + offset + 4, 4).readUInt32LE(0)
       const writeTo = emulator!.readMemory(baseAdr + offset, 8).readUInt32LE(0) - 0x80000000
-      metaDataArray.push({
+        metaDataArray.push({
         length,
         address: writeTo,
         data: emulator!.readMemory(readFrom, length)
