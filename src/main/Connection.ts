@@ -1,5 +1,7 @@
 import * as WS from 'ws'
 
+import * as zlib from 'zlib'
+
 import { connector, emulator, deleteConnection } from '.'
 import { Emulator } from './Emulator'
 import { Server } from '../models/Server.model'
@@ -142,17 +144,23 @@ export class Connection {
    *
    * @param {Buffer} data - Received data
    */
-  private onMessage (data: Buffer): void {
+  private async onMessage (data: Buffer): Promise<void> {
     if (!emulator) {
       this.disconnect()
       return
     }
     const message = ServerClientMessage.decode(data)
-    if (message.compression === Compression.ZSTD) {
-      // TODO compression
-      return
+    let messageData: typeof message.data
+    switch (message.compression) {
+      case Compression.ZSTD:
+        throw new Error('ZSTD decompression not yet implemented!')
+      case Compression.GZIP:
+        if (!message.compressedData) return
+        messageData = await this.decompressGzipMessage(message.compressedData)
+        break
+      default:
+        messageData = message.data
     }
-    const messageData = message.data
     if (!messageData) return
     switch (messageData.messageType) {
       case ServerClient.MessageType.HANDSHAKE:
@@ -180,6 +188,16 @@ export class Connection {
         this.onChatMessage(messageData)
         break
     }
+  }
+
+  private async decompressGzipMessage (dataBuffer: Uint8Array): Promise<IServerClient> {
+     const decompressedData = await new Promise<Buffer>((resolve, reject) => {
+      zlib.gunzip(dataBuffer as Buffer, (err, decompressedBuffer) => {
+        if (err) reject(err)
+        resolve(decompressedBuffer)
+      })
+    })
+    return ServerClient.decode(decompressedData)
   }
 
   /**
