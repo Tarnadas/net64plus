@@ -13,7 +13,7 @@ import { WarningPanel } from '../panels/WarningPanel'
 import { disconnect } from '../../actions/connection'
 import { State } from '../../../models/State.model'
 import { Server } from '../../../models/Server.model'
-import { IPlayer } from '../../../../proto/ServerClientMessage'
+import { IPlayer, GameModeType } from '../../../../proto/ServerClientMessage'
 
 interface Net64ServerPanelProps {
   dispatch: Dispatch<State>
@@ -107,26 +107,49 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
           </div>
       )
   }
+  private getGameMode (server: Server): string {
+    switch (server.gameMode) {
+      case GameModeType.DEFAULT:
+        return 'Regular'
+      case GameModeType.INTERACTIONLESS:
+        return 'Interactionless'
+      case GameModeType.THIRD_PERSON_SHOOTER:
+        return '3rd Person Shooter'
+      case GameModeType.PROP_HUNT:
+        return 'Prop Hunt'
+      case GameModeType.TAG:
+        return 'Tag'
+      case GameModeType.BOSS_RUSH:
+        return 'Boss Rush'
+      case GameModeType.WARIO_WARE:
+        return 'Wario Ware'
+    }
+    return ''
+  }
+  private getGameModeImgSrc (server: Server): string | undefined {
+    switch (server.gameMode) {
+      case GameModeType.DEFAULT:
+        return 'img/regular.svg'
+      case GameModeType.INTERACTIONLESS:
+        return 'img/interactionless.svg'
+      case GameModeType.THIRD_PERSON_SHOOTER:
+        return 'img/shooter.svg'
+      case GameModeType.PROP_HUNT:
+        return 'img/prop_hunt.svg'
+      case GameModeType.TAG:
+        return 'img/tag.svg'
+      case GameModeType.BOSS_RUSH:
+        return 'img/boss_rush.png'
+      case GameModeType.WARIO_WARE:
+        return 'img/wario_ware.png'
+    }
+  }
   render () {
     const { server, isConnected } = this.props
     const { display, displayDescription, warning } = this.state
     const players = server.players || []
+    let gameMode: string | undefined = this.getGameModeImgSrc(server)
     const styles: React.CSSProperties = {
-      panel: {
-        fontSize: '18px',
-        margin: '10px 0'
-      },
-      header: {
-        width: '100%',
-        padding: '6px 12px',
-        backgroundColor: '#fff8af',
-        borderRadius: '6px',
-        border: '4px solid #f8ca00',
-        boxShadow: '0 0 0 4px black',
-        cursor: 'pointer',
-        display: 'flex',
-        flexWrap: 'wrap'
-      },
       name: {
         flex: '1 1 auto',
         wordWrap: 'break-word',
@@ -168,11 +191,20 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
       }
     }
     return (
-      <div style={styles.panel}>
-        <div style={styles.header} onClick={this.onToggle}>
+      <div className='net64-server-panel'>
+        <div
+          className='net64-server-panel-header'
+          onClick={this.onToggle}
+        >
           <div style={{ flex: '0 0 40px' }}>
             { server.countryCode || '' }
           </div>
+          {
+            gameMode &&
+            <div className='net64-server-panel-header-gamemode'>
+              <img src={gameMode} />
+            </div>
+          }
           <div style={styles.name}>
             { server.name || `${server.ip}:${server.port}` }
           </div>
@@ -198,6 +230,15 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
               <div style={styles.el}>
                 { server.domain || server.ip }:{ server.port }
               </div>
+              {
+                gameMode &&
+                <div
+                  className='net64-server-panel-gamemode'
+                  style={styles.el}
+                >
+                  Game Mode: { this.getGameMode(server) }
+                </div>
+              }
               <div
                 className='markdown'
                 style={styles.el}

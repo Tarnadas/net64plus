@@ -1,4 +1,28 @@
 .net64-server-panel {
+  font-size: 18px;
+  margin: 10px 0;
+
+  &-header {
+    width: 100%;
+    padding: 6px 12px;
+    background-color: #fff8af;
+    border-radius: 6px;
+    border: 4px solid #f8ca00;
+    box-shadow: 0 0 0 4px black;
+    cursor: pointer;
+    display: flex;
+    flex-wrap: wrap;
+
+    &-gamemode {
+      height: 18px;
+      width: 36px;
+
+      & > img {
+        height: 100%;
+      }
+    }
+  }
+
   &-description {
     &-inactive {
       display: none;
