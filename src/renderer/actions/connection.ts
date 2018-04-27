@@ -4,6 +4,7 @@ import {
   SetConnectionErrorAction,
   SetPlayersAction,
   SetPlayerAction,
+  SetGameModeAction,
   DisconnectAction,
   ConnectionActionType
 } from './models/connection.model'
@@ -43,6 +44,13 @@ export function setPlayer (playerId: number, player: IPlayer): SetPlayerAction {
     type: ConnectionActionType.SET_PLAYER,
     playerId,
     player
+  }
+}
+
+export function setGameMode (gameMode: number): SetGameModeAction {
+  return {
+    type: ConnectionActionType.GAME_MODE,
+    gameMode
   }
 }
 

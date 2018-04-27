@@ -35,6 +35,10 @@ export const connection = (state: ConnectionState = initialState.connection, act
         if (!draft.server.players) draft.server.players = []
         draft.server.players[action.playerId] = action.player
         break
+      case ConnectionActionType.GAME_MODE:
+        if (!draft.server) return
+        draft.server.gameMode = action.gameMode
+        break
       case ConnectionActionType.DISCONNECT:
         draft.server = null
         break

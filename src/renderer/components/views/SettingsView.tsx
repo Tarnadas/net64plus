@@ -67,7 +67,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
         warning: 'Your username is too short'
       })
     } else {
-      connector.changeCharacter(this.state.characterId)
+      connector.playerUpdate({ username, characterId: this.state.characterId })
       this.props.dispatch(setUsername(username))
       this.props.dispatch(setCharacter(this.state.characterId))
       this.props.dispatch(setEmuChat(this.state.emuChat))

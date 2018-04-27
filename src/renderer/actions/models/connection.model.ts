@@ -24,6 +24,10 @@ export interface SetPlayerAction extends Action {
   player: IPlayer
 }
 
+export interface SetGameModeAction extends Action {
+  gameMode: number
+}
+
 export type DisconnectAction = Action
 
 export type ConnectionAction =
@@ -32,6 +36,7 @@ export type ConnectionAction =
   & SetConnectionErrorAction
   & SetPlayersAction
   & SetPlayerAction
+  & SetGameModeAction
   & DisconnectAction
 
 export enum ConnectionActionType {
@@ -40,5 +45,6 @@ export enum ConnectionActionType {
   SET_CONNECTION_ERROR = 'SET_CONNECTION_ERROR',
   SET_PLAYERS = 'SET_PLAYERS',
   SET_PLAYER = 'SET_PLAYER',
+  GAME_MODE = 'GAME_MODE',
   DISCONNECT = 'DISCONNECT'
 }

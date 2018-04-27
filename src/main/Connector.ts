@@ -12,7 +12,7 @@ export class Connector {
     ipcMain.on(RendererMessage.DISCONNECT, this.onDisconnect)
     ipcMain.on(RendererMessage.CREATE_EMULATOR_CONNECTION, this.onCreateEmulatorConnection)
     ipcMain.on(RendererMessage.DISCONNECT_EMULATOR, this.onDisconnectEmulator)
-    ipcMain.on(RendererMessage.CHANGE_CHARACTER, this.onChangeCharacter)
+    ipcMain.on(RendererMessage.PLAYER_UPDATE, this.onPlayerUpdate)
     ipcMain.on(RendererMessage.CHAT_GLOBAL, this.onSendGlobalChatMessage)
     ipcMain.on(RendererMessage.CHAT_COMMAND, this.onSendCommandMessage)
   }
@@ -43,9 +43,11 @@ export class Connector {
     deleteEmulator()
   }
 
-  private onChangeCharacter = (event: Electron.Event, characterId: number) => {
+  private onPlayerUpdate = (event: Electron.Event, { username, characterId }: { username: string, characterId: number }) => {
     if (!emulator) return
     emulator.changeCharacter(characterId)
+    if (!connection) return
+    connection.sendPlayerUpdate({ username, characterId })
   }
 
   private onSendGlobalChatMessage = (event: Electron.Event, message: string) => {
@@ -81,6 +83,10 @@ export class Connector {
 
   public setPlayerId (playerId: number): void {
     this.window.webContents.send(MainMessage.SET_PLAYER_ID, playerId)
+  }
+
+  public setGameMode (gameMode: number): void {
+    this.window.webContents.send(MainMessage.GAME_MODE, gameMode)
   }
 
   public serverFull (): void {

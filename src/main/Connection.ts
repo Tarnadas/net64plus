@@ -329,6 +329,7 @@ export class Connection {
     const gameMode = serverMessage.gameMode
     if (!gameMode || !gameMode.gameMode) return
     emulator!.setGameMode(gameMode.gameMode)
+    connector.setGameMode(gameMode.gameMode)
     connector.commandMessage(`Gamemode changed to ${gameMode.gameMode}`)
   }
 

@@ -2,7 +2,7 @@ import { ipcRenderer } from 'electron'
 
 import { store } from '.'
 import { addGlobalMessage, clearGlobalMessages } from './utils/chat.util'
-import { isConnectedToEmulator, disconnect, setConnectionError, setPlayer, setPlayers, setServer } from './actions/connection'
+import { isConnectedToEmulator, disconnect, setConnectionError, setPlayer, setPlayers, setServer, setGameMode } from './actions/connection'
 import { MainMessage, RendererMessage } from '../models/Message.model'
 import { Server } from '../models/Server.model'
 import { IPlayer, IPlayerUpdate } from '../../proto/ServerClientMessage'
@@ -13,7 +13,9 @@ export class Connector {
     ipcRenderer.on(MainMessage.EMULATOR_DISCONNECT, this.onEmulatorDisconnect)
     ipcRenderer.on(MainMessage.SET_SERVER, this.onSetServer)
     ipcRenderer.on(MainMessage.SET_PLAYERS, this.onSetPlayers)
+    ipcRenderer.on(MainMessage.SET_PLAYER, this.onSetPlayer)
     ipcRenderer.on(MainMessage.SET_PLAYER_ID, this.onSetPlayerId)
+    ipcRenderer.on(MainMessage.GAME_MODE, this.onSetGameMode)
     ipcRenderer.on(MainMessage.SERVER_FULL, this.onServerFull)
     ipcRenderer.on(MainMessage.WRONG_VERSION, this.onWrongVersion)
     ipcRenderer.on(MainMessage.CHAT_GLOBAL, this.onGlobalChatMessage)
@@ -52,6 +54,10 @@ export class Connector {
 
   private onSetPlayerId = (event: Electron.Event, playerId: number) => {
     addGlobalMessage(`Your player ID is ${playerId}`, '[SERVER]')
+  }
+
+  private onSetGameMode = (event: Electron.Event, gameMode: number) => {
+    store.dispatch(setGameMode(gameMode))
   }
 
   private onServerFull = () => {
@@ -109,8 +115,8 @@ export class Connector {
     ipcRenderer.send(RendererMessage.DISCONNECT_EMULATOR)
   }
 
-  public changeCharacter (characterId: number): void {
-    ipcRenderer.send(RendererMessage.CHANGE_CHARACTER, characterId)
+  public playerUpdate (update: { username: string, characterId: number }): void {
+    ipcRenderer.send(RendererMessage.PLAYER_UPDATE, update)
   }
 
   public sendGlobalChatMessage (message: string): void {
