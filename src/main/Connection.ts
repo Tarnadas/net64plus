@@ -195,7 +195,7 @@ export class Connection {
   }
 
   private async decompressGzipMessage (dataBuffer: Uint8Array): Promise<IServerClient> {
-     const decompressedData = await new Promise<Buffer>((resolve, reject) => {
+    const decompressedData = await new Promise<Buffer>((resolve, reject) => {
       zlib.gunzip(dataBuffer as Buffer, (err, decompressedBuffer) => {
         if (err) reject(err)
         resolve(decompressedBuffer)
@@ -525,7 +525,7 @@ export class Connection {
       }
       const length = emulator!.readMemory(baseAdr + offset + 4, 4).readUInt32LE(0)
       const writeTo = emulator!.readMemory(baseAdr + offset, 8).readUInt32LE(0) - 0x80000000
-        metaDataArray.push({
+      metaDataArray.push({
         length,
         address: writeTo,
         data: emulator!.readMemory(readFrom, length)

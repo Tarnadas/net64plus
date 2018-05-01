@@ -49,7 +49,7 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
     }
   }
   componentWillReceiveProps (nextProps: AppViewProps) {
-    if (nextProps.location.pathname === this.props.location.pathname && nextProps.isConnectedToEmulator === this.props.isConnectedToEmulator ) return
+    if (nextProps.location.pathname === this.props.location.pathname && nextProps.isConnectedToEmulator === this.props.isConnectedToEmulator) return
     this.forcePath(nextProps)
   }
   async updateCheck () {
