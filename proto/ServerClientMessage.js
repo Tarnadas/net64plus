@@ -2333,7 +2333,7 @@ $root.ServerMessage = (function() {
      * @property {ServerMessage.MessageType|null} [messageType] ServerMessage messageType
      * @property {IConnectionDenied|null} [connectionDenied] ServerMessage connectionDenied
      * @property {IGameMode|null} [gameMode] ServerMessage gameMode
-     * @property {IServerToken|null} [serverToken] ServerMessage serverToken
+     * @property {IPlayerReorder|null} [playerReorder] ServerMessage playerReorder
      * @property {IError|null} [error] ServerMessage error
      */
 
@@ -2377,12 +2377,12 @@ $root.ServerMessage = (function() {
     ServerMessage.prototype.gameMode = null;
 
     /**
-     * ServerMessage serverToken.
-     * @member {IServerToken|null|undefined} serverToken
+     * ServerMessage playerReorder.
+     * @member {IPlayerReorder|null|undefined} playerReorder
      * @memberof ServerMessage
      * @instance
      */
-    ServerMessage.prototype.serverToken = null;
+    ServerMessage.prototype.playerReorder = null;
 
     /**
      * ServerMessage error.
@@ -2397,12 +2397,12 @@ $root.ServerMessage = (function() {
 
     /**
      * ServerMessage message.
-     * @member {"connectionDenied"|"gameMode"|"serverToken"|"error"|undefined} message
+     * @member {"connectionDenied"|"gameMode"|"playerReorder"|"error"|undefined} message
      * @memberof ServerMessage
      * @instance
      */
     Object.defineProperty(ServerMessage.prototype, "message", {
-        get: $util.oneOfGetter($oneOfFields = ["connectionDenied", "gameMode", "serverToken", "error"]),
+        get: $util.oneOfGetter($oneOfFields = ["connectionDenied", "gameMode", "playerReorder", "error"]),
         set: $util.oneOfSetter($oneOfFields)
     });
 
@@ -2436,8 +2436,8 @@ $root.ServerMessage = (function() {
             $root.ConnectionDenied.encode(message.connectionDenied, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
         if (message.gameMode != null && message.hasOwnProperty("gameMode"))
             $root.GameMode.encode(message.gameMode, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
-        if (message.serverToken != null && message.hasOwnProperty("serverToken"))
-            $root.ServerToken.encode(message.serverToken, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+        if (message.playerReorder != null && message.hasOwnProperty("playerReorder"))
+            $root.PlayerReorder.encode(message.playerReorder, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
         if (message.error != null && message.hasOwnProperty("error"))
             $root.Error.encode(message.error, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
         return writer;
@@ -2484,7 +2484,7 @@ $root.ServerMessage = (function() {
                 message.gameMode = $root.GameMode.decode(reader, reader.uint32());
                 break;
             case 4:
-                message.serverToken = $root.ServerToken.decode(reader, reader.uint32());
+                message.playerReorder = $root.PlayerReorder.decode(reader, reader.uint32());
                 break;
             case 5:
                 message.error = $root.Error.decode(reader, reader.uint32());
@@ -2553,14 +2553,14 @@ $root.ServerMessage = (function() {
                     return "gameMode." + error;
             }
         }
-        if (message.serverToken != null && message.hasOwnProperty("serverToken")) {
+        if (message.playerReorder != null && message.hasOwnProperty("playerReorder")) {
             if (properties.message === 1)
                 return "message: multiple values";
             properties.message = 1;
             {
-                var error = $root.ServerToken.verify(message.serverToken);
+                var error = $root.PlayerReorder.verify(message.playerReorder);
                 if (error)
-                    return "serverToken." + error;
+                    return "playerReorder." + error;
             }
         }
         if (message.error != null && message.hasOwnProperty("error")) {
@@ -2597,7 +2597,7 @@ $root.ServerMessage = (function() {
         case 1:
             message.messageType = 1;
             break;
-        case "SERVER_TOKEN":
+        case "PLAYER_REORDER":
         case 2:
             message.messageType = 2;
             break;
@@ -2616,10 +2616,10 @@ $root.ServerMessage = (function() {
                 throw TypeError(".ServerMessage.gameMode: object expected");
             message.gameMode = $root.GameMode.fromObject(object.gameMode);
         }
-        if (object.serverToken != null) {
-            if (typeof object.serverToken !== "object")
-                throw TypeError(".ServerMessage.serverToken: object expected");
-            message.serverToken = $root.ServerToken.fromObject(object.serverToken);
+        if (object.playerReorder != null) {
+            if (typeof object.playerReorder !== "object")
+                throw TypeError(".ServerMessage.playerReorder: object expected");
+            message.playerReorder = $root.PlayerReorder.fromObject(object.playerReorder);
         }
         if (object.error != null) {
             if (typeof object.error !== "object")
@@ -2656,10 +2656,10 @@ $root.ServerMessage = (function() {
             if (options.oneofs)
                 object.message = "gameMode";
         }
-        if (message.serverToken != null && message.hasOwnProperty("serverToken")) {
-            object.serverToken = $root.ServerToken.toObject(message.serverToken, options);
+        if (message.playerReorder != null && message.hasOwnProperty("playerReorder")) {
+            object.playerReorder = $root.PlayerReorder.toObject(message.playerReorder, options);
             if (options.oneofs)
-                object.message = "serverToken";
+                object.message = "playerReorder";
         }
         if (message.error != null && message.hasOwnProperty("error")) {
             object.error = $root.Error.toObject(message.error, options);
@@ -2686,14 +2686,14 @@ $root.ServerMessage = (function() {
      * @enum {string}
      * @property {number} CONNECTION_DENIED=0 CONNECTION_DENIED value
      * @property {number} GAME_MODE=1 GAME_MODE value
-     * @property {number} SERVER_TOKEN=2 SERVER_TOKEN value
+     * @property {number} PLAYER_REORDER=2 PLAYER_REORDER value
      * @property {number} ERROR=3 ERROR value
      */
     ServerMessage.MessageType = (function() {
         var valuesById = {}, values = Object.create(valuesById);
         values[valuesById[0] = "CONNECTION_DENIED"] = 0;
         values[valuesById[1] = "GAME_MODE"] = 1;
-        values[valuesById[2] = "SERVER_TOKEN"] = 2;
+        values[valuesById[2] = "PLAYER_REORDER"] = 2;
         values[valuesById[3] = "ERROR"] = 3;
         return values;
     })();
@@ -2701,24 +2701,25 @@ $root.ServerMessage = (function() {
     return ServerMessage;
 })();
 
-$root.ServerToken = (function() {
+$root.PlayerReorder = (function() {
 
     /**
-     * Properties of a ServerToken.
-     * @exports IServerToken
-     * @interface IServerToken
-     * @property {ServerToken.TokenType|null} [tokenType] ServerToken tokenType
+     * Properties of a PlayerReorder.
+     * @exports IPlayerReorder
+     * @interface IPlayerReorder
+     * @property {boolean|null} [grantToken] PlayerReorder grantToken
+     * @property {number|null} [playerId] PlayerReorder playerId
      */
 
     /**
-     * Constructs a new ServerToken.
-     * @exports ServerToken
-     * @classdesc Represents a ServerToken.
-     * @implements IServerToken
+     * Constructs a new PlayerReorder.
+     * @exports PlayerReorder
+     * @classdesc Represents a PlayerReorder.
+     * @implements IPlayerReorder
      * @constructor
-     * @param {IServerToken=} [properties] Properties to set
+     * @param {IPlayerReorder=} [properties] Properties to set
      */
-    function ServerToken(properties) {
+    function PlayerReorder(properties) {
         if (properties)
             for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                 if (properties[keys[i]] != null)
@@ -2726,75 +2727,88 @@ $root.ServerToken = (function() {
     }
 
     /**
-     * ServerToken tokenType.
-     * @member {ServerToken.TokenType} tokenType
-     * @memberof ServerToken
+     * PlayerReorder grantToken.
+     * @member {boolean} grantToken
+     * @memberof PlayerReorder
      * @instance
      */
-    ServerToken.prototype.tokenType = 0;
+    PlayerReorder.prototype.grantToken = false;
 
     /**
-     * Creates a new ServerToken instance using the specified properties.
-     * @function create
-     * @memberof ServerToken
-     * @static
-     * @param {IServerToken=} [properties] Properties to set
-     * @returns {ServerToken} ServerToken instance
+     * PlayerReorder playerId.
+     * @member {number} playerId
+     * @memberof PlayerReorder
+     * @instance
      */
-    ServerToken.create = function create(properties) {
-        return new ServerToken(properties);
+    PlayerReorder.prototype.playerId = 0;
+
+    /**
+     * Creates a new PlayerReorder instance using the specified properties.
+     * @function create
+     * @memberof PlayerReorder
+     * @static
+     * @param {IPlayerReorder=} [properties] Properties to set
+     * @returns {PlayerReorder} PlayerReorder instance
+     */
+    PlayerReorder.create = function create(properties) {
+        return new PlayerReorder(properties);
     };
 
     /**
-     * Encodes the specified ServerToken message. Does not implicitly {@link ServerToken.verify|verify} messages.
+     * Encodes the specified PlayerReorder message. Does not implicitly {@link PlayerReorder.verify|verify} messages.
      * @function encode
-     * @memberof ServerToken
+     * @memberof PlayerReorder
      * @static
-     * @param {IServerToken} message ServerToken message or plain object to encode
+     * @param {IPlayerReorder} message PlayerReorder message or plain object to encode
      * @param {$protobuf.Writer} [writer] Writer to encode to
      * @returns {$protobuf.Writer} Writer
      */
-    ServerToken.encode = function encode(message, writer) {
+    PlayerReorder.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
-        if (message.tokenType != null && message.hasOwnProperty("tokenType"))
-            writer.uint32(/* id 1, wireType 0 =*/8).int32(message.tokenType);
+        if (message.grantToken != null && message.hasOwnProperty("grantToken"))
+            writer.uint32(/* id 1, wireType 0 =*/8).bool(message.grantToken);
+        if (message.playerId != null && message.hasOwnProperty("playerId"))
+            writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.playerId);
         return writer;
     };
 
     /**
-     * Encodes the specified ServerToken message, length delimited. Does not implicitly {@link ServerToken.verify|verify} messages.
+     * Encodes the specified PlayerReorder message, length delimited. Does not implicitly {@link PlayerReorder.verify|verify} messages.
      * @function encodeDelimited
-     * @memberof ServerToken
+     * @memberof PlayerReorder
      * @static
-     * @param {IServerToken} message ServerToken message or plain object to encode
+     * @param {IPlayerReorder} message PlayerReorder message or plain object to encode
      * @param {$protobuf.Writer} [writer] Writer to encode to
      * @returns {$protobuf.Writer} Writer
      */
-    ServerToken.encodeDelimited = function encodeDelimited(message, writer) {
+    PlayerReorder.encodeDelimited = function encodeDelimited(message, writer) {
         return this.encode(message, writer).ldelim();
     };
 
     /**
-     * Decodes a ServerToken message from the specified reader or buffer.
+     * Decodes a PlayerReorder message from the specified reader or buffer.
      * @function decode
-     * @memberof ServerToken
+     * @memberof PlayerReorder
      * @static
      * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
      * @param {number} [length] Message length if known beforehand
-     * @returns {ServerToken} ServerToken
+     * @returns {PlayerReorder} PlayerReorder
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    ServerToken.decode = function decode(reader, length) {
+    PlayerReorder.decode = function decode(reader, length) {
         if (!(reader instanceof $Reader))
             reader = $Reader.create(reader);
-        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.ServerToken();
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.PlayerReorder();
         while (reader.pos < end) {
             var tag = reader.uint32();
             switch (tag >>> 3) {
             case 1:
-                message.tokenType = reader.int32();
+                message.grantToken = reader.bool();
+                break;
+            case 2:
+                message.playerId = reader.uint32();
                 break;
             default:
                 reader.skipType(tag & 7);
@@ -2805,114 +2819,96 @@ $root.ServerToken = (function() {
     };
 
     /**
-     * Decodes a ServerToken message from the specified reader or buffer, length delimited.
+     * Decodes a PlayerReorder message from the specified reader or buffer, length delimited.
      * @function decodeDelimited
-     * @memberof ServerToken
+     * @memberof PlayerReorder
      * @static
      * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-     * @returns {ServerToken} ServerToken
+     * @returns {PlayerReorder} PlayerReorder
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    ServerToken.decodeDelimited = function decodeDelimited(reader) {
+    PlayerReorder.decodeDelimited = function decodeDelimited(reader) {
         if (!(reader instanceof $Reader))
             reader = new $Reader(reader);
         return this.decode(reader, reader.uint32());
     };
 
     /**
-     * Verifies a ServerToken message.
+     * Verifies a PlayerReorder message.
      * @function verify
-     * @memberof ServerToken
+     * @memberof PlayerReorder
      * @static
      * @param {Object.<string,*>} message Plain object to verify
      * @returns {string|null} `null` if valid, otherwise the reason why it is not
      */
-    ServerToken.verify = function verify(message) {
+    PlayerReorder.verify = function verify(message) {
         if (typeof message !== "object" || message === null)
             return "object expected";
-        if (message.tokenType != null && message.hasOwnProperty("tokenType"))
-            switch (message.tokenType) {
-            default:
-                return "tokenType: enum value expected";
-            case 0:
-            case 1:
-                break;
-            }
+        if (message.grantToken != null && message.hasOwnProperty("grantToken"))
+            if (typeof message.grantToken !== "boolean")
+                return "grantToken: boolean expected";
+        if (message.playerId != null && message.hasOwnProperty("playerId"))
+            if (!$util.isInteger(message.playerId))
+                return "playerId: integer expected";
         return null;
     };
 
     /**
-     * Creates a ServerToken message from a plain object. Also converts values to their respective internal types.
+     * Creates a PlayerReorder message from a plain object. Also converts values to their respective internal types.
      * @function fromObject
-     * @memberof ServerToken
+     * @memberof PlayerReorder
      * @static
      * @param {Object.<string,*>} object Plain object
-     * @returns {ServerToken} ServerToken
+     * @returns {PlayerReorder} PlayerReorder
      */
-    ServerToken.fromObject = function fromObject(object) {
-        if (object instanceof $root.ServerToken)
+    PlayerReorder.fromObject = function fromObject(object) {
+        if (object instanceof $root.PlayerReorder)
             return object;
-        var message = new $root.ServerToken();
-        switch (object.tokenType) {
-        case "GRANT":
-        case 0:
-            message.tokenType = 0;
-            break;
-        case "LOSE":
-        case 1:
-            message.tokenType = 1;
-            break;
-        }
+        var message = new $root.PlayerReorder();
+        if (object.grantToken != null)
+            message.grantToken = Boolean(object.grantToken);
+        if (object.playerId != null)
+            message.playerId = object.playerId >>> 0;
         return message;
     };
 
     /**
-     * Creates a plain object from a ServerToken message. Also converts values to other types if specified.
+     * Creates a plain object from a PlayerReorder message. Also converts values to other types if specified.
      * @function toObject
-     * @memberof ServerToken
+     * @memberof PlayerReorder
      * @static
-     * @param {ServerToken} message ServerToken
+     * @param {PlayerReorder} message PlayerReorder
      * @param {$protobuf.IConversionOptions} [options] Conversion options
      * @returns {Object.<string,*>} Plain object
      */
-    ServerToken.toObject = function toObject(message, options) {
+    PlayerReorder.toObject = function toObject(message, options) {
         if (!options)
             options = {};
         var object = {};
-        if (options.defaults)
-            object.tokenType = options.enums === String ? "GRANT" : 0;
-        if (message.tokenType != null && message.hasOwnProperty("tokenType"))
-            object.tokenType = options.enums === String ? $root.ServerToken.TokenType[message.tokenType] : message.tokenType;
+        if (options.defaults) {
+            object.grantToken = false;
+            object.playerId = 0;
+        }
+        if (message.grantToken != null && message.hasOwnProperty("grantToken"))
+            object.grantToken = message.grantToken;
+        if (message.playerId != null && message.hasOwnProperty("playerId"))
+            object.playerId = message.playerId;
         return object;
     };
 
     /**
-     * Converts this ServerToken to JSON.
+     * Converts this PlayerReorder to JSON.
      * @function toJSON
-     * @memberof ServerToken
+     * @memberof PlayerReorder
      * @instance
      * @returns {Object.<string,*>} JSON object
      */
-    ServerToken.prototype.toJSON = function toJSON() {
+    PlayerReorder.prototype.toJSON = function toJSON() {
         return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
     };
 
-    /**
-     * TokenType enum.
-     * @name ServerToken.TokenType
-     * @enum {string}
-     * @property {number} GRANT=0 GRANT value
-     * @property {number} LOSE=1 LOSE value
-     */
-    ServerToken.TokenType = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
-        values[valuesById[0] = "GRANT"] = 0;
-        values[valuesById[1] = "LOSE"] = 1;
-        return values;
-    })();
-
-    return ServerToken;
+    return PlayerReorder;
 })();
 
 $root.Error = (function() {

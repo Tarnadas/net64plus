@@ -7,24 +7,21 @@ message ServerMessage {
   enum MessageType {
     CONNECTION_DENIED = 0;
     GAME_MODE = 1;
-    SERVER_TOKEN = 2;
+    PLAYER_REORDER = 2;
     ERROR = 3;
   }
   MessageType message_type = 1;
   oneof message {
     ConnectionDenied connection_denied = 2;
     GameMode game_mode = 3;
-    ServerToken server_token = 4;
+    PlayerReorder player_reorder = 4;
     Error error = 5;
   }
 }
 
-message ServerToken {
-  enum TokenType {
-    GRANT = 0;
-    LOSE = 1;
-  }
-  TokenType token_type = 1;
+message PlayerReorder {
+  bool grant_token = 1;
+  uint32 player_id = 2;
 }
 
 message Error {

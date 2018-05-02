@@ -886,8 +886,8 @@ export interface IServerMessage {
     /** ServerMessage gameMode */
     gameMode?: (IGameMode|null);
 
-    /** ServerMessage serverToken */
-    serverToken?: (IServerToken|null);
+    /** ServerMessage playerReorder */
+    playerReorder?: (IPlayerReorder|null);
 
     /** ServerMessage error */
     error?: (IError|null);
@@ -911,14 +911,14 @@ export class ServerMessage implements IServerMessage {
     /** ServerMessage gameMode. */
     public gameMode?: (IGameMode|null);
 
-    /** ServerMessage serverToken. */
-    public serverToken?: (IServerToken|null);
+    /** ServerMessage playerReorder. */
+    public playerReorder?: (IPlayerReorder|null);
 
     /** ServerMessage error. */
     public error?: (IError|null);
 
     /** ServerMessage message. */
-    public message?: ("connectionDenied"|"gameMode"|"serverToken"|"error");
+    public message?: ("connectionDenied"|"gameMode"|"playerReorder"|"error");
 
     /**
      * Creates a new ServerMessage instance using the specified properties.
@@ -997,108 +997,105 @@ export namespace ServerMessage {
     enum MessageType {
         CONNECTION_DENIED = 0,
         GAME_MODE = 1,
-        SERVER_TOKEN = 2,
+        PLAYER_REORDER = 2,
         ERROR = 3
     }
 }
 
-/** Properties of a ServerToken. */
-export interface IServerToken {
+/** Properties of a PlayerReorder. */
+export interface IPlayerReorder {
 
-    /** ServerToken tokenType */
-    tokenType?: (ServerToken.TokenType|null);
+    /** PlayerReorder grantToken */
+    grantToken?: (boolean|null);
+
+    /** PlayerReorder playerId */
+    playerId?: (number|null);
 }
 
-/** Represents a ServerToken. */
-export class ServerToken implements IServerToken {
+/** Represents a PlayerReorder. */
+export class PlayerReorder implements IPlayerReorder {
 
     /**
-     * Constructs a new ServerToken.
+     * Constructs a new PlayerReorder.
      * @param [properties] Properties to set
      */
-    constructor(properties?: IServerToken);
+    constructor(properties?: IPlayerReorder);
 
-    /** ServerToken tokenType. */
-    public tokenType: ServerToken.TokenType;
+    /** PlayerReorder grantToken. */
+    public grantToken: boolean;
+
+    /** PlayerReorder playerId. */
+    public playerId: number;
 
     /**
-     * Creates a new ServerToken instance using the specified properties.
+     * Creates a new PlayerReorder instance using the specified properties.
      * @param [properties] Properties to set
-     * @returns ServerToken instance
+     * @returns PlayerReorder instance
      */
-    public static create(properties?: IServerToken): ServerToken;
+    public static create(properties?: IPlayerReorder): PlayerReorder;
 
     /**
-     * Encodes the specified ServerToken message. Does not implicitly {@link ServerToken.verify|verify} messages.
-     * @param message ServerToken message or plain object to encode
+     * Encodes the specified PlayerReorder message. Does not implicitly {@link PlayerReorder.verify|verify} messages.
+     * @param message PlayerReorder message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
-    public static encode(message: IServerToken, writer?: $protobuf.Writer): $protobuf.Writer;
+    public static encode(message: IPlayerReorder, writer?: $protobuf.Writer): $protobuf.Writer;
 
     /**
-     * Encodes the specified ServerToken message, length delimited. Does not implicitly {@link ServerToken.verify|verify} messages.
-     * @param message ServerToken message or plain object to encode
+     * Encodes the specified PlayerReorder message, length delimited. Does not implicitly {@link PlayerReorder.verify|verify} messages.
+     * @param message PlayerReorder message or plain object to encode
      * @param [writer] Writer to encode to
      * @returns Writer
      */
-    public static encodeDelimited(message: IServerToken, writer?: $protobuf.Writer): $protobuf.Writer;
+    public static encodeDelimited(message: IPlayerReorder, writer?: $protobuf.Writer): $protobuf.Writer;
 
     /**
-     * Decodes a ServerToken message from the specified reader or buffer.
+     * Decodes a PlayerReorder message from the specified reader or buffer.
      * @param reader Reader or buffer to decode from
      * @param [length] Message length if known beforehand
-     * @returns ServerToken
+     * @returns PlayerReorder
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): ServerToken;
+    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): PlayerReorder;
 
     /**
-     * Decodes a ServerToken message from the specified reader or buffer, length delimited.
+     * Decodes a PlayerReorder message from the specified reader or buffer, length delimited.
      * @param reader Reader or buffer to decode from
-     * @returns ServerToken
+     * @returns PlayerReorder
      * @throws {Error} If the payload is not a reader or valid buffer
      * @throws {$protobuf.util.ProtocolError} If required fields are missing
      */
-    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): ServerToken;
+    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): PlayerReorder;
 
     /**
-     * Verifies a ServerToken message.
+     * Verifies a PlayerReorder message.
      * @param message Plain object to verify
      * @returns `null` if valid, otherwise the reason why it is not
      */
     public static verify(message: { [k: string]: any }): (string|null);
 
     /**
-     * Creates a ServerToken message from a plain object. Also converts values to their respective internal types.
+     * Creates a PlayerReorder message from a plain object. Also converts values to their respective internal types.
      * @param object Plain object
-     * @returns ServerToken
+     * @returns PlayerReorder
      */
-    public static fromObject(object: { [k: string]: any }): ServerToken;
+    public static fromObject(object: { [k: string]: any }): PlayerReorder;
 
     /**
-     * Creates a plain object from a ServerToken message. Also converts values to other types if specified.
-     * @param message ServerToken
+     * Creates a plain object from a PlayerReorder message. Also converts values to other types if specified.
+     * @param message PlayerReorder
      * @param [options] Conversion options
      * @returns Plain object
      */
-    public static toObject(message: ServerToken, options?: $protobuf.IConversionOptions): { [k: string]: any };
+    public static toObject(message: PlayerReorder, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
     /**
-     * Converts this ServerToken to JSON.
+     * Converts this PlayerReorder to JSON.
      * @returns JSON object
      */
     public toJSON(): { [k: string]: any };
-}
-
-export namespace ServerToken {
-
-    /** TokenType enum. */
-    enum TokenType {
-        GRANT = 0,
-        LOSE = 1
-    }
 }
 
 /** Properties of an Error. */
