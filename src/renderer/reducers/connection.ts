@@ -20,13 +20,10 @@ export const connection = (state: ConnectionState = initialState.connection, act
         break
       case ConnectionActionType.SET_PLAYERS:
         if (!draft.server) return
-        const players: IPlayer[] = []
+        const players: IPlayer[] = new Array(25).fill(null)
         for (const player of action.players) {
           if (!player.player || player.playerId == null) continue
-          players[player.playerId] = {
-            username: player.player.username,
-            characterId: player.player.characterId
-          }
+          players[player.playerId] = player.player
         }
         draft.server.players = players
         break
