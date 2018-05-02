@@ -72,8 +72,7 @@ export class Emulator {
     }
 
     this.changeCharacter(characterId)
-    this.setGameMode(1)
-    this.setConnectionFlag(0)
+    this.reset()
   }
 
   /**
@@ -93,6 +92,15 @@ export class Emulator {
    */
   public readMemory (offset: number, length: number): Buffer {
     return this.process.readMemory(this.baseAddress + offset, length)
+  }
+
+  public reset (): void {
+    this.setGameMode(1)
+    this.setConnectionFlag(0)
+    const buffer = Buffer.alloc(0x1C)
+    for (let i = 0; i < 24; i++) {
+      this.writeMemory(0xFF7800 + 0x100 * i, buffer)
+    }
   }
 
   /**

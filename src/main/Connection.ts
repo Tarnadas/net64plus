@@ -137,6 +137,7 @@ export class Connection {
       this.loop = null
     }
     connector.closeWebSocket(code, this.hasError)
+    emulator!.reset()
   }
 
   /**
