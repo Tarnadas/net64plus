@@ -22,8 +22,7 @@ import {
   GameMode,
   IServerClient,
   IServerMessage,
-  IConnectionDenied,
-  ServerToken
+  IConnectionDenied
 } from '../../proto/ServerClientMessage'
 
 const UPDATE_INTERVAL = 32
@@ -274,8 +273,8 @@ export class Connection {
       case ServerMessage.MessageType.GAME_MODE:
         this.onGameMode(serverMessage)
         break
-      case ServerMessage.MessageType.SERVER_TOKEN:
-        this.onServerToken(serverMessage)
+      case ServerMessage.MessageType.PLAYER_REORDER:
+        this.onPlayerReorder(serverMessage)
         break
     }
   }
@@ -339,23 +338,20 @@ export class Connection {
    *
    * @param {IServerClient} serverMessage - The decoded message
    */
-  private onServerToken (serverMessage: IServerMessage): void {
-    const serverToken = serverMessage.serverToken
-    if (!serverToken) return
-    let tokenType: boolean | undefined
-    switch (serverToken.tokenType) {
-      case ServerToken.TokenType.GRANT:
-        tokenType = true
-        break
-      case ServerToken.TokenType.LOSE:
-        tokenType = false
-        break
+  private onPlayerReorder (serverMessage: IServerMessage): void {
+    const playerReorder = serverMessage.playerReorder
+    if (!playerReorder) return
+    let grantToken = playerReorder.grantToken
+    if (grantToken) {
+      emulator!.setConnectionFlag(1)
+      if (process.env.NODE_ENV === 'development') {
+        connector.consoleInfo(`Granted server token`)
+      }
     }
-    if (tokenType == null) return
-    if (process.env.NODE_ENV === 'development') {
-      connector.consoleInfo(`${tokenType ? 'Granted' : 'Lost'} server token`)
-    }
-    emulator!.setConnectionFlag(1)
+    const playerId = playerReorder.playerId
+    if (playerId == null) return
+    this.playerId = playerId
+    emulator!.setPlayerId(playerId)
   }
 
   /**
@@ -393,11 +389,17 @@ export class Connection {
     if (!playerData || !playerData.dataLength || !playerData.playerBytes) return
     const playerBytes = playerData.playerBytes
     const dataLength = playerData.dataLength
+    let maxReceivedPlayerId = 1
     for (const player of playerBytes) {
       const playerId = player.playerId
       const playerData = player.playerData
       if (playerId == null || !playerData) continue
+      maxReceivedPlayerId = Math.max(maxReceivedPlayerId, playerId)
       emulator!.writeMemory(0xFF7700 + 0x100 * playerId, playerData as Buffer)
+    }
+    const emptyBuffer = Buffer.alloc(0x1C)
+    for (let i = maxReceivedPlayerId + 1; i < 25; i++) {
+      emulator!.writeMemory(0xFF7700 + 0x100 * i, emptyBuffer)
     }
   }
 
@@ -486,6 +488,9 @@ export class Connection {
    */
   private sendPlayerData (): void {
     const playerDataBuffer = emulator!.readMemory(0xFF7700, 0x1C)
+    if (this.playerId) {
+      emulator!.writeMemory(0xFF7700 + 0x100 * this.playerId, playerDataBuffer)
+    }
     if (playerDataBuffer[0xF] !== 0) {
       try {
         const playerData: IClientServerMessage = {

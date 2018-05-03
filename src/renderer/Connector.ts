@@ -53,7 +53,7 @@ export class Connector {
   }
 
   private onSetPlayerId = (event: Electron.Event, playerId: number) => {
-    addGlobalMessage(`Your player ID is ${playerId}`, '[SERVER]')
+    addGlobalMessage('Connected', '[SERVER]')
   }
 
   private onSetGameMode = (event: Electron.Event, gameMode: number) => {
