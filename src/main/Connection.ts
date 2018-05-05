@@ -390,11 +390,14 @@ export class Connection {
     const playerBytes = playerData.playerBytes
     const dataLength = playerData.dataLength
     let maxReceivedPlayerId = 1
+    const ownGameMode = emulator!.readMemory(0xFF5FF7, 1).readUInt8(0)
     for (const player of playerBytes) {
       const playerId = player.playerId
       const playerData = player.playerData
-      if (playerId == null || !playerData) continue
+      if (playerId == null || playerId === this.playerId || !playerData || playerData.length !== 0x1C) continue
       maxReceivedPlayerId = Math.max(maxReceivedPlayerId, playerId)
+      const gameMode = (playerData as Buffer).readUInt8(0x16)
+      if (gameMode !== ownGameMode) continue
       emulator!.writeMemory(0xFF7700 + 0x100 * playerId, playerData as Buffer)
     }
     const emptyBuffer = Buffer.alloc(0x1C)
@@ -491,7 +494,7 @@ export class Connection {
     if (this.playerId) {
       emulator!.writeMemory(0xFF7700 + 0x100 * this.playerId, playerDataBuffer)
     }
-    if (playerDataBuffer[0xF] !== 0) {
+    if (playerDataBuffer[3] !== 0) {
       try {
         const playerData: IClientServerMessage = {
           compression: Compression.NONE,

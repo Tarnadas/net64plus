@@ -56,5 +56,14 @@
     display: flex;
     border-bottom: 1px solid black;
     border-top: 1px solid black;
+
+    &-img {
+      width: 24px;
+      height: 24px;
+
+      & img {
+        height: 100%;
+      }
+    }
   }
 }

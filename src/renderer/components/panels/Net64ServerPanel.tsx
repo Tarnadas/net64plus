@@ -32,7 +32,7 @@ interface Net64ServerPanelState {
 }
 
 const CHARACTER_IMAGES = [
-  'mario.png', 'luigi.png', 'yoshi.png', 'wario.png', 'peach.png', 'toad.png', 'waluigi.png', 'rosalina.png'
+  'mario.png', 'luigi.png', 'yoshi.png', 'wario.png', 'peach.png', 'toad.png', 'waluigi.png', 'rosalina.png', 'sonic.png', 'knuckles.png', 'goomba.png', 'kirby.png'
 ]
 
 class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelState> {
@@ -100,7 +100,9 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
             key={index}
             className='net64-server-panel-player'
           >
-            <img src={`img/${CHARACTER_IMAGES[player.characterId || 0]}`} />
+            <div className='net64-server-panel-player-img'>
+              <img src={`img/${CHARACTER_IMAGES[player.characterId || 0]}`} />
+            </div>
             <div>
               { player.username }
             </div>
