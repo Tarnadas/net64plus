@@ -23,7 +23,6 @@ module.exports = [
       filename: 'renderer.js',
       path: path.join(__dirname, 'build')
     },
-    devtool: 'inline-source-map',
     node: {
       __dirname: true,
       __filename: false,
@@ -56,9 +55,8 @@ module.exports = [
     module: {
       loaders: [
         {
-          test: /\.jsx?$/,
-          exclude: /node_modules/,
-          loader: 'babel-loader'
+          test: /\.tsx?$/,
+          loader: 'awesome-typescript-loader'
         },
         {
           test: /\.(png|jpg)$/,
@@ -101,6 +99,7 @@ module.exports = [
             ],
             fallback: 'style-loader'
           })
+        }
       ]
     }
   },
@@ -111,7 +110,6 @@ module.exports = [
       filename: 'index.js',
       path: path.join(__dirname, 'build')
     },
-    devtool: 'inline-source-map',
     node: {
       __dirname: false,
       __filename: false
