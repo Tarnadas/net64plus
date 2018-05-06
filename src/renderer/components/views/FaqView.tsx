@@ -57,19 +57,11 @@ class View extends React.PureComponent<FaqViewProps> {
         <div style={styles.text}>
           Make sure your emulator settings match the green circles
         </div>
-        <h3>Project64 1.6</h3>
         <div style={styles.imgWrapper}>
-          <img style={styles.img} src='img/pj1.6_help1.png' />
+          <img style={styles.img} src='img/pj64_help1.png' />
         </div>
         <div style={styles.imgWrapper}>
-          <img style={styles.img} src='img/pj1.6_help2.png' />
-        </div>
-        <h3>Project64 2.3</h3>
-        <div style={styles.imgWrapper}>
-          <img style={styles.img} src='img/pj2.3_help1.png' />
-        </div>
-        <div style={styles.imgWrapper}>
-          <img style={styles.img} src='img/pj2.3_help2.png' />
+          <img style={styles.img} src='img/pj64_help2.png' />
         </div>
       </div>
     )

@@ -47,22 +47,19 @@ class View extends React.PureComponent<MainViewProps> {
           onClick={this.onStartClick}
         />
         <h2>Thank you for downloading Net64+</h2>
-        <div>Net64+ is a modified version of Net64, aka SM64O.
-          It uses a different and more performant networking technique.
-          Right now both programs are not compatible with each other, but the client devs are working it.
-          Net64+ also has a dedicated server software, which makes it extremely easy to host or find servers.
-          There is a server list integrated inside the client, so you will always immediately find servers to play on.
-          If you only want to play with friends, the original client might be a better choice.
-        </div>
-        <h3>This is a client only program</h3>
         <div>
-          You won&#39;t be able to create a server.<br />
-          If you want to create a server, please visit <ExternalLink href='https://github.com/tarnadas/net64plus-ded'>the GitHub repository of the server software</ExternalLink>
+          Net64 aka SM64O allows playing Super Mario 64 in an online multiplayer mode.
+          Net64+ is the official continuation of the program and features an integrated server list.
+          You can also play with your friends by hosting your own server with the server software provided.
+        </div>
+        <h3>Want to host your own server?</h3>
+        <div>
+          If you want your server to be listed, please visit <ExternalLink href='https://github.com/tarnadas/net64plus-server'>the GitHub repository of the server software</ExternalLink> and follow its instructions.
         </div>
         <h3>Join our community</h3>
         <div>
           <SMMButton
-            link='https://discord.gg/k9QMFaB' external
+            link='https://discord.gg/net64' external
             text='Net64 Discord'
             iconSrc='img/discord.svg'
           />
