@@ -10,4 +10,5 @@ export interface Server {
   players?: IPlayer[]
   countryCode?: string
   gameMode?: number
+  version?: string
 }
