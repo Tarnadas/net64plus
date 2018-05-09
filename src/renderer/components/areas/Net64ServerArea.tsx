@@ -64,9 +64,17 @@ export class Net64ServerArea extends React.PureComponent<Net64ServerAreaProps, N
     setTimeout(this.updateServers, 10000)
   }
   renderServers (servers: Server[]) {
-    return servers.map(
-      server => <Net64ServerPanel key={server.id} server={server} onConnect={this.onConnect} />
-    )
+    return servers
+      .filter(
+        server => {
+          if (!server.version) return false
+          const [ major, minor ] = server.version.split('.')
+          return major === process.env.PACKAGE_MAJOR && minor === process.env.PACKAGE_MINOR
+        }
+      )
+      .map(
+        server => <Net64ServerPanel key={server.id} server={server} onConnect={this.onConnect} />
+      )
   }
   render () {
     const servers = this.state.servers

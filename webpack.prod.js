@@ -6,6 +6,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 const [ major, minor, patch ] = process.env.npm_package_compatVersion.split('.')
+const [ packageMajor, packageMinor, packagePatch ] = process.env.npm_package_version.split('.')
 
 const extractSass =
   new ExtractTextPlugin({
@@ -37,7 +38,10 @@ module.exports = [
         VERSION: process.env.npm_package_version.slice(-2) === '.0' ? process.env.npm_package_version.slice(0, process.env.npm_package_version.length - 2) : process.env.npm_package_version,
         MAJOR: major,
         MINOR: minor,
-        PATCH: patch
+        PATCH: patch,
+        PACKAGE_MAJOR: packageMajor,
+        PACKAGE_MINOR: packageMinor,
+        PACKAGE_PATCH: packagePatch
       }),
       new HtmlWebpackPlugin({
         filename: 'index.html',
@@ -120,7 +124,10 @@ module.exports = [
         VERSION: process.env.npm_package_version.slice(-2) === '.0' ? process.env.npm_package_version.slice(0, process.env.npm_package_version.length - 2) : process.env.npm_package_version,
         MAJOR: major,
         MINOR: minor,
-        PATCH: patch
+        PATCH: patch,
+        PACKAGE_MAJOR: packageMajor,
+        PACKAGE_MINOR: packageMinor,
+        PACKAGE_PATCH: packagePatch
       }),
       new webpack.optimize.ModuleConcatenationPlugin(),
       new BabiliPlugin({
