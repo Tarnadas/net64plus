@@ -1,4 +1,4 @@
-import './Net64ServerPanel.scss'
+import './ServerPanel.scss'
 
 import * as React from 'react'
 import { Dispatch } from 'redux'
@@ -10,12 +10,12 @@ import { emojify } from 'node-emoji'
 import { connector } from '../..'
 import { SMMButton } from '../buttons/SMMButton'
 import { WarningPanel } from '../panels/WarningPanel'
-import { disconnect } from '../../actions/connection'
+import { disconnect, setConnectionError } from '../../actions/connection'
 import { State } from '../../../models/State.model'
 import { Server } from '../../../models/Server.model'
 import { IPlayer, GameModeType } from '../../../../proto/ServerClientMessage'
 
-interface Net64ServerPanelProps {
+interface ServerPanelProps {
   dispatch: Dispatch<State>
   server: Server
   username: string
@@ -25,7 +25,7 @@ interface Net64ServerPanelProps {
   isConnected?: boolean
 }
 
-interface Net64ServerPanelState {
+interface ServerPanelState {
   display: boolean
   displayDescription: boolean
   warning: string
@@ -35,8 +35,8 @@ const CHARACTER_IMAGES = [
   'mario.png', 'luigi.png', 'yoshi.png', 'wario.png', 'peach.png', 'toad.png', 'waluigi.png', 'rosalina.png', 'sonic.png', 'knuckles.png', 'goomba.png', 'kirby.png'
 ]
 
-class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelState> {
-  constructor (public props: Net64ServerPanelProps) {
+class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
+  constructor (public props: ServerPanelProps) {
     super(props)
     this.state = {
       display: !!props.isConnected,
@@ -79,6 +79,7 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
   onConnect () {
     if (this.props.onConnect) this.props.onConnect()
     const server = this.props.server
+    this.props.dispatch(setConnectionError(''))
     connector.createConnection({
       domain: server.domain,
       ip: server.ip,
@@ -98,12 +99,12 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
         (player, index) =>
           <div
             key={index}
-            className='net64-server-panel-player'
+            className='server-panel-player'
           >
-            <div className='net64-server-panel-player-img'>
+            <div className='server-panel-player-img'>
               <img src={`img/${CHARACTER_IMAGES[player.characterId || 0]}`} />
             </div>
-            <div>
+            <div className='server-panel-player-name'>
               { player.username }
             </div>
           </div>
@@ -162,40 +163,19 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
         flex: '0 0 70px',
         textAlign: 'right'
       },
-      details: {
-        display: display ? 'flex' : 'none',
-        margin: '4px 10px 0 10px',
-        width: 'calc(100% - 20px)',
-        backgroundColor: 'rgba(255,255,255,0.3)',
-        borderRadius: '0 0 10px 10px',
-        flexWrap: 'wrap'
-      },
       left: {
         display: 'flex',
-        minWidth: displayDescription ? '300px' : undefined,
-        width: displayDescription ? '50%' : undefined,
-        wordWrap: 'break-word'
-      },
-      right: {
-        display: 'flex',
-        flexDirection: 'column',
-        flexWrap: 'wrap',
-        alignItems: 'stretch',
-        flex: '1 0 auto',
-        padding: '6px',
-        width: '50%',
-        minWidth: '300px',
-        maxHeight: '340px',
-        overflow: 'hidden'
+        wordWrap: 'break-word',
+        flex: displayDescription ? '1 1 0' : undefined
       },
       el: {
         margin: '6px'
       }
     }
     return (
-      <div className='net64-server-panel'>
+      <div className='server-panel'>
         <div
-          className='net64-server-panel-header'
+          className='server-panel-header'
           onClick={this.onToggle}
         >
           <div style={{ flex: '0 0 40px' }}>
@@ -203,7 +183,7 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
           </div>
           {
             gameMode &&
-            <div className='net64-server-panel-header-gamemode'>
+            <div className='server-panel-header-gamemode'>
               <img src={gameMode} />
             </div>
           }
@@ -214,44 +194,46 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
             { players.filter(player => player).length } / 24
           </div>
         </div>
-        <div style={styles.details}>
-          {
-            warning &&
-            <WarningPanel warning={warning} />
-          }
-          <div style={styles.left}>
-            <div
-              className={`net64-server-panel-description-toggle${!displayDescription ? ' net64-server-panel-description-toggle-inactive' : ''}`}
-              onClick={this.handleDescriptionToggle}
-            >
-              <img src='img/arrow.svg' style={{ width: '100%' }} />
-            </div>
-            <div
-              className={`net64-server-panel-description${!displayDescription ? ' net64-server-panel-description-inactive' : ''}`}
-            >
-              <div style={styles.el}>
-                { server.domain || server.ip }:{ server.port }
-              </div>
-              {
-                gameMode &&
-                <div
-                  className='net64-server-panel-gamemode'
-                  style={styles.el}
-                >
-                  Game Mode: { this.getGameMode(server) }
-                </div>
-              }
-              <div
-                className='markdown'
-                style={styles.el}
-                dangerouslySetInnerHTML={{ __html: this.getDescription() }}
-              />
-            </div>
-          </div>
-          <div style={styles.right}>
+        <div className={`server-panel-details-wrapper${!display ? ' global-hidden' : ''}`}>
+          <div className='server-panel-details'>
             {
-              this.renderPlayers(players)
+              warning &&
+              <WarningPanel warning={warning} />
             }
+            <div style={styles.left}>
+              <div
+                className={`server-panel-description-toggle${!displayDescription ? ' server-panel-description-toggle-inactive' : ''}`}
+                onClick={this.handleDescriptionToggle}
+              >
+                <img src='img/arrow.svg' style={{ width: '100%' }} />
+              </div>
+              <div
+                className={`server-panel-description${!displayDescription ? ' server-panel-description-inactive' : ''}`}
+              >
+                <div style={styles.el}>
+                  { server.domain || server.ip }:{ server.port }
+                </div>
+                {
+                  gameMode &&
+                  <div
+                    className='server-panel-gamemode'
+                    style={styles.el}
+                  >
+                    Game Mode: { this.getGameMode(server) }
+                  </div>
+                }
+                <div
+                  className='markdown'
+                  style={styles.el}
+                  dangerouslySetInnerHTML={{ __html: this.getDescription() }}
+                />
+              </div>
+            </div>
+            <div className='server-panel-details-playerlist'>
+              {
+                this.renderPlayers(players)
+              }
+            </div>
           </div>
           <div style={{width: '100%'}}>
             {
@@ -273,7 +255,7 @@ class Panel extends React.PureComponent<Net64ServerPanelProps, Net64ServerPanelS
     )
   }
 }
-export const Net64ServerPanel = connect((state: State) => ({
+export const ServerPanel = connect((state: State) => ({
   username: state.save.appSaveData.username,
   characterId: state.save.appSaveData.character,
   connectionError: state.connection.error

@@ -28,7 +28,8 @@ class Request {
     try {
       return (await this.axios.request({
         method: 'get',
-        url: '/getnet64servers'
+        url: '/getnet64servers',
+        timeout: 10000
       })).data
     } catch (err) {
       console.error(err)

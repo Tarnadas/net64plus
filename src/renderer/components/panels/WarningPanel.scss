@@ -1,0 +1,18 @@
+.warning-panel {
+  color: #a00003;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &-wrapper {
+    display: flex;
+    justify-content: center;
+    margin: 0 20px;
+    font-size: 18px;
+  }
+
+  & img {
+    height: 30px;
+    margin-right: 20px;
+  }
+}

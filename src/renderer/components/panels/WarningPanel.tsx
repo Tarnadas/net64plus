@@ -1,3 +1,5 @@
+import './WarningPanel.scss'
+
 import * as React from 'react'
 
 interface WarningPanelProps {
@@ -6,29 +8,14 @@ interface WarningPanelProps {
 
 export class WarningPanel extends React.PureComponent<WarningPanelProps> {
   render () {
-    const warning = this.props.warning
-    const styles: React.CSSProperties = {
-      warningWrapper: {
-        width: '100%'
-      },
-      warning: {
-        color: '#a00003',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      },
-      warningImg: {
-        height: '30px',
-        marginRight: '20px'
-      }
-    }
+    const { warning } = this.props
     return (
-      <div style={styles.warningWrapper}>
+      <div className='warning-panel-wrapper'>
         {
           warning &&
-          <div style={styles.warning}>
-            <img style={styles.warningImg} src='img/warning.svg' />
-            <div>{warning}</div>
+          <div className='warning-panel'>
+            <img src='img/warning.svg' />
+            <div>{ warning }</div>
           </div>
         }
       </div>
