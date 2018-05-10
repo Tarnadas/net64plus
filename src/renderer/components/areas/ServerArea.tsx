@@ -1,31 +1,34 @@
+import './ServerArea.scss'
+
 import * as React from 'react'
 
 import { resolve } from 'url'
 
-import { Net64ServerPanel } from '../panels/Net64ServerPanel'
+import { ServerPanel } from '../panels/ServerPanel'
 import { WarningPanel } from '../panels/WarningPanel'
+import { ProgressSpinner } from '../helpers/ProgressSpinner'
 import { request } from '../../Request'
 import { Server } from '../../../models/Server.model'
 
-interface Net64ServerAreaProps {
+interface ServerAreaProps {
   connectionError: string
 }
 
-interface Net64ServerAreaState {
+interface ServerAreaState {
   servers: Server[]
   warning: string
   loading: boolean
 }
 
-export class Net64ServerArea extends React.PureComponent<Net64ServerAreaProps, Net64ServerAreaState> {
+export class ServerArea extends React.PureComponent<ServerAreaProps, ServerAreaState> {
   private mounted: boolean = false
 
-  constructor (props: Net64ServerAreaProps) {
+  constructor (props: ServerAreaProps) {
     super(props)
     this.state = {
       servers: [],
       warning: '',
-      loading: false
+      loading: true
     }
     this.onConnect = this.onConnect.bind(this)
     this.updateServers = this.updateServers.bind(this)
@@ -38,7 +41,7 @@ export class Net64ServerArea extends React.PureComponent<Net64ServerAreaProps, N
   componentWillUnmount () {
     this.mounted = false
   }
-  componentWillReceiveProps (nextProps: Net64ServerAreaProps) {
+  componentWillReceiveProps (nextProps: ServerAreaProps) {
     if (!nextProps.connectionError || nextProps.connectionError === this.props.connectionError) return
     this.setState({
       warning: String(nextProps.connectionError),
@@ -54,14 +57,25 @@ export class Net64ServerArea extends React.PureComponent<Net64ServerAreaProps, N
     if (!this.mounted) return
     try {
       const servers = await request.getNet64Servers()
-      if (!servers || !this.mounted) return
-      if (this.mounted) {
+      if (!this.mounted) return
+      if (!servers) {
         this.setState({
-          servers
+          warning: 'Could not fetch server list. You or the website might be offline. This doesn\'t mean, that Nintendo sent us a DMCA. You can still search for emulator on our Discord server and direct connect to them.'
+        })
+        return
+      }
+      this.setState({
+        servers
+      })
+    } catch (err) {
+    } finally {
+      if (this.mounted) {
+        setTimeout(this.updateServers, 10000)
+        this.setState({
+          loading: false
         })
       }
-    } catch (err) {}
-    setTimeout(this.updateServers, 10000)
+    }
   }
   renderServers (servers: Server[]) {
     return servers
@@ -73,41 +87,16 @@ export class Net64ServerArea extends React.PureComponent<Net64ServerAreaProps, N
         }
       )
       .map(
-        server => <Net64ServerPanel key={server.id} server={server} onConnect={this.onConnect} />
+        server => <ServerPanel key={server.id} server={server} onConnect={this.onConnect} />
       )
   }
   render () {
-    const servers = this.state.servers
-    const loading = this.state.loading
-    const warning = this.state.warning
-    const styles: React.CSSProperties = {
-      list: {
-        overflowY: 'auto',
-        padding: '4px',
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%'
-      },
-      loading: {
-        display: 'flex',
-        position: 'fixed',
-        zIndex: '100',
-        backgroundColor: 'rgba(0,0,0,0.6)',
-        top: '0',
-        left: '0',
-        width: '100%',
-        height: '100%',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }
-    }
+    const { servers, loading, warning } = this.state
     return (
-      <div className='scroll' style={styles.list}>
+      <div className='server-area'>
         {
           loading &&
-          <div style={styles.loading}>
-            <img src='img/load.gif' />
-          </div>
+          <ProgressSpinner />
         }
         {
           warning &&

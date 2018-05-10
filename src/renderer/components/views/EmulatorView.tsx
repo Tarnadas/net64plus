@@ -9,6 +9,7 @@ import { spawn } from 'child_process'
 import { connector } from '../..'
 import { SMMButton } from '../buttons/SMMButton'
 import { WarningPanel } from '../panels/WarningPanel'
+import { ProgressSpinner } from '../helpers/ProgressSpinner'
 import { isConnectedToEmulator } from '../../actions/connection'
 import { State } from '../../../models/State.model'
 
@@ -119,19 +120,19 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
       })
     }
   }
-  async onSelectEmulator (e: FilteredEmulator) {
+  async onSelectEmulator (emulator: FilteredEmulator) {
     this.setState({
       loading: true
     })
     setTimeout(() => {
       connector.createEmulatorConnection({
-        processId: e.pid,
+        processId: emulator.pid,
         characterId: this.props.characterId,
         inGameChatEnabled: false
       })
       this.props.dispatch(isConnectedToEmulator(true))
       this.props.dispatch(push('/browse'))
-    }, 10)
+    }, 50)
     setTimeout(() => {
       if (!this.mounted) return
       this.setState({
@@ -211,18 +212,6 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'column'
-      },
-      loading: {
-        display: 'flex',
-        position: 'fixed',
-        zIndex: '100',
-        backgroundColor: 'rgba(0,0,0,0.6)',
-        top: '0',
-        left: '0',
-        width: '100%',
-        height: '100%',
-        alignItems: 'center',
-        justifyContent: 'center'
       }
     }
     return (
@@ -232,19 +221,15 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
           <WarningPanel warning={warning} />
         }
         {
-          !emulators || emulators.length === 0 ? (
-            <div>Scanning for running emulators...</div>
-          ) : (
-            <div style={styles.ul}>
+          !emulators || emulators.length === 0
+            ? <div>Scanning for running emulators...</div>
+            : <div style={styles.ul}>
               { this.renderEmulators(emulators) }
               {
                 loading &&
-                <div style={styles.loading}>
-                  <img src='img/load.gif' />
-                </div>
+                <ProgressSpinner />
               }
             </div>
-          )
         }
       </div>
     )

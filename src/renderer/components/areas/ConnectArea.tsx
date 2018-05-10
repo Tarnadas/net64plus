@@ -5,7 +5,9 @@ import { connect } from 'react-redux'
 import { connector } from '../..'
 import { SMMButton } from '../buttons/SMMButton'
 import { WarningPanel } from '../panels/WarningPanel'
+import { ProgressSpinner } from '../helpers/ProgressSpinner'
 import { State } from '../../../models/State.model'
+import { setConnectionError } from '../../actions/connection'
 
 interface ConnectAreaProps {
   dispatch: Dispatch<State>
@@ -35,14 +37,12 @@ class Area extends React.PureComponent<ConnectAreaProps, ConnectAreaState> {
     this.onKeyPress = this.onKeyPress.bind(this)
     this.onConnect = this.onConnect.bind(this)
   }
-  componentWillMount () {
-    if (!this.props.connectionError) return
-    this.setState({
-      warning: String(this.props.connectionError)
-    })
-  }
   componentWillReceiveProps (nextProps: ConnectAreaProps) {
-    if (!nextProps.connectionError || nextProps.connectionError === this.props.connectionError) return
+    if (
+      !nextProps.connectionError ||
+      nextProps.connectionError === this.props.connectionError ||
+      this.state.warning === nextProps.connectionError
+    ) return
     this.setState({
       warning: String(nextProps.connectionError),
       loading: false
@@ -67,8 +67,10 @@ class Area extends React.PureComponent<ConnectAreaProps, ConnectAreaState> {
   }
   onConnect () {
     this.setState({
+      warning: '',
       loading: true
     })
+    this.props.dispatch(setConnectionError(''))
     connector.createConnection({
       ip: this.state.ip,
       port: this.state.port,
@@ -77,8 +79,7 @@ class Area extends React.PureComponent<ConnectAreaProps, ConnectAreaState> {
     })
   }
   render () {
-    const warning = this.state.warning
-    const loading = this.state.loading
+    const { warning, loading } = this.state
     const styles: React.CSSProperties = {
       area: {
         display: 'flex',
@@ -97,27 +98,13 @@ class Area extends React.PureComponent<ConnectAreaProps, ConnectAreaState> {
       input: {
         width: '60%',
         fontSize: '16px'
-      },
-      loading: {
-        display: 'flex',
-        position: 'fixed',
-        zIndex: '100',
-        backgroundColor: 'rgba(0,0,0,0.6)',
-        top: '0',
-        left: '0',
-        width: '100%',
-        height: '100%',
-        alignItems: 'center',
-        justifyContent: 'center'
       }
     }
     return (
       <div style={styles.area}>
         {
           loading &&
-          <div style={styles.loading}>
-            <img src='img/load.gif' />
-          </div>
+          <ProgressSpinner />
         }
         {
           warning &&

@@ -4,7 +4,7 @@ import { resolve } from 'url'
 
 import { Connector } from '../../Connector'
 import { request } from '../../Request'
-import { Net64ServerPanel } from '../panels/Net64ServerPanel'
+import { ServerPanel } from '../panels/ServerPanel'
 import { ChatArea } from '../areas/ChatArea'
 import { Server } from '../../../models/Server.model'
 
@@ -27,7 +27,7 @@ export class ConnectionArea extends React.PureComponent<ConnectionAreaProps, {}>
     }
     return (
       <div className='scroll' style={styles.area}>
-        <Net64ServerPanel server={server} isConnected />
+        <ServerPanel server={server} isConnected />
         <ChatArea />
       </div>
     )

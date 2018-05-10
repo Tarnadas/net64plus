@@ -1,4 +1,4 @@
-.net64-server-panel {
+.server-panel {
   font-size: 18px;
   margin: 10px 0;
 
@@ -23,7 +23,37 @@
     }
   }
 
+  &-details {
+    display: flex;
+    flex-wrap: wrap;
+    overflow: hidden;
+
+    &-wrapper {
+      display: flex;
+      flex-direction: column;
+      margin: 4px 10px 0 10px;
+      width: calc(100% - 20px);
+      background-color: rgba(255,255,255,0.3);
+      border-radius: 0 0 10px 10px;
+    }
+
+    &-playerlist {
+      display: flex;
+      flex: 1 1 100px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      align-content: flex-start;
+      padding: 6px;
+      min-width: 300px;
+      max-height: 340px;
+      overflow: hidden;
+    }
+  }
+
   &-description {
+    flex: 1 1 auto;
+    overflow: hidden;
+
     &-inactive {
       display: none;
     }
@@ -54,8 +84,11 @@
 
   &-player {
     display: flex;
+    flex: 1 1 0;
     border-bottom: 1px solid black;
     border-top: 1px solid black;
+    min-width: 50%;
+    overflow: hidden;
 
     &-img {
       width: 24px;
@@ -64,6 +97,13 @@
       & img {
         height: 100%;
       }
+    }
+
+    &-name {
+      flex: 1 1 auto;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 }
