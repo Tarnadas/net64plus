@@ -74,7 +74,7 @@ export class Connection {
   public disconnect (): void {
     this.onClose(0)
     this.ws.close()
-    emulator!.setConnectionFlag(0)
+    emulator!.setConnectionFlag(1)
     emulator!.setGameMode(1)
   }
 
