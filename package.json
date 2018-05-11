@@ -1,6 +1,6 @@
 {
   "name": "net64plus",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "compatVersion": "1.0.0",
   "description": "Net64+ client",
   "main": "index.js",
