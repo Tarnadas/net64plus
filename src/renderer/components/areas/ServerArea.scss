@@ -5,4 +5,17 @@
   padding: 4px;
   flex: 1 0 auto;
   justify-content: space-around;
+
+  &-fetch {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+
+    & div {
+      display: flex;
+      justify-content: center;
+      font-size: 18px;
+      margin: 10px 0;
+    }
+  }
 }
