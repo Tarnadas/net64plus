@@ -28,7 +28,7 @@ export class ServerArea extends React.PureComponent<ServerAreaProps, ServerAreaS
     this.state = {
       servers: [],
       warning: '',
-      loading: true
+      loading: false
     }
     this.onConnect = this.onConnect.bind(this)
     this.updateServers = this.updateServers.bind(this)
@@ -92,11 +92,19 @@ export class ServerArea extends React.PureComponent<ServerAreaProps, ServerAreaS
   }
   render () {
     const { servers, loading, warning } = this.state
+    const initialLoading = servers.length === 0 && !warning
     return (
       <div className='server-area'>
         {
           loading &&
           <ProgressSpinner />
+        }
+        {
+          initialLoading &&
+          <div className='server-area-fetch'>
+            <div>Fetching server list...</div>
+            <ProgressSpinner inline />
+          </div>
         }
         {
           warning &&

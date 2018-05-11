@@ -166,6 +166,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
       left: {
         display: 'flex',
         wordWrap: 'break-word',
+        maxWidth: '100%',
         flex: displayDescription ? '1 1 0' : undefined
       },
       el: {
