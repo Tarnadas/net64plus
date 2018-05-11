@@ -60,7 +60,7 @@ export class ServerArea extends React.PureComponent<ServerAreaProps, ServerAreaS
       if (!this.mounted) return
       if (!servers) {
         this.setState({
-          warning: 'Could not fetch server list. You or the website might be offline. This doesn\'t mean, that Nintendo sent us a DMCA. You can still search for emulator on our Discord server and direct connect to them.'
+          warning: 'Could not fetch server list. You or the website might be offline. This doesn\'t mean, that Nintendo sent us a DMCA. You can still search for servers on our Discord server and direct connect to them.'
         })
         return
       }
