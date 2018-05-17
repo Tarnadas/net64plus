@@ -96,7 +96,7 @@ export class Emulator {
 
   public reset (): void {
     this.setGameMode(1)
-    this.setConnectionFlag(1)
+    this.setConnectionFlag(2)
     const buffer = Buffer.alloc(0x1C)
     for (let i = 0; i < 24; i++) {
       this.writeMemory(0xFF7800 + 0x100 * i, buffer)
