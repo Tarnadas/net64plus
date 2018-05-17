@@ -74,8 +74,6 @@ export class Connection {
   public disconnect (): void {
     this.onClose(0)
     this.ws.close()
-    emulator!.setConnectionFlag(1)
-    emulator!.setGameMode(1)
   }
 
   /**
@@ -243,7 +241,6 @@ export class Connection {
       })
     }
     emulator!.setPlayerId(this.playerId)
-    emulator!.setConnectionFlag(2)
     emulator!.setGameMode(handshake.gameMode)
     connector.setPlayerId(this.playerId)
     this.loop = setInterval(this.sendAll, UPDATE_INTERVAL)
