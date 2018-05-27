@@ -1,7 +1,5 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import * as marked from 'marked'
-import { emojify } from 'node-emoji'
 
 import { connector } from '../..'
 import { SMMButton } from '../buttons/SMMButton'
@@ -66,7 +64,7 @@ class Area extends React.PureComponent<ChatAreaProps, ChatAreaState> {
   renderChatMessages (chat: ChatMessage[]) {
     return chat.map(
       message => {
-        const html = emojify(marked(`[${message.time}] ${message.username}: ${message.message}`))
+        const html = `[${message.time}] ${message.username}: ${message.message}`
           .replace('<p>', '<p class="header">')
         return (
           <div

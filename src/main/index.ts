@@ -111,6 +111,9 @@ export const deleteConnection = () => {
 
   process.on('uncaughtException', (err: Error) => {
     const filePath = path.resolve(__dirname, `./error_log_${new Date().toISOString()}.log`)
+    if (!fs.existsSync(filePath)) {
+      fs.mkdirSync(filePath)
+    }
     fs.writeFileSync(filePath, err)
     app.quit()
   })
