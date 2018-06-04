@@ -43,9 +43,10 @@ export interface ChatStateDraft {
 }
 export type ChatState = Readonly<ChatStateDraft>
 
-export interface State {
-  readonly save: SaveState
-  readonly router: RouterState
-  readonly connection: ConnectionState
-  readonly chat: ChatState
+export interface StateDraft {
+  save: SaveState
+  router: RouterState
+  connection: ConnectionState
+  chat: ChatState
 }
+export type State = Readonly<StateDraft>

@@ -22,8 +22,8 @@ interface SettingsViewState {
   warning: string
 }
 
-const MIN_LENGTH_USERNAME = 3
-const MAX_LENGTH_USERNAME = 24
+export const MIN_LENGTH_USERNAME = 3
+export const MAX_LENGTH_USERNAME = 24
 
 class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
   constructor (public props: SettingsViewProps) {
