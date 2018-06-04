@@ -3740,9 +3740,9 @@ ignore@^3.0.11, ignore@^3.0.9, ignore@^3.2.0, ignore@^3.3.3, ignore@^3.3.6:
   version "3.3.7"
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-3.3.7.tgz#612289bfb3c220e186a58118618d5be8c1bab021"
 
-immer@^0.8.1:
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/immer/-/immer-0.8.1.tgz#44d7d0779947da32eb34314addaac5a82c9ec5ad"
+immer@^1.3.1:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/immer/-/immer-1.3.1.tgz#3a8c18d9d618c8b7169760a79beec24a1da6a43e"
 
 import-local@^1.0.0:
   version "1.0.0"
