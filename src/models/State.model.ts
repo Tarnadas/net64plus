@@ -36,6 +36,7 @@ export interface ChatMessage {
   time: string
   message: string
   username: string
+  isTrusted: boolean
 }
 
 export interface ChatStateDraft {
