@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 
 import { connector } from '../..'
 import { SMMButton } from '../buttons/SMMButton'
+import { ChatMessagePanel } from '../panels/ChatMessagePanel'
 import { State, ChatMessage } from '../../../models/State.model'
 
 interface ChatAreaProps {
@@ -63,18 +64,19 @@ class Area extends React.PureComponent<ChatAreaProps, ChatAreaState> {
   }
   renderChatMessages (chat: ChatMessage[]) {
     return chat.map(
-      message => {
-        const html = `[${message.time}] ${message.username}: ${message.message}`
-          .replace('<p>', '<p class="header">')
-        return (
-          <div
+      message =>
+        message.isTrusted
+          ? <div
             key={message.key}
             dangerouslySetInnerHTML={{
-              __html: html
+              __html: `[${message.time}] ${message.username}: ${message.message}`
+              .replace('<p>', '<p class="header">')
             }}
           />
-        )
-      }
+          : <ChatMessagePanel
+            key={message.key}
+            message={message}
+          />
     )
   }
   render () {

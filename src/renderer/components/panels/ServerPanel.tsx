@@ -15,6 +15,8 @@ import { State } from '../../../models/State.model'
 import { Server } from '../../../models/Server.model'
 import { IPlayer, GameModeType } from '../../../../proto/ServerClientMessage'
 
+const { sanitize } = require('dompurify').default
+
 interface ServerPanelProps {
   dispatch: Dispatch<State>
   server: Server
@@ -62,7 +64,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
         shell.openExternal(href)
       }
     }
-    description = document.body.outerHTML
+    description = sanitize(document.body.outerHTML)
     return description
   }
   onToggle () {
