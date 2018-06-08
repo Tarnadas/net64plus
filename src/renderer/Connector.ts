@@ -53,7 +53,7 @@ export class Connector {
   }
 
   private onSetPlayerId = (event: Electron.Event, playerId: number) => {
-    addGlobalMessage('Connected', '[SERVER]')
+    addGlobalMessage('Connected', '[SERVER]', true)
   }
 
   private onSetGameMode = (event: Electron.Event, gameMode: number) => {
@@ -76,11 +76,11 @@ export class Connector {
     const server = store.getState().connection.server
     if (!server || !server.players) return
     const username = server.players[senderId] && server.players[senderId].username
-    addGlobalMessage(message, username || '?')
+    addGlobalMessage(message, username || '?', false)
   }
 
   private onCommandMessage = (event: Electron.Event, { message }: { message: string }) => {
-    addGlobalMessage(message, '[SERVER]')
+    addGlobalMessage(message, '[SERVER]', true)
   }
 
   private onConnectionError = (event: Electron.Event, message: string) => {
