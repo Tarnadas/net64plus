@@ -325,6 +325,7 @@ $root.ClientServer = (function() {
      * @property {IClientHandshake|null} [handshake] ClientServer handshake
      * @property {IPing|null} [ping] ClientServer ping
      * @property {IPlayer|null} [player] ClientServer player
+     * @property {IAuthentication|null} [authentication] ClientServer authentication
      * @property {IPlayerData|null} [playerData] ClientServer playerData
      * @property {IMetaData|null} [metaData] ClientServer metaData
      * @property {IChat|null} [chat] ClientServer chat
@@ -378,6 +379,14 @@ $root.ClientServer = (function() {
     ClientServer.prototype.player = null;
 
     /**
+     * ClientServer authentication.
+     * @member {IAuthentication|null|undefined} authentication
+     * @memberof ClientServer
+     * @instance
+     */
+    ClientServer.prototype.authentication = null;
+
+    /**
      * ClientServer playerData.
      * @member {IPlayerData|null|undefined} playerData
      * @memberof ClientServer
@@ -406,12 +415,12 @@ $root.ClientServer = (function() {
 
     /**
      * ClientServer message.
-     * @member {"handshake"|"ping"|"player"|"playerData"|"metaData"|"chat"|undefined} message
+     * @member {"handshake"|"ping"|"player"|"authentication"|"playerData"|"metaData"|"chat"|undefined} message
      * @memberof ClientServer
      * @instance
      */
     Object.defineProperty(ClientServer.prototype, "message", {
-        get: $util.oneOfGetter($oneOfFields = ["handshake", "ping", "player", "playerData", "metaData", "chat"]),
+        get: $util.oneOfGetter($oneOfFields = ["handshake", "ping", "player", "authentication", "playerData", "metaData", "chat"]),
         set: $util.oneOfSetter($oneOfFields)
     });
 
@@ -447,6 +456,8 @@ $root.ClientServer = (function() {
             $root.Ping.encode(message.ping, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
         if (message.player != null && message.hasOwnProperty("player"))
             $root.Player.encode(message.player, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+        if (message.authentication != null && message.hasOwnProperty("authentication"))
+            $root.Authentication.encode(message.authentication, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
         if (message.playerData != null && message.hasOwnProperty("playerData"))
             $root.PlayerData.encode(message.playerData, writer.uint32(/* id 128, wireType 2 =*/1026).fork()).ldelim();
         if (message.metaData != null && message.hasOwnProperty("metaData"))
@@ -498,6 +509,9 @@ $root.ClientServer = (function() {
                 break;
             case 6:
                 message.player = $root.Player.decode(reader, reader.uint32());
+                break;
+            case 7:
+                message.authentication = $root.Authentication.decode(reader, reader.uint32());
                 break;
             case 128:
                 message.playerData = $root.PlayerData.decode(reader, reader.uint32());
@@ -552,6 +566,7 @@ $root.ClientServer = (function() {
             case 2:
             case 3:
             case 6:
+            case 7:
             case 128:
             case 129:
             case 130:
@@ -583,6 +598,16 @@ $root.ClientServer = (function() {
                 var error = $root.Player.verify(message.player);
                 if (error)
                     return "player." + error;
+            }
+        }
+        if (message.authentication != null && message.hasOwnProperty("authentication")) {
+            if (properties.message === 1)
+                return "message: multiple values";
+            properties.message = 1;
+            {
+                var error = $root.Authentication.verify(message.authentication);
+                if (error)
+                    return "authentication." + error;
             }
         }
         if (message.playerData != null && message.hasOwnProperty("playerData")) {
@@ -647,6 +672,10 @@ $root.ClientServer = (function() {
         case 6:
             message.messageType = 6;
             break;
+        case "AUTHENTICATION":
+        case 7:
+            message.messageType = 7;
+            break;
         case "PLAYER_DATA":
         case 128:
             message.messageType = 128;
@@ -674,6 +703,11 @@ $root.ClientServer = (function() {
             if (typeof object.player !== "object")
                 throw TypeError(".ClientServer.player: object expected");
             message.player = $root.Player.fromObject(object.player);
+        }
+        if (object.authentication != null) {
+            if (typeof object.authentication !== "object")
+                throw TypeError(".ClientServer.authentication: object expected");
+            message.authentication = $root.Authentication.fromObject(object.authentication);
         }
         if (object.playerData != null) {
             if (typeof object.playerData !== "object")
@@ -725,6 +759,11 @@ $root.ClientServer = (function() {
             if (options.oneofs)
                 object.message = "player";
         }
+        if (message.authentication != null && message.hasOwnProperty("authentication")) {
+            object.authentication = $root.Authentication.toObject(message.authentication, options);
+            if (options.oneofs)
+                object.message = "authentication";
+        }
         if (message.playerData != null && message.hasOwnProperty("playerData")) {
             object.playerData = $root.PlayerData.toObject(message.playerData, options);
             if (options.oneofs)
@@ -762,6 +801,7 @@ $root.ClientServer = (function() {
      * @property {number} HANDSHAKE=2 HANDSHAKE value
      * @property {number} PING=3 PING value
      * @property {number} PLAYER_UPDATE=6 PLAYER_UPDATE value
+     * @property {number} AUTHENTICATION=7 AUTHENTICATION value
      * @property {number} PLAYER_DATA=128 PLAYER_DATA value
      * @property {number} META_DATA=129 META_DATA value
      * @property {number} CHAT=130 CHAT value
@@ -772,6 +812,7 @@ $root.ClientServer = (function() {
         values[valuesById[2] = "HANDSHAKE"] = 2;
         values[valuesById[3] = "PING"] = 3;
         values[valuesById[6] = "PLAYER_UPDATE"] = 6;
+        values[valuesById[7] = "AUTHENTICATION"] = 7;
         values[valuesById[128] = "PLAYER_DATA"] = 128;
         values[valuesById[129] = "META_DATA"] = 129;
         values[valuesById[130] = "CHAT"] = 130;
@@ -1403,6 +1444,193 @@ $root.Player = (function() {
     };
 
     return Player;
+})();
+
+$root.Authentication = (function() {
+
+    /**
+     * Properties of an Authentication.
+     * @exports IAuthentication
+     * @interface IAuthentication
+     * @property {string|null} [password] Authentication password
+     */
+
+    /**
+     * Constructs a new Authentication.
+     * @exports Authentication
+     * @classdesc Represents an Authentication.
+     * @implements IAuthentication
+     * @constructor
+     * @param {IAuthentication=} [properties] Properties to set
+     */
+    function Authentication(properties) {
+        if (properties)
+            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                if (properties[keys[i]] != null)
+                    this[keys[i]] = properties[keys[i]];
+    }
+
+    /**
+     * Authentication password.
+     * @member {string} password
+     * @memberof Authentication
+     * @instance
+     */
+    Authentication.prototype.password = "";
+
+    /**
+     * Creates a new Authentication instance using the specified properties.
+     * @function create
+     * @memberof Authentication
+     * @static
+     * @param {IAuthentication=} [properties] Properties to set
+     * @returns {Authentication} Authentication instance
+     */
+    Authentication.create = function create(properties) {
+        return new Authentication(properties);
+    };
+
+    /**
+     * Encodes the specified Authentication message. Does not implicitly {@link Authentication.verify|verify} messages.
+     * @function encode
+     * @memberof Authentication
+     * @static
+     * @param {IAuthentication} message Authentication message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    Authentication.encode = function encode(message, writer) {
+        if (!writer)
+            writer = $Writer.create();
+        if (message.password != null && message.hasOwnProperty("password"))
+            writer.uint32(/* id 1, wireType 2 =*/10).string(message.password);
+        return writer;
+    };
+
+    /**
+     * Encodes the specified Authentication message, length delimited. Does not implicitly {@link Authentication.verify|verify} messages.
+     * @function encodeDelimited
+     * @memberof Authentication
+     * @static
+     * @param {IAuthentication} message Authentication message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    Authentication.encodeDelimited = function encodeDelimited(message, writer) {
+        return this.encode(message, writer).ldelim();
+    };
+
+    /**
+     * Decodes an Authentication message from the specified reader or buffer.
+     * @function decode
+     * @memberof Authentication
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @param {number} [length] Message length if known beforehand
+     * @returns {Authentication} Authentication
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    Authentication.decode = function decode(reader, length) {
+        if (!(reader instanceof $Reader))
+            reader = $Reader.create(reader);
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Authentication();
+        while (reader.pos < end) {
+            var tag = reader.uint32();
+            switch (tag >>> 3) {
+            case 1:
+                message.password = reader.string();
+                break;
+            default:
+                reader.skipType(tag & 7);
+                break;
+            }
+        }
+        return message;
+    };
+
+    /**
+     * Decodes an Authentication message from the specified reader or buffer, length delimited.
+     * @function decodeDelimited
+     * @memberof Authentication
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @returns {Authentication} Authentication
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    Authentication.decodeDelimited = function decodeDelimited(reader) {
+        if (!(reader instanceof $Reader))
+            reader = new $Reader(reader);
+        return this.decode(reader, reader.uint32());
+    };
+
+    /**
+     * Verifies an Authentication message.
+     * @function verify
+     * @memberof Authentication
+     * @static
+     * @param {Object.<string,*>} message Plain object to verify
+     * @returns {string|null} `null` if valid, otherwise the reason why it is not
+     */
+    Authentication.verify = function verify(message) {
+        if (typeof message !== "object" || message === null)
+            return "object expected";
+        if (message.password != null && message.hasOwnProperty("password"))
+            if (!$util.isString(message.password))
+                return "password: string expected";
+        return null;
+    };
+
+    /**
+     * Creates an Authentication message from a plain object. Also converts values to their respective internal types.
+     * @function fromObject
+     * @memberof Authentication
+     * @static
+     * @param {Object.<string,*>} object Plain object
+     * @returns {Authentication} Authentication
+     */
+    Authentication.fromObject = function fromObject(object) {
+        if (object instanceof $root.Authentication)
+            return object;
+        var message = new $root.Authentication();
+        if (object.password != null)
+            message.password = String(object.password);
+        return message;
+    };
+
+    /**
+     * Creates a plain object from an Authentication message. Also converts values to other types if specified.
+     * @function toObject
+     * @memberof Authentication
+     * @static
+     * @param {Authentication} message Authentication
+     * @param {$protobuf.IConversionOptions} [options] Conversion options
+     * @returns {Object.<string,*>} Plain object
+     */
+    Authentication.toObject = function toObject(message, options) {
+        if (!options)
+            options = {};
+        var object = {};
+        if (options.defaults)
+            object.password = "";
+        if (message.password != null && message.hasOwnProperty("password"))
+            object.password = message.password;
+        return object;
+    };
+
+    /**
+     * Converts this Authentication to JSON.
+     * @function toJSON
+     * @memberof Authentication
+     * @instance
+     * @returns {Object.<string,*>} JSON object
+     */
+    Authentication.prototype.toJSON = function toJSON() {
+        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+    };
+
+    return Authentication;
 })();
 
 $root.PlayerData = (function() {

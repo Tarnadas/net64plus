@@ -9,6 +9,7 @@ message ServerMessage {
     GAME_MODE = 1;
     PLAYER_REORDER = 2;
     ERROR = 3;
+    AUTHENTICATION = 4;
   }
   MessageType message_type = 1;
   oneof message {
@@ -16,6 +17,7 @@ message ServerMessage {
     GameMode game_mode = 3;
     PlayerReorder player_reorder = 4;
     Error error = 5;
+    Authentication authentication = 6;
   }
 }
 
@@ -34,4 +36,13 @@ message Error {
   }
   ErrorType error_type = 1;
   string message = 2;
+}
+
+message Authentication {
+  enum Status {
+    ACCEPTED = 0;
+    DENIED = 1;
+  }
+  Status status = 1;
+  uint32 throttle = 2;
 }
