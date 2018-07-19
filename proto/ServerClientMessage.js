@@ -878,6 +878,7 @@ $root.ServerHandshake = (function() {
      * @property {IPlayerListUpdate|null} [playerList] ServerHandshake playerList
      * @property {string|null} [countryCode] ServerHandshake countryCode
      * @property {GameModeType|null} [gameMode] ServerHandshake gameMode
+     * @property {boolean|null} [passwordRequired] ServerHandshake passwordRequired
      */
 
     /**
@@ -968,6 +969,14 @@ $root.ServerHandshake = (function() {
     ServerHandshake.prototype.gameMode = 0;
 
     /**
+     * ServerHandshake passwordRequired.
+     * @member {boolean} passwordRequired
+     * @memberof ServerHandshake
+     * @instance
+     */
+    ServerHandshake.prototype.passwordRequired = false;
+
+    /**
      * Creates a new ServerHandshake instance using the specified properties.
      * @function create
      * @memberof ServerHandshake
@@ -1009,6 +1018,8 @@ $root.ServerHandshake = (function() {
             writer.uint32(/* id 8, wireType 2 =*/66).string(message.countryCode);
         if (message.gameMode != null && message.hasOwnProperty("gameMode"))
             writer.uint32(/* id 9, wireType 0 =*/72).int32(message.gameMode);
+        if (message.passwordRequired != null && message.hasOwnProperty("passwordRequired"))
+            writer.uint32(/* id 10, wireType 0 =*/80).bool(message.passwordRequired);
         return writer;
     };
 
@@ -1069,6 +1080,9 @@ $root.ServerHandshake = (function() {
                 break;
             case 9:
                 message.gameMode = reader.int32();
+                break;
+            case 10:
+                message.passwordRequired = reader.bool();
                 break;
             default:
                 reader.skipType(tag & 7);
@@ -1145,6 +1159,9 @@ $root.ServerHandshake = (function() {
             case 8:
                 break;
             }
+        if (message.passwordRequired != null && message.hasOwnProperty("passwordRequired"))
+            if (typeof message.passwordRequired !== "boolean")
+                return "passwordRequired: boolean expected";
         return null;
     };
 
@@ -1213,6 +1230,8 @@ $root.ServerHandshake = (function() {
             message.gameMode = 8;
             break;
         }
+        if (object.passwordRequired != null)
+            message.passwordRequired = Boolean(object.passwordRequired);
         return message;
     };
 
@@ -1239,6 +1258,7 @@ $root.ServerHandshake = (function() {
             object.playerList = null;
             object.countryCode = "";
             object.gameMode = options.enums === String ? "NONE" : 0;
+            object.passwordRequired = false;
         }
         if (message.playerId != null && message.hasOwnProperty("playerId"))
             object.playerId = message.playerId;
@@ -1258,6 +1278,8 @@ $root.ServerHandshake = (function() {
             object.countryCode = message.countryCode;
         if (message.gameMode != null && message.hasOwnProperty("gameMode"))
             object.gameMode = options.enums === String ? $root.GameModeType[message.gameMode] : message.gameMode;
+        if (message.passwordRequired != null && message.hasOwnProperty("passwordRequired"))
+            object.passwordRequired = message.passwordRequired;
         return object;
     };
 
@@ -2335,6 +2357,7 @@ $root.ServerMessage = (function() {
      * @property {IGameMode|null} [gameMode] ServerMessage gameMode
      * @property {IPlayerReorder|null} [playerReorder] ServerMessage playerReorder
      * @property {IError|null} [error] ServerMessage error
+     * @property {IAuthentication|null} [authentication] ServerMessage authentication
      */
 
     /**
@@ -2392,17 +2415,25 @@ $root.ServerMessage = (function() {
      */
     ServerMessage.prototype.error = null;
 
+    /**
+     * ServerMessage authentication.
+     * @member {IAuthentication|null|undefined} authentication
+     * @memberof ServerMessage
+     * @instance
+     */
+    ServerMessage.prototype.authentication = null;
+
     // OneOf field names bound to virtual getters and setters
     var $oneOfFields;
 
     /**
      * ServerMessage message.
-     * @member {"connectionDenied"|"gameMode"|"playerReorder"|"error"|undefined} message
+     * @member {"connectionDenied"|"gameMode"|"playerReorder"|"error"|"authentication"|undefined} message
      * @memberof ServerMessage
      * @instance
      */
     Object.defineProperty(ServerMessage.prototype, "message", {
-        get: $util.oneOfGetter($oneOfFields = ["connectionDenied", "gameMode", "playerReorder", "error"]),
+        get: $util.oneOfGetter($oneOfFields = ["connectionDenied", "gameMode", "playerReorder", "error", "authentication"]),
         set: $util.oneOfSetter($oneOfFields)
     });
 
@@ -2440,6 +2471,8 @@ $root.ServerMessage = (function() {
             $root.PlayerReorder.encode(message.playerReorder, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
         if (message.error != null && message.hasOwnProperty("error"))
             $root.Error.encode(message.error, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+        if (message.authentication != null && message.hasOwnProperty("authentication"))
+            $root.Authentication.encode(message.authentication, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
         return writer;
     };
 
@@ -2489,6 +2522,9 @@ $root.ServerMessage = (function() {
             case 5:
                 message.error = $root.Error.decode(reader, reader.uint32());
                 break;
+            case 6:
+                message.authentication = $root.Authentication.decode(reader, reader.uint32());
+                break;
             default:
                 reader.skipType(tag & 7);
                 break;
@@ -2533,6 +2569,7 @@ $root.ServerMessage = (function() {
             case 1:
             case 2:
             case 3:
+            case 4:
                 break;
             }
         if (message.connectionDenied != null && message.hasOwnProperty("connectionDenied")) {
@@ -2573,6 +2610,16 @@ $root.ServerMessage = (function() {
                     return "error." + error;
             }
         }
+        if (message.authentication != null && message.hasOwnProperty("authentication")) {
+            if (properties.message === 1)
+                return "message: multiple values";
+            properties.message = 1;
+            {
+                var error = $root.Authentication.verify(message.authentication);
+                if (error)
+                    return "authentication." + error;
+            }
+        }
         return null;
     };
 
@@ -2605,6 +2652,10 @@ $root.ServerMessage = (function() {
         case 3:
             message.messageType = 3;
             break;
+        case "AUTHENTICATION":
+        case 4:
+            message.messageType = 4;
+            break;
         }
         if (object.connectionDenied != null) {
             if (typeof object.connectionDenied !== "object")
@@ -2625,6 +2676,11 @@ $root.ServerMessage = (function() {
             if (typeof object.error !== "object")
                 throw TypeError(".ServerMessage.error: object expected");
             message.error = $root.Error.fromObject(object.error);
+        }
+        if (object.authentication != null) {
+            if (typeof object.authentication !== "object")
+                throw TypeError(".ServerMessage.authentication: object expected");
+            message.authentication = $root.Authentication.fromObject(object.authentication);
         }
         return message;
     };
@@ -2666,6 +2722,11 @@ $root.ServerMessage = (function() {
             if (options.oneofs)
                 object.message = "error";
         }
+        if (message.authentication != null && message.hasOwnProperty("authentication")) {
+            object.authentication = $root.Authentication.toObject(message.authentication, options);
+            if (options.oneofs)
+                object.message = "authentication";
+        }
         return object;
     };
 
@@ -2688,6 +2749,7 @@ $root.ServerMessage = (function() {
      * @property {number} GAME_MODE=1 GAME_MODE value
      * @property {number} PLAYER_REORDER=2 PLAYER_REORDER value
      * @property {number} ERROR=3 ERROR value
+     * @property {number} AUTHENTICATION=4 AUTHENTICATION value
      */
     ServerMessage.MessageType = (function() {
         var valuesById = {}, values = Object.create(valuesById);
@@ -2695,6 +2757,7 @@ $root.ServerMessage = (function() {
         values[valuesById[1] = "GAME_MODE"] = 1;
         values[valuesById[2] = "PLAYER_REORDER"] = 2;
         values[valuesById[3] = "ERROR"] = 3;
+        values[valuesById[4] = "AUTHENTICATION"] = 4;
         return values;
     })();
 
@@ -3167,6 +3230,243 @@ $root.Error = (function() {
     })();
 
     return Error;
+})();
+
+$root.Authentication = (function() {
+
+    /**
+     * Properties of an Authentication.
+     * @exports IAuthentication
+     * @interface IAuthentication
+     * @property {Authentication.Status|null} [status] Authentication status
+     * @property {number|null} [throttle] Authentication throttle
+     */
+
+    /**
+     * Constructs a new Authentication.
+     * @exports Authentication
+     * @classdesc Represents an Authentication.
+     * @implements IAuthentication
+     * @constructor
+     * @param {IAuthentication=} [properties] Properties to set
+     */
+    function Authentication(properties) {
+        if (properties)
+            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                if (properties[keys[i]] != null)
+                    this[keys[i]] = properties[keys[i]];
+    }
+
+    /**
+     * Authentication status.
+     * @member {Authentication.Status} status
+     * @memberof Authentication
+     * @instance
+     */
+    Authentication.prototype.status = 0;
+
+    /**
+     * Authentication throttle.
+     * @member {number} throttle
+     * @memberof Authentication
+     * @instance
+     */
+    Authentication.prototype.throttle = 0;
+
+    /**
+     * Creates a new Authentication instance using the specified properties.
+     * @function create
+     * @memberof Authentication
+     * @static
+     * @param {IAuthentication=} [properties] Properties to set
+     * @returns {Authentication} Authentication instance
+     */
+    Authentication.create = function create(properties) {
+        return new Authentication(properties);
+    };
+
+    /**
+     * Encodes the specified Authentication message. Does not implicitly {@link Authentication.verify|verify} messages.
+     * @function encode
+     * @memberof Authentication
+     * @static
+     * @param {IAuthentication} message Authentication message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    Authentication.encode = function encode(message, writer) {
+        if (!writer)
+            writer = $Writer.create();
+        if (message.status != null && message.hasOwnProperty("status"))
+            writer.uint32(/* id 1, wireType 0 =*/8).int32(message.status);
+        if (message.throttle != null && message.hasOwnProperty("throttle"))
+            writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.throttle);
+        return writer;
+    };
+
+    /**
+     * Encodes the specified Authentication message, length delimited. Does not implicitly {@link Authentication.verify|verify} messages.
+     * @function encodeDelimited
+     * @memberof Authentication
+     * @static
+     * @param {IAuthentication} message Authentication message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    Authentication.encodeDelimited = function encodeDelimited(message, writer) {
+        return this.encode(message, writer).ldelim();
+    };
+
+    /**
+     * Decodes an Authentication message from the specified reader or buffer.
+     * @function decode
+     * @memberof Authentication
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @param {number} [length] Message length if known beforehand
+     * @returns {Authentication} Authentication
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    Authentication.decode = function decode(reader, length) {
+        if (!(reader instanceof $Reader))
+            reader = $Reader.create(reader);
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.Authentication();
+        while (reader.pos < end) {
+            var tag = reader.uint32();
+            switch (tag >>> 3) {
+            case 1:
+                message.status = reader.int32();
+                break;
+            case 2:
+                message.throttle = reader.uint32();
+                break;
+            default:
+                reader.skipType(tag & 7);
+                break;
+            }
+        }
+        return message;
+    };
+
+    /**
+     * Decodes an Authentication message from the specified reader or buffer, length delimited.
+     * @function decodeDelimited
+     * @memberof Authentication
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @returns {Authentication} Authentication
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    Authentication.decodeDelimited = function decodeDelimited(reader) {
+        if (!(reader instanceof $Reader))
+            reader = new $Reader(reader);
+        return this.decode(reader, reader.uint32());
+    };
+
+    /**
+     * Verifies an Authentication message.
+     * @function verify
+     * @memberof Authentication
+     * @static
+     * @param {Object.<string,*>} message Plain object to verify
+     * @returns {string|null} `null` if valid, otherwise the reason why it is not
+     */
+    Authentication.verify = function verify(message) {
+        if (typeof message !== "object" || message === null)
+            return "object expected";
+        if (message.status != null && message.hasOwnProperty("status"))
+            switch (message.status) {
+            default:
+                return "status: enum value expected";
+            case 0:
+            case 1:
+                break;
+            }
+        if (message.throttle != null && message.hasOwnProperty("throttle"))
+            if (!$util.isInteger(message.throttle))
+                return "throttle: integer expected";
+        return null;
+    };
+
+    /**
+     * Creates an Authentication message from a plain object. Also converts values to their respective internal types.
+     * @function fromObject
+     * @memberof Authentication
+     * @static
+     * @param {Object.<string,*>} object Plain object
+     * @returns {Authentication} Authentication
+     */
+    Authentication.fromObject = function fromObject(object) {
+        if (object instanceof $root.Authentication)
+            return object;
+        var message = new $root.Authentication();
+        switch (object.status) {
+        case "ACCEPTED":
+        case 0:
+            message.status = 0;
+            break;
+        case "DENIED":
+        case 1:
+            message.status = 1;
+            break;
+        }
+        if (object.throttle != null)
+            message.throttle = object.throttle >>> 0;
+        return message;
+    };
+
+    /**
+     * Creates a plain object from an Authentication message. Also converts values to other types if specified.
+     * @function toObject
+     * @memberof Authentication
+     * @static
+     * @param {Authentication} message Authentication
+     * @param {$protobuf.IConversionOptions} [options] Conversion options
+     * @returns {Object.<string,*>} Plain object
+     */
+    Authentication.toObject = function toObject(message, options) {
+        if (!options)
+            options = {};
+        var object = {};
+        if (options.defaults) {
+            object.status = options.enums === String ? "ACCEPTED" : 0;
+            object.throttle = 0;
+        }
+        if (message.status != null && message.hasOwnProperty("status"))
+            object.status = options.enums === String ? $root.Authentication.Status[message.status] : message.status;
+        if (message.throttle != null && message.hasOwnProperty("throttle"))
+            object.throttle = message.throttle;
+        return object;
+    };
+
+    /**
+     * Converts this Authentication to JSON.
+     * @function toJSON
+     * @memberof Authentication
+     * @instance
+     * @returns {Object.<string,*>} JSON object
+     */
+    Authentication.prototype.toJSON = function toJSON() {
+        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+    };
+
+    /**
+     * Status enum.
+     * @name Authentication.Status
+     * @enum {string}
+     * @property {number} ACCEPTED=0 ACCEPTED value
+     * @property {number} DENIED=1 DENIED value
+     */
+    Authentication.Status = (function() {
+        var valuesById = {}, values = Object.create(valuesById);
+        values[valuesById[0] = "ACCEPTED"] = 0;
+        values[valuesById[1] = "DENIED"] = 1;
+        return values;
+    })();
+
+    return Authentication;
 })();
 
 $root.ConnectionDenied = (function() {
