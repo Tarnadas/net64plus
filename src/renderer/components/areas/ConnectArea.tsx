@@ -37,7 +37,8 @@ class Area extends React.PureComponent<ConnectAreaProps, ConnectAreaState> {
     this.onKeyPress = this.onKeyPress.bind(this)
     this.onConnect = this.onConnect.bind(this)
   }
-  componentWillReceiveProps (nextProps: ConnectAreaProps) {
+
+  public componentWillReceiveProps (nextProps: ConnectAreaProps): void {
     if (
       !nextProps.connectionError ||
       nextProps.connectionError === this.props.connectionError ||
@@ -48,24 +49,28 @@ class Area extends React.PureComponent<ConnectAreaProps, ConnectAreaState> {
       loading: false
     })
   }
-  onIPChange (e: React.ChangeEvent<any>) {
+
+  private onIPChange ({ target }: React.ChangeEvent<any>): void {
     this.setState({
-      ip: e.target.value.replace(/[^0-9a-z|^.]/g, '')
+      ip: target.value.replace(/[^0-9a-z|^.]/g, '')
     })
   }
-  onPortChange (e: React.ChangeEvent<any>) {
+
+  private onPortChange ({ target }: React.ChangeEvent<any>): void {
     try {
       this.setState({
-        port: parseInt(e.target.value.replace(/[^0-9]/g, ''))
+        port: parseInt(String(target.value).replace(/[^0-9]/g, '')) || undefined
       })
     } catch (err) {}
   }
-  onKeyPress (e: React.KeyboardEvent<any>) {
-    if (e.key === 'Enter') {
+
+  private onKeyPress ({ key }: React.KeyboardEvent<any>): void {
+    if (key === 'Enter') {
       this.onConnect()
     }
   }
-  onConnect () {
+
+  private onConnect (): void {
     this.setState({
       warning: '',
       loading: true
@@ -78,8 +83,9 @@ class Area extends React.PureComponent<ConnectAreaProps, ConnectAreaState> {
       characterId: this.props.characterId
     })
   }
-  render () {
-    const { warning, loading } = this.state
+
+  public render (): JSX.Element {
+    const { warning, loading, ip, port } = this.state
     const styles: React.CSSProperties = {
       area: {
         display: 'flex',
@@ -111,9 +117,14 @@ class Area extends React.PureComponent<ConnectAreaProps, ConnectAreaState> {
           <WarningPanel warning={warning} />
         }
         <div style={styles.label}>IP address:</div>
-        <input style={styles.input} value={this.state.ip} onChange={this.onIPChange} onKeyPress={this.onKeyPress} />
+        <input style={styles.input} value={ip} onChange={this.onIPChange} onKeyPress={this.onKeyPress} />
         <div style={styles.label}>Port:</div>
-        <input style={styles.input} value={this.state.port} onChange={this.onPortChange} onKeyPress={this.onKeyPress} />
+        <input
+          style={styles.input}
+          value={port}
+          onChange={this.onPortChange}
+          onKeyPress={this.onKeyPress}
+        />
         <SMMButton text='Connect' iconSrc='img/net64.svg' onClick={this.onConnect} />
       </div>
     )

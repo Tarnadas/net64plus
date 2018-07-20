@@ -1,9 +1,6 @@
 import * as React from 'react'
 
-import { resolve } from 'url'
-
-import { Connector } from '../../Connector'
-import { request } from '../../Request'
+import { SendPasswordArea } from './SendPasswordArea'
 import { ServerPanel } from '../panels/ServerPanel'
 import { ChatArea } from '../areas/ChatArea'
 import { Server } from '../../../models/Server.model'
@@ -12,9 +9,21 @@ interface ConnectionAreaProps {
   server: Server
 }
 
-export class ConnectionArea extends React.PureComponent<ConnectionAreaProps, {}> {
-  render () {
-    const server = this.props.server
+interface ConnectionAreaState {
+  passwordAccepted: boolean
+}
+
+export class ConnectionArea extends React.PureComponent<ConnectionAreaProps, ConnectionAreaState> {
+  constructor (props: ConnectionAreaProps) {
+    super(props)
+    this.state = {
+      passwordAccepted: !props.server.passwordRequired
+    }
+  }
+
+  public render (): JSX.Element {
+    const { server } = this.props
+    const { passwordAccepted } = this.state
     const styles: React.CSSProperties = {
       area: {
         overflowY: 'auto',
@@ -29,6 +38,10 @@ export class ConnectionArea extends React.PureComponent<ConnectionAreaProps, {}>
       <div className='scroll' style={styles.area}>
         <ServerPanel server={server} isConnected />
         <ChatArea />
+        {
+          !passwordAccepted &&
+          <SendPasswordArea />
+        }
       </div>
     )
   }
