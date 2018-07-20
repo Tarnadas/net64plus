@@ -10,7 +10,7 @@ import { connector } from '../..'
 import { SMMButton } from '../buttons/SMMButton'
 import { WarningPanel } from '../panels/WarningPanel'
 import { ProgressSpinner } from '../helpers/ProgressSpinner'
-import { isConnectedToEmulator } from '../../actions/connection'
+import { isConnectedToEmulator, setEmulatorError } from '../../actions/emulator'
 import { State } from '../../../models/State.model'
 
 const TIMEOUT = 1000
@@ -19,6 +19,7 @@ interface EmulatorViewProps {
   dispatch: Dispatch<State>
   characterId: number
   emuChat: boolean
+  error: string
 }
 
 interface FilteredEmulator {
@@ -43,23 +44,26 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
     this.state = {
       emulators: [],
       loading: false,
-      warning: 'You must start and select an emulator'
+      warning: props.error || 'You must start and select an emulator'
     }
     this.scan = this.scan.bind(this)
     this.onSelectEmulator = this.onSelectEmulator.bind(this)
     this.renderEmulators = this.renderEmulators.bind(this)
     this.mounted = true
   }
-  componentDidMount () {
+
+  public componentDidMount (): void {
     this.scan()
     this.timer = setInterval(this.scan, 10000)
   }
-  componentWillUnmount () {
+
+  public componentWillUnmount (): void {
     if (!this.timer) return
     clearInterval(this.timer)
     this.mounted = false
   }
-  async scan () {
+
+  private async scan (): Promise<void> {
     if (!this.mounted) return
 
     try {
@@ -111,6 +115,13 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
           windowName: process[8]
         }))
       if (!this.mounted) return
+      if (process.env.NODE_ENV === 'development') {
+        emulators.push({
+          name: 'Fake Emulator',
+          pid: 0,
+          windowName: 'Fake Super Mario - Project64'
+        })
+      }
       this.setState({
         emulators
       })
@@ -120,7 +131,8 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
       })
     }
   }
-  async onSelectEmulator (emulator: FilteredEmulator) {
+
+  private async onSelectEmulator (emulator: FilteredEmulator): Promise<void> {
     this.setState({
       loading: true
     })
@@ -131,6 +143,7 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
         inGameChatEnabled: false
       })
       this.props.dispatch(isConnectedToEmulator(true))
+      this.props.dispatch(setEmulatorError())
       this.props.dispatch(push('/browse'))
     }, 50)
     setTimeout(() => {
@@ -141,7 +154,8 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
       })
     }, TIMEOUT)
   }
-  renderEmulators (emulators: FilteredEmulator[]) {
+
+  private renderEmulators (emulators: FilteredEmulator[]): JSX.Element[] {
     const li: React.CSSProperties = {
       margin: '10px 0',
       lineHeight: '40px',
@@ -189,10 +203,9 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
       }
     )
   }
-  render () {
-    const emulators = this.state.emulators
-    const loading = this.state.loading
-    const warning = this.state.warning
+
+  public render (): JSX.Element {
+    const { emulators, loading, warning } = this.state
     const styles: React.CSSProperties = {
       main: {
         display: 'flex',
@@ -237,5 +250,6 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
 }
 export const EmulatorView = connect((state: State) => ({
   characterId: state.save.appSaveData.character,
-  emuChat: state.save.appSaveData.emuChat
+  emuChat: state.save.appSaveData.emuChat,
+  error: state.emulator.error
 }))(View)

@@ -3,7 +3,7 @@ import winProcess, { Process } from 'winprocess'
 import * as fs from 'fs'
 import * as path from 'path'
 
-import { connector } from '.'
+import { connector, deleteEmulator } from '.'
 import { buf2hex } from '../utils/Buffer.util'
 
 enum ConnectionFlag {
@@ -91,7 +91,13 @@ export class Emulator {
    * @returns {Buffer} Memory buffer
    */
   public readMemory (offset: number, length: number): Buffer {
-    return this.process.readMemory(this.baseAddress + offset, length)
+    const memory = this.process.readMemory(this.baseAddress + offset, length)
+    if (memory instanceof Buffer) {
+      return memory
+    }
+    deleteEmulator()
+    connector.setEmulatorError('Insufficient permission to read memory. Try starting Net64+ with admin privileges')
+    throw new Error('Insufficient permission')
   }
 
   public reset (): void {

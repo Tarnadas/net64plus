@@ -1,5 +1,4 @@
 import {
-  IsConnectedToEmulatorAction,
   SetServerAction,
   SetConnectionErrorAction,
   SetPlayersAction,
@@ -10,13 +9,6 @@ import {
 } from './models/connection.model'
 import { Server } from '../../models/Server.model'
 import { IPlayer, IPlayerUpdate } from '../../../proto/ServerClientMessage'
-
-export function isConnectedToEmulator (isConnectedToEmulator: boolean): IsConnectedToEmulatorAction {
-  return {
-    type: ConnectionActionType.IS_CONNECTED_TO_EMULATOR,
-    isConnectedToEmulator
-  }
-}
 
 export function setServer (server: Server): SetServerAction {
   return {
