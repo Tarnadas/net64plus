@@ -115,7 +115,6 @@ export class Connection {
       warning = 'Server refused connection.\nThe server might not have set up proper port forwarding or you inserted a wrong port'
     }
     connector.setConnectionError(warning)
-    // TODO set connection error
     this.hasError = true
   }
 
@@ -234,7 +233,8 @@ export class Connection {
         description: handshake.description,
         countryCode: handshake.countryCode,
         gameMode: handshake.gameMode,
-        players
+        players,
+        passwordRequired: handshake.passwordRequired
       })
     }
     emulator!.setPlayerId(this.playerId)
