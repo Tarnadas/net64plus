@@ -3,10 +3,6 @@ import { Action } from 'redux'
 import { Server } from '../../../models/Server.model'
 import { IPlayer, IPlayerUpdate } from '../../../../proto/ServerClientMessage'
 
-export interface IsConnectedToEmulatorAction extends Action {
-  isConnectedToEmulator: boolean
-}
-
 export interface SetServerAction extends Action {
   server: Server
 }
@@ -31,8 +27,7 @@ export interface SetGameModeAction extends Action {
 export type DisconnectAction = Action
 
 export type ConnectionAction =
-  IsConnectedToEmulatorAction
-  & SetServerAction
+  SetServerAction
   & SetConnectionErrorAction
   & SetPlayersAction
   & SetPlayerAction
@@ -40,7 +35,6 @@ export type ConnectionAction =
   & DisconnectAction
 
 export enum ConnectionActionType {
-  IS_CONNECTED_TO_EMULATOR = 'IS_CONNECTED_TO_EMULATOR',
   SET_SERVER = 'SET_SERVER',
   SET_CONNECTION_ERROR = 'SET_CONNECTION_ERROR',
   SET_PLAYERS = 'SET_PLAYERS',

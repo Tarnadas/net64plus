@@ -110,11 +110,23 @@ export const deleteConnection = () => {
   })
 
   process.on('uncaughtException', (err: Error) => {
-    const filePath = path.resolve(__dirname, `./error_log_${new Date().toISOString()}.log`)
-    if (!fs.existsSync(filePath)) {
-      fs.mkdirSync(filePath)
+    const errorFolderPath = path.resolve(__dirname, 'error')
+    const filePath = path.resolve(
+      errorFolderPath,
+      `./error_log_${new Date().toISOString().split('.')[0].replace(/:/g, '').replace(/-/g, '')}.log`
+    )
+    if (!fs.existsSync(errorFolderPath)) {
+      fs.mkdirSync(errorFolderPath)
     }
-    fs.writeFileSync(filePath, err)
+    fs.writeFileSync(
+      filePath,
+      `\
+Here is a detailed error log of the unhandled exception that caused Net64+ to crash.\n
+Please report this error log on GitHub: https://github.com/tarnadas/net64plus/issues\n\n\
+Error name: ${err.name}\n\
+Error message: ${err.message}\n\
+StackTrace: ${err.stack}`
+    )
     app.quit()
   })
 })()
