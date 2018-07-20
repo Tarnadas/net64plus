@@ -1,11 +1,12 @@
 {
   "name": "net64plus",
-  "version": "2.0.4",
+  "version": "2.1.0",
   "compatVersion": "1.0.0",
   "description": "Net64+ client",
   "main": "index.js",
   "scripts": {
     "start": "webpack --env=dev && cd ./build && electron .",
+    "start:debug": "webpack --env=dev",
     "build": "webpack --env=prod && node ./build-app",
     "build:dev": "webpack --env=dev && node ./build-app",
     "build:proto": "pbjs -t static-module -w commonjs -p ./proto -o ./proto/ServerClientMessage.js ./proto/ServerClientMessage.proto && pbts -o ./proto/ServerClientMessage.d.ts ./proto/ServerClientMessage.js && pbjs -t static-module -w commonjs -p ./proto -o ./proto/ClientServerMessage.js ./proto/ClientServerMessage.proto && pbts -o ./proto/ClientServerMessage.d.ts ./proto/ClientServerMessage.js",
