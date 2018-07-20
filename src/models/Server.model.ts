@@ -11,4 +11,5 @@ export interface Server {
   countryCode?: string
   gameMode?: number
   version?: string
+  passwordRequired?: boolean | null
 }

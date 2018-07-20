@@ -51,7 +51,8 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
     this.onDisconnect = this.onDisconnect.bind(this)
     this.renderPlayers = this.renderPlayers.bind(this)
   }
-  getDescription = () => {
+
+  private getDescription = (): string => {
     if (!this.props.server.description) return ''
     let description = emojify(marked(this.props.server.description))
     const document: Document = new DOMParser().parseFromString(description, 'text/html')
@@ -67,18 +68,21 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
     description = sanitize(document.body.outerHTML)
     return description
   }
-  onToggle () {
+
+  private onToggle (): void {
     if (this.props.isConnected) return
     this.setState(prevState => ({
       display: !prevState.display
     }))
   }
-  handleDescriptionToggle () {
+
+  private handleDescriptionToggle (): void {
     this.setState(prevState => ({
       displayDescription: !prevState.displayDescription
     }))
   }
-  onConnect () {
+
+  private onConnect (): void {
     if (this.props.onConnect) this.props.onConnect()
     const server = this.props.server
     this.props.dispatch(setConnectionError(''))
@@ -90,28 +94,12 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
       characterId: this.props.characterId
     })
   }
-  onDisconnect () {
+
+  private onDisconnect (): void {
     this.props.dispatch(disconnect())
     connector.disconnect()
   }
-  renderPlayers (players: IPlayer[]) {
-    return players
-      .filter(player => player)
-      .map(
-        (player, index) =>
-          <div
-            key={index}
-            className='server-panel-player'
-          >
-            <div className='server-panel-player-img'>
-              <img src={`img/${CHARACTER_IMAGES[player.characterId || 0]}`} />
-            </div>
-            <div className='server-panel-player-name'>
-              { player.username }
-            </div>
-          </div>
-      )
-  }
+
   private getGameMode (server: Server): string {
     switch (server.gameMode) {
       case GameModeType.DEFAULT:
@@ -131,6 +119,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
     }
     return ''
   }
+
   private getGameModeImgSrc (server: Server): string | undefined {
     switch (server.gameMode) {
       case GameModeType.DEFAULT:
@@ -149,11 +138,31 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
         return 'img/wario_ware.png'
     }
   }
-  render () {
+
+  private renderPlayers (players: IPlayer[]): JSX.Element[] {
+    return players
+      .filter(player => player)
+      .map(
+        (player, index) =>
+          <div
+            key={index}
+            className='server-panel-player'
+          >
+            <div className='server-panel-player-img'>
+              <img src={`img/${CHARACTER_IMAGES[player.characterId || 0]}`} />
+            </div>
+            <div className='server-panel-player-name'>
+              { player.username }
+            </div>
+          </div>
+      )
+  }
+
+  public render (): JSX.Element {
     const { server, isConnected } = this.props
     const { display, displayDescription, warning } = this.state
     const players = server.players || []
-    let gameMode: string | undefined = this.getGameModeImgSrc(server)
+    const gameMode: string | undefined = this.getGameModeImgSrc(server)
     const styles: React.CSSProperties = {
       name: {
         flex: '1 1 auto',
@@ -243,7 +252,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
               isConnected
                 ? <SMMButton
                   text='Disconnect'
-                  iconSrc='img/net64.svg'
+                  iconSrc='img/disconnect.svg'
                   onClick={this.onDisconnect}
                 />
                 : <SMMButton
