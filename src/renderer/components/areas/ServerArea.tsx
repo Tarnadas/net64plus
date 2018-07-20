@@ -2,8 +2,6 @@ import './ServerArea.scss'
 
 import * as React from 'react'
 
-import { resolve } from 'url'
-
 import { ServerPanel } from '../panels/ServerPanel'
 import { WarningPanel } from '../panels/WarningPanel'
 import { ProgressSpinner } from '../helpers/ProgressSpinner'

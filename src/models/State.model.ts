@@ -1,5 +1,4 @@
 import { RouterState as ReactRouterState } from 'react-router-redux'
-import { Dispatch } from 'redux'
 
 import { Server } from '../models/Server.model'
 
@@ -24,12 +23,18 @@ export type RouterStateDraft = ReactRouterState
 export type RouterState = Readonly<RouterStateDraft>
 
 export interface ConnectionStateDraft {
-  isConnectedToEmulator: boolean
   server: Server | null
   hasToken: boolean
   error: string
 }
 export type ConnectionState = Readonly<ConnectionStateDraft>
+
+export interface EmulatorStateDraft {
+  isConnectedToEmulator: boolean
+  error: string
+}
+
+export type EmulatorState = Readonly<EmulatorStateDraft>
 
 export interface ChatMessage {
   key: number
@@ -48,6 +53,7 @@ export interface StateDraft {
   save: SaveState
   router: RouterState
   connection: ConnectionState
+  emulator: EmulatorState
   chat: ChatState
 }
 export type State = Readonly<StateDraft>

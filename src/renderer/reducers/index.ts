@@ -1,11 +1,11 @@
 import { createStore, applyMiddleware, combineReducers, Store, ReducersMapObject } from 'redux'
-import { routerMiddleware, RouterState } from 'react-router-redux'
+import { routerMiddleware } from 'react-router-redux'
 import { History } from 'history'
-import produce from 'immer'
 
 import { save } from './save'
 import { router } from './router'
 import { connection } from './connection'
+import { emulator } from './emulator'
 import { chat } from './chat'
 import { MIN_LENGTH_USERNAME, MAX_LENGTH_USERNAME } from '../components/views/SettingsView'
 import { State, SaveState, ElectronSaveData, StateDraft } from '../../models/State.model'
@@ -42,9 +42,12 @@ export function initReducer (history: History, electronSave: SaveState): Store<S
       location: null
     },
     connection: {
-      isConnectedToEmulator: false,
       server: null,
       hasToken: false,
+      error: ''
+    },
+    emulator: {
+      isConnectedToEmulator: false,
       error: ''
     },
     chat: {
@@ -55,6 +58,7 @@ export function initReducer (history: History, electronSave: SaveState): Store<S
     save,
     router,
     connection,
+    emulator,
     chat
   }
   const middleware = applyMiddleware(routerMiddleware(history))

@@ -2,24 +2,20 @@ import * as WS from 'ws'
 
 import * as zlib from 'zlib'
 
-import { connector, emulator, deleteConnection } from '.'
-import { Emulator } from './Emulator'
-import { Server } from '../models/Server.model'
+import { connector, emulator } from '.'
 import { buf2hex } from '../utils/Buffer.util'
 import {
   Compression,
   ClientServerMessage,
   IClientServerMessage,
   ClientServer,
-  Chat,
-  ClientHandshake
+  Chat
 } from '../../proto/ClientServerMessage'
 import {
   ServerClientMessage,
   ServerClient,
   ServerMessage,
   ConnectionDenied,
-  GameMode,
   IServerClient,
   IServerMessage,
   IConnectionDenied
@@ -134,7 +130,8 @@ export class Connection {
       this.loop = null
     }
     connector.closeWebSocket(code, this.hasError)
-    emulator!.reset()
+    if (!emulator) return
+    emulator.reset()
   }
 
   /**
@@ -188,7 +185,7 @@ export class Connection {
           break
       }
     } catch (err) {
-      this.catchError()
+      this.catchError(err)
     }
   }
 
@@ -466,7 +463,9 @@ export class Connection {
     }
   }
 
-  private catchError (): void {
+  private catchError (err?: Error): void {
+    if (err) console.error(err)
+    // TODO handle error
     // Emulator might have been closed
     this.disconnect()
     connector.disconnectEmulator()

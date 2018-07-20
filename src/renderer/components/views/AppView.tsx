@@ -202,5 +202,5 @@ export const AppView = connect((state: State) => ({
   username: state.save.appSaveData.username,
   version: state.save.appSaveData.version,
   route: state.router,
-  isConnectedToEmulator: state.connection.isConnectedToEmulator
+  isConnectedToEmulator: state.emulator.isConnectedToEmulator
 }))(View)

@@ -13,7 +13,6 @@ export function addGlobalMessage (message: string, username: string, isTrusted =
   const sanitizedMessage = isTrusted
     ? sanitize(emojify(marked(message)))
     : emojify(message)
-  console.log('MSG', message, sanitizedMessage)
   const chatMessage: ChatMessage = {
     key: date.getUTCMilliseconds(),
     time: `${String(date.getHours()).padStart(2, '00')}:${String(date.getMinutes()).padStart(2, '00')}:${String(date.getSeconds()).padStart(2, '00')}`,

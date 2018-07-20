@@ -1,7 +1,6 @@
-import { BrowserWindow, ipcMain } from 'electron'
+import { ipcMain } from 'electron'
 
 import { emulator, createEmulator, deleteEmulator, connection, createConnection, deleteConnection } from '.'
-import { Emulator } from './Emulator'
 import { MainMessage, RendererMessage } from '../models/Message.model'
 import { Server } from '../models/Server.model'
 import { IPlayerUpdate, IPlayer } from '../../proto/ServerClientMessage'
@@ -18,7 +17,7 @@ export class Connector {
   }
 
   private onCreateConnection = (
-    event: Electron.Event,
+    _: Electron.Event,
     { domain, ip, port, username, characterId }:
     {
       domain?: string, ip?: string, port?: number, username: string, characterId: number
@@ -32,7 +31,7 @@ export class Connector {
   }
 
   private onCreateEmulatorConnection = (
-    event: Electron.Event,
+    _: Electron.Event,
     { processId, characterId, inGameChatEnabled }:
     { processId: number, characterId: number, inGameChatEnabled: boolean }
   ) => {
@@ -43,19 +42,27 @@ export class Connector {
     deleteEmulator()
   }
 
-  private onPlayerUpdate = (event: Electron.Event, { username, characterId }: { username: string, characterId: number }) => {
+  private onPlayerUpdate = (
+    _: Electron.Event,
+    { username, characterId }:
+    { username: string, characterId: number }
+  ) => {
     if (!emulator) return
     emulator.changeCharacter(characterId)
     if (!connection) return
     connection.sendPlayerUpdate({ username, characterId })
   }
 
-  private onSendGlobalChatMessage = (event: Electron.Event, message: string) => {
+  private onSendGlobalChatMessage = (_: Electron.Event, message: string) => {
     if (!connection) return
     connection.sendGlobalChatMessage(message)
   }
 
-  private onSendCommandMessage = (event: Electron.Event, { message, args }: { message: string, args: string[] }) => {
+  private onSendCommandMessage = (
+    _: Electron.Event,
+    { message, args }:
+    { message: string, args: string[] }
+  ) => {
     if (!connection) return
     connection.sendCommandMessage(message, args)
   }
@@ -107,6 +114,10 @@ export class Connector {
 
   public setConnectionError (message: string): void {
     this.window.webContents.send(MainMessage.SET_CONNECTION_ERROR, message)
+  }
+
+  public setEmulatorError (message: string): void {
+    this.window.webContents.send(MainMessage.SET_EMULATOR_ERROR, message)
   }
 
   public consoleInfo (...messages: string[]): void {
