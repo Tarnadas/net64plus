@@ -5,8 +5,11 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CheckerPlugin } = require('awesome-typescript-loader')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
+const getCompatMin = require('./compat-list')
+
 const [ major, minor, patch ] = process.env.npm_package_compatVersion.split('.')
 const [ packageMajor, packageMinor, packagePatch ] = process.env.npm_package_version.split('.')
+const [ compatMinMajor, compatMinMinor ] = getCompatMin(process.env.npm_package_version)
 
 const extractSass =
   new ExtractTextPlugin({
@@ -42,7 +45,9 @@ module.exports = [
         PATCH: patch,
         PACKAGE_MAJOR: packageMajor,
         PACKAGE_MINOR: packageMinor,
-        PACKAGE_PATCH: packagePatch
+        PACKAGE_PATCH: packagePatch,
+        COMPAT_MIN_MAJOR: compatMinMajor,
+        COMPAT_MIN_MINOR: compatMinMinor
       }),
       new HtmlWebpackPlugin({
         filename: 'index.html',
@@ -127,7 +132,9 @@ module.exports = [
         PATCH: patch,
         PACKAGE_MAJOR: packageMajor,
         PACKAGE_MINOR: packageMinor,
-        PACKAGE_PATCH: packagePatch
+        PACKAGE_PATCH: packagePatch,
+        COMPAT_MIN_MAJOR: compatMinMajor,
+        COMPAT_MIN_MINOR: compatMinMinor
       })
     ],
     externals: {
