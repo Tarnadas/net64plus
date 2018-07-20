@@ -32,26 +32,31 @@ export class ServerArea extends React.PureComponent<ServerAreaProps, ServerAreaS
     this.updateServers = this.updateServers.bind(this)
     this.renderServers = this.renderServers.bind(this)
   }
-  componentWillMount () {
+
+  public componentWillMount (): void {
     this.mounted = true
     this.updateServers()
   }
-  componentWillUnmount () {
+
+  public componentWillUnmount (): void {
     this.mounted = false
   }
-  componentWillReceiveProps (nextProps: ServerAreaProps) {
+
+  public componentWillReceiveProps (nextProps: ServerAreaProps): void {
     if (!nextProps.connectionError || nextProps.connectionError === this.props.connectionError) return
     this.setState({
       warning: String(nextProps.connectionError),
       loading: false
     })
   }
-  onConnect () {
+
+  private onConnect (): void {
     this.setState({
       loading: true
     })
   }
-  async updateServers () {
+
+  private async updateServers (): Promise<void> {
     if (!this.mounted) return
     try {
       const servers = await request.getNet64Servers()
@@ -75,20 +80,22 @@ export class ServerArea extends React.PureComponent<ServerAreaProps, ServerAreaS
       }
     }
   }
-  renderServers (servers: Server[]) {
+
+  private renderServers (servers: Server[]): JSX.Element[] {
     return servers
-      .filter(
-        server => {
-          if (!server.version) return false
-          const [ major, minor ] = server.version.split('.')
-          return major === process.env.PACKAGE_MAJOR && minor === process.env.PACKAGE_MINOR
-        }
-      )
+      .filter(this.filterIncompatibleServers)
       .map(
         server => <ServerPanel key={server.id} server={server} onConnect={this.onConnect} />
       )
   }
-  render () {
+
+  private filterIncompatibleServers (server: Server): boolean {
+    if (!server.version) return false
+    const [ major, minor ] = server.version.split('.')
+    return Number(major) >= Number(process.env.COMPAT_MIN_MAJOR) && Number(minor) >= Number(process.env.COMPAT_MIN_MINOR)
+  }
+
+  public render (): JSX.Element {
     const { servers, loading, warning } = this.state
     const initialLoading = servers.length === 0 && !warning
     return (
