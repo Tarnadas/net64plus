@@ -138,6 +138,10 @@ export class Connector {
     ipcRenderer.send(RendererMessage.PLAYER_UPDATE, update)
   }
 
+  public sendPassword (password: string): void {
+    ipcRenderer.send(RendererMessage.PASSWORD, password)
+  }
+
   public sendGlobalChatMessage (message: string): void {
     ipcRenderer.send(RendererMessage.CHAT_GLOBAL, message)
   }

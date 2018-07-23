@@ -50,6 +50,7 @@ class Area extends React.PureComponent<SendPasswordProps, SendPasswordAreaState>
 
   private onSubmit (): void {
     const { password } = this.state
+    connector.sendPassword(password)
   }
 
   private onDisconnect (): void {
