@@ -557,6 +557,25 @@ export class Connection {
   }
 
   /**
+   * Send password to server.
+   *
+   * @param {string} password - The password to send
+   */
+  public sendPassword (password: string): void {
+    const chat: IClientServerMessage = {
+      compression: Compression.NONE,
+      data: {
+        messageType: ClientServer.MessageType.AUTHENTICATION,
+        authentication: {
+          password
+        }
+      }
+    }
+    const passwordMessage = ClientServerMessage.encode(ClientServerMessage.fromObject(chat)).finish()
+    this.ws.send(passwordMessage)
+  }
+
+  /**
    * Send global chat message to server.
    *
    * @param {string} message - The message to send
