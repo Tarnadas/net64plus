@@ -12,6 +12,7 @@ export class Connector {
     ipcMain.on(RendererMessage.CREATE_EMULATOR_CONNECTION, this.onCreateEmulatorConnection)
     ipcMain.on(RendererMessage.DISCONNECT_EMULATOR, this.onDisconnectEmulator)
     ipcMain.on(RendererMessage.PLAYER_UPDATE, this.onPlayerUpdate)
+    ipcMain.on(RendererMessage.PASSWORD, this.onSendPassword)
     ipcMain.on(RendererMessage.CHAT_GLOBAL, this.onSendGlobalChatMessage)
     ipcMain.on(RendererMessage.CHAT_COMMAND, this.onSendCommandMessage)
   }
@@ -51,6 +52,11 @@ export class Connector {
     emulator.changeCharacter(characterId)
     if (!connection) return
     connection.sendPlayerUpdate({ username, characterId })
+  }
+
+  private onSendPassword = (_: Electron.Event, password: string) => {
+    if (!connection) return
+    connection.sendPassword(password)
   }
 
   private onSendGlobalChatMessage = (_: Electron.Event, message: string) => {
