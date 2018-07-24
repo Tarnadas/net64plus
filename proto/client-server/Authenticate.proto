@@ -1,5 +1,5 @@
 syntax = "proto3";
 
-message Authentication {
+message Authenticate {
   string password = 1;
 }

@@ -565,8 +565,8 @@ export class Connection {
     const chat: IClientServerMessage = {
       compression: Compression.NONE,
       data: {
-        messageType: ClientServer.MessageType.AUTHENTICATION,
-        authentication: {
+        messageType: ClientServer.MessageType.AUTHENTICATE,
+        authenticate: {
           password
         }
       }

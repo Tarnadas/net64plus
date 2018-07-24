@@ -3,7 +3,7 @@ syntax = "proto3";
 import "client-server/ClientHandshake.proto";
 import "shared/Ping.proto";
 import "shared/Player.proto";
-import "client-server/Authentication.proto";
+import "client-server/Authenticate.proto";
 import "shared/PlayerData.proto";
 import "shared/MetaData.proto";
 import "shared/Chat.proto";
@@ -14,7 +14,7 @@ message ClientServer {
     HANDSHAKE = 2;
     PING = 3;
     PLAYER_UPDATE = 6;
-    AUTHENTICATION = 7;
+    AUTHENTICATE = 7;
     PLAYER_DATA = 128;
     META_DATA = 129;
     CHAT = 130;
@@ -24,7 +24,7 @@ message ClientServer {
     ClientHandshake handshake = 2;
     Ping ping = 3;
     Player player = 6;
-    Authentication authentication = 7;
+    Authenticate authenticate = 7;
     PlayerData player_data = 128;
     MetaData meta_data = 129;
     Chat chat = 130;
