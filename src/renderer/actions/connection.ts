@@ -4,6 +4,9 @@ import {
   SetPlayersAction,
   SetPlayerAction,
   SetGameModeAction,
+  AuthenticationRequired,
+  AuthenticationAccepted,
+  AuthenticationDenied,
   DisconnectAction,
   ConnectionActionType
 } from './models/connection.model'
@@ -43,6 +46,25 @@ export function setGameMode (gameMode: number): SetGameModeAction {
   return {
     type: ConnectionActionType.GAME_MODE,
     gameMode
+  }
+}
+
+export function authenticationRequired (): AuthenticationRequired {
+  return {
+    type: ConnectionActionType.AUTHENTICATION_REQUIRED
+  }
+}
+
+export function authenticationAccepted (): AuthenticationAccepted {
+  return {
+    type: ConnectionActionType.AUTHENTICATION_ACCEPTED
+  }
+}
+
+export function authenticationDenied (throttle: number): AuthenticationDenied {
+  return {
+    type: ConnectionActionType.AUTHENTICATION_DENIED,
+    throttle
   }
 }
 

@@ -110,6 +110,14 @@ export class Connector {
     this.window.webContents.send(MainMessage.WRONG_VERSION, { majorVersion, minorVersion })
   }
 
+  public acceptAuthentication (): void {
+    this.window.webContents.send(MainMessage.AUTHENTICATION_ACCEPTED)
+  }
+
+  public denyAuthentication (throttle: number): void {
+    this.window.webContents.send(MainMessage.AUTHENTICATION_DENIED, throttle)
+  }
+
   public globalChatMessage (message: string, senderId: number): void {
     this.window.webContents.send(MainMessage.CHAT_GLOBAL, { message, senderId })
   }

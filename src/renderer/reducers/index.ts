@@ -43,6 +43,8 @@ export function initReducer (history: History, electronSave: SaveState): Store<S
     },
     connection: {
       server: null,
+      authenticated: true,
+      authenticationThrottle: 0,
       hasToken: false,
       error: ''
     },
