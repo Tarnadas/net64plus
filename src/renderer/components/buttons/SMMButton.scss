@@ -1,0 +1,6 @@
+.smm-button {
+  &-disabled {
+    background-color: #666 !important;
+    pointer-events: none;
+  }
+}

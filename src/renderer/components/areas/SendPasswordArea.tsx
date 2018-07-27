@@ -14,22 +14,60 @@ export const MAX_LENGTH_PASSWORD = 30
 
 interface SendPasswordProps {
   dispatch: Dispatch<State>
+  throttle: number
 }
 
 interface SendPasswordAreaState {
   password: string
+  timeout: string
 }
 
 class Area extends React.PureComponent<SendPasswordProps, SendPasswordAreaState> {
+  private throttleUpdateInterval?: NodeJS.Timer
+
   constructor (props: SendPasswordProps) {
     super(props)
     this.state = {
-      password: ''
+      password: '',
+      timeout: ''
     }
     this.onPasswordChange = this.onPasswordChange.bind(this)
     this.onKeyPress = this.onKeyPress.bind(this)
     this.onSubmit = this.onSubmit.bind(this)
     this.onDisconnect = this.onDisconnect.bind(this)
+  }
+
+  public componentDidMount (): void {
+    if (!this.props.throttle || this.throttleUpdateInterval) return
+    this.startThrottleUpdate()
+  }
+
+  public componentWillReceiveProps (nextProps: SendPasswordProps): void {
+    if (nextProps.throttle == null || this.throttleUpdateInterval) return
+    this.startThrottleUpdate()
+  }
+
+  private startThrottleUpdate (): void {
+    this.throttleUpdateInterval = setInterval(() => {
+      const { throttle } = this.props
+      const remainingThrottleTime = (throttle - Date.now()) / 1000
+      if (remainingThrottleTime <= 0) {
+        this.setState({
+          timeout: ''
+        })
+        return
+      }
+      const timeout = String(Math.trunc(Math.ceil(remainingThrottleTime)))
+      this.setState({
+        timeout
+      })
+    }, 100)
+  }
+
+  public componentWillUnmount (): void {
+    if (!this.throttleUpdateInterval) return
+    clearInterval(this.throttleUpdateInterval)
+    delete this.throttleUpdateInterval
   }
 
   private onPasswordChange ({ target }: React.ChangeEvent<HTMLInputElement>): void {
@@ -59,7 +97,7 @@ class Area extends React.PureComponent<SendPasswordProps, SendPasswordAreaState>
   }
 
   public render (): JSX.Element {
-    const { password } = this.state
+    const { password, timeout } = this.state
     return (
       <div className='send-password-area-wrapper'>
         <div className='send-password-area'>
@@ -74,8 +112,17 @@ class Area extends React.PureComponent<SendPasswordProps, SendPasswordAreaState>
               onChange={this.onPasswordChange}
               onKeyPress={this.onKeyPress}
             />
+            {
+              timeout &&
+              <label>You can try again in {timeout} seconds</label>
+            }
           </div>
-          <SMMButton text='Submit' iconSrc='img/net64.svg' onClick={this.onSubmit} />
+          <SMMButton
+            text='Submit'
+            iconSrc='img/net64.svg'
+            onClick={this.onSubmit}
+            disabled={!!timeout}
+          />
           <SMMButton
             onClick={this.onDisconnect}
             text='Disconnect'

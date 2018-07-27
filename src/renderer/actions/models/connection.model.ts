@@ -24,6 +24,14 @@ export interface SetGameModeAction extends Action {
   gameMode: number
 }
 
+export type AuthenticationRequired = Action
+
+export type AuthenticationAccepted = Action
+
+export interface AuthenticationDenied extends Action {
+  throttle: number
+}
+
 export type DisconnectAction = Action
 
 export type ConnectionAction =
@@ -32,6 +40,9 @@ export type ConnectionAction =
   & SetPlayersAction
   & SetPlayerAction
   & SetGameModeAction
+  & AuthenticationRequired
+  & AuthenticationAccepted
+  & AuthenticationDenied
   & DisconnectAction
 
 export enum ConnectionActionType {
@@ -40,5 +51,8 @@ export enum ConnectionActionType {
   SET_PLAYERS = 'SET_PLAYERS',
   SET_PLAYER = 'SET_PLAYER',
   GAME_MODE = 'GAME_MODE',
+  AUTHENTICATION_REQUIRED = 'AUTHENTICATION_REQUIRED',
+  AUTHENTICATION_ACCEPTED = 'AUTHENTICATION_ACCEPTED',
+  AUTHENTICATION_DENIED = 'AUTHENTICATION_DENIED',
   DISCONNECT = 'DISCONNECT'
 }

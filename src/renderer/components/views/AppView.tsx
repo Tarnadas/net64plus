@@ -15,7 +15,6 @@ import { TopBarArea } from '../areas/TopBarArea'
 import { NewVersionArea } from '../areas/NewVersionArea'
 import { request } from '../../Request'
 import { State } from '../../../models/State.model'
-import { Release } from '../../../models/Release.model'
 
 interface AppViewProps {
   dispatch: Dispatch<State>

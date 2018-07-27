@@ -24,6 +24,8 @@ export type RouterState = Readonly<RouterStateDraft>
 
 export interface ConnectionStateDraft {
   server: Server | null
+  authenticated: boolean
+  authenticationThrottle: number
   hasToken: boolean
   error: string
 }

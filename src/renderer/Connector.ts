@@ -3,7 +3,17 @@ import { push } from 'react-router-redux'
 
 import { store } from '.'
 import { addGlobalMessage, clearGlobalMessages } from './utils/chat.util'
-import { disconnect, setConnectionError, setPlayer, setPlayers, setServer, setGameMode } from './actions/connection'
+import {
+  authenticationAccepted,
+  authenticationDenied,
+  authenticationRequired,
+  disconnect,
+  setConnectionError,
+  setGameMode,
+  setPlayer,
+  setPlayers,
+  setServer
+} from './actions/connection'
 import { isConnectedToEmulator, setEmulatorError } from './actions/emulator'
 import { MainMessage, RendererMessage } from '../models/Message.model'
 import { Server } from '../models/Server.model'
@@ -20,6 +30,8 @@ export class Connector {
     ipcRenderer.on(MainMessage.GAME_MODE, this.onSetGameMode)
     ipcRenderer.on(MainMessage.SERVER_FULL, this.onServerFull)
     ipcRenderer.on(MainMessage.WRONG_VERSION, this.onWrongVersion)
+    ipcRenderer.on(MainMessage.AUTHENTICATION_ACCEPTED, this.onAuthenticationAccepted)
+    ipcRenderer.on(MainMessage.AUTHENTICATION_DENIED, this.onAuthenticationDenied)
     ipcRenderer.on(MainMessage.CHAT_GLOBAL, this.onGlobalChatMessage)
     ipcRenderer.on(MainMessage.CHAT_COMMAND, this.onCommandMessage)
     ipcRenderer.on(MainMessage.SET_CONNECTION_ERROR, this.onConnectionError)
@@ -49,6 +61,9 @@ export class Connector {
       console.info('CONNECTED TO SERVER', server)
     }
     store.dispatch(setServer(server))
+    if (server.passwordRequired) {
+      store.dispatch(authenticationRequired())
+    }
   }
 
   private onSetPlayers = (_: Electron.Event, players: IPlayerUpdate[]) => {
@@ -72,12 +87,20 @@ export class Connector {
   }
 
   private onWrongVersion = (
-    event: Electron.Event,
+    _: Electron.Event,
     { majorVersion, minorVersion }:
     { majorVersion: number, minorVersion: number}
   ) => {
     store.dispatch(setConnectionError(`The server's network API version (${majorVersion}.${minorVersion}) is incompatible with your client API version (${process.env.MAJOR}.${process.env.MINOR})`))
     // TODO add server version -> client version mapping
+  }
+
+  private onAuthenticationAccepted = () => {
+    store.dispatch(authenticationAccepted())
+  }
+
+  private onAuthenticationDenied = (_: Electron.Event, throttle: number) => {
+    store.dispatch(authenticationDenied(throttle))
   }
 
   private onGlobalChatMessage = (

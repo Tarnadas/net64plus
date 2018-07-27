@@ -1,3 +1,5 @@
+import './SMMButton.scss'
+
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { shell } from 'electron'
@@ -17,7 +19,9 @@ interface SMMButtonProps {
   styles?: React.CSSProperties
   colorScheme?: COLOR_SCHEME
   iconStyle?: ICON_STYLE
+  // @deprecated
   enabled?: boolean
+  disabled?: boolean
   external?: boolean
   onMouseEnter?: () => void
   onMouseLeave?: () => void
@@ -64,10 +68,8 @@ export class SMMButton extends React.PureComponent<SMMButtonProps, SMMButtonStat
     )
   }
   render () {
-    const hover = this.state.hover
-    const iconSrc = this.props.iconSrc
-    const iconSrcHover = this.props.iconSrcHover || iconSrc
-    const text = this.props.text
+    const { disabled } = this.props
+    const { hover } = this.state
     const colorScheme = this.props.colorScheme || 'yellow'
     const enabled = this.props.enabled == null
       ? true
@@ -140,6 +142,7 @@ export class SMMButton extends React.PureComponent<SMMButtonProps, SMMButtonStat
     )
     return (
       <div
+        className={`smm-button${disabled ? ' smm-button-disabled' : ''}`}
         style={styles.button}
         onMouseEnter={this.mouseEnter}
         onMouseLeave={this.mouseLeave}

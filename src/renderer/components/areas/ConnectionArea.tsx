@@ -1,29 +1,23 @@
 import * as React from 'react'
+import { Dispatch } from 'redux'
+import { connect } from 'react-redux'
 
 import { SendPasswordArea } from './SendPasswordArea'
 import { ServerPanel } from '../panels/ServerPanel'
 import { ChatArea } from '../areas/ChatArea'
+import { State } from '../../../models/State.model'
 import { Server } from '../../../models/Server.model'
 
 interface ConnectionAreaProps {
+  dispatch: Dispatch<State>
   server: Server
+  authenticated: boolean
+  authenticationThrottle: number
 }
 
-interface ConnectionAreaState {
-  passwordAccepted: boolean
-}
-
-export class ConnectionArea extends React.PureComponent<ConnectionAreaProps, ConnectionAreaState> {
-  constructor (props: ConnectionAreaProps) {
-    super(props)
-    this.state = {
-      passwordAccepted: !props.server.passwordRequired
-    }
-  }
-
+class Area extends React.PureComponent<ConnectionAreaProps, {}> {
   public render (): JSX.Element {
-    const { server } = this.props
-    const { passwordAccepted } = this.state
+    const { server, authenticated, authenticationThrottle } = this.props
     const styles: React.CSSProperties = {
       area: {
         overflowY: 'auto',
@@ -39,10 +33,16 @@ export class ConnectionArea extends React.PureComponent<ConnectionAreaProps, Con
         <ServerPanel server={server} isConnected />
         <ChatArea />
         {
-          !passwordAccepted &&
-          <SendPasswordArea />
+          !authenticated &&
+          <SendPasswordArea
+            throttle={authenticationThrottle}
+          />
         }
       </div>
     )
   }
 }
+export const ConnectionArea = connect((state: State) => ({
+  authenticated: state.connection.authenticated,
+  authenticationThrottle: state.connection.authenticationThrottle
+}))(Area)
