@@ -33,6 +33,15 @@ export const connection = (state: ConnectionState = initialState.connection, act
         if (!draft.server) return
         draft.server.gameMode = action.gameMode
         break
+      case ConnectionActionType.AUTHENTICATION_REQUIRED:
+        draft.authenticated = false
+        break
+      case ConnectionActionType.AUTHENTICATION_ACCEPTED:
+        draft.authenticated = true
+        break
+      case ConnectionActionType.AUTHENTICATION_DENIED:
+        draft.authenticationThrottle = Date.now() + action.throttle * 1000
+        break
       case ConnectionActionType.DISCONNECT:
         draft.server = null
         break

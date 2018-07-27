@@ -18,7 +18,8 @@ import {
   ConnectionDenied,
   IServerClient,
   IServerMessage,
-  IConnectionDenied
+  IConnectionDenied,
+  Authentication
 } from '../../proto/ServerClientMessage'
 
 const UPDATE_INTERVAL = 32
@@ -28,8 +29,6 @@ const UPDATE_INTERVAL = 32
  * Net64+ server.
  */
 export class Connection {
-  // public server: Server
-
   private ws: WS
 
   private playerId?: number
@@ -270,6 +269,9 @@ export class Connection {
       case ServerMessage.MessageType.PLAYER_REORDER:
         this.onPlayerReorder(serverMessage)
         break
+      case ServerMessage.MessageType.AUTHENTICATION:
+        this.onAuthentication(serverMessage)
+        break
     }
   }
 
@@ -346,6 +348,27 @@ export class Connection {
     if (playerId == null) return
     this.playerId = playerId
     emulator!.setPlayerId(playerId)
+  }
+
+  /**
+   * Handle server authentication message.
+   *
+   * @param {IServerMessage} serverMessage - The decoded message
+   */
+  private onAuthentication (serverMessage: IServerMessage): void {
+    const authentication = serverMessage.authentication
+    if (!authentication) return
+    const { status, throttle } = authentication
+    if (status == null) return
+    switch (status) {
+      case Authentication.Status.ACCEPTED:
+        connector.acceptAuthentication()
+        break
+      case Authentication.Status.DENIED:
+        if (throttle == null) return
+        connector.denyAuthentication(throttle)
+        break
+    }
   }
 
   /**
