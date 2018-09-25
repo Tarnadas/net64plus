@@ -2,9 +2,6 @@ import * as React from 'react'
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
-import * as parse from 'csv-parse'
-
-import { spawn } from 'child_process'
 
 import { connector } from '../..'
 import { SMMButton } from '../buttons/SMMButton'
@@ -12,24 +9,19 @@ import { WarningPanel } from '../panels/WarningPanel'
 import { ProgressSpinner } from '../helpers/ProgressSpinner'
 import { isConnectedToEmulator, setEmulatorError } from '../../actions/emulator'
 import { State } from '../../../models/State.model'
+import { FilteredEmulator } from '../../../models/Emulator.model'
 
 const TIMEOUT = 1000
 
 interface EmulatorViewProps {
   dispatch: Dispatch<State>
+  emulators: FilteredEmulator[]
   characterId: number
   emuChat: boolean
   error: string
 }
 
-interface FilteredEmulator {
-  name: string
-  pid: number
-  windowName: string
-}
-
 interface EmulatorViewState {
-  emulators: FilteredEmulator[]
   loading: boolean
   warning: string
 }
@@ -42,7 +34,6 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
   constructor (public props: EmulatorViewProps) {
     super(props)
     this.state = {
-      emulators: [],
       loading: false,
       warning: props.error || 'You must start and select an emulator'
     }
@@ -63,73 +54,9 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
     this.mounted = false
   }
 
-  private async scan (): Promise<void> {
+  private scan (): void {
     if (!this.mounted) return
-
-    try {
-      const emulators: FilteredEmulator[] = (await Promise.all((await new Promise<string[][]>((resolve, reject) => {
-        const tasklist = spawn('tasklist', ['/FO', 'CSV', '/NH'])
-        let stdout = ''
-        tasklist.stdout.on('data', data => {
-          stdout += data.toString()
-        })
-        tasklist.stderr.on('data', data => {
-          console.error(`tasklist stderr: ${data}`)
-        })
-        tasklist.on('close', code => {
-          if (code !== 0) {
-            console.warn(`tasklist process exited with code ${code}`)
-          }
-          parse(stdout, {}, (err: Error, data: string[][]) => {
-            if (err) reject(err)
-            resolve(data)
-          })
-        })
-      }))
-        .filter((process: string[]) => process[0].match(/project64/i))
-        .map(process =>
-          new Promise<string[]>((resolve, reject) => {
-            const tasklist = spawn('tasklist', ['/FI', `PID eq ${process[1]}`, '/FO', 'CSV', '/NH', '/V'])
-            let stdout = ''
-            tasklist.stdout.on('data', data => {
-              stdout += data.toString()
-            })
-            tasklist.stderr.on('data', data => {
-              console.error(`tasklist stderr: ${data}`)
-            })
-            tasklist.on('close', code => {
-              if (code !== 0) {
-                console.warn(`tasklist process exited with code ${code}`)
-              }
-              parse(stdout, {}, (err: Error, data: string[][]) => {
-                if (err) reject(err)
-                if (data.length === 0) reject(new Error(`tasklist couldn't find process with PID ${process[1]}`))
-                resolve(data[0])
-              })
-            })
-          })
-        )))
-        .map((process: string[]) => ({
-          name: process[0],
-          pid: parseInt(process[1]),
-          windowName: process[8]
-        }))
-      if (!this.mounted) return
-      if (process.env.NODE_ENV === 'development') {
-        emulators.push({
-          name: 'Fake Emulator',
-          pid: 0,
-          windowName: 'Fake Super Mario - Project64'
-        })
-      }
-      this.setState({
-        emulators
-      })
-    } catch (err) {
-      this.setState({
-        warning: `Scanning for emulator failed:\n\n${err}`
-      })
-    }
+    connector.updateEmulators()
   }
 
   private async onSelectEmulator (emulator: FilteredEmulator): Promise<void> {
@@ -171,17 +98,10 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
     const onSelect = this.onSelectEmulator
     return emulators.map(
       emulator => {
-        let romName
-        try {
-          const windowName = emulator.windowName
-          romName = windowName.includes(' - ')
-            ? emulator.windowName.split(' - Project64')[0]
-            : null
-        } catch (err) {}
         return (
           <div style={li} key={emulator.pid}>
             <div>
-              { emulator.name } | pid: { emulator.pid } | { romName || 'Game is not running' }
+              { emulator.name } | pid: { emulator.pid }
             </div>
             <SMMButton
               text='Select'
@@ -195,7 +115,6 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
                   padding: '3px'
                 }
               }}
-              enabled={romName != null}
               onClick={onSelect.bind(null, emulator)}
             />
           </div>
@@ -205,7 +124,8 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
   }
 
   public render (): JSX.Element {
-    const { emulators, loading, warning } = this.state
+    const { emulators } = this.props
+    const { loading, warning } = this.state
     const styles: React.CSSProperties = {
       main: {
         display: 'flex',
@@ -249,6 +169,7 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
   }
 }
 export const EmulatorView = connect((state: State) => ({
+  emulators: state.emulator.emulators,
   characterId: state.save.appSaveData.character,
   emuChat: state.save.appSaveData.emuChat,
   error: state.emulator.error

@@ -7,6 +7,9 @@ import { EmulatorState, EmulatorStateDraft } from '../../models/State.model'
 export const emulator = (state: EmulatorState = initialState.emulator, action: EmulatorAction) =>
   produce<EmulatorState>(state, (draft: EmulatorStateDraft) => {
     switch (action.type) {
+      case EmulatorActionType.UPDATE_EMULATORS:
+        draft.emulators = action.emulators
+        break
       case EmulatorActionType.IS_CONNECTED_TO_EMULATOR:
         draft.isConnectedToEmulator = action.isConnectedToEmulator
         break
