@@ -1,10 +1,15 @@
 import winProcess, { Process } from 'winprocess'
+import { snapshot } from 'process-list'
 
 import * as fs from 'fs'
 import * as path from 'path'
+import { promisify } from 'util'
 
 import { connector, deleteEmulator } from '.'
+import { FilteredEmulator } from '../models/Emulator.model'
 import { buf2hex } from '../utils/Buffer.util'
+
+const tasklist = promisify(snapshot)
 
 enum ConnectionFlag {
   IS_DISCONNECTED = 0,
@@ -22,6 +27,15 @@ export class Emulator {
   public inGameChatEnabled = false
 
   private process: Process
+
+  public static async updateEmulators () {
+    const emulators = (await tasklist({
+      name: true,
+      pid: true
+    }))
+      .filter(({ name }: FilteredEmulator) => name.match(/project64/i))
+    connector.updateEmulators(emulators)
+  }
 
   /**
    * Emulator constructor.

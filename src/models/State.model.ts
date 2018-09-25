@@ -1,6 +1,7 @@
 import { RouterState as ReactRouterState } from 'react-router-redux'
 
-import { Server } from '../models/Server.model'
+import { Server } from './Server.model'
+import { FilteredEmulator } from './Emulator.model'
 
 export interface ElectronSaveDataDraft {
   apiKey: string
@@ -32,6 +33,7 @@ export interface ConnectionStateDraft {
 export type ConnectionState = Readonly<ConnectionStateDraft>
 
 export interface EmulatorStateDraft {
+  emulators: FilteredEmulator[]
   isConnectedToEmulator: boolean
   error: string
 }

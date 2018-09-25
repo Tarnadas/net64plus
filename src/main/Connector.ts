@@ -1,6 +1,8 @@
 import { ipcMain } from 'electron'
 
 import { emulator, createEmulator, deleteEmulator, connection, createConnection, deleteConnection } from '.'
+import { Emulator } from './Emulator'
+import { FilteredEmulator } from '../models/Emulator.model'
 import { MainMessage, RendererMessage } from '../models/Message.model'
 import { Server } from '../models/Server.model'
 import { IPlayerUpdate, IPlayer } from '../../proto/ServerClientMessage'
@@ -9,6 +11,7 @@ export class Connector {
   constructor (private window: Electron.BrowserWindow) {
     ipcMain.on(RendererMessage.CREATE_CONNECTION, this.onCreateConnection)
     ipcMain.on(RendererMessage.DISCONNECT, this.onDisconnect)
+    ipcMain.on(RendererMessage.UPDATE_EMULATORS, this.onUpdateEmulators)
     ipcMain.on(RendererMessage.CREATE_EMULATOR_CONNECTION, this.onCreateEmulatorConnection)
     ipcMain.on(RendererMessage.DISCONNECT_EMULATOR, this.onDisconnectEmulator)
     ipcMain.on(RendererMessage.PLAYER_UPDATE, this.onPlayerUpdate)
@@ -29,6 +32,10 @@ export class Connector {
 
   private onDisconnect = () => {
     deleteConnection()
+  }
+
+  private onUpdateEmulators = () => {
+    Emulator.updateEmulators()
   }
 
   private onCreateEmulatorConnection = (
@@ -80,6 +87,10 @@ export class Connector {
   public disconnectEmulator (): void {
     this.window.webContents.send(MainMessage.EMULATOR_DISCONNECT)
     deleteEmulator()
+  }
+
+  public updateEmulators (emulators: FilteredEmulator[]): void {
+    this.window.webContents.send(MainMessage.UPDATE_EMULATORS, emulators)
   }
 
   public setServer (server: Server): void {

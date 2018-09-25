@@ -49,6 +49,7 @@ export function initReducer (history: History, electronSave: SaveState): Store<S
       error: ''
     },
     emulator: {
+      emulators: [],
       isConnectedToEmulator: false,
       error: ''
     },
