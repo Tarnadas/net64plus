@@ -71,10 +71,9 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
         let [major, minor, patch] = release.tag_name.split('.')
           .map(mapVersionToNumber)
         if (patch == null) patch = 0
-        if (major < currentMajor) continue
-        if (minor < currentMinor) continue
-        if (patch < currentPatch) continue
-        if (major === currentMajor && minor === currentMinor && patch === currentPatch) continue
+        const versionValue = major * 10000 + minor * 100 + patch
+        const currentVersionValue = currentMajor * 10000 + currentMinor * 100 + currentPatch
+        if (versionValue <= currentVersionValue) continue
         let foundUpdate = false
         for (const asset of release.assets) {
           if (asset.name == null || !asset.name.includes('win32-x64')) continue
