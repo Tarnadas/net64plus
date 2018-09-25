@@ -14,15 +14,17 @@ import {
   setPlayers,
   setServer
 } from './actions/connection'
-import { isConnectedToEmulator, setEmulatorError } from './actions/emulator'
+import { isConnectedToEmulator, setEmulatorError, updateEmulators } from './actions/emulator'
 import { MainMessage, RendererMessage } from '../models/Message.model'
 import { Server } from '../models/Server.model'
 import { IPlayer, IPlayerUpdate } from '../../proto/ServerClientMessage'
+import { FilteredEmulator } from '../models/Emulator.model'
 
 export class Connector {
   constructor () {
     ipcRenderer.on(MainMessage.WEBSOCKET_CLOSE, this.onWebSocketClose)
     ipcRenderer.on(MainMessage.EMULATOR_DISCONNECT, this.onEmulatorDisconnect)
+    ipcRenderer.on(MainMessage.UPDATE_EMULATORS, this.onUpdateEmulators)
     ipcRenderer.on(MainMessage.SET_SERVER, this.onSetServer)
     ipcRenderer.on(MainMessage.SET_PLAYERS, this.onSetPlayers)
     ipcRenderer.on(MainMessage.SET_PLAYER, this.onSetPlayer)
@@ -54,6 +56,10 @@ export class Connector {
   private onEmulatorDisconnect = () => {
     store.dispatch(isConnectedToEmulator(false))
     store.dispatch(setConnectionError('Emulator disconnected or closed'))
+  }
+
+  private onUpdateEmulators = (_: Electron.Event, emulators: FilteredEmulator[]) => {
+    store.dispatch(updateEmulators(emulators))
   }
 
   private onSetServer = (_: Electron.Event, server: Server) => {
@@ -144,6 +150,10 @@ export class Connector {
 
   public disconnect (): void {
     ipcRenderer.send(RendererMessage.DISCONNECT)
+  }
+
+  public updateEmulators (): void {
+    ipcRenderer.send(RendererMessage.UPDATE_EMULATORS)
   }
 
   public createEmulatorConnection (
