@@ -1,9 +1,11 @@
 import winProcess, { Process } from 'winprocess'
 import { snapshot } from 'process-list'
+import * as parse from 'csv-parse'
 
 import * as fs from 'fs'
 import * as path from 'path'
 import { promisify } from 'util'
+import { spawn } from 'child_process'
 
 import { connector, deleteEmulator } from '.'
 import { FilteredEmulator } from '../models/Emulator.model'
@@ -29,12 +31,78 @@ export class Emulator {
   private process: Process
 
   public static async updateEmulators () {
-    const emulators = (await tasklist({
+    let emulators: FilteredEmulator[] = []
+    try {
+      emulators = await this.getEmulatorsFromTasklist()
+    } catch (err) {
+      emulators = await this.getEmulatorsFromNativeNodeBinaries()
+    }
+    connector.updateEmulators(emulators)
+  }
+
+  private static async getEmulatorsFromTasklist (): Promise<FilteredEmulator[]> {
+    return (await Promise.all((await new Promise<string[][]>((resolve, reject) => {
+      try {
+        const tasklist = spawn('tasklist', ['/FO', 'CSV', '/NH'])
+        let stdout = ''
+        tasklist.stdout.on('data', data => {
+          stdout += data.toString()
+        })
+        tasklist.stderr.on('data', data => {
+          console.error(`tasklist stderr: ${data}`)
+        })
+        tasklist.on('error', err => reject(err))
+        tasklist.on('close', code => {
+          if (code !== 0) {
+            console.warn(`tasklist process exited with code ${code}`)
+            return
+          }
+          parse(stdout, {}, (err: Error, data: string[][]) => {
+            if (err) reject(err)
+            resolve(data)
+          })
+        })
+      } catch (err) {
+        console.error(err)
+        reject(err)
+      }
+    }))
+      .filter((process: string[]) => process[0].match(/project64/i))
+      .map(process =>
+        new Promise<string[]>((resolve, reject) => {
+          const tasklist = spawn('tasklist', ['/FI', `PID eq ${process[1]}`, '/FO', 'CSV', '/NH', '/V'])
+          let stdout = ''
+          tasklist.stdout.on('data', data => {
+            stdout += data.toString()
+          })
+          tasklist.stderr.on('data', data => {
+            console.error(`tasklist stderr: ${data}`)
+          })
+          tasklist.on('close', code => {
+            if (code !== 0) {
+              console.warn(`tasklist process exited with code ${code}`)
+            }
+            parse(stdout, {}, (err: Error, data: string[][]) => {
+              if (err) reject(err)
+              if (data.length === 0) reject(new Error(`tasklist couldn't find process with PID ${process[1]}`))
+              resolve(data[0])
+            })
+          })
+        })
+      )))
+      .map((process: string[]) => ({
+        name: process[0],
+        pid: parseInt(process[1]),
+        windowName: process[8]
+      }))
+  }
+
+  private static async getEmulatorsFromNativeNodeBinaries (): Promise<FilteredEmulator[]> {
+    return (await tasklist({
       name: true,
       pid: true
     }))
       .filter(({ name }: FilteredEmulator) => name.match(/project64/i))
-    connector.updateEmulators(emulators)
   }
 
   /**

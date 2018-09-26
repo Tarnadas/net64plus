@@ -110,10 +110,23 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
     const onSelect = this.onSelectEmulator
     return emulators.map(
       emulator => {
+        let romName: string | null = null
+        const windowName = emulator.windowName
+        try {
+          if (windowName) {
+            romName = windowName.includes(' - ')
+              ? windowName.split(' - Project64')[0]
+              : null
+          }
+        } catch (err) {}
         return (
           <div style={li} key={emulator.pid}>
             <div>
               { emulator.name } | pid: { emulator.pid }
+              {
+                windowName &&
+                ` | ${romName || 'Game is not running'}`
+              }
             </div>
             <SMMButton
               text='Select'
@@ -127,6 +140,7 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
                   padding: '3px'
                 }
               }}
+              enabled={windowName == null || romName != null}
               onClick={onSelect.bind(null, emulator)}
             />
           </div>
