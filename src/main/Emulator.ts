@@ -60,7 +60,19 @@ export class Emulator {
       if (val2 !== 0x275A7650) continue
       this.baseAddress = i
     }
+    if (!this.checkMemory()) {
+      throw new Error('Memory check failed')
+    }
     this.patchMemory(characterId)
+    connector.connectEmulator()
+  }
+
+  private checkMemory (): boolean {
+    try {
+      this.readMemory(0xFF5FF0, 0x10)
+      return true
+    } catch (err) {}
+    return false
   }
 
   private async patchMemory (characterId: number): Promise<void> {
@@ -110,8 +122,18 @@ export class Emulator {
       return memory
     }
     deleteEmulator()
-    connector.setEmulatorError('Insufficient permission to read memory. Try starting Net64+ with admin privileges')
-    throw new Error('Insufficient permission')
+    // let errorMessage = 'An error occured. Please double check whether your memory is set to 16MB and/or try starting Net64+ and PJ64 with admin privileges'
+    let errorMessage = 'An unknown error occured'
+    switch (memory) {
+      case 6:
+        errorMessage = 'Insufficient permission to read memory. Try starting Net64+ with admin privileges'
+        break
+      case 299:
+        errorMessage = 'Your memory is not set to 16MB. RTFM!'
+        break
+    }
+    connector.setEmulatorError(errorMessage)
+    throw new Error(errorMessage)
   }
 
   public reset (): void {
