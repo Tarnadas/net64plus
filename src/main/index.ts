@@ -24,8 +24,12 @@ export const createEmulator = (
   { processId, characterId, inGameChatEnabled }:
   { processId: number, characterId: number, inGameChatEnabled: boolean }
 ) => {
-  emulator = new Emulator(processId, characterId, inGameChatEnabled)
-  emulator.displayChatMessage('- Net64 connected -')
+  try {
+    emulator = new Emulator(processId, characterId, inGameChatEnabled)
+    emulator.displayChatMessage('- Net64 connected -')
+  } catch (err) {
+    console.warn(err)
+  }
 }
 
 export const deleteEmulator = () => {

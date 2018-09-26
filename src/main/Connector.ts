@@ -89,6 +89,10 @@ export class Connector {
     deleteEmulator()
   }
 
+  public connectEmulator (): void {
+    this.window.webContents.send(MainMessage.EMULATOR_CONNECTED)
+  }
+
   public updateEmulators (emulators: FilteredEmulator[]): void {
     this.window.webContents.send(MainMessage.UPDATE_EMULATORS, emulators)
   }

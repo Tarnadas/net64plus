@@ -16,6 +16,7 @@ const TIMEOUT = 1000
 interface EmulatorViewProps {
   dispatch: Dispatch<State>
   emulators: FilteredEmulator[]
+  isConnectedToEmulator: boolean
   characterId: number
   emuChat: boolean
   error: string
@@ -48,6 +49,20 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
     this.timer = setInterval(this.scan, 10000)
   }
 
+  public componentWillReceiveProps (nextProps: EmulatorViewProps) {
+    if (nextProps.error) {
+      this.setState({
+        loading: false,
+        warning: nextProps.error
+      })
+    }
+    if (nextProps.isConnectedToEmulator && !this.props.isConnectedToEmulator) {
+      this.props.dispatch(isConnectedToEmulator(true))
+      this.props.dispatch(setEmulatorError())
+      this.props.dispatch(push('/browse'))
+    }
+  }
+
   public componentWillUnmount (): void {
     if (!this.timer) return
     clearInterval(this.timer)
@@ -69,9 +84,6 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
         characterId: this.props.characterId,
         inGameChatEnabled: false
       })
-      this.props.dispatch(isConnectedToEmulator(true))
-      this.props.dispatch(setEmulatorError())
-      this.props.dispatch(push('/browse'))
     }, 50)
     setTimeout(() => {
       if (!this.mounted) return
@@ -170,6 +182,7 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
 }
 export const EmulatorView = connect((state: State) => ({
   emulators: state.emulator.emulators,
+  isConnectedToEmulator: state.emulator.isConnectedToEmulator,
   characterId: state.save.appSaveData.character,
   emuChat: state.save.appSaveData.emuChat,
   error: state.emulator.error
