@@ -53,12 +53,19 @@ class View extends React.PureComponent<FaqViewProps> {
           text='Got it!'
           onClick={this.onDone}
         />
-        <h2 style={{marginTop: '40px'}}>Emulator settings</h2>
+        <div style={{marginTop: '40px'}}></div>
+        <div style={styles.text}>
+          You must use the emulator which comes bundled with Net64+!
+        </div>
+        <h2>Emulator settings</h2>
         <div style={styles.text}>
           Make sure your emulator settings match the green circles
         </div>
         <div style={styles.imgWrapper}>
           <img style={styles.img} src='img/pj64_help1.png' />
+        </div>
+        <div style={styles.text}>
+          After setting your memory to 16MB, you will have to restart Project64
         </div>
         <div style={styles.imgWrapper}>
           <img style={styles.img} src='img/pj64_help2.png' />

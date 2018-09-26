@@ -24,6 +24,7 @@ export class Connector {
   constructor () {
     ipcRenderer.on(MainMessage.WEBSOCKET_CLOSE, this.onWebSocketClose)
     ipcRenderer.on(MainMessage.EMULATOR_DISCONNECT, this.onEmulatorDisconnect)
+    ipcRenderer.on(MainMessage.EMULATOR_CONNECTED, this.onEmulatorConnected)
     ipcRenderer.on(MainMessage.UPDATE_EMULATORS, this.onUpdateEmulators)
     ipcRenderer.on(MainMessage.SET_SERVER, this.onSetServer)
     ipcRenderer.on(MainMessage.SET_PLAYERS, this.onSetPlayers)
@@ -55,7 +56,14 @@ export class Connector {
 
   private onEmulatorDisconnect = () => {
     store.dispatch(isConnectedToEmulator(false))
-    store.dispatch(setConnectionError('Emulator disconnected or closed'))
+    store.dispatch(setEmulatorError('Emulator disconnected or closed'))
+    store.dispatch(push('/emulator'))
+  }
+
+  private onEmulatorConnected = () => {
+    store.dispatch(isConnectedToEmulator(true))
+    store.dispatch(setEmulatorError())
+    store.dispatch(push('/browse'))
   }
 
   private onUpdateEmulators = (_: Electron.Event, emulators: FilteredEmulator[]) => {
