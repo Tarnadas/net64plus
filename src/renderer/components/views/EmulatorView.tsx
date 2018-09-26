@@ -32,6 +32,8 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
 
   private timer: NodeJS.Timer | null = null
 
+  private timerTimeout: NodeJS.Timer | null = null
+
   constructor (public props: EmulatorViewProps) {
     super(props)
     this.state = {
@@ -51,6 +53,9 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
 
   public componentWillReceiveProps (nextProps: EmulatorViewProps) {
     if (nextProps.error) {
+      if (this.timerTimeout) {
+        clearTimeout(this.timerTimeout)
+      }
       this.setState({
         loading: false,
         warning: nextProps.error
@@ -64,8 +69,12 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
   }
 
   public componentWillUnmount (): void {
-    if (!this.timer) return
-    clearInterval(this.timer)
+    if (this.timer) {
+      clearInterval(this.timer)
+    }
+    if (this.timerTimeout) {
+      clearTimeout(this.timerTimeout)
+    }
     this.mounted = false
   }
 
@@ -85,7 +94,7 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
         inGameChatEnabled: false
       })
     }, 50)
-    setTimeout(() => {
+    this.timerTimeout = setTimeout(() => {
       if (!this.mounted) return
       this.setState({
         loading: false,
