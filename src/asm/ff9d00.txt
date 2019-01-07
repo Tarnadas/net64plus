@@ -1,0 +1,14 @@
+.org 0x000
+!main:
+lui t7, $8036
+lw t7, $1160 (T7)
+lw t1, $0134 (T7)
+ori at, r0, $a000
+bne at, t1, !skipplayid
+nop
+lbu t2, $0188 (T7)
+lui t3, $80ff
+sb t2, $5fef (T3)
+!skipplayid:
+jr ra
+nop

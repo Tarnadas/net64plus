@@ -1,0 +1,117 @@
+.org 0x7f00
+!main:
+addiu sp, sp, $ffe4
+sw ra, $14 (SP)
+lui t0, $8039
+lw t2, $be28 (T0)
+beq t2, r0, !end
+nop
+lw t3, $0004 (T2)
+lui at, $8016
+ori at, at, $f5b0
+bne t3, at, !end
+nop
+lui t0, $80ff
+lbu t2, $5ff4 (T0)
+addiu at, r0, $8
+bne t2, at, !end
+nop
+ori t1, t0, $1b00
+or a3, r0, r0
+or t4, r0, r0
+!Loopcheck:
+lbu t3, $771a (T0)
+slt at, t3, a3
+bne at, r0, !endofloop
+nop
+lbu t4, $7700 (T0)
+or a3, t3, r0
+!endofloop:
+addiu t0, t0, $0100
+bne t0, t1, !Loopcheck
+nop
+or t5, a3, r0
+sw a3, $0018 (SP)
+or a3, t4, r0
+lui t0, $8091
+lbu t0, $02ff (T0)
+bne t5, t0, !noplayerwin
+nop
+addiu a0, r0, $0020
+addiu a1, r0, $00d1
+lui a2, $8091
+jal $2d62d8
+ori a2, a2, $02a0
+beq r0, r0, !reunition
+nop
+
+
+!noplayerwin:
+addiu a0, r0, $0020
+addiu a1, r0, $00d1
+lui a2, $8091
+jal $2d62d8
+ori a2, a2, $0260
+
+
+lw a3, $0018 (SP)
+addiu a0, r0, $0020
+addiu a1, r0, $00b9
+lui a2, $8091
+jal $2d62d8
+ori a2, a2, $0280
+!reunition:
+lui t0, $80ff
+lbu t1, $7714 (T0)
+lui at, $8033
+sh t1, $ddf8 (AT)
+
+lui t1, $8034
+sw r0, $afa0 (T1)
+jal $ffa000
+nop
+jal $910d00
+lui t0, $801a
+!end:
+lw ra, $14 (SP)
+jr ra
+addiu sp, sp, $1c
+
+.org 0x7d00
+!nops:
+sb r0, $7860 (T0)
+sb r0, $7870 (T0)
+sb r0, $7880 (T0)
+sb r0, $7890 (T0)
+sb r0, $78a0 (T0)
+sb r0, $78b0 (T0)
+sb r0, $78c0 (T0)
+sb r0, $78d0 (T0)
+sb r0, $78e0 (T0)
+sb r0, $78f0 (T0)
+sb r0, $7900 (T0)
+sb r0, $7910 (T0)
+sb r0, $7920 (T0)
+sb r0, $7930 (T0)
+sb r0, $7940 (T0)
+sb r0, $7950 (T0)
+sb r0, $7960 (T0)
+sb r0, $7970 (T0)
+sb r0, $7980 (T0)
+sb r0, $7990 (T0)
+sb r0, $79a0 (T0)
+sb r0, $79b0 (T0)
+sb r0, $79c0 (T0)
+sb r0, $79d0 (T0)
+sb r0, $79e0 (T0)
+sb r0, $79f0 (T0)
+sb r0, $7a00 (T0)
+sb r0, $7a10 (T0)
+sb r0, $7a20 (T0)
+sb r0, $7a30 (T0)
+sb r0, $7a40 (T0)
+sb r0, $7a50 (T0)
+sb r0, $7a60 (T0)
+sb r0, $7c40 (T0)
+jr ra
+sb r0, $7c50 (T0)

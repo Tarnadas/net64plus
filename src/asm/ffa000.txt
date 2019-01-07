@@ -1,0 +1,4171 @@
+//add dpad taunts
+
+//80367600 copy area <address> <length> <destination>
+//80367700 <isalive?> <mario1anim> <mario1frame> <mario1pos(short)>
+//80367800 <isalive?> <mario2anim> <mario2frame> <mario2pos(short)> <rotation> <mario2level> <caps&mario2 area> <character look> <last update frame> 
+//8036781C mario 2 pointer (update if outdated)
+//(repeat every 0x100 byte for each new mario, p1 always copies itself to 80367800)
+//8036A000 holds code
+
+//mariomare doesnt work properly without interpreter mode
+//make host send data
+
+.org 0x0000
+!main:
+addiu sp, sp, $ffdc
+sw ra, $14 (SP)
+lui t9, $80ff
+lbu t1, $5fff (T9)
+beq t1, r0, !nomario2stuff
+nop
+addiu at, r0, $1
+bne at, t1, !checkplayercount
+nop
+sb t1, $7700 (T9)	//not necessary anymore?
+addiu at, r0, $2
+sw at, $5ff8 (T9)
+
+ori at, t9, $5ff8
+sw at, $740c (T9)
+addiu at, r0, $0004
+sw at, $7410 (T9)
+ori at, t9, $5ffC
+sw at, $7414 (T9)
+
+lui t8, $80ff
+lui t0, $80ff
+ori t0, t0, $1b00
+
+lui t7, $80ff
+addiu t7, t7, $000c
+!hostloop:
+lbu t1, $7800 (T8)
+beq t1, r0, !endofplayerloop
+nop
+addiu at, t8, $7800
+sw at, $7400 (T7)	//change all 7600 to 7400 (there are later ones)
+
+addiu at, r0, $001c	//???
+sw at, $7404 (T7)
+sll t1, t1, $8
+
+ori at, t9, $7700
+add at, at, t1
+sw at, $7408 (T7)
+
+
+!endofplayerloop:
+addiu t7, t7, $000c
+addiu t8, t8, $0100
+bne t0, t8, !hostloop
+nop
+
+beq r0, r0, !afterplayID
+nop
+!checkplayercount:
+lbu t1, $7815 (T9)
+sb t1, $5ff4 (T9)
+lbu a0, $7700 (T9)
+bne a0, r0, !afterplayID
+nop
+addiu a0, r0, $0000
+ori t0, t9, $7800
+!loopaddID:
+lbu t1, $0000 (T0)
+addiu a0, a0, $1
+addiu t0, t0, $0100
+bne t1, r0, !loopaddID
+nop
+sb a0, $7700 (T9)
+!afterplayID:
+sw t9, $0018 (SP)
+lui t0, $8036
+lw t0, $1158 (T0)
+beq t0, r0, !nomario2stuff
+nop
+
+lhu t8, $0040 (T0)
+sh t8, $7702 (T9)
+
+lhu t8, $0038 (T0)
+lui t3, $8034
+lw t3, $b17c (T3)
+ori t2, r0, $1371
+bne t2, t3, !regularstoremario2stuff
+nop
+addiu t8, r0, $00C4
+!regularstoremario2stuff:
+sb t8, $7701 (T9)
+
+lwc1 f8, $0020 (T0)
+cvt.w.s f8, f8
+mfc1 t8, f8
+sh t8, $7704 (T9)
+
+
+lwc1 f8, $0024 (T0)
+cvt.w.s f8, f8
+mfc1 t8, f8
+sh t8, $7706 (T9)
+
+
+lwc1 f8, $0028 (T0)
+cvt.w.s f8, f8
+mfc1 t8, f8
+sh t8, $7708 (T9)
+
+lhu t0, $001c (T0)
+sh t0, $770a (T9)
+
+lui t0, $8033
+lhu t0, $ddf8 (T0)
+sb t0, $770c (T9)
+
+lui t0, $8034
+lbu t3, $b177 (T0)
+andi t3, t3, $000f
+sll t3, t3, $4
+lbu t2, $bacb (T0)
+or t2, t2, t3
+sb t2, $770d (T9)
+
+
+
+sb r0, $770f (T9)
+lui t2, $80ff
+lbu t2, $5ff0 (T2)
+sb t2, $770e (T9)
+
+ori at, t9, $7700
+sw at, $7400 (T9)
+addiu at, r0, $001c		//???
+sw at, $7404 (T9)
+
+lbu t1, $7700 (T9)
+sll t1, t1, $8
+ori at, t9, $7700
+add at, at, t1
+sw at, $7408 (T9)
+
+
+!loop:
+lbu t0, $7800 (T9)
+beq t0, r0, !skipthismario
+nop
+lui a0, $80ff
+lbu a0, $7700 (A0)
+beq a0, t0, !skipthismario
+nop
+
+lw a0, $781c (T9)
+beq a0, r0, !spawnmario
+nop
+lh t1, $0074 (A0)
+beq t1, r0, !spawnmario
+nop
+lw t1, $0144 (a0)
+lui at, $7777
+ori at, at, $7777
+beq t1, at, !nospawnmario
+nop
+!spawnmario:
+sw t9, $0018 (SP)
+lui a0, $8036
+lw a0, $1158 (A0)
+addiu a1, r0, $0001
+lui a2, $00ff
+jal $29edcc
+ori a2, a2, $9f00
+lui at, $7777
+ori at, at, $7777
+sw at, $0144 (v0)
+lw t9, $0018 (SP)
+sw v0, $781c (T9)
+lbu t1, $7800 (T9)
+sb t1, $0188 (V0)
+
+lh t1, $7804 (T9)
+sh t1, $7884 (T9)
+
+lh t1, $7806 (T9)
+sh t1, $7886 (T9)
+
+lh t1, $7808 (T9)
+sh t1, $7888 (T9)
+!nospawnmario:
+
+lbu a1, $7801 (T9)
+beq a1, r0, !dontanimateaaaaaaaaaaaaaaaa
+nop
+addiu at, r0, $00ff
+bne a1, at, !dontreasnbfiasnifu
+nop
+addiu a1, r0, $00c2
+!dontreasnbfiasnifu:
+lw a0, $781c (T9)
+
+lui t0, $8100
+lbu t1, $7800 (T9)
+sll t1, t1, $2
+add t0, t0, t1
+lw t0, $9f7c (T0)	//changed frp, 9fbc
+beq t0, r0, !dontanimateaaaaaaaaaaaaaaaa
+nop
+
+sw a0, $0580 (T0)
+addiu at, t0, $05b8
+sw at, $0598 (T0)
+lui at, $8006
+ori t1, at, $4040
+sw t1, $05b8 (t0)
+addiu at, t0, $0680
+sw at, $05c0 (T0)
+addiu at, r0, $bd
+sh at, $05a8 (T0)
+JAL $802509B8
+addiu a0, t0, $04f8
+!dontanimateaaaaaaaaaaaaaaaa:
+lw t9, $0018 (SP)
+
+lui t3, $80ff
+lbu t3, $5ff4 (T3)
+beq t3, r0, !yesORstars
+nop
+addiu t4, r0, $1
+bne t4, t3, !NoOR
+nop
+!yesORstars:
+lw t3, $7810 (T9)
+lbu t4, $7814 (T9)
+beq t3, r0, !NoOR
+nop
+lbu t5, $0000 (T3)
+or t5, t5, t4
+sb t5, $0000 (T3)
+
+lbu t5, $0038 (T3)
+or t5, t5, t4
+sb t5, $0038 (T3)
+!NoOR:
+lw a0, $781c (T9)
+
+
+
+lbu t0, $780f (T9)
+addiu t1, t0, $1
+sb t1, $780f (t9)
+beq r0, t0, !nointerpolate
+nop
+lh t1, $7804 (T9)
+lh t2, $78c4 (T9)
+sub t3, t1, t2
+add t1, t1, t3
+sh t1, $7804 (T9)
+sh t1, $7884 (T9)
+
+lh t1, $7806 (T9)
+lh t2, $78c6 (T9)
+sub t3, t1, t2
+add t1, t1, t3
+sh t1, $7806 (T9)
+sh t1, $7886 (T9)
+
+lh t1, $7808 (T9)
+lh t2, $78c8 (T9)
+sub t3, t1, t2
+add t1, t1, t3
+sh t1, $7808 (T9)
+sh t1, $7888 (T9)
+
+
+lui t0, $8100
+lbu t1, $7800 (T9)
+sll t1, t1, $2
+add t0, t0, t1
+lw t0, $9f7c (T0)
+beq t0, r0, !nointerpolate
+nop
+lhu t1, $0688 (T0)
+
+lhu t0, $7802 (T9)
+addiu t0, t0, $0001
+slt at, t0, t1
+xori at, at, $0001
+sub t0, t0, at
+sh t0, $7802 (T9)
+
+!nointerpolate:
+
+lhu t0, $7884 (T9)
+sh t0, $78c4 (T9)
+lhu t0, $7886 (T9)
+sh t0, $78c6 (T9)
+lhu t0, $7888 (T9)
+sh t0, $78c8 (T9)	//position one frame ago
+
+
+
+
+lhu t0, $7802 (T9)
+sh t0, $0040 (A0)
+
+sh t0, $7882 (T9)	//last position backup
+lhu t0, $7800 (T9)
+sh t0, $7880 (T9)
+
+lh t1, $7804 (T9)
+sh t1, $7884 (T9)
+mtc1 t1, f2
+cvt.s.w f2, f2
+swc1 f2, $0020 (a0)
+swc1 f2, $00a0 (a0)
+
+lh t1, $7806 (T9)
+sh t1, $7886 (T9)
+mtc1 t1, f2
+cvt.s.w f2, f2
+swc1 f2, $0024 (a0)
+swc1 f2, $00a4 (a0)
+
+lh t1, $7808 (T9)
+sh t1, $7888 (T9)
+mtc1 t1, f2
+cvt.s.w f2, f2
+swc1 f2, $0028 (a0)
+swc1 f2, $00a8 (a0)
+
+lhu t2, $780a (t9)
+sw t2, $00d4 (a0)
+sw r0, $00d0 (A0)
+sw r0, $00d8 (A0)
+sh t2, $001c (A0)
+
+//set powerups
+sw t9, $001c (SP)
+sw a0, $0020 (SP)
+
+lhu t1, $780c (T9)
+lui at, $80ff
+lhu t2, $770c (at)
+andi t1, t1, $FF0F
+andi t2, t2, $FF0F
+bne t1, t2, !nowings
+nop
+
+
+lbu t2, $780d (T9)
+andi t2, t2, $0020
+beq t2, r0, !novanish
+nop
+lw t1, $0154 (a0)
+andi t1, t1, $1
+bne t1, r0, !novanish
+nop
+LH T7, 0x0002 (a0)
+xORI T8, T7, 0x0010
+SH T8, 0x0002 (a0)
+beq r0, r0, !vanishunite
+nop
+!novanish:
+LH T7, 0x0002 (a0)
+andi t8, t7, $ffef
+SH T8, 0x0002 (a0)
+!vanishunite:
+lw t9, $001c (SP)
+
+lbu t2, $780d (T9)
+andi t2, t2, $0040
+beq t2, r0, !nometal
+nop
+lw t0, $0154 (a0)
+andi t0, t0, $3
+addiu at, r0, $3
+bne t0, at, !checkcoll
+nop
+addiu a1, r0, $0
+lui a2, $1300
+jal $29edcc
+ori a2, a2, $2Af0
+lw a0, $0020 (SP)
+
+!checkcoll:
+!nometal:
+lw t9, $001c (SP)
+lw a0, $0020 (SP)
+lbu t2, $780d (T9)
+andi t2, t2, $0080
+beq t2, r0, !nowings
+nop
+lw t0, $0154 (a0)
+addiu t0, t0, $2
+andi t0, t0, $3
+addiu at, r0, $3
+bne t0, at, !checkcoll222
+nop
+addiu a1, r0, $96
+lui a2, $1300
+jal $29edcc
+ori a2, a2, $31ac
+
+!checkcoll222:
+!nowings:
+lw t9, $001c (SP)
+lw a0, $0020 (SP)
+
+lui t3, $8033
+lw t3, $DDC4 (T3)
+lw t4, $0004 (T3)
+
+lbu t1, $780e (t9)
+addiu at, r0, $1
+beq t1, at, !store2
+nop
+lui t3, $80ff
+sll t1, t1, $2
+add t3, t3, t1
+addiu t3, t3, $2000
+lw t4, $7f3c (T3)		//character model pointer, realign this somewhere else later
+
+!store2:
+lhu t1, $780c (T9)
+lui at, $80ff
+lhu t2, $770c (at)
+andi t1, t1, $FF0F
+andi t2, t2, $FF0F
+beq t1, t2, !store
+nop
+or t4, r0, r0
+!store:
+sw t4, $0014 (A0)
+//test
+addiu t4, r0, $0021
+sh t4, $0002 (A0)
+!skipthismario:
+addiu t9, t9, $0100
+sw t9, $0018 (SP)
+lui t8, $80ff
+ori t8, t8, $1b00	//27 marios
+bne t9, t8, !loop
+nop
+!nomario2stuff:
+lui t3, $8033
+lw t3, $DDC4 (T3)
+lw t4, $0004 (T3)
+lui t9, $80ff
+lbu t1, $770e (t9)
+addiu at, r0, $1
+beq t1, at, !marioasnfuiasnuifnhuasdf
+nop
+lui t3, $80ff
+sll t1, t1, $2
+add t3, t3, t1
+addiu t3, t3, $2000
+lw t4, $7f3c (T3)		//character model pointer, realign this somewhere else later
+!marioasnfuiasnuifnhuasdf:
+lui t3, $8036
+lw t3, $1158 (T3)
+beq t3, r0, !realendasfasf
+nop
+sw t4, $0014 (T3)
+!realendasfasf:
+lui t0, $8036
+lw t0, $1158 (T0)
+beq t0, r0, !finalendasdgadsg
+nop
+
+lui at, $8026
+ori at, at, $ff8c
+lui t2, $8033
+sw at, $6c98 (T2)
+
+lui t2, $80ff
+lbu t2, $770e (T2)
+andi t2, t2, $000f		//15 chars with 15 skins
+addiu at, r0, $1
+beq at, t2, !finalendasdgadsg
+nop
+addiu at, r0, $2
+beq at, t2, !luigi
+nop
+addiu at, r0, $3
+beq at, t2, !yoshi
+nop
+addiu at, r0, $4
+beq at, t2, !wario
+nop
+addiu at, r0, $5
+beq at, t2, !peach
+nop
+addiu at, r0, $6
+beq at, t2, !toad
+nop
+addiu at, r0, $7
+beq at, t2, !waluigi
+nop
+addiu at, r0, $8
+beq at, t2, !birdo
+nop	//actually rosalina
+addiu at, r0, $9
+beq at, t2, !sonic
+nop
+addiu at, r0, 0x0A
+beq at, t2, !knuckles
+nop
+addiu at, r0, 0x0B
+beq at, t2, !goomba
+nop
+addiu at, r0, 0x0c
+beq at, t2, !pinkguy
+nop
+beq r0, r0, !finalendasdgadsg
+nop
+!luigi:
+lui t2, $8034
+lhu t1, $b1c4 (T2)
+andi t1, t1, $8000
+bne t1, r0, !nospeedasuibduiasdfwetwet
+nop
+lw t1, $b1d8 (T2)
+beq t1, r0, !nospeedasuibduiasdfwetwet
+nop
+lhu t1, $0000 (T1)
+addiu at, r0, $0013
+beq t1, at, !nospeedasuibduiasdfwetwet
+nop
+addiu at, r0, $0014
+beq t1, at, !nospeedasuibduiasdfwetwet
+nop
+addiu at, r0, $0036
+beq t1, at, !nospeedasuibduiasdfwetwet
+nop
+addiu at, r0, $002E
+beq t1, at, !nospeedasuibduiasdfwetwet
+nop
+//disable on super slippery terrain
+lwc1 f2, $b1c4 (T2)
+lui at, $3e20
+mtc1 at, f4
+sub.s f2, f2, f4
+swc1 f2, $b1c4 (T2)
+!nospeedasuibduiasdfwetwet:
+
+
+lwc1 f2, $b1bc (T2)
+lui at, $3e80
+mtc1 at, f4
+add.s f2, f2, f4
+swc1 f2, $b1bc (T2)
+lw t3, $b17c (T2)
+lui at, $0400
+ori at, at, $0445
+bne t3, at, !finalendasdgadsg
+nop
+lw t1, $b1d8 (T2)
+beq t1, r0, !everythingsfine
+nop
+lhu t1, $0000 (T1)
+addiu at, r0, $0013
+beq at, t1, !finalendasdgadsg
+nop
+addiu at, r0, $0014
+beq at, t1, !finalendasdgadsg
+nop
+addiu at, r0, $002e
+beq at, t1, !finalendasdgadsg
+nop
+//disable on super slippery terrain
+!everythingsfine:
+lwc1 f2, $b1c4 (T2)
+lui at, $4060
+mtc1 at, f4
+add.s f2, f2, f4
+swc1 f2, $b1c4 (T2)
+beq r0, r0, !finalendasdgadsg
+nop
+//8036767f - yoshi flutterjump timer
+!yoshi:
+lui t0, $8034
+sb r0, $b19a (T0)
+lw t3, $b17c (t0)
+lui at, $0300
+ori at, at, $0886
+bne t3, at, !nobonk
+nop
+lw t1, $b180 (T0)
+
+lui at, $0010
+ori at, at, $0345
+beq at, t1, !nobonk
+nop
+lui at, $0010
+ori at, at, $0343
+beq at, t1, !nobonk
+nop
+lui at, $0010
+ori at, at, $0344
+beq at, t1, !nobonk
+nop
+lui at, $0810
+ori at, at, $0340
+beq at, t1, !nobonk
+nop
+
+
+
+lui at, $0102
+ori at, at, $08B0
+sw at, $b17c (T0)
+lui at, $c100
+sw at, $b1bc (T0)
+lui t2, $80ff
+sb r0, $767f (T2)
+!nobonk:
+lw t3, $b1b0 (T0)
+lw t4, $b1e0 (T0)
+lui t2, $80ff
+bne t3, t4, !Noresetasfgasdg
+nop
+sb r0, $767f (T2)
+beq r0, r0, !finalendasdgadsg
+nop
+!Noresetasfgasdg:
+lbu t1, $767f (T2)
+bne t1, r0, !dontactivate
+nop
+lhu at, $afa0 (t0)
+andi at, at, $8000
+beq at, r0, !dontactivate
+nop
+lhu at, $b1bc (T0)
+andi at, at, $8000
+beq at, r0, !dontactivate
+nop
+lhu at, $b17c (T0)
+ori t1, r0, $0300
+beq at, t1, !yougeabfisabnfuiuiasfd
+nop
+lw at, $b17c (T0)
+lui t1, $0100
+ori t1, t1, $0882
+beq at, t1, !yougeabfisabnfuiuiasfd
+nop
+beq r0, r0, !dontactivate
+nop
+!yougeabfisabnfuiuiasfd:
+addiu at, r0, $0023
+sb at, $767f (T2)
+!dontactivate:
+lbu t1, $767f (T2)
+addiu t0, t1, $ffff
+beq t1, r0, !nosubtractaiusfiusa
+nop
+sb t0, $767f (t2)
+!nosubtractaiusfiusa:
+lbu t0, $767f (T2)
+slti at, t0, $10
+bne at, r0, !finalendasdgadsg
+nop
+lui t6, $8034
+addiu at, r0, $0022
+bne at, t0, !nonsaifosaf
+nop
+lui at, $c180
+sw at, $b1bc (T6)
+lui at, $0300
+ori at, at, $0888
+sw at, $b17c (T6)
+!nonsaifosaf:
+lwc1 f2, $b1bc (t6)
+lui at, $4068 //change when longjumping
+mtc1 at, f4
+add.s f2, f2, f4
+lui at, $4120
+mtc1 at, f8
+c.lt.s f2, f8
+nop
+bc1f !nostoreasfasfiuduigniuasdf
+nop
+swc1 f2, $b1bc (T6)
+!nostoreasfasfiuduigniuasdf:
+lui t0, $8036
+lw t0, $1158 (T0)
+sw r0, $0110 (t0)
+lhu t1, $0040 (t0)
+slti at, t1, $000d
+bne at, r0, !animationok
+nop
+addiu t1, t1, $fff6
+!animationok:
+addiu t1, t1, $0001
+sh t1, $0040 (T0)
+lui a1, $8033
+ori a1, a1, $31f0
+lui a0, $2413
+jal $31eb00
+ori a0, a0, $0081
+
+
+beq r0, r0, !finalendasdgadsg
+nop
+
+!wario:
+//add shoulderbash and reduce tankiness
+lui t1, $80ff
+lbu t2, $767e (T1)
+addiu t3, t2, $ffff
+beq t2, r0, !asbuifbsaziuiasdbsazufbgzuasbzasfbnasfu
+nop
+sb t3, $767e (T1)
+beq r0, r0, !shouldb2
+nop
+!asbuifbsaziuiasdbsazufbgzuasbzasfbnasfu:
+lui t0, $8034
+lhu t1, $afa0 (T0)
+andi t1, t1, $4000
+beq t1, r0, !dontshoulderbash
+nop
+lw t1, $b17c (T0)
+lui at, $0C40
+ori at, at, $0201
+beq at, t1, !shouldb
+nop
+lui at, $0400
+ori at, at, $0440
+beq at, t1, !shouldb
+nop
+lui at, $0C00
+ori at, at, $023D
+bne at, t1, !dontshoulderbash
+nop
+!shouldb:
+addiu at, r0, $0020
+lui t1, $80ff
+sb at, $767e (T1)
+LUI A0, $240c
+LUI A1, $8033
+ADDIU A1, A1, $31F0
+JAL $0031EB00
+ORI A0, A0, $0081
+!shouldb2:
+lui t0, $8034
+lw t1, $b1e0 (T0)
+lw t2, $b1b0 (T0)
+bne t1, t2, !resetbach
+nop
+lbu t1, $b222 (T0)
+bne t1, r0, !resetbach
+nop
+sw r0, $af90 (t0)
+sw r0, $af94 (t0)
+sw r0, $af98 (t0)
+sw r0, $af9c (t0)
+sw r0, $afa0 (t0)
+
+lui at, $4248
+sw at, $b1c4 (T0)
+
+lui at, $0080
+ori at, at, $0457
+sw at, $b17c (T0)
+addiu a0, t0, $b170
+jal $2509B8
+addiu a1, r0, $0067
+addiu at, r0, $4
+lui t0, $8036
+lw t0, $1158 (T0)
+sh at, $0040 (T0)
+lui t0, $8034
+addiu at, r0, $1
+beq r0, r0, !dontshoulderbash
+sw at, $b18c (T0)
+!resetbach:
+lui t1, $80ff
+sb r0, $767e (T1)
+!dontshoulderbash:
+lbu t4, $b222 (t0)
+beq t4, r0, !dontsubasgdsag
+nop
+addiu t4, t4, $ffff
+sb t4, $b222 (t0)
+!dontsubasgdsag:
+
+lwc1 f2, $b1bc (T0)
+lui at, $bdc8
+mtc1 at, f4
+add.s f2, f2, f4
+swc1 f2, $b1bc (T0)
+
+
+lhu t1, $b1c4 (T0)
+andi t1, t1, $8000
+bne t1, r0, !nospeedasuibduiasdf
+nop
+lwc1 f2, $b1c4 (T0)
+lui at, $3e80
+mtc1 at, f4
+sub.s f2, f2, f4
+swc1 f2, $b1c4 (T0)
+!nospeedasuibduiasdf:
+lui t2, $80ff
+lbu t1, $767f (T2)
+addiu t3, t1, $ffff
+beq t1, r0, !skipasfbiasbfuiasfasfbzuasf
+nop
+sb t3, $767f (t2)
+lui t2, $8036
+lw t3, $1158 (T2)
+sw t3, $1160 (T2)
+jal $02A50FC
+addiu a0, r0, $1
+!skipasfbiasbfuiasfasfbzuasf:
+
+lui t2, $80ff
+lui t0, $8034
+lw t1, $b17c (T0)
+lui at, $0080
+ori at, at, $023C
+bne t1, at, !finalendasdgadsg
+nop
+addiu at, r0, $000f
+sb at, $767f (T2)
+beq r0, r0, !finalendasdgadsg
+nop
+!peach:
+
+lui t2, $8034
+lhu t1, $b1c4 (T2)
+andi t1, t1, $8000
+bne t1, r0, !nospeedasuibduiasdfwetwet111
+nop
+lwc1 f2, $b1c4 (T2)
+lui at, $3e40
+mtc1 at, f4
+sub.s f2, f2, f4
+swc1 f2, $b1c4 (T2)
+!nospeedasuibduiasdfwetwet111:
+
+
+lui t0, $80ff
+lbu t1, $767f (T0)
+slti at, t1, $003c
+beq at, r0, !recoverfloat
+nop
+lui t0, $8034
+lw a0, $b17c (T0)
+lui a1, $0300
+ori a1, a1, $0880
+beq a1, a0, !paaasdfaaa
+nop
+lui a1, $0300
+ori a1, a1, $0881
+beq a1, a0, !paaasdfaaa
+nop
+lui a1, $0100
+ori a1, a1, $0882
+beq a1, a0, !paaasdfaaa
+nop
+lui a1, $0100
+ori a1, a1, $0887
+beq a1, a0, !paaasdfaaa
+nop
+lui a1, $0300
+ori a1, a1, $0886
+beq a1, a0, !paaasdfaaa
+nop
+beq r0, r0, !endphysics
+nop
+
+!paaasdfaaa:
+
+
+
+lh at, $afa0 (T0)
+andi at, at, $8000
+beq at, r0, !checkused
+nop
+lwc1 f2, $b1bc (T0)
+lui at, $0000
+mtc1 at, f4
+c.lt.s f2, f4
+nop
+bc1f !endphysics
+nop
+lui t0, $80ff
+lbu t1, $767f (T0)
+addiu t1, t1, $1
+sb t1, $767f (T0)
+lui t0, $8034
+sw r0, $b1bc (T0)
+
+lui a1, $0100
+ori a1, a1, $0882
+sw a1, $b17c (T0)
+lui t0, $8036
+lw t0, $1158 (T0)
+addiu at, r0, $003f
+sh at, $0040 (T0)
+beq r0, r0, !endphysics
+nop
+!checkused:
+lui t0, $80ff
+lbu t1, $767f (T0)
+beq t1, r0, !endphysics
+nop
+addiu at, r0, $003c
+sb at, $767f (T0)
+beq r0, r0, !endphysics
+nop
+!recoverfloat:
+lui t0, $8034
+lw t1, $b1b0 (T0)
+lw t2, $b1e0 (T0)
+bne t1, t2, !endphysics
+nop
+lui at, $80ff
+sb r0, $767f (at)
+!endphysics:
+beq r0, r0, !finalendasdgadsg
+nop
+
+!toad:
+
+lui t0, $8034
+lwc1 f2, $b1c4 (T0)
+lui at, $4288
+mtc1 at, f4
+c.lt.s f2, f4
+nop
+bc1f !nogainspeedtoad
+nop
+lui at, $3e70
+mtc1 at, f4
+add.s f2, f2, f4
+swc1 f2, $b1c4 (T0)
+!nogainspeedtoad:
+lwc1 f2, $b1bc (T0)
+lui at, $bf00
+mtc1 at, f4
+add.s f2, f2, f4
+swc1 f2, $b1bc (T0)
+
+
+
+beq r0, r0, !finalendasdgadsg
+nop
+
+!waluigi:
+lui t0, $80ff
+lbu t1, $767f (T0)
+bne t1, r0, !endphysics11
+nop
+
+
+lui t0, $8034
+lw a0, $b17c (T0)
+lui a1, $0300
+ori a1, a1, $0880
+beq a1, a0, !paaasdfaaa11
+nop
+lui a1, $0300
+ori a1, a1, $0881
+beq a1, a0, !paaasdfaaa11
+nop
+lui a1, $0100
+ori a1, a1, $0882
+beq a1, a0, !paaasdfaaa11
+nop
+lui a1, $0100
+ori a1, a1, $0887
+beq a1, a0, !paaasdfaaa11
+nop
+lui a1, $0300
+ori a1, a1, $0886
+beq a1, a0, !paaasdfaaa11
+nop
+beq r0, r0, !endphysics11
+nop
+!paaasdfaaa11:
+lhu t1, $afa0 (T0)
+andi t1, t1, $8000
+beq t1, r0, !endphysics11
+nop
+lwc1 f2, $b1bc (T0)
+lui at, $c120
+mtc1 at, f4
+c.lt.s f2, f4
+nop
+bc1f !endphysics11
+nop
+lui at, $0300
+ori at, at, $0881
+sw at, $b17c (T0)
+lui t2, $80ff
+sb at, $767f (T2)
+lui at, $4248
+sw at, $b1bc (T0)
+lui a0, $8036
+lw a0, $1158 (A0)
+beq a0, r0, !endphysics11
+nop
+LUI A2, 0x1300
+ADDIU A2, A2, 0x0E24
+JAL 0x8029EDCC
+ORI A1, R0, $0000
+
+
+!endphysics11:
+
+
+lui t2, $8034
+lhu t1, $b1c4 (T2)
+andi t1, t1, $8000
+bne t1, r0, !nospeedasuibduiasdfwetwet66666
+nop
+lwc1 f2, $b1c4 (T2)
+lui at, $3e20
+mtc1 at, f4
+sub.s f2, f2, f4
+swc1 f2, $b1c4 (T2)
+!nospeedasuibduiasdfwetwet66666:
+
+lui t2, $8034
+lw t4, $b1b0 (T2)
+lw t5, $b1e0 (T2)
+lui at, $3e80
+bne t4, t5, !asfouiasoiufno
+nop
+lui at, $3f80
+!asfouiasoiufno:
+lwc1 f2, $b1c4 (T2)
+mtc1 at, f4
+add.s f2, f2, f4
+swc1 f2, $b1c4 (T2)
+lui t1, $8034
+lbu t6, $b222 (T1)
+beq t6, r0, !skipaddmoredamage
+nop
+lhu t6, $b21e (t1)
+addiu t6, t6, $ffa0
+sh t6, $b21e (T1)
+!skipaddmoredamage:
+
+lw t3, $b17c (T2)
+lui at, $0400
+ori at, at, $0445
+bne t3, at, !finalendasdgadsg234
+nop
+lw t1, $b1d8 (T2)
+beq t1, r0, !everythingsfine11
+nop
+lhu t1, $0000 (T1)
+addiu at, r0, $0013
+beq at, t1, !finalendasdgadsg234
+nop
+addiu at, r0, $0014
+beq at, t1, !finalendasdgadsg234
+nop
+addiu at, r0, $002e
+beq at, t1, !finalendasdgadsg234
+nop
+!everythingsfine11:
+lwc1 f2, $b1c4 (T2)
+lui at, $3fe0
+mtc1 at, f4
+add.s f2, f2, f4
+swc1 f2, $b1c4 (T2)
+
+
+!finalendasdgadsg234:
+lui t0, $8034
+lw t4, $b17c (T0)
+lui at, $0300
+ori at, at, $0886
+beq t4, at, !resasbuifabsuzhdfbsuazfbuzasbfzuasbzuf
+nop
+lw t1, $b1b0 (T0)
+lw t2, $b1e0 (T0)
+bne t1, t2, !finalendasdgadsg
+nop
+!resasbuifabsuzhdfbsuazfbuzasbfzuasbzuf:
+lui at, $80ff
+sb r0, $767f (AT)
+
+
+beq r0, r0, !finalendasdgadsg
+nop
+!birdo:
+lui t0, $8034
+lhu t1, $b1c4 (T0)
+andi t1, t1, $8000
+bne t1, r0, !nospeedasuibduiasdf555ros
+nop
+lwc1 f2, $b1c4 (T0)
+lui at, $3e40
+mtc1 at, f4
+sub.s f2, f2, f4
+swc1 f2, $b1c4 (T0)
+!nospeedasuibduiasdf555ros:
+lui at, $8034
+lw t1, $b1b0 (AT)
+lw t2, $b1e0 (AT)
+bne t1, t2, !noresetjumpros
+nop
+lui at, $80ff
+sb r0, $767f (AT)
+!noresetjumpros:
+
+lui at, $80ff
+lb t4, $767f (AT)
+beq r0, t4, !storetimerros
+nop
+addiu t4, t4, $ffff
+!storetimerros:
+sb t4, $767f (AT)
+
+!checkbuttonsros:
+lui at, $8034
+lh at, $afa0 (AT)
+andi at, at, $4000
+beq at, r0, !nospinjumpros
+nop
+lui at, $8034
+lw at, $b17c (AT)
+lui a0, $0100
+ori a0, a0, $0882
+beq at, a0, !passros
+nop
+lui a0, $0300
+ori a0, a0, $08AF
+beq at, a0, !passros
+nop
+lui a0, $0300
+ori a0, a0, $0880
+beq at, a0, !passros
+nop
+lui a0, $0300
+ori a0, a0, $0881
+beq at, a0, !passros
+nop
+lui a0, $0300
+ori a0, a0, $0886
+beq at, a0, !passros
+nop
+lui a0, $0100
+ori a0, a0, $0887
+beq at, a0, !passros
+nop
+lui a0, $0300
+ori a0, a0, $0888
+beq at, a0, !passros
+nop
+
+lui a0, $0100
+ori a0, a0, $0883
+beq at, a0, !passros
+nop
+
+beq r0, r0, !nospinjumpros
+nop
+!passros:
+lui at, $80ff
+lb t4, $767f (AT)
+bne t4, r0, !nospinjumpros
+nop
+addiu t5, r0, $0050
+sb t5, $767f (AT)
+lui t5, $8034
+lh t5, $b19e (T5)
+sh t5, $fff8 (AT)
+lui at, $41f0
+lui t2, $8034
+sw at, $b1bc (T2)
+LUI A0, $242e
+LUI A1, $8033
+ADDIU A1, A1, $31F0
+JAL $0031EB00
+ORI A0, A0, $0081
+
+
+!nospinjumpros:
+lui at, $80ff
+lb t4, $767f (AT)
+slti at, t4, $0040
+bne at, r0, !nomoveupros
+nop
+lui at, $8034
+lui a0, $1080
+ori a0, a0, $08a4
+sw a0, $b17c (AT)
+addiu at, r0, $0040
+lui t4, $80ff
+lb t4, $767f (t4)
+bne t4, at, !nomoveupros
+nop
+lui at, $8034
+lui a0, $0100
+ori a0, a0, $08a6
+sw a0, $b17c (AT)
+!nomoveupros:
+
+beq r0, r0, !finalendasdgadsg
+nop
+!sonic:
+//straight line spindash from soot
+//coins are health
+
+lui t0, $8034
+lui at, $0400
+ori at, at, $0445
+lw t2, $b17c (T0)
+bne at, t2, !notrolling
+nop
+lwc1 f2, $b1c4 (T0)
+lui at, $424e
+mtc1 at, f4
+c.lt.s f2, f4
+nop
+bc1t !notrolling
+nop
+lui t1, $8036
+lw t1, $1158 (T1)
+lh t3, $0040 (T1)
+lui a0, $809b
+ori a0, a0, $4000
+sw a0, $003c (T1)
+lui at, $42ce
+mtc1 at, f4
+c.lt.s f2, f4
+nop
+bc1t !notrolling1
+nop
+addiu t3, t3, $1
+lui at, $434e
+mtc1 at, f4
+c.lt.s f2, f4
+nop
+bc1t !notrolling1
+nop
+addiu t3, t3, $1
+!notrolling1:
+sh t3, $0040 (T1)
+!notrolling:
+
+
+lui t2, $8036
+lw t1, $1158 (T2)
+lhu t1, $0038 (T1)
+addiu at, r0, $0071
+bne t1, at, !skipstarslide
+nop
+lui at, $4358
+sw at, $b1c4 (T0)
+lui at, $0400
+ori at, at, $0445
+sw at, $b17c (T0)
+!skipstarslide:
+
+
+lui t1, $8034
+lbu t6, $b222 (T1)
+beq t6, r0, !skipaddmoredamage2
+nop
+sb r0, $b222 (T1)
+lh t2, $b218 (T1)
+beq t2, r0, !killsonic
+nop
+slti at, t2, $000a
+addiu t2, t2, $fff6
+beq at, r0, !nullify
+nop
+or t2, r0, r0
+!nullify:
+sh t2, $b218 (T1)
+sh t2, $b262 (T1)
+
+addiu at, r0, $0880
+sh at, $b21e (T1)
+addiu at, r0, $0011
+lui t0, $80ff
+sb at, $767f (T0)
+beq r0, r0, !skipaddmoredamage2
+nop
+!killsonic:
+sh r0, $b21e (T1)
+!skipaddmoredamage2:
+
+lui t0, $80ff
+lbu t1, $767f (T0)
+beq t1, r0, !skipsoundsonic
+nop
+andi t2, t1, $0001
+addiu t1, t1, $ffff
+sb t1, $767f (T0)
+beq t2, r0, !skipsoundsonic
+nop
+lui a0, $3036
+jal $2ca144
+ori a0, a0, $0081
+!skipsoundsonic:
+
+lui t0, $8034
+sb r0, $b19a (T0)
+lw t3, $b17c (t0)
+lui at, $0300
+ori at, at, $0886
+bne t3, at, !nobonk2
+nop
+lw t1, $b180 (T0)
+
+lui at, $0010
+ori at, at, $0345
+beq at, t1, !nobonk2
+nop
+lui at, $0010
+ori at, at, $0343
+beq at, t1, !nobonk2
+nop
+lui at, $0010
+ori at, at, $0344
+beq at, t1, !nobonk2
+nop
+lui at, $0810
+ori at, at, $0340
+beq at, t1, !nobonk2
+nop
+
+lui at, $0102
+ori at, at, $08B0
+sw at, $b17c (T0)
+lui at, $c100
+sw at, $b1bc (T0)
+!nobonk2:
+beq r0, r0, !finalendasdgadsg
+nop
+!knuckles:
+lui at, $8033
+lui t2, $8026
+ori t2, t2, $B49C
+sw t2, $6c1c (AT)
+
+lui t0, $8034
+lhu t2, $b21e (T0)
+slti at, t2, $0480
+bne at, r0, !okknuckles
+nop
+addiu at, r0, $0480
+sh at, $b21e (T0)
+!okknuckles:
+lwc1 f2, $b1bc (T0)
+mtc1 r0, f4
+c.lt.s f2, f4
+nop
+bc1f !dontglideknuckles
+nop
+//restrict this by action state (jumps, dive)
+lw t2, $b17c (T0)
+lui at, $0300
+ori at, at, $0880
+beq t2, at, !youareokaytoglideknuckles
+nop
+lui at, $0300
+ori at, at, $0881
+beq t2, at, !youareokaytoglideknuckles
+nop
+lui at, $0300
+ori at, at, $0882
+beq t2, at, !youareokaytoglideknuckles
+nop
+lui at, $0188
+ori at, at, $088a
+beq t2, at, !youareokaytoglideknuckles
+nop
+
+lui at, $0100
+ori at, at, $0887
+beq t2, at, !youareokaytoglideknuckles
+nop
+lui at, $0300
+ori at, at, $0886
+bne t2, at, !dontglideknuckles
+nop
+
+!youareokaytoglideknuckles:
+lhu at, $afa0 (T0)
+andi at, at, $8000
+beq at, r0, !dontglideknuckles
+nop
+lui at, $43fa
+mtc1 at, f4
+lwc1 f2, $b1b0 (T0)
+add.s f2, f2, f4
+swc1 f2, $c6a8 (T0)
+
+lui a0, $8033
+ori a0, a0, $b1ac
+lui a1, $41f0
+JAL $80251A48
+lui a2, $4328
+beq v0, r0, !dontclimbwallknuckles
+nop
+lwc1 f12, $0024 (v0)
+jal $37a9a8
+lwc1 f14, $001c (v0)
+addiu v0, v0, $8000
+andi v0, v0, $ffff
+sw v0, $0020 (SP)
+
+lui t0, $8034
+sh v0, $b19e (T0)
+lui at, $4100
+sw at, $b1c4 (T0)
+lui at, $8033
+ori a0, at, $c604
+jal $29E694
+ori a1, at, $b10c
+sw v0, $001c (SP)
+
+lui t0, $8034
+lwc1 f12, $af98 (t0)
+jal $37a9a8
+lwc1 f14, $af94 (t0)
+lw t3, $0020 (SP)
+lw t2, $001c (SP)
+sub t2, t2, t3
+sub t7, v0, t2
+andi t7, t7, $ffff
+
+lui t0, $8034
+lwc1 f12, $af98 (t0)
+lwc1 f14, $af94 (t0)
+mul.s f2, f12, f12
+mul.s f4, f14, f14
+add.s f0, f2, f4
+sqrt.s f0, f0
+lui at, $4060
+mtc1 at, f2
+div.s f6, f0, f2
+lui t1, $8036
+lw t1, $1158 (T1)
+lhu t2, $0040 (T1)
+beq t2, r0, !dontreduceanim
+nop
+addiu t2, t2, $ffff
+!dontreduceanim:
+lui at, $40a0
+mtc1 at, f4
+div.s f4, f6, f4
+cvt.w.s f4, f4
+nop
+mfc1 t4, f4
+add t2, t2, t4
+
+sh t2, $0040 (T1)
+
+
+lui t4, $8038
+sra t8, t7, $4
+sll t9, t8, $2
+addu t4, t4, t9
+lwc1 f4, $7000 (T4)
+mul.s f8, f4, f6
+lwc1 f18, $b1b0 (T0)
+add.s f18, f18, f8
+swc1 f18, $b1b0 (T0)
+
+lwc1 f10, $6000 (T4)
+mul.s f6, f10, f6
+
+lw t7, $0020 (SP)
+addiu t7, t7, $C000
+andi t7, t7, $ffff
+lui t4, $8038
+sra t8, t7, $4
+sll t9, t8, $2
+addu t4, t4, t9
+lwc1 f4, $6000 (T4)
+mul.s f8, f4, f6
+lwc1 f2, $b1ac (T0)
+add.s f2, f2, f8
+swc1 f2, $b1ac (T0)
+lwc1 f10, $7000 (T4)
+mul.s f6, f10, f6
+lwc1 f4, $b1b4 (t0)
+add.s f4, f4, f6
+swc1 f4, $b1b4 (T0)
+
+lui at, $4248
+mtc1 at, f6
+lw t7, $0020 (SP)
+lui t4, $8038
+sra t8, t7, $4
+sll t9, t8, $2
+addu t4, t4, t9
+lwc1 f4, $6000 (T4)
+mul.s f8, f4, f6
+lwc1 f2, $b1ac (T0)
+add.s f2, f2, f8
+swc1 f2, $b1ac (T0)
+
+lwc1 f10, $7000 (T4)
+mul.s f14, f10, f6
+lwc1 f4, $b1b4 (t0)
+add.s f4, f4, f14
+swc1 f4, $b1b4 (T0)
+
+
+
+lui at, $0100
+ori at, at, $0887
+sw at, $b17c (T0)
+addiu at, r0, $2
+sh at, $b188 (T0)
+
+lui at, $4000
+sw at, $b1bc (T0)
+//crawl animation
+
+lui at, $8033
+lui t2, $8026
+ori t2, t2, $B680
+sw t2, $6c1c (AT)
+addiu at, r0, $4
+sb at, $b188 (T0)
+lui a0, $8033
+ori a0, a0, $b170
+jal $802509B8
+addiu a1, r0, $0099
+lui at, $8006
+ori t1, r0, $bfff
+sh t1, $0200 (AT)
+addiu t1, r0, $1
+sh t1, $0068 (AT)
+addiu t1, r0, $4000
+sh t1, $1bf2 (AT)
+
+beq r0, r0, !dontglideknuckles
+nop
+!dontclimbwallknuckles:
+lui t0, $8034
+
+lui at, $0100
+ori at, at, $0887
+lw t2, $b17c (T0)
+beq at, t2, !dontglideknuckles
+nop
+lui at, $c080
+sw at, $b1bc (t0)
+
+lui at, $8033
+ori a0, at, $c604
+jal $29E694
+ori a1, at, $b10c
+sw v0, $001c (SP)
+
+lui t0, $8034
+lwc1 f12, $af98 (t0)
+lwc1 f14, $af94 (t0)
+mul.s f2, f12, f12
+mul.s f4, f14, f14
+add.s f2, f2, f4
+lui at, $3f80
+mtc1 at, f6
+c.lt.s f2, f6
+nop
+bc1t !dontrotateknuckles
+nop
+jal $37a9a8
+nop
+lw a1, $001c (SP)
+sub a1, a1, v0
+lui t8, $8034
+lhu a0, $b19e (t8)
+jal $8029E530
+addiu a2, r0, $0800
+lui t8, $8034
+sh v0, $b19e (t8)
+!dontrotateknuckles:
+lui t8, $8034
+lui at, $4258
+sw at, $b1c4 (t8)
+lui a0, $8033
+ori a0, a0, $b170
+lui at, $0188
+ori at, at, $088A
+sw at, $000c (A0)
+jal $802509B8
+addiu a1, r0, $0088
+addiu at, r0, $1
+lui t0, $8036
+lw t0, $1158 (T0)
+sh at, $0040 (T0)
+sh r0, $001a (T0)
+sh r0, $001e (T0)
+
+
+!dontglideknuckles:
+lui t0, $8034
+lwc1 f2, $b1bc (T0)
+mtc1 r0, f4
+c.lt.s f2, f4
+nop
+bc1t !dontlosespeedknuckles
+nop
+lui at, $4000
+mtc1 at, f6
+sub.s f2, f2, f6
+swc1 f2, $b1bc (T0)
+!dontlosespeedknuckles:
+
+
+beq r0, r0, !finalendasdgadsg
+nop
+//taking this out stops the crash
+!goomba:
+lui t0, $8034
+
+lhu t1, $afa0 (T0)
+ori t1, t1, $8000
+sh t1, $afa0 (T0)
+beq r0, r0, !finalendasdgadsg
+nop
+
+!pinkguy:
+//lui at, $80ff
+//ori at, at, $f000
+lui at, $8026
+ori at, at, $fd84
+lui t1, $8033
+sw at, $6c98 (T1)
+
+lui t2, $8034
+lwc1 f2, $b1bc (T2)
+lui at, $3f90
+mtc1 at, f4
+add.s f2, f2, f4
+lui at, $3f70
+mtc1 at, f6
+mul.s f2, f2, f6
+swc1 f2, $b1bc (T2)
+lwc1 f4, $b1c4 (T2)
+lui at, $3f78
+mtc1 at, f6
+mul.s f4, f4, f6
+swc1 f4, $b1c4 (T2)
+
+lw t3, $b1b0 (T2)
+lw t4, $b1e0 (T2)
+bne t3, t4, !dontersearkirbaysibIUFB
+NOP
+lui t0, $80ff
+addiu t1, r0, $5
+sb t1, $767f (T0)
+!dontersearkirbaysibIUFB:
+lui t2, $8034
+lw a0, $b17c (T2)
+lui a1, $0300
+ori a1, a1, $0880
+beq a1, a0, !paaasdfaaa222
+nop
+lui a1, $0300
+ori a1, a1, $0881
+beq a1, a0, !paaasdfaaa222
+nop
+lui a1, $0100
+ori a1, a1, $0882
+beq a1, a0, !paaasdfaaa222
+nop
+lui a1, $0100
+ori a1, a1, $0887
+beq a1, a0, !paaasdfaaa222
+nop
+lui a1, $0300
+ori a1, a1, $0886
+beq a1, a0, !paaasdfaaa222
+nop
+lui a1, $0300
+ori a1, a1, $088e
+beq a1, a0, !paaasspecial
+nop
+beq r0, r0, !kirbycantjump
+nop
+!paaasspecial:
+lui a0, $8033
+ori a0, a0, $b170
+jal $02509B8
+addiu a1, r0, $50
+lui t2, $8034
+
+
+!paaasdfaaa222:
+
+lhu t3, $b1bc (T2)
+andi t3, t3, $8000
+beq t3, r0, !kirbycantjump
+nop
+lhu t3, $afa2 (T2)
+andi t3, t3, $8000
+beq t3, r0, !kirbycantjump
+nop
+lui t0, $80ff
+lbu t1, $767f (T0)
+beq t1, r0, !kirbycantjump
+nop
+addiu t1, t1, $ffff
+sb t1, $767f (T0)
+lui at, $4230
+sw at, $b1bc (T2)
+lui at, $0300
+ori at, at, $088e
+sw at, $b17c (T2)
+addiu at, r0, $4
+sb at, $b188 (T2)
+lui a0, $8033
+ori a0, a0, $b170
+jal $02509B8
+addiu a1, r0, $50
+!kirbycantjump:
+
+
+!finalendasdgadsg:
+lui t0, $8034
+lw t1, $b17c (T0)
+ori at, r0, $1300
+bne t1, at, !dontasbfuasbzufuzasf
+nop
+ori at, r0, $8000
+lui t2, $80ff
+sh at, $7706 (T2)
+!dontasbfuasbzufuzasf:
+
+lhu t1, $afa0 (T0)
+andi t2, t1, $0100
+beq t2, r0, !nodowntaunt
+nop
+addiu at, r0, $3
+sb at, $b189 (T0)
+!nodowntaunt:
+
+lw t2, $b17c (T0)
+lui at, $0C40
+ori at, at, $0201
+bne t2, at, !norighttaunt
+nop
+
+lhu t1, $afa0 (T0)
+andi t2, t1, $0200
+beq t2, r0, !nouptaunt
+nop
+addiu at, r0, $4
+sb at, $b188 (T0)
+lui a0, $8033
+ori a0, a0, $b170
+jal $02509B8
+addiu a1, r0, $1d
+//lui t2, $8036
+//lw t2, $1158 (T2)
+//addiu at, r0, $0072
+//sh at, $0040 (T2)
+!nouptaunt:
+lui t0, $8034
+lhu t1, $afa0 (T0)
+andi t2, t1, $0400
+beq t2, r0, !nolefttaunt
+nop
+addiu at, r0, $4
+sb at, $b188 (T0)
+lui a0, $8033
+ori a0, a0, $b170
+jal $02509B8
+addiu a1, r0, $63
+!nolefttaunt:
+
+lui t0, $8034
+lhu t1, $afa0 (T0)
+andi t2, t1, $0800
+beq t2, r0, !norighttaunt
+nop
+addiu at, r0, $4
+sb at, $b188 (T0)
+lui a0, $8033
+ori a0, a0, $b170
+jal $02509B8
+addiu a1, r0, $7a
+!norighttaunt:
+
+
+lui t9, $80ff
+addiu t9, t9, $7700
+lui a0, $8036
+lw a0, $1158 (A0)
+sw a0, $0020 (SP)
+beq a0, r0, !endasuifbzusafbuzsabfzuaszuf
+nop
+sw t9, $001c (SP)
+lbu t2, $000d (T9)
+andi t2, t2, $0020
+beq t2, r0, !novanish44
+nop
+lw t1, $0154 (a0)
+andi t1, t1, $1
+bne t1, r0, !novanish44
+nop
+sw r0, $0014 (a0)
+!novanish44:
+!vanishunite44:
+lw t9, $001c (SP)
+
+lbu t2, $000d (T9)
+sw a0, $0020 (SP)
+andi t2, t2, $0040
+beq t2, r0, !nometal44
+nop
+lw t0, $0154 (a0)
+andi t0, t0, $3
+addiu at, r0, $3
+bne t0, at, !checkcoll44
+nop
+addiu a1, r0, $0
+lui a2, $1300
+jal $29edcc
+ori a2, a2, $2Af0
+
+!checkcoll44:
+!nometal44:
+lw t9, $001c (SP)
+lw a0, $0020 (SP)
+lbu t2, $000d (T9)
+andi t2, t2, $0080
+beq t2, r0, !nowings44
+nop
+lw t0, $0154 (a0)
+addiu t0, t0, $2
+andi t0, t0, $3
+addiu at, r0, $3
+bne t0, at, !checkcoll22244
+nop
+addiu a1, r0, $0096
+lui a2, $1300
+jal $29edcc
+ori a2, a2, $31ac
+
+!checkcoll22244:
+!nowings44:
+!endasuifbzusafbuzsabfzuaszuf:
+
+LUI A0, 0x8033
+LH A0, 0xDDF4 (A0)
+OR A1, R0, R0
+ADDIU A2, R0, 0x0018
+JAL 0x8027A010 
+ADDIU A0, A0, 0xFFFF
+lui at, $8034
+sh v0, $b21a (AT)
+lui t0, $8036
+lw t1, $1158 (T0)
+beq t1, r0, !Notreefix
+nop
+lw t1, $0078 (T1)
+beq t1, r0, !Notreefix
+nop
+lw t1, $020c (T1)
+lui at, $80ff
+ori at, at, $9f00
+bne t1, at, !Notreefix
+nop
+lui t0, $8034
+lw t1, $b17c (T0)
+lui at, $0010
+ori at, at, $0345
+beq at, t1, !fixtree
+nop
+lui at, $0010
+ori at, at, $0343
+beq at, t1, !fixtree
+nop
+lui at, $0010
+ori at, at, $0344
+beq at, t1, !fixtree
+nop
+lui at, $0810
+ori at, at, $0340
+bne t1, at, !Notreefix
+nop
+!fixtree:
+lui at, $0102
+ori at, at, $08b6
+sw at, $b17c (T0)
+!Notreefix:
+
+lui t0, $80ff
+lbu t1, $5ff4 (T0)
+beq t1, r0, !dosendplayerdatafornomrladata
+nop
+addiu at, r0, $1
+bne t1, at, !dontsendplaydatafornormalmode
+nop
+!dosendplayerdatafornomrladata:
+
+
+lui t0, $8033
+lh t1, $ddf4 (T0)
+sll t2, t1, $6
+sll t3, t1, $5
+sll t4, t1, $4
+add t2, t2, t3
+add t2, t2, t4
+lui t7, $8020
+add t7, t7, t2
+addiu v0, t7, $7698
+lbu a0, $0001 (V0)
+andi a0, a0, $00f0
+sb a0, $0001 (V0)
+
+
+addiu a0, v0, $0001
+addiu a1, v0, $0002
+
+addiu a2, v0, $0003
+
+addiu t2, v0, $001D
+!checkloop:
+lbu t1, $0000 (V0)
+lbu t4, $0038 (V0)
+and t4, t4, t1
+bne v0, a0, !skipbyte9
+nop
+andi t1, t1, $00f0
+andi t4, t4, $00f0
+!skipbyte9:
+bne v0, a1, !skipbyteA
+nop
+andi t1, t1, $fE
+andi t4, t4, $fE
+!skipbyteA:
+bne v0, a2, !skipbyteB
+nop
+andi t1, t1, $fE
+andi t4, t4, $fE
+!skipbyteB:
+
+
+xor t1, t1, t4
+beq t1, r0, !nothingnew
+nop
+lui t8, $80ff
+lw t3, $7710 (T8)
+lui at, $00ff
+ori at, at, $ffff
+and t3, t3, at
+lbu t4, $7714 (T8)
+sll t4, t4, $1c
+or t4, t3, t4
+beq t3, r0, !everythingOK
+nop
+and t9, v0, at
+sll t0, t1, $1C
+or t9, t9, t0
+beq t9, t4, !everythingOK
+nop
+lui at, $8000
+or t3, t3, at
+lbu t4, $7714 (t8)
+lbu t5, $0000 (T3)
+or t5, t5, t4
+sb t5, $0038 (T3)
+!everythingOK:
+sw v0, $7710 (T8)
+sb t1, $7714 (t8)
+!nothingnew:
+addiu v0, v0, $1
+bne t2, v0, !checkloop
+nop
+!dontsendplaydatafornormalmode:
+
+lui a0, $0200
+jal $277f50
+ori a0, a0, $77d0
+lui at, $80ff
+lbu at, $770e (at)
+sll at, at, $9
+lui t1, $809b
+addiu t1, t1, $0000
+add t1, t1, at
+sw t1, $0000 (v0)		//write life icon here
+
+
+
+
+lui a0, $0200
+jal $277f50
+ori a0, a0, $7700
+lui t0, $0084
+
+//XJQVZ
+ori t1, t0, $5000
+lw t3, $0084 (V0)
+bne t3, r0, !skipthisletter1
+nop
+sw t1, $0084 (V0)
+!skipthisletter1:
+
+
+lw t3, $004c (V0)
+bne t3, r0, !skipthisletter2
+nop
+ori t1, t0, $5200
+sw t1, $004c (V0)
+!skipthisletter2:
+
+
+lw t3, $0068 (V0)
+bne t3, r0, !skipthisletter3
+nop
+ori t1, t0, $5400
+sw t1, $0068 (V0)
+!skipthisletter3:
+
+lw t3, $007c (V0)
+bne t3, r0, !skipthisletter4
+nop
+ori t1, t0, $5600
+sw t1, $007c (V0)
+!skipthisletter4:
+
+lw t3, $008c (V0)
+bne t3, r0, !skipthisletter5
+nop
+ori t1, t0, $5800
+sw t1, $008c (V0)
+!skipthisletter5:
+
+
+
+
+
+
+
+
+
+
+
+lui t0, $80ff
+lbu t1, $7680 (T0)
+addiu t2, t1, $0001
+slti at, t1, $0060
+beq at, r0, !skipaddingasniufnbasuifiusa
+nop
+sb t2, $7680 (t0)
+lui a2, $80ff
+ori a2, a2, $7684
+addiu a0, r0, $0008
+jal $2d62d8
+addiu a1, r0, $0020
+
+!skipaddingasniufnbasuifiusa:
+
+lui a0, $80ff
+lbu a0, $5ff4 (a0)
+addiu at, r0, $8
+beq at, a0, !dontcheckifmarioisdeadpls
+nop
+lui v1, $8036
+lw v1, $1158 (V1)
+beq v1, r0, !reuniafasbuzfaszuf
+nop
+!dontcheckifmarioisdeadpls:
+lui t9, $80ff
+lbu t1, $7700 (T9)
+addiu at, r0, $1
+beq t1, at, !skipcopyminigamenumber
+nop
+lbu t2, $7815 (T9)
+sb t2, $5ff4 (T9)
+!skipcopyminigamenumber:
+lui a0, $80ff
+lbu a0, $5ff4 (a0)
+addiu at, r0, $1
+beq at, a0, !regular
+nop
+addiu at, r0, $2
+beq at, a0, !fireflower
+nop
+addiu at, r0, $3
+beq at, a0, !interactionless
+nop
+addiu at, r0, $4
+beq at, a0, !prophunt
+nop
+addiu at, r0, $5
+beq at, a0, !bossrush
+nop
+addiu at, r0, $6
+beq at, a0, !tagmode
+nop
+addiu at, r0, $7
+beq at, a0, !hide&seek
+nop
+addiu at, r0, $8
+beq at, a0, !warioware
+nop
+beq r0, r0, !reuniafasbuzfaszuf
+nop
+!fireflower:
+
+
+lui t1, $80ff
+lui t2, $8100
+lbu t3, $fffd (T2)
+beq t3, r0, !Nosubcasbfasiuf
+nop
+addiu t3, t3, $ffff
+sb t3, $fffd (T2)
+beq r0, r0, !saifuasiufiuasfiuasuifbasbnfzubasuzfuzas
+nop
+!Nosubcasbfasiuf:
+sb r0, $7718 (T1)
+!saifuasiufiuasfiuasuifbasbnfzubasuzfuzas:
+lui t0, $8034
+lhu t2, $afa0 (T0)
+andi t2, t2, $0020
+beq t2, r0, !notyourself
+nop
+
+lh t2, $b17c (T0)
+addiu at, r0, $0002
+beq t2, at, !nofiresuit
+nop
+addiu at, r0, $0018
+lui t2, $8100
+lbu t3, $fffd (T2)
+bne t3, r0, !nofiresuit
+nop
+sb at, $fffd (T2)
+
+
+lui v1, $80ff
+
+addiu at, r0, $1
+sb at, $7718 (v1)
+lhu at, $b19e (T0)
+sh at, $7716 (v1)	//back these up for others
+lui v1, $8036
+lw v1, $1158 (V1)
+//addiu at, r0, $FFf9
+//sw at, $0144 (V1)
+//lw t2, $014c (V1)
+//addiu t2, t2, $1
+//sw t2, $014c (V1)
+addiu a1, r0, $90
+or a0, v1, r0
+lui a2, $1300
+jal $29edcc
+ori a2, a2, $1184
+lui at, $4080
+sw at, $002c (V0)
+sw at, $0030 (V0)
+sw at, $0034 (V0)
+
+lui at, $8034
+lui t3, $4320
+mtc1 t3, f2
+swc1 f2, $00b8 (V0)
+lw t1, $b1ac (AT)
+sw t1, $00a0 (V0)
+lw t1, $b1b0 (AT)
+sw t1, $00a4 (V0)
+lw t1, $b1b4 (AT)
+sw t1, $00a8 (V0)
+lh t1, $b19e (AT)
+sw t1, $00c8 (V0)
+//store 0 here for other players
+lui a0, $5055
+LUI A1, $8033
+ADDIU A1, A1, $31F0
+JAL $0031EB00
+ORI A0, A0, $0081
+
+!nofiresuit:
+!notyourself:
+
+
+lui t0, $80ff
+sw t0, $0020 (SP)
+!firesuitloop:
+lw t0, $0020 (SP)
+
+lbu t5, $7800 (T0)
+beq t5, r0, !thismariohasnofire
+nop
+lui a0, $80ff
+lbu a0, $7700 (A0)
+//DANGER UNTESTED
+beq a0, t5, !thismariohasnofire
+nop
+
+
+lbu t1, $7818 (T0)
+bne t1, r0, !notresettingfirestate
+nop
+sb r0, $7898 (T0)
+!notresettingfirestate:
+lw t2, $7814 (T0)
+lui at, $00ff
+ori at, at, $ffff
+and t2, t2, at
+lw t3, $7894 (T0)
+sw t2, $7894 (T0)
+beq t3, t2, !thismariohasnofire
+nop
+lbu t1, $7818 (T0)
+beq t1, r0, !thismariohasnofire
+nop
+lbu t1, $7898 (T0)
+bne t1, r0, !thismariohasnofire
+nop
+addiu at, r0, $1
+sb at, $7898 (T0)
+
+lui a0, $8036
+lw a0, $1158 (A0)
+
+addiu a1, r0, $90
+lui a2, $1300
+jal $29edcc
+ori a2, a2, $1184
+lui at, $4080
+sw at, $002c (V0)
+sw at, $0030 (V0)
+sw at, $0034 (V0)
+
+lui at, $8034
+lui t3, $4320
+mtc1 t3, f4
+swc1 f4, $00b8 (V0)
+sw r0, $009c (V0)
+addiu at, r0, $0049
+sw at, $008c (V0)
+
+lw t0, $0020 (SP)
+
+lh t1, $7804 (T0)
+mtc1 t1, f2
+cvt.s.w f2, f2
+swc1 f2, $00a0 (V0)
+
+lh t1, $7806 (T0)
+mtc1 t1, f4
+cvt.s.w f4, f4
+swc1 f4, $00a4 (V0)
+
+lh t1, $7808 (T0)
+mtc1 t1, f6
+cvt.s.w f6, f6
+swc1 f6, $00a8 (V0)
+
+lh t1, $7816 (t0)
+sw t1, $00c8 (V0)
+
+
+!thismariohasnofire:
+
+lw t0, $0020 (SP)
+lui t2, $80ff
+addiu t2, t2, $1b00
+addiu t0, t0, $0100
+bne t0, t2, !firesuitloop
+sw t0, $0020 (SP)
+beq r0, r0, !reuniafasbuzfaszuf
+nop
+
+
+!prophunt:
+lui a0, $1300
+jal $277f50
+ori a0, a0, $2a48
+
+lui t0, $8034
+addiu t0, t0, $d488
+!proploop2:
+lw t2, $0014 (T0)
+beq t2, r0, !propendofthisloop2
+nop
+lh t1, $0074 (T0)
+beq t1, r0, !propendofthisloop2
+nop
+lw t1, $020c (T0)
+beq t1, v0, !propendofthisloop2
+nop
+lui t3, $80ff
+ori t3, t3, $e400	//change this for full version
+!loopcheckmodelIDsprop:
+lw t1, $0000 (T3)
+beq t1, t2, !storeanimetc
+nop
+beq t1, r0, !storeanimetc2
+nop
+addiu t3, t3, $c
+lui t4, $80ff
+ori t4, t4, $e7fc
+bne t4, t3, !loopcheckmodelIDsprop
+nop
+!storeanimetc2:
+//iterate over player models, dont store if it is one
+lui t1, $8100
+addiu t9, t1, $0024
+!iterateplayermodels:
+lw t8, $9f40 (T1)
+beq t8, t2, !propendofthisloop2
+nop
+addiu t1, t1, $4
+bne t1, t9, !iterateplayermodels
+nop
+sw t2, $0000 (T3)
+!storeanimetc:
+lw t1, $003c (t0)
+sw t1, $0004 (T3)
+lhu t1, $0040 (t0)
+sh t1, $0008 (T3)
+lhu t1, $0002 (t0)
+andi t1, t1, $0004
+ori t1, t1, $0021
+sh t1, $000a (T3)
+
+!propendofthisloop2:
+lui t1, $8036
+ori t1, t1, $0e88
+addiu t0, t0, $260
+bne t0, t1, !proploop2
+nop
+
+
+
+
+
+
+
+
+
+
+
+lui t1, $80ff
+lhu t2, $7716 (T1)
+sh t2, $0018 (SP)
+addiu at, r0, $0708
+div t2, at
+mflo a3
+LUI A2, 0x8034
+ADDIU A2, A2, 0x83B0
+mult a3, at
+mflo t0
+ADDIU A0, R0, 0x000c
+ADDIU A1, R0, 0x0007
+JAL 0x802d62d8   
+sh t0, $001c (SP)
+lh t2, $0018 (SP)
+lhu t1, $001c (SP)
+sub t2, t2, t1
+addiu at, r0, $1e
+div t2, at
+mflo a3
+LUI A2, 0x8034
+ADDIU A2, A2, 0x83B4
+mult a3, at
+mflo t0
+ADDIU A0, R0, 0x0021
+ADDIU A1, R0, 0x0007
+JAL 0x802d62d8        
+sh t0, $001e (SP)
+lh t2, $0018 (SP)
+lhu t1, $001c (SP)
+sub t2, t2, t1
+lhu t1, $001e (SP)
+LUI A2, 0x8034
+ADDIU A2, A2, 0x83B4
+ADDIU A0, R0, 0x0043
+ADDIU A1, R0, 0x0007
+sub a3, t2, t1
+add t2, a3, a3    
+add a3, a3, t2
+addiu at, r0, $9
+div a3, at
+mflo t2
+JAL 0x802d62d8     
+add a3, t2, a3
+
+
+lui t2, $8034
+lhu t2, $afa0 (T2)
+andi t2, t2, $1020
+addiu at, r0, $1020
+bne t2, at, !dontpossiblyrestartthegameprop
+nop
+lui t2, $80ff
+lbu t1, $7700 (T2)
+addiu at, r0, $1
+bne at, t1, !dontpossiblyrestartthegameprop
+nop
+sh r0, $7716 (T2)
+!dontpossiblyrestartthegameprop:
+
+sw r0, $0018 (SP)
+lui t1, $80ff
+lbu t3, $7700 (T1)
+addiu at, r0, $0001
+bne t3, at, !dontcontrolgameprop
+nop
+addiu at, r0, $1
+sw at, $0018 (SP)
+lhu t3, $7716 (T1)
+bne t3, r0, !dontselecthunter
+nop
+//TEST THIS
+//hunterselection
+addiu a0, r0, $000
+lui t0, $80ff
+addiu t1, t0, $1b00
+!loopplayercounrpropasfuasfas:
+lbu t2, $7800 (T0)
+beq t2, r0, !dontafASDFSAUFPROP
+nop
+addiu a0, a0, $0001
+!dontafASDFSAUFPROP:
+addiu t0, t0, $0100
+bne t1, t0, !loopplayercounrpropasfuasfas
+nop
+addiu a0, a0, $1
+srl a0, a0, $1
+srl t2, a0, $1
+sub a0, a0, t2
+lui t2, $80ff
+sb a0, $7714 (T2)
+
+!newrng:
+jal $383bb0
+nop
+andi v0, v0, $1f
+beq v0, r0, !playerone
+nop
+lui t3, $80ff
+sll t1, v0, $8
+add t4, t3, t1
+lbu t2, $7800 (T4)
+beq t2, r0, !newrng
+nop
+!playerone:
+lui t3, $80ff
+addiu v0, v0, $1
+slti at, v0, $0018
+beq at, r0, !newrng
+nop
+sb v0, $7718 (T3)
+!dontselecthunter:
+lui t1, $80ff
+lhu t3, $7716 (T1)
+addiu t3, t3, $1
+sh t3, $7716 (T1)
+beq r0, r0, !reuniteprop
+nop
+!dontcontrolgameprop:
+lui t1, $80ff
+lbu t2, $7818 (T1)
+sb t2, $7718 (T1)
+lw t2, $7814 (T1)
+sw t2, $7714 (T1)
+beq r0, r0, !reuniteprop
+nop
+!reuniteprop:
+lui t2, $80ff
+lbu t1, $7700 (T2)
+lbu t3, $7714 (T2)
+lbu a0, $7718 (T2)
+slt at, t1, a0
+bne at, r0, !YOUARENOTTHEHUNTER1
+nop
+add a0, a0, t3
+slt at, t1, a0
+bne at, r0, !YOUARETHEHUNTER
+NOP
+!YOUARENOTTHEHUNTER1:
+
+
+addiu a0, r0, $0000
+lui t0, $80ff
+addiu t1, t0, $1b00
+!loopplayercounrpropasfuasfas11:
+lbu t2, $7800 (T0)
+beq t2, r0, !dontafASDFSAUFPROP11
+nop
+addiu a0, a0, $0001
+!dontafASDFSAUFPROP11:
+addiu t0, t0, $0100
+bne t1, t0, !loopplayercounrpropasfuasfas11
+nop
+lw t2, $0018 (SP)
+add a0, a0, t2
+
+lui t2, $80ff
+lbu t1, $7700 (T2)
+lbu t3, $7714 (T2)
+lbu at, $7718 (T2)
+sub a0, at, a0
+add a0, a0, t3
+slt at, t1, a0
+bne at, r0, !YOUARETHEHUNTER
+NOP
+!YOUARENOTTHEHUNTER2:
+
+
+lui at, $8034
+lwc1 f2, $b1c4 (AT)
+lui t2, $3f7c
+mtc1 t2, f4
+mul.s f2, f2, f4
+lui t2, $3f00
+mtc1 t2, f4
+sub.s f2, f2, f4
+swc1 f2, $b1c4 (AT)	//made the props slower
+
+lhu t2, $b21e (AT)
+slti t3, t2, $0100
+bne t3, r0, !dontresetasfbuzasbuzfhbasdzufbzuasfzuazusdfzuaszufprop
+nop
+addiu t3, r0, $0100
+sh t3, $b21e (AT)
+!dontresetasfbuzasbuzfhbasdzufbzuasfzuazusdfzuaszufprop:
+
+lui t1, $8033
+lhu t1, $ddf8 (T1)
+lui t3, $8100
+lbu t2, $e7fe (T3)
+sb t1, $e7fe (T3)
+//also compare area
+lbu t4, $e7ff (T3)
+
+lui a0, $8036
+lw a0, $1158 (A0)
+
+lui t5, $8034
+lhu t5, $baca (T5)
+sb t5, $e7ff (T3)
+bne t4, t5, !spawnnewpropheadnowprop
+nop
+
+sw r0, $0014 (a0)
+beq t1, t2, !everyxthigsafiusabifsa7zufgzuasfi
+nop
+!spawnnewpropheadnowprop:
+addiu a1, r0, $0
+lui a2, $1300
+jal $29edcc
+ori a2, a2, $2a48
+lui at, $80ff
+sw v0, $7724 (At)
+lui t3, $80ff
+ori t3, t3, $e400
+!lsandufisazufbgaszf:
+sw r0, $0000 (T3)
+sw r0, $0004 (T3)
+sw r0, $0008 (T3)
+addiu t3, t3, $c
+lui t4, $80ff
+ori t4, t4, $e7fc
+bne t4, t3, !lsandufisazufbgaszf
+nop
+beq r0, r0, !prophunt
+nop
+!everyxthigsafiusabifsa7zufgzuasfi:
+lui t7, $80ff
+lw a0, $7724 (T7)
+//make sure 7724 is even alive, especially interesting in second areas
+lui t2, $8034
+lhu t1, $b19e (T2)
+sh t1, $001e (A0)
+sw t1, $00d4 (A0)
+lw t1, $b1ac (T2)
+sw t1, $00a0 (A0)
+lw t1, $b1b0 (T2)
+sw t1, $00a4 (A0)
+lw t1, $b1b4 (T2)
+sw t1, $00a8 (A0)
+
+
+lui t3, $8100
+lhu t2, $e7fc (T3)
+sll t1, t2, $2
+sll t2, t2, $3
+add t1, t1, t2
+add t1, t1, t3
+lw t4, $e400 (T1)
+sw t4, $0014 (A0)
+lw t5, $e404 (T1)
+sw t5, $003c (A0)
+lhu t6, $e408 (T1)
+sh t6, $0040 (A0)
+lhu t6, $e40a (T1)
+//AND this with something so it cant be invisible
+andi t6, t6, $0004
+ori t6, t6, $0021
+sh t6, $0002 (A0)
+addiu at, r0, $00ff
+sw at, $017c (A0)
+
+
+addiu a0, r0, $0000
+lui t3, $8033
+lw t3, $DDC4 (T3)
+!nothisisnotmypropnumber:
+lw t1, $0000 (T3)
+beq t1, t4, !yesthisismypropnumber
+nop
+addiu at, r0, $00ff
+beq at, a0, !yesthisismypropnumber
+nop
+addiu a0, a0, $1
+beq r0, r0, !nothisisnotmypropnumber
+addiu t3, t3, $4
+!yesthisismypropnumber:
+//translate ram number into geo layout
+sb a0, $7710 (t7)
+
+lbu t4, $7718 (T7)
+sll t4, t4, $18
+lui at, $00ff
+ori at, at, $ffff
+and t5, t5, at
+or t5, t5, t4
+//sw t5, $7718 (t7)
+
+lui t1, $8034
+lhu t1, $afa0 (T1)
+lhu t8, $7720 (T7)
+sh t1, $7720 (T7)
+andi t1, t1, $0020
+beq t1, r0, !dontadvance
+nop
+andi t8, t8, $0020
+bne t8, r0, !dontadvance
+nop
+!advancemoreprop:
+lui t3, $8100
+lhu t2, $e7fc (T3)
+addiu t2, t2, $1
+sh t2, $e7fc (T3)
+
+sll t1, t2, $2
+sll t2, t2, $3
+add t1, t1, t2
+add t1, t1, t3
+lw t4, $e400 (T1)
+bne t4, r0, !dontadvance
+nop
+sh r0, $e7fc (T3)
+!dontadvance:
+//make it skip another ID, if the current modelID is invisible
+addiu v0, r0, $0000
+lui t3, $8033
+lw t3, $ddc4 (T3)
+!highermodelIDprop:
+lw t2, $0004 (T3)
+addiu t3, t3, $4
+addiu v0, v0, $1		//make sure this exits eventually
+bne t2, t4, !highermodelIDprop
+nop
+
+addiu at, r0, $1	//sampleID
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, 0xa4
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, $9f
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, 0x00a1
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, $9e
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, $84
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, $DA
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, $96
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, $95
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, 0xa8
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, 0xa5
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, 0xa6
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, 0xa7
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, 0x00a3
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, $94
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, 0x00a2
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, 0xaa
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, $9f
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, $9c
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, $8e
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, $e0
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, 0x00a0
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, $cb
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, $cd
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, $8a
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, $8b
+beq at, v0, !advancemoreprop
+nop
+lui at, $8033
+lhu at, $ddf8 (AT)
+addiu t1, r0, $0010
+bne at, t1, !noCGexceptions
+nop
+addiu at, r0, $36
+beq at, v0, !advancemoreprop
+nop
+addiu at, r0, $38
+beq at, v0, !advancemoreprop
+nop
+!noCGexceptions:
+
+//test if being the hunter works
+!YOUARETHEHUNTER:
+//make it so if you are the hunter, you send modelID 0
+lui t0, $80ff
+!loopplayerobjectsprops:
+lw t1, $781c (T0)
+beq t1, r0, !thisisnotamariothatisaliveprop
+nop
+//check if the player is in the same level
+
+lhu t8, $780c (T0)
+lui at, $80ff
+lhu t2, $770c (at)
+andi t8, t8, $FF0F
+andi t2, t2, $FF0F
+beq t8, t2, !dontkillthismariopropasfiuasf
+nop
+sw r0, $0014 (T1)
+beq r0, r0, !thisisnotamariothatisaliveprop
+nop
+!dontkillthismariopropasfiuasf:
+addiu t2, r0, $00ff
+sw t2, $017c (t1)
+addiu t2, r0, $0021
+sh t2, $0002 (T1)
+
+lui t2, $80ff
+lbu t1, $7800 (T0)
+lbu t3, $7714 (T2)
+lbu a0, $7718 (T2)
+slt at, t1, a0
+bne at, r0, !YOUARENOTTHEHUNTER133
+nop
+add a0, a0, t3
+slt at, t1, a0
+bne at, r0, !thisisnotamariothatisaliveprop
+NOP
+!YOUARENOTTHEHUNTER133:
+
+
+addiu a0, r0, $0000
+lui t9, $80ff
+addiu t1, t9, $1b00
+!loopplayercounrpropasfuasfas1133:
+lbu t2, $7800 (T9)
+beq t2, r0, !dontafASDFSAUFPROP1133
+nop
+addiu a0, a0, $0001
+!dontafASDFSAUFPROP1133:
+addiu t9, t9, $0100
+bne t1, t9, !loopplayercounrpropasfuasfas1133
+nop
+lw t2, $0018 (SP)
+add a0, a0, t2
+
+lui t2, $80ff
+lbu t1, $7800 (T0)
+lbu t3, $7714 (T2)
+lbu at, $7718 (T2)
+sub a0, at, a0
+add a0, a0, t3
+slt at, t1, a0
+bne at, r0, !thisisnotamariothatisaliveprop
+NOP
+!YOUARENOTTHEHUNTER233:
+
+
+
+
+
+lw t1, $781c (T0)
+lbu t6, $7810 (T0)
+lui t3, $8033
+lw t3, $DDC4 (T3)
+sll t6, t6, $2
+add t3, t3, t6
+lw t6, $0000 (T3)
+//put this to a default value if it would be invisible
+sw t6, $0014 (T1)
+
+//lw t2, $7818 (T0)
+//lui at, $00ff
+//ori at, at, $ffff
+//and t2, t2, at
+//lui at, $8000
+//or t2, t2, at
+//sw t2, $003c (T1)
+//taken out cause unstable
+//TEST THIS
+lui t3, $80ff
+ori t3, t3, $e400	//change this for full version
+!loopcheckmodelIDsprop2:
+lw t9, $0000 (T3)
+beq t9, t6, !storegraphflagsprop
+nop
+addiu t3, t3, $c
+lui t4, $80ff
+ori t4, t4, $e7fc
+bne t4, t3, !loopcheckmodelIDsprop2
+nop
+beq r0, r0, !thisisnotamariothatisaliveprop
+nop
+!storegraphflagsprop:
+lhu t2, $000a (T3)
+andi t2, t2, $0004
+ori t2, t2, $0021
+sh t2, $0002 (T1)
+lw t2, $0004 (T3)
+sw t2, $003c (T1)
+
+
+!thisisnotamariothatisaliveprop:
+addiu t0, t0, $0100
+lui t1, $80ff
+ori t1, t1, $1b00
+bne t0, t1, !loopplayerobjectsprops
+nop
+beq r0, r0, !reuniafasbuzfaszuf
+nop
+
+
+!bossrush:
+lui t0, $80ff
+lbu t2, $7700 (T0)
+addiu at, r0, $1
+bne at, t2, !Noinitbossrush
+nop
+lbu t1, $7718 (T0)
+bne t1, r0, !Noinitbossrush
+nop
+sb at, $7718 (T0)
+!Noinitbossrush:
+lui t0, $80ff
+lbu t2, $7718 (T0)
+bne t2, r0, !noinitplayerbossurhs
+nop
+lbu t1, $7818 (T0)
+sb t1, $7718 (T0)
+!noinitplayerbossurhs:
+
+lui t5, $80ff
+lbu t4, $771a (T5)
+bne t4, r0, !checkkillbossrush
+nop
+
+
+lui t0, $80ff
+!loopplayerobjectsbossrush:
+lw t1, $781c (T0)
+beq t1, r0, !thisisnotamariothatisalivebossrush
+nop
+lui at, $3f80
+sw at, $002c (T1)
+sw at, $0030 (T1)
+sw at, $0034 (T1)
+!thisisnotamariothatisalivebossrush:
+addiu t0, t0, $0100
+lui t1, $80ff
+ori t1, t1, $1b00
+bne t0, t1, !loopplayerobjectsbossrush
+nop
+
+
+
+lui t2, $80ff
+lbu t3, $7718 (T2)
+lbu t4, $7700 (T2)
+bne t3, t4, !noupscalebossrush
+nop
+//take damage in water
+lui t2, $8034
+lbu t1, $b17c (T2)
+ori t3, r0, $0030
+andi t1, t1, $00f0
+bne t3, t1, !skipdamagefromwaterbossrush
+nop
+lh t3, $b21e (T2)
+addiu t3, t3, $ffe0
+sh t3, $b21e (T2)
+!skipdamagefromwaterbossrush:
+lui t0, $8036
+lw t0, $1158 (T0)
+lui at, $4080
+sw at, $002c (T0)
+sw at, $0030 (T0)
+sw at, $0034 (T0)
+//hit box
+lui t1, $8034
+lbu t3, $b222 (T1)
+beq t3, r0, !dontenddamagetakebossrush
+nop
+addiu at, r0, $1
+sb at, $b222 (T1)
+!dontenddamagetakebossrush:
+
+lui t1, $8034
+lbu t3, $b223 (T1)
+beq t3, r0, !dontheaenddamagetakebossrush
+nop
+addiu at, r0, $2
+sb at, $b222 (T1)
+sb r0, $b223 (T1)
+!dontheaenddamagetakebossrush:
+
+
+lwc1 f2, $002c (T0)
+lui at, $4214
+mtc1 at, f4
+mul.s f4, f4, f2
+swc1 f4, $01f8 (T0)
+
+lui at, $4320
+mtc1 at, f6
+mul.s f6, f6, f2
+swc1 f6, $01fc (T0)
+
+
+lui t2, $8034
+lw t1, $b17c (T2)
+ori t3, r0, $1928
+beq t1, t3, !newbossrush
+nop
+ori t3, r0, $1920
+beq t1, t3, !newbossrush
+nop
+lbu t1, $b21e (T2)
+bne t1, r0, !checkkillbossrush
+nop
+!newbossrush:
+lui t3, $80ff
+lbu t4, $5fef (T3)
+sb t4, $7719 (T3)
+sb t4, $7718 (T3)
+addiu at, r0, $00a0
+sb at, $771a (T3)
+beq r0, r0, !checkkillbossrush
+nop
+
+
+
+!noupscalebossrush:
+
+lui t2, $80ff
+lbu t3, $7718 (T2)
+sll t3, t3, $8
+add t3, t2, t3
+lw t4, $771c (T3)
+lui at, $4080
+sw at, $002c (T4)
+sw at, $0030 (T4)
+sw at, $0034 (T4)
+//hit box
+
+
+!checkkillbossrush:
+lui t5, $80ff
+lbu t4, $771a (T5)
+beq t4, r0, !checkothersbossrush
+nop
+addiu t4, t4, $ffff
+beq r0, r0, !reuniafasbuzfaszuf
+sb t4, $771a (T5)
+!checkothersbossrush:
+sb r0, $7719 (T5)
+
+lui t0, $80ff
+!bossrushloopcopy:
+lbu t3, $7719 (T0)
+beq t3, r0, !bossrushloopcopyend
+nop
+sb t3, $7718 (T5)
+addiu at, r0, $00a0
+sb at, $771a (T5)
+!bossrushloopcopyend:
+addiu t0, t0, $0100
+lui t1, $80ff
+ori t1, t1, $1b00
+bne t0, t1, !bossrushloopcopy
+nop
+
+
+
+beq r0, r0, !reuniafasbuzfaszuf
+nop
+
+
+
+!tagmode:
+lui t0, $80ff
+lbu t1, $7700 (T0)
+addiu at, r0, $1
+bne t1, at, !dontcontrolgameTAGcheckelse
+nop
+lbu t1, $7718 (T0)
+bne t1, r0, !dontcontrolgameTAG
+nop
+addiu at, r0, $1
+sb at, $7718 (T0)
+sb at, $7719 (T0)
+!dontcontrolgameTAG:
+beq r0, r0, !reunitenotcontrollsafiuasfTAG
+nop
+!dontcontrolgameTAGcheckelse:
+lui t0, $80ff
+lhu t1, $7718 (T0)
+bne t1, r0, !reunitenotcontrollsafiuasfTAG
+nop
+lhu t2, $7818 (T0)
+sh t2, $7718 (T0)
+!reunitenotcontrollsafiuasfTAG:
+lui a0, $8036
+lw a0, $1158 (A0)
+beq a0, r0, !skipspawntag
+nop
+lw t1, $0154 (A0)
+andi t1, t1, $3
+bne t1, r0, !skipspawntag
+nop
+addiu a1, r0, $0
+lui a2, $1300
+jal $29edcc
+ori a2, a2, $2Af0
+lui t0, $80ff
+lbu t1, $7718 (T0)
+lbu t3, $7700 (T0)
+beq t1, t3, !skipspawntag
+nop
+addiu t1, t1, $ffff
+sll t1, t1, $8
+add t0, t0, t1
+
+lh t1, $7804 (T0)
+mtc1 t1, f2
+cvt.s.w f2, f2
+swc1 f2, $00a0 (V0)
+lh t1, $7806 (T0)
+mtc1 t1, f4
+cvt.s.w f4, f4
+lui at, $41f0
+mtc1 at, f8
+add.s f4, f4, f8
+swc1 f4, $00a4 (V0)
+lh t1, $7808 (T0)
+mtc1 t1, f6
+cvt.s.w f6, f6
+swc1 f6, $00a8 (V0)
+
+
+!skipspawntag:
+lui t0, $80ff
+lbu t1, $7718 (T0)
+lbu t2, $7700 (T0)
+bne t1, t2, !dontbeitTAG
+nop
+sb t1, $7719 (T0)
+lbu t3, $771b (T0)
+beq t3, r0, !youpassTAG
+nop
+addiu t3, t3, $ffff
+sb t3, $771b (T0)
+bne t3, r0, !reuniafasbuzfaszuf
+nop
+!youpassTAG:
+lui t0, $80ff
+!checkcollisionTAG:
+lui t1, $80ff
+lbu t1, $7700 (T1)
+lbu t2, $7800 (T0)
+beq t1, t2, !thisisnotaliveTAG
+nop
+lw t2, $781c (T0)
+beq t2, r0, !thisisnotaliveTAG
+nop
+sw t0, $0018 (SP)
+or a1, t2, r0
+lui a0, $8036
+jal $29E2F8
+lw a0, $1158 (A0)
+lw t0, $0018 (SP)
+lui at, $42c8
+mtc1 at, f4
+c.lt.s f0, f4
+nop
+bc1f !thisisnotaliveTAG
+nop
+lbu t3, $7800 (T0)
+lui t1, $80ff
+sb t3, $7719 (T1)
+sb t3, $7718 (T1)
+addiu at, r0, $0020
+sb at, $7717 (T1)
+
+!thisisnotaliveTAG:
+addiu t0, t0, $0100
+lui t1, $80ff
+addiu t1, t1, $1b00
+bne t1, t0, !checkcollisionTAG
+nop
+beq r0, r0, !reuniafasbuzfaszuf
+nop
+
+!dontbeitTAG:
+lui t0, $80ff
+lbu t3, $7717 (T0)
+beq t3, r0, !updatetagguynowTAG
+nop
+addiu t3, t3, $ffff
+sb t3, $7717 (T0)
+bne t3, r0, !reuniafasbuzfaszuf
+nop
+!updatetagguynowTAG:
+lbu t2, $7718 (T0)
+addiu t2, t2, $ffff
+sll t3, t2, $8
+add t1, t0, t3
+lbu t4, $7819 (T1)
+lbu t5, $771a (T0)
+sb t4, $7718 (T0)
+sb t4, $771a (T0)
+bne t5, t4, !reuniafasbuzfaszuf
+nop
+addiu at, r0, $0020
+sb at, $771b (T0)
+beq r0, r0, !reuniafasbuzfaszuf
+nop
+
+!hide&seek:
+
+
+beq r0, r0, !reuniafasbuzfaszuf
+nop
+
+//7710 goals + goal variables
+//7714 level to do the goals in
+
+//7716 goals finished so far
+//7718 timer before next round starts (start round at 0x00a0 and end round at 0x0eb0)
+//771a points for this player
+//771b has game started?
+
+//database for this at 910000 in ram
+//delete useless strings in level select menu from original game
+//tell tarnadas to store a random value at 8038eee0 when you select game mode 8(2 byte)
+
+//mission isnt resetting for p1, warps arent global
+!warioware:
+lui t0, $8091
+addiu t1, r0, $5
+sb t1, $02ff (T0)
+
+lui t0, $8020
+lbu t1, $770b (T0)
+ori t1, t1, $1
+sb t1, $770b (T0)
+lbu t1, $777b (T0)
+ori t1, t1, $1
+sb t1, $777b (T0)
+lbu t1, $77eb (T0)
+ori t1, t1, $1
+sb t1, $77eb (T0)
+lbu t1, $785b (T0)
+ori t1, t1, $1
+sb t1, $785b (T0)
+lui at, $ffff
+ori at, at, $ffff
+sw at, $7858 (T0)
+sw at, $785c (T0)
+sw at, $7860 (T0)
+sw at, $7864 (T0)
+sw at, $7868 (T0)
+sw at, $786c (t0)
+sw at, $7870 (t0)
+sw at, $7874 (t0)
+sw at, $7878 (t0)
+sw at, $787c (t0)
+sw at, $7880 (t0)
+lui t0, $8033
+addiu at, r0, $4
+sh at, $ddf4 (T0)
+
+lui t0, $80ff
+lbu t1, $7700 (T0)
+addiu at, r0, $1
+bne t1, at, !dontcontrolgameWW
+nop
+lbu t2, $771b (T0)
+beq t2, r0, !nochallengestartWW
+nop
+lhu t2, $7718 (T0)
+addiu at, r0, $0042
+bne t2, at, !nochallengestartWW
+nop
+sw r0, $7710 (T0)
+
+
+
+!newgoalspleaseWW:
+jal $383bb0
+nop
+andi v0, v0, $000f
+addiu at, r0, $1
+sllv at, at, v0
+lui t0, $80ff
+sh at, $7710 (T0)
+
+jal $383bb0
+nop
+andi v0, v0, $000f
+addiu at, r0, $1
+sllv at, at, v0
+lui t0, $80ff
+lhu t1, $7710 (T0)
+or t1, t1, at
+sh t1, $7710 (T0)
+andi t2, t1, $03FF
+beq t2, r0, !newgoalspleaseWW
+nop
+
+andi t2, t1, 0xfC00
+sh t2, $7716 (T0)
+
+jal $383bb0
+nop
+lui t0, $80ff
+sh v0, $7712 (T0)
+
+
+!newlevelID:
+jal $383bb0
+nop
+andi v0, v0, $001f
+lui t0, $8091
+add v0, v0, t0
+lbu t1, $0000 (V0)
+lui t0, $80ff
+sb t1, $7714 (T0)
+
+beq r0, r0, !showgoals
+nop
+!nochallengestartWW:
+lhu t1, $7718 (T0)
+slti at, t1, $00f0
+beq at, r0, !checkgoals
+nop
+addiu at, r0, $0040
+bne at, t1, !showgoals
+nop
+addiu at, r0, $1
+sb at, $771b (T0)
+beq r0, r0, !showgoals
+nop
+
+!dontcontrolgameWW:
+lw t1, $7810 (T0)
+sw t1, $7710 (T0)
+lbu t1, $7814 (T0)
+sb t1, $7714 (T0)
+lbu t1, $781b (T0)
+sb t1, $771b (T0)
+bne t1, r0, !checkgoalsplebs
+nop
+lui t0, $80ff
+lbu a3, $5fec (T0)
+beq a3, r0, !noprintwinWW
+nop
+addiu a0, r0, $0020
+addiu a1, r0, $0020
+lui a2, $8091
+jal $2d62d8
+ori a2, a2, $0240
+lui t0, $80ff
+!noprintwinWW:
+sh r0, $7718 (T0)
+beq r0, r0, !showgoals
+nop
+!checkgoalsplebs:
+lhu t1, $7718 (T0)
+bne t1, r0, !checkgoals
+nop
+addiu at, r0, $004a
+sh at, $7718 (T0)
+!checkgoals:
+lui t0, $80ff
+ori t1, t0, $1b00
+!loopcheckgoalsWW:
+lhu t2, $5c10 (T1)
+lhu t3, $7716 (T0)
+bne t2, t3, !pastgoalsww
+nop
+lbu t3, $7700 (T0)
+sb r0, $5fec (T0)
+lhu t4, $7718 (t0)
+slti at, t4, $0050
+bne at, r0, !noyoudontwinWW
+nop
+lbu t4, $771a (T0)
+addiu t4, t4, $1
+sb t4, $771a (T0)	//THIS WONT WORK IF P1 SCORES BECAUSE IT CHANGES GAME MODE FOR EVERYONE ELSE
+lui t0, $80ff
+sb t3, $5fec (T0)	//last player that won byte
+sh r0, $7718 (T0)
+!noyoudontwinWW:
+lui a0, $8033
+ori a0, a0, $b170
+jal $24A9CC
+addiu a1, r0, $0016
+lui t0, $80ff
+sb r0, $771b (T0)
+beq r0, r0, !reuniafasbuzfaszuf
+nop
+!pastgoalsww:
+addiu t0, t0, $0100
+bne t0, t1, !loopcheckgoalsWW
+nop
+lui t0, $80ff
+//disable buttons if the timer is smaller
+lhu t1, $7718 (T0)
+addiu at, r0, $00e0
+bne t1, at, !nowarpstart
+nop
+//make it warp, assuming you are in the level select menu
+lbu t1, $7714 (T0)
+lui t2, $8039
+sw t1, $be24 (T2)
+addiu t1, r0, $1
+sh t1, $be20 (T2)
+lw t1, $be28 (T2)
+lw t3, $0004 (T1)
+lui at, $8016
+ori at, at, $f5b0
+bne t3, at, !dontwarpmearu9asfhdWW
+nop
+
+
+lbu t3, $0001 (T1)
+addu t3, t3, t1
+sw t3, $be28 (T2)
+!dontwarpmearu9asfhdWW:
+sw r0, $5f80 (T0)	//5f80 is enemies beaten (1byte)
+sw r0, $5f84 (T0)
+sw r0, $5f88 (T0)
+sw r0, $5f8c (T0) 
+sw r0, $5f90 (T0)
+sw r0, $5f94 (T0)
+sw r0, $5f98 (T0)//these store temp values
+ori at, r0, $fc00 //the bits that correspond to "dont do X or Y" goals
+lhu t3, $7710 (T0)
+and at, at, t3
+sh at, $7716 (T0)
+!nowarpstart:
+//check if objectives are fulfilled or rules broken
+//round restarts if it took less than 3 frames
+lhu t1, $7710 (T0)
+andi t1, t1, $0200
+beq t1, r0, !dontcheckcoinsWW
+nop
+lui t1, $8034
+lhu t1, $b262 (T1)
+lhu a3, $7712 (T0)
+andi a0, a3, $0040
+addiu a3, r0, $0014
+beq a0, r0, !skipcoinWW2
+nop
+addiu a3, r0, $001e
+!skipcoinWW2:
+slt at, t1, a3
+bne at, r0, !dontcheckcoinsWW
+nop
+lhu t2, $7716 (T0)
+ori t2, t2, $0200
+sh t2, $7716 (T0)
+!dontcheckcoinsWW:
+
+
+lhu t1, $7710 (T0)
+andi t1, t1, $1
+beq t1, r0, !dontcheckredsWW
+nop
+lhu t1, $7712 (T0)
+andi t1, t1, $0003
+addiu t1, t1, $0001
+
+lui t2, $8036
+lbu t2, $13fe (T2)
+slt at, t2, t1
+bne at, r0, !dontcheckredsWW
+nop
+lhu t2, $7716 (T0)
+ori t2, t2, $1
+sh t2, $7716 (T0)
+!dontcheckredsWW:
+
+lhu t1, $7710 (T0)
+andi t1, t1, $100
+beq t1, r0, !dontcheckstarsWW
+nop
+lui t2, $8036
+lw t2, $1158 (T2)
+beq t2, r0, !dontcheckstarsWW
+nop
+lw t3, $0078 (T2)
+beq t3, r0, !dontcheckstarsWW
+nop
+lw t4, $0130 (T3)
+ori at, r0, $1000
+bne t4, at, !dontcheckstarsWW
+nop
+lbu t3, $0188 (T3)
+addiu t3, t3, $1
+lhu t1, $7712 (T0)
+andi t1, t1, $0700
+srl t1, t1, $8
+bne t1, t3, !dontcheckstarsWW
+nop
+
+lhu t2, $7716 (T0)
+ori t2, t2, $100
+sh t2, $7716 (T0)
+!dontcheckstarsWW:
+
+
+
+lhu t1, $7710 (T0)
+andi t1, t1, $2
+beq t1, r0, !dontcheckenemiesWW
+nop
+lui t1, $8033
+ori t1, t1, $d488
+lui t2, $8036
+ori t2, t2, $0e88
+!checkallenemiesWW:
+lh t3, $0074 (t1)
+beq t3, r0, !dontcheckthisoneWW
+nop
+lw t4, $014c (T1)
+slti t3, t4, $0060
+beq t3, r0, !freepassWW
+nop
+lw t3, $0134 (T1)
+ori t4, r0, $c003
+bne t3, t4, !dontcheckthisoneWW
+nop
+ori t3, r0, $c004
+sw t3, $0134 (T1)
+!freepassWW:
+sh r0, $0074 (T1)
+lbu t3, $5f80 (T0)
+addiu t3, t3, $1
+sb t3, $5f80 (T0)
+!dontcheckthisoneWW:
+addiu t1, t1, $260
+bne t1, t2, !checkallenemiesWW
+nop
+lhu t1, $7712 (T0)
+andi t1, t1, $000c
+srl t1, t1, $2
+
+lbu t3, $5f80 (T0)
+slt at, t3, t1
+bne at, r0, !dontcheckenemiesWW
+nop
+lhu t2, $7716 (T0)
+ori t2, t2, $2
+sh t2, $7716 (T0)
+!dontcheckenemiesWW:
+
+
+
+
+lhu t1, $7710 (T0)
+andi t1, t1, $4
+beq t1, r0, !dontcheckpolesWW
+nop
+lui t1, $8034
+lw t1, $b17c (T1)
+lui at, $0010
+ori at, at, $0340
+and t1, at, t1
+bne at, t1, !notthispoleWW
+nop
+lui t2, $8036
+lw t2, $1158 (T2)
+beq t2, r0, !dontcheckpolesWW
+nop
+lw t3, $0078 (T2)
+lw t4, $5f84 (T0)
+beq t4, t3, !notthispoleWW
+nop
+bne t4, r0, !poleonecheckWW
+nop
+sw t3, $5f84 (T0)
+beq r0, r0, !notthispoleWW
+nop
+!poleonecheckWW:
+lhu t2, $7716 (T0)
+ori t2, t2, $4
+sh t2, $7716 (T0)
+!notthispoleWW:
+!dontcheckpolesWW:
+
+lhu t1, $7710 (T0)
+andi t1, t1, $8
+beq t1, r0, !dontcheckplatformsWW
+nop
+lhu t1, $7712 (T0)
+andi t1, t1, $0030
+srl t1, t1, $4
+
+LUI T6, 0x8036
+LW T6, 0x1158 (T6)
+beq t6, r0, !dontcheckplatformsWW
+nop
+LW T7, 0x0214 (T6)
+beq t7, r0, !dontcheckplatformsWW
+nop
+lw t3, $5f88 (T0)
+beq t7, t3, !dontcheckplatformsWW
+nop
+bne t3, r0, !checkoneplatformWW
+nop
+sw t7, $5f88 (T0)
+bne t1, r0, !dontcheckplatformsWW
+nop
+lhu t2, $7716 (T0)
+ori t2, t2, $8
+sh t2, $7716 (T0)
+beq r0, r0, !dontcheckplatformsWW
+nop
+!checkoneplatformWW:
+lw t3, $5f8c (T0)
+beq t7, t3, !dontcheckplatformsWW
+nop
+bne t3, r0, !checktwoplatformWW
+nop
+sw t7, $5f8c (T0)
+addiu at, r0, $1
+bne t1, at, !dontcheckplatformsWW
+nop
+lhu t2, $7716 (T0)
+ori t2, t2, $8
+sh t2, $7716 (T0)
+beq r0, r0, !dontcheckplatformsWW
+nop
+!checktwoplatformWW:
+lhu t2, $7716 (T0)
+ori t2, t2, $8
+sh t2, $7716 (T0)
+!dontcheckplatformsWW:
+
+
+
+
+
+lhu t1, $7710 (T0)
+andi t1, t1, $10
+beq t1, r0, !dontcheckitemWW
+nop
+lui t2, $8034
+lw t2, $B1EC (T2)
+beq t2, r0, !dontcheckitemWW
+nop
+lhu t2, $7716 (T0)
+ori t2, t2, $10
+sh t2, $7716 (T0)
+!dontcheckitemWW:
+
+
+lhu t1, $7710 (T0)
+andi t1, t1, $20
+beq t1, r0, !dontchecktripleWW
+nop
+lui t2, $8034
+lw t2, $B17c (T2)
+lui at, $0100
+ori at, at, $0882
+bne t2, at, !dontchecktripleWW
+nop
+lhu t2, $7716 (T0)
+ori t2, t2, $20
+sh t2, $7716 (T0)
+!dontchecktripleWW:
+
+
+lhu t1, $7710 (T0)
+andi t1, t1, $40
+beq t1, r0, !dontcheckwallkickWW
+nop
+lui t2, $8034
+lhu t5, $b19e (T2)
+lw t3, $b1b0 (T2)
+lw t4, $b1e0 (T2)
+bne t3, t4, !noreset
+nop
+sb r0, $5f81 (T0)
+addiu at, r0, $7777
+sh at, $5f82 (T0)
+!noreset:
+lw t2, $B17c (T2)
+lui at, $0300
+ori at, at, $0886
+bne t2, at, !dontcheckwallkickWW
+nop
+lhu t6, $5f82 (T0)
+beq t6, t5, !dontcheckwallkickWW
+nop
+addiu at, r0, $7777
+sh t5, $5f82 (T0)
+beq at, t6, !dontcheckwallkickWW
+nop
+
+lhu t2, $7716 (T0)
+ori t2, t2, $40
+sh t2, $7716 (T0)
+!dontcheckwallkickWW:
+
+
+lhu t1, $7710 (T0)
+andi t1, t1, $80
+beq t1, r0, !dontcheckfalldamageWW
+nop
+lui t2, $8034
+lw t2, $B17c (T2)
+lui at, $0002
+ori at, at, $0460
+beq t2, at, !dontcheckfalldamage2WW
+nop
+lui at, $0002
+ori at, at, $0461
+bne t2, at, !dontcheckfalldamageWW
+nop
+!dontcheckfalldamage2WW:
+lhu t2, $7716 (T0)
+ori t2, t2, $80
+sh t2, $7716 (T0)
+!dontcheckfalldamageWW:
+//program in sideconditions
+lhu t1, $7710 (T0)
+andi t1, t1, $0400
+beq t1, r0, !dontdisablebuttonWW
+nop
+lhu t3, $7712 (T0)
+andi t3, t3, $0c00
+srl t3, t3, 0x0A
+ori t5, r0, $4000
+beq t3, r0, !noBbutton
+nop
+ori t5, r0, $2000
+addiu at, r0, $1
+beq t3, at, !noZbutton
+nop
+ori t5, r0, $000f
+!noBbutton:
+!noZbutton:
+lui at, $8034
+lhu t3, $afa0 (AT)
+or t3, t3, t5
+sh t3, $afa0 (AT)
+!dontdisablebuttonWW:
+lhu t1, $7710 (T0)
+andi t1, t1, $0800
+beq t1, r0, !dontmakethegroundhotWW
+nop
+lui t2, $8034
+lw t3, $b17c (T2)
+lui t4, $0400
+ori t4, t4, $0440
+bne t3, t4, !notthathowWW
+nop
+lw t3, $b1b0 (T2)
+lw t4, $b1e0 (T2)
+beq t3, t4, !itshotWW
+nop
+sb r0, $5f90 (T0)
+!itshotWW:
+lbu t3, $5f90 (T0)
+addiu t3, t3, $1
+sb t3, $5f90 (T0)
+addiu at, r0, $0010
+bne t3, at, !notthathowWW
+nop
+sb r0, $5f90 (T0)
+lui at, $0102
+ori at, at, $08B7
+lui t2, $8034
+sw at, $b17c (T2)
+addiu at, r0, $000c
+sb at, $b222 (t2)
+lui at, $4248
+sw at, $b1bc (T2)
+!notthathowWW:
+!dontmakethegroundhotWW:
+lhu t1, $7710 (T0)
+andi t1, t1, $1000
+beq t1, r0, !dontdothatactionWW
+nop
+lhu t3, $7712 (T0)
+andi t3, t3, $7000
+srl t3, t3, $C
+lui at, $0300
+ori at, at, $0888
+beq t3, r0, !thisoneWW
+nop
+lui at, $0300
+ori at, at, $0886
+addiu t2, r0, $1
+beq t3, t2, !thisoneWW
+nop
+lui at, $0188
+ori at, at, $088A
+addiu t2, r0, $2
+beq t3, t2, !thisoneWW
+nop
+lui at, $0188
+ori at, at, $088A
+addiu t2, r0, $3
+beq t3, t2, !withnodamageWW
+nop
+lui at, $0300
+ori at, at, $0881
+addiu t2, r0, $4
+beq t3, t2, !thisoneWW
+nop
+!withnodamageWW:
+lui t2, $8034
+lbu t2, $b222 (T2)
+bne t2, r0, !respawnmarioWW
+nop
+beq r0, r0, !dontdothatactionWW
+nop
+!thisoneWW:
+lui t3, $8034
+lw t3, $b17c (T3)
+beq t3, at, !respawnmarioWW
+nop
+!dontdothatactionWW:
+beq r0, r0, !showgoals
+nop
+!respawnmarioWW:
+lui t2, $8034
+sh r0, $b21e (T2)
+
+
+!showgoals:
+lui t0, $80ff
+lhu t1, $7718 (T0)
+addiu t1, t1, $1
+sh t1, $7718 (T0)
+
+addiu v1, r0, $1
+
+
+
+//print texts but only if you havent finished the objective
+lhu t1, $7710 (T0)
+lhu t2, $7716 (T0)
+xor t1, t1, t2
+andi t1, t1, $1
+beq t1, r0, !dontshowtext1
+nop
+lhu t1, $7712 (T0)
+andi t1, t1, $0003
+addiu a3, t1, $0001
+addiu v1, v1, $0020
+addiu a0, r0, $0011
+addiu a1, v1, $0009
+lui a2, $8091
+jal $2d62d8
+addiu a2, a2, $0020
+!dontshowtext1:
+
+lui t0, $80ff
+lhu t1, $7710 (T0)
+lhu t2, $7716 (T0)
+xor t1, t1, t2
+andi t1, t1, $2
+beq t1, r0, !dontshowtext2
+nop
+lhu t1, $7712 (T0)
+andi t1, t1, $000c
+srl t1, t1, $2
+addiu at, r0, $3
+bne at, t1, !skipenemymaxWW
+nop
+addiu t1, r0, $2
+
+lhu t2, $7712 (T0)
+andi t2, t2, $fff3
+addiu t2, t2, $0008
+sh t2, $7712 (t0)
+!skipenemymaxWW:
+addiu a3, t1, $0001
+
+
+
+
+addiu v1, v1, $0020
+addiu a0, r0, $0011
+addiu a1, v1, $0009
+lui a2, $8091
+jal $2d62d8
+addiu a2, a2, $0040
+!dontshowtext2:
+
+lui t0, $80ff
+lhu t1, $7710 (T0)
+lhu t2, $7716 (T0)
+xor t1, t1, t2
+andi t1, t1, $4
+beq t1, r0, !dontshowtext4
+nop
+addiu v1, v1, $0020
+addiu a0, r0, $0011
+addiu a1, v1, $0009
+lui a2, $8091
+jal $2d62d8
+addiu a2, a2, $0060
+!dontshowtext4:
+
+lui t0, $80ff
+lhu t1, $7710 (T0)
+lhu t2, $7716 (T0)
+xor t1, t1, t2
+andi t1, t1, $8
+beq t1, r0, !dontshowtext8
+nop
+
+lhu t1, $7712 (T0)
+andi t1, t1, $0030
+srl t1, t1, $4
+addiu at, r0, $3
+bne at, t1, !skipplatformWW
+nop
+addiu t1, r0, $2
+
+lhu t2, $7712 (T0)
+andi t2, t2, $ffcf
+addiu t2, t2, $0020
+sh t2, $7712 (t0)
+!skipplatformWW:
+addiu a3, t1, $0001
+
+
+addiu v1, v1, $0020
+addiu a0, r0, $0011
+addiu a1, v1, $0009
+lui a2, $8091
+jal $2d62d8
+addiu a2, a2, $0080
+!dontshowtext8:
+
+lui t0, $80ff
+lhu t1, $7710 (T0)
+lhu t2, $7716 (T0)
+xor t1, t1, t2
+andi t1, t1, $10
+beq t1, r0, !dontshowtext10
+nop
+addiu v1, v1, $0020
+addiu a0, r0, $0011
+addiu a1, v1, $0009
+lui a2, $8091
+jal $2d62d8
+addiu a2, a2, $00a0
+!dontshowtext10:
+
+lui t0, $80ff
+lhu t1, $7710 (T0)
+lhu t2, $7716 (T0)
+xor t1, t1, t2
+andi t1, t1, $20
+beq t1, r0, !dontshowtext20
+nop
+addiu v1, v1, $0020
+addiu a0, r0, $0011
+addiu a1, v1, $0009
+lui a2, $8091
+jal $2d62d8
+addiu a2, a2, $00c0
+!dontshowtext20:
+
+
+lui t0, $80ff
+lhu t1, $7710 (T0)
+lhu t2, $7716 (T0)
+xor t1, t1, t2
+andi t1, t1, $40
+beq t1, r0, !dontshowtext40
+nop
+addiu v1, v1, $0020
+addiu a0, r0, $0011
+addiu a1, v1, $0009
+lui a2, $8091
+jal $2d62d8
+addiu a2, a2, $00e0
+!dontshowtext40:
+
+lui t0, $80ff
+lhu t1, $7710 (T0)
+lhu t2, $7716 (T0)
+xor t1, t1, t2
+andi t1, t1, $80
+beq t1, r0, !dontshowtext80
+nop
+addiu v1, v1, $0020
+addiu a0, r0, $0011
+addiu a1, v1, $0009
+lui a2, $8091
+jal $2d62d8
+addiu a2, a2, $0100
+!dontshowtext80:
+
+lui t0, $80ff
+lhu t1, $7710 (T0)
+lhu t2, $7716 (T0)
+xor t1, t1, t2
+andi t1, t1, $100
+beq t1, r0, !dontshowtext100
+nop
+
+lhu t1, $7712 (T0)
+andi t1, t1, $0700
+srl t1, t1, $8
+addiu at, r0, $7
+bne at, t1, !skipstarWW
+nop
+addiu t1, r0, $6
+
+lhu t2, $7712 (T0)
+andi t2, t2, $f8ff
+addiu t2, t2, $0600
+sh t2, $7712 (t0)
+!skipstarWW:
+or a3, t1, r0
+addiu v1, v1, $0020
+addiu a0, r0, $0011
+addiu a1, v1, $0009
+lui a2, $8091
+jal $2d62d8
+addiu a2, a2, $0120
+!dontshowtext100:
+
+lui t0, $80ff
+lhu t1, $7710 (T0)
+lhu t2, $7716 (T0)
+xor t1, t1, t2
+andi t1, t1, $200
+beq t1, r0, !dontshowtext200
+nop
+
+lhu a3, $7712 (T0)
+andi a0, a3, $0040
+addiu a3, r0, $0014
+beq a0, r0, !skipcoinWW
+nop
+addiu a3, r0, $001e
+!skipcoinWW:
+
+addiu v1, v1, $0020
+addiu a0, r0, $0011
+addiu a1, v1, $0009
+lui a2, $8091
+jal $2d62d8
+addiu a2, a2, $0140
+!dontshowtext200:
+
+lui t0, $80ff
+lhu t1, $7710 (T0)
+andi t1, t1, $400
+beq t1, r0, !dontshowtext400
+nop
+addiu v1, v1, $0020
+addiu a0, r0, $0011
+addiu a1, v1, $0009
+lui a2, $8091
+addiu a2, a2, $0160
+lui t3, $80ff
+lhu t3, $7712 (T3)
+andi t3, t3, $0c00
+srl t3, t3, 0x0A
+addiu at, r0, $3
+bne at, t3, !skipbuttonWW
+nop
+addiu t3, r0, $2
+
+lhu t2, $7712 (T0)
+andi t2, t2, $f3FF
+addiu t2, t2, $0800
+sh t2, $7712 (t0)
+
+!skipbuttonWW:
+sll t3, t3, $5
+jal $2d62d8
+add a2, a2, t3
+!dontshowtext400:
+
+lui t0, $80ff
+lhu t1, $7710 (T0)
+andi t1, t1, $800
+beq t1, r0, !dontshowtext800
+nop
+addiu v1, v1, $0020
+addiu a0, r0, $0011
+addiu a1, v1, $0009
+lui a2, $8091
+jal $2d62d8
+addiu a2, a2, $01c0
+!dontshowtext800:
+
+lui t0, $80ff
+lhu t1, $7710 (T0)
+andi t1, t1, $1000
+beq t1, r0, !dontshowtext1000
+nop
+lhu t3, $7712 (T0)
+andi t3, t3, $7000
+srl t3, t3, $C
+slti at, t3, $5
+bne at, r0, !skipactionWW
+nop
+addiu t3, r0, $4
+
+lhu t2, $7712 (T0)
+andi t2, t2, $8fff
+addiu t2, t2, $4000
+sh t2, $7712 (t0)
+
+!skipactionWW:
+sll t3, t3, $4
+addiu v1, v1, $0020
+addiu a0, r0, $0011
+addiu a1, v1, $0009
+lui a2, $8091
+addiu a2, a2, $01e0
+jal $2d62d8
+add a2, a2, t3
+!dontshowtext1000:
+//warp back and activate level select debug, if not in
+
+lui t0, $8033
+sb r0, $d58c (T0)
+
+lui t0, $80ff
+lhu t1, $7718 (T0)
+slti at, t1, $00d0
+beq at, r0, !dontdisableWW
+nop
+lui t1, $8034
+sw r0, $afa0 (T1)
+addiu at, r0, $1000
+sh at, $afa0 (T1)
+lbu t1, $7714 (T0)
+lui at, $8033
+sh t1, $ddf8 (AT)
+lui t0, $8033
+addiu t1, r0, $0001
+sb t1, $d58c (T0)
+//kill the texts on the beta level select here
+lui t2, $801a
+sb r0, $7860 (T2)
+sb r0, $7870 (T2)
+sb r0, $7880 (T2)
+sb r0, $7890 (T2)
+sb r0, $78a0 (T2)
+sb r0, $78b0 (T2)
+sb r0, $78c0 (T2)
+sb r0, $78d0 (T2)
+sb r0, $78e0 (T2)
+sb r0, $78f0 (T2)
+sb r0, $7900 (T2)
+sb r0, $7910 (T2)
+sb r0, $7920 (T2)
+sb r0, $7930 (T2)
+sb r0, $7940 (T2)
+sb r0, $7950 (T2)
+sb r0, $7960 (T2)
+sb r0, $7970 (T2)
+sb r0, $7980 (T2)
+sb r0, $7990 (T2)
+sb r0, $79a0 (T2)
+sb r0, $79b0 (T2)
+sb r0, $79c0 (T2)
+sb r0, $79d0 (T2)
+sb r0, $79e0 (T2)
+sb r0, $79f0 (T2)
+sb r0, $7a00 (T2)
+sb r0, $7a10 (T2)
+sb r0, $7a30 (T2)
+sb r0, $7a40 (T2)
+sb r0, $7a60 (T2)
+sb r0, $7c40 (T2)
+sb r0, $7c50 (T2)
+sb r0, $7c60 (T2)
+sb r0, $7c64 (T2)
+!dontdisableWW:
+
+
+beq r0, r0, !reuniafasbuzfaszuf
+nop
+
+
+
+!interactionless:
+!regular:
+!reuniafasbuzfaszuf:
+lw ra, $0014 (SP)
+jr ra
+addiu sp, sp, $0024
