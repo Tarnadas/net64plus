@@ -1,0 +1,26 @@
+.org 0x000
+!main:
+lui t0, $80ff
+lbu t1, $5ff4 (T0)
+addiu at, r0, $5
+bne at, t1, !skip
+nop
+lbu t1, $7718 (T0)
+lbu t2, $7700 (T0)
+bne t1, t2, !skip
+nop
+lui t1, $8036
+lw t1, $1158 (T1)
+lui at, $4080
+mtc1 at, f2
+lwc1 f4, $002c (T1)
+mul.s f4, f4, f2
+swc1 f4, $002c (T1)
+swc1 f4, $0034 (T1)
+
+lwc1 f6, $0030 (T1)
+mul.s f6, f6, f2
+swc1 f6, $0030 (T1)
+!skip:
+jr a3
+nop

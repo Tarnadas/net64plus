@@ -1,0 +1,158 @@
+.org 0x0000
+!main:
+addiu sp, sp, $ffe4
+sw ra, $14 (SP)
+lui t0, $8036
+lw t7, $1160 (T0)
+lbu t2, $0188 (T7)
+sll t2, t2, $08
+lui t1, $80ff
+add t1, t1, t2
+lbu t9, $770e (T1)
+lhu t8, $770c (T1)
+andi t8, t8, $ff0f
+lui t6, $80ff
+lhu t6, $770c (T6)
+andi t6, t6, $ff0f
+bne t8, t6, !nonsolid
+nop
+
+
+lbu t1, $7701 (T1)
+addiu t8, r0, $0
+addiu at, r0, $4
+bne at, t9, !notwario
+nop
+addiu t8, r0, $1
+!notwario:
+lw t9, $0180 (T7)
+add t9, t9, t8
+sw t9, $0180 (t7)
+lui t3, $80ff
+lbu t8, $5ff4 (t3)
+addiu at, r0, $0005
+bne at, t8, !regularbox
+nop
+lbu at, $7718 (T3)
+lbu t2, $0188 (T7)
+bne t2, at, !regularbox
+nop
+addiu t9, t9, $3
+sw t9, $0180 (T7)
+!regularbox:
+sll t1, t1, $2
+add t0, t3, t1
+addiu t0, t0, $2000
+lw t0, $7400 (T0)
+ori at, r0, $8000
+bne t0, at, !dontset
+nop
+sw r0, $0180 (T7)
+lw t1, $0134 (T7)
+ori at, r0, $c003
+bne t1, at, !dontset
+nop
+lui t0, $8034
+lui at, $4268
+sw at, $b1bc (T0)
+lui at, $1080
+ori at, at, $08A4
+sw at, $b17c (T0)
+ori t0, r0, $8000
+!dontset:
+sw t0, $0130 (T7)
+ori at, r0, $0008
+bne at, t0, !noexpansion
+nop
+lui a0, $80ff
+lbu a0, $5ff4 (a0)
+addiu at, r0, $0003
+beq at, a0, !noexpansion
+nop
+lw t1, $00d4 (T7)
+sw t1, $00c8 (T7)
+sw t7, $0018 (SP)
+addiu a1, r0, $0000
+or a0, t7, r0
+lui a2, $00ff
+jal $29edcc
+ori a2, a2, $9e80
+lw t7, $0018 (SP)
+lbu t2, $0188 (T7)
+sb t2, $0188 (V0)
+!noexpansion:
+lui t1, $4000
+bne t1, t0, !end
+nop
+lui t2, $8034
+lwc1 f2, $b1b0 (T2)
+lwc1 f4, $b1bc (T2)
+mtc1 r0, f8
+c.lt.s f4, f8
+nop
+bc1f !end
+nop
+lui at, $42c8
+mtc1 at, f4
+sub.s f2, f2, f4
+lwc1 f6, $00a4 (T7)
+c.lt.s f2, f6
+nop
+bc1t !end
+nop
+addiu at, r0, $0080
+sw at, $0130 (T7)
+sw r0, $0180 (T7)
+!end:
+lui t0, $8036
+lw t7, $1160 (T0)
+
+
+lbu t2, $0188 (T7)
+sll t2, t2, $08
+lui t1, $80ff
+add t1, t1, t2
+lhu t8, $770c (T1)
+
+andi t8, t8, $0040
+beq t8, r0, !nonmetalasnfiunsaf
+nop
+addiu at, r0, $0008
+sw at, $0130 (T7)
+!nonmetalasnfiunsaf:
+lw t1, $0134 (T7)
+ori at, r0, $a000
+bne at, t1, !skipplayid
+nop
+lbu t2, $0188 (T7)
+lui t3, $80ff
+sb t2, $5fef (T3)
+
+!skipplayid:
+sw r0, $0134 (T7)
+lui t2, $80ff
+lbu t2, $5ff4 (T2)
+addiu at, r0, $0003
+bne t2, at, !asbfuiasbzufasfasbzuf
+nop
+!nonsolid:
+addiu at, r0, $ffff
+sw at, $009c (t7)
+lui at, $8000
+sw at, $0130 (T7)
+!asbfuiasbzufasfasbzuf:
+lwc1 f2, $002c (T7)
+lui at, $4214
+mtc1 at, f4
+mul.s f4, f4, f2
+swc1 f2, $01f8 (T7)
+
+lui at, $4320
+mtc1 at, f4
+mul.s f4, f4, f2
+swc1 f2, $01fc (T7)
+
+
+lw ra, $14 (SP)
+jr ra
+addiu sp, sp, $001c

@@ -1,0 +1,182 @@
+//yoshi is at 80570000 to 80590E00 model size 2ac0
+
+.org 0x861c0
+!hook:
+addiu sp, sp, $ffe8
+sw ra, $14 (SP)
+jal $2ca6d0
+nop
+!endhook:
+lw ra, $14 (SP)
+jr ra
+addiu sp, sp, $0018
+
+.org 0x856d0
+!main:
+addiu sp, sp, $ffe8
+sw ra, $14 (SP)
+lui a2, $8040
+ori a2, a2, $0000	//RAM location, update 369F40 to write this in for your own characters
+lui t0, $800f
+ori t0, t0, $0860
+sub a3, a2, t0
+
+lui t0, $8033
+lw t0, $DDC4 (T0)
+lw t3, $0008 (T0)
+bne t3, r0, !nonewmodelset
+nop
+lw t1, $0004 (T0)
+or at, a2, r0
+addiu t9, at, $7ce8		//model size
+!loop:
+lw t2, $0000 (T1)
+lui t3, $ffff
+and t3, t2, t3
+lui t4, $800f
+bne t3, t4, !skipthisasbiufbau9sif
+nop
+add t2, t2, a3
+!skipthisasbiufbau9sif:
+sw t2, $0000 (AT)
+addiu at, at, $4
+addiu t1, t1, $4
+bne t9, at, !loop
+nop
+lui at, $8033
+lw at, $ddc4 (AT)
+or t0, a2, r0
+sw t0, $0008 (at)
+nop
+jal $277f50
+lui a0, $0400
+addiu a3, a2, $2000
+//addiu a3, a3, $4000
+lui at, $0003
+ori at, at, $6000		//bank 04 size
+add a1, a3, at
+!copyloop:
+lw t2, $0000 (v0)
+sw t2, $0000 (A3)
+addiu a3, a3, $4
+addiu v0, v0, $4
+bne a1, a3, !copyloop
+nop
+or a0, a2, r0
+addiu a1, a2, $3000		//model size again
+!loppsaf:
+lw t2, $0000 (A0)
+lui at, $ffff
+and at, at, t2
+lui t3, $0400
+beq t3, at, !fixthispointer
+nop
+lui t3, $0401
+beq t3, at, !fixthispointer
+nop
+lui t3, $0403
+beq t3, at, !fixthispointer
+nop
+lui t3, $0402
+bne t3, at, !dontfix
+nop
+!fixthispointer:
+jal $30FFF8
+nop
+!dontfix:
+addiu a0, a0, $4
+bne a0, a1, !loppsaf
+nop
+
+!nonewmodelset:
+lui a0, $8034
+lhu a0, $afa0 (A0)
+andi a0, a0, $0020
+beq a0, r0, !end
+nop
+addiu a1, r0, $0002
+lui a0, $8036
+lw a0, $1158 (A0)
+lui a2, $1300
+jal $29edcc
+addiu a2, a2, $2a48
+!end:
+lw ra, $14 (SP)
+jr ra
+addiu sp, sp, $018
+
+//803e92b0
+.org 0xCAFF8
+!fixDL:
+addiu sp, sp, $ffe8
+sw ra, $14 (SP)
+addiu a3, a2, $2000
+//addiu a3, a3, $4000
+lui at, $00ff
+ori at, at, $ffff
+and a3, a3, at
+lui at, $0400
+sub a3, a3, at
+add t2, t2, a3
+sw t2, $0000 (A0)
+lui t3, $8000
+or t3, t3, t2
+jal $3145D4
+nop
+lw ra, $14 (SP)
+jr ra
+addiu sp, sp, $0018
+
+
+.org 0xCF5D4
+!dasfihasbuf:
+addiu sp, sp, $ffe8
+sw ra, $14 (SP)
+!loopfixDL:
+
+lw t4, $0000 (T3)
+lui at, $ff00
+and at, at, t4
+lui t5, $0300
+beq t5, at, !fixpointer
+nop
+lui t5, $0400
+beq t5, at, !fixpointer
+nop
+lui t5, $fd00
+bne t5, at, !Notexturefix
+nop
+!fixpointer:
+lw t7, $0004 (t3)
+lui at, $ff00
+and at, at, t7
+beq at, r0, !Notexturefix
+nop
+add t7, t7, a3
+sw t7, $0004 (T3)
+!Notexturefix:
+sw t3, $0010 (SP)
+lui t5, $0600
+bne t5, at, !nosubcall
+nop
+lw t2, $0004 (t3)
+lui at, $ff00
+and at, at, t2
+beq at, r0, !nosubcall
+nop
+add t2, t2, a3
+sw t2, $0004 (T3)
+lui t3, $8000
+jal $3145D4
+or t3, t3, t2
+!nosubcall:
+lw t3, $0010 (SP)
+!endoftextureloop:
+lw t2, $0008 (T3)
+lui at, $b800
+addiu t3, t3, $0008
+bne t2, at, !loopfixDL
+nop
+lw ra, $14 (SP)
+jr ra
+addiu sp, sp, $0018
