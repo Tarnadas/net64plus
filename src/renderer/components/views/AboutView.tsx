@@ -59,7 +59,7 @@ export class AboutView extends React.PureComponent {
         <code style={styles.text}>
 MIT License<br/><br/>
 
-Copyright (c) 2017 Mario Reder<br/><br/>
+Copyright (c) 2017-2019 Mario Reder<br/><br/>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the &quot;Software&quot;), to deal
