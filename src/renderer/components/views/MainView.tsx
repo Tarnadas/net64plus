@@ -64,7 +64,7 @@ class View extends React.PureComponent<MainViewProps> {
             iconSrc='img/discord.svg'
           />
           <SMMButton
-            link='http://sm64o.io/' external
+            link='https://smmdb.ddns.net/' external
             text='Net64 Website'
             iconSrc='img/net64.svg'
           />
