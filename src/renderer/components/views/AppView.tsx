@@ -9,6 +9,7 @@ import { SettingsView } from './SettingsView'
 import { EmulatorView } from './EmulatorView'
 import { BrowseView } from './BrowseView'
 import { ConnectView } from './ConnectView'
+import { HostView } from './HostView'
 import { AboutView } from './AboutView'
 import { FaqView } from './FaqView'
 import { TopBarArea } from '../areas/TopBarArea'
@@ -41,59 +42,34 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
     this.forcePath = this.forcePath.bind(this)
     this.onClosePatchNotes = this.onClosePatchNotes.bind(this)
   }
-  componentWillMount () {
+
+  public componentWillMount () {
     this.updateCheck()
     if (this.props.version !== process.env.VERSION) {
       this.props.dispatch(push('/faq'))
     }
   }
-  componentWillReceiveProps (nextProps: AppViewProps) {
+
+  public componentWillReceiveProps (nextProps: AppViewProps) {
     if (nextProps.location.pathname === this.props.location.pathname && nextProps.isConnectedToEmulator === this.props.isConnectedToEmulator) return
     this.forcePath(nextProps)
   }
-  async updateCheck () {
-    const version: string = process.env.VERSION || ''
+
+  private async updateCheck () {
     try {
-      const releases = await request.getGithubReleases()
-      if (!releases) {
-        console.warn('Update check failed. You might be offline')
-        return
-      }
-      const mapVersionToNumber = (versionNumber: string) => versionNumber != null ? parseInt(versionNumber) : 0
-      let [currentMajor, currentMinor, currentPatch] = version.split('.')
-        .map(mapVersionToNumber)
-      if (currentPatch == null) currentPatch = 0
-      for (const release of releases) {
-        if (release.draft == null || release.draft) continue
-        if (release.prerelease == null || release.prerelease) continue
-        if (release.assets == null || release.assets.length === 0) continue
-        if (!release.tag_name) continue
-        let [major, minor, patch] = release.tag_name.split('.')
-          .map(mapVersionToNumber)
-        if (patch == null) patch = 0
-        const versionValue = major * 10000 + minor * 100 + patch
-        const currentVersionValue = currentMajor * 10000 + currentMinor * 100 + currentPatch
-        if (versionValue <= currentVersionValue) continue
-        let foundUpdate = false
-        for (const asset of release.assets) {
-          if (asset.name == null || !asset.name.includes('win32-x64')) continue
-          const newVersionUrl = asset.browser_download_url
-          if (!newVersionUrl) continue
-          this.setState({
-            newVersionUrl,
-            patchNotes: release.body
-          })
-          foundUpdate = true
-          break
-        }
-        if (foundUpdate) break
-      }
+      const { foundUpdate, newVersionUrl, patchNotes } = await request.updateCheck()
+      if (!foundUpdate) return
+      this.setState({
+        newVersionUrl,
+        patchNotes
+      })
     } catch (err) {
       console.error(err)
       setTimeout(this.updateCheck, 15000)
     }
   }
-  forcePath (props: AppViewProps) {
+
+  private forcePath (props: AppViewProps) {
     const pathName = props.location.pathname
     if (pathName !== '/' && pathName !== '/about' && pathName !== '/faq') {
       if (!props.username) {
@@ -103,12 +79,14 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
       }
     }
   }
-  onClosePatchNotes () {
+
+  private onClosePatchNotes () {
     this.setState({
       newVersionUrl: ''
     })
   }
-  render () {
+
+  public render (): JSX.Element {
     const newVersionUrl = this.state.newVersionUrl
     const patchNotes = this.state.patchNotes
     const styles: React.CSSProperties = {
@@ -181,6 +159,7 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
         <Route path='/emulator' component={EmulatorView} />
         <Route path='/browse' component={BrowseView} />
         <Route path='/connect' component={ConnectView} />
+        <Route path='/host' component={HostView} />
         <Route path='/about' component={AboutView} />
         <Route path='/faq' component={FaqView} />
         <div style={styles.footer}>

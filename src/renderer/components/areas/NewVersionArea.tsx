@@ -1,3 +1,5 @@
+import './NewVersionArea.scss'
+
 import * as React from 'react'
 import { shell } from 'electron'
 import * as marked from 'marked'
@@ -7,7 +9,9 @@ import { SMMButton } from '../buttons/SMMButton'
 interface NewVersionAreaProps {
   patchNotes: string
   versionUrl: string
-  onClose: () => void
+  canClose?: boolean
+  progress?: number
+  onClose?: () => void
 }
 
 export class NewVersionArea extends React.PureComponent<NewVersionAreaProps> {
@@ -17,10 +21,13 @@ export class NewVersionArea extends React.PureComponent<NewVersionAreaProps> {
     super(props)
     this.onClose = this.onClose.bind(this)
   }
-  onClose () {
-    this.props.onClose()
+
+  private onClose (): void {
+    const { onClose } = this.props
+    if (onClose) onClose()
   }
-  componentDidMount () {
+
+  public componentDidMount (): void {
     if (!this.props.patchNotes || !this.patchNotesRenderer) return
     this.patchNotesRenderer.innerHTML = marked(this.props.patchNotes)
     const nodes: NodeListOf<HTMLDivElement> = this.patchNotesRenderer.querySelectorAll('.markdown a')
@@ -33,35 +40,13 @@ export class NewVersionArea extends React.PureComponent<NewVersionAreaProps> {
       }
     }
   }
-  render () {
-    const versionUrl = this.props.versionUrl
-    const styles: React.CSSProperties = {
-      area: {
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        position: 'fixed',
-        top: '0',
-        left: '0',
-        width: '100%',
-        height: '100%',
-        backgroundColor: 'rgba(0,0,0,0.6)',
-        zIndex: '101'
-      },
-      popup: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        width: '80%',
-        backgroundColor: '#24997e',
-        borderRadius: '8px',
-        border: '5px solid black',
-        padding: '16px'
-      }
-    }
+
+  public render (): JSX.Element {
+    const { canClose, versionUrl, progress } = this.props
     return (
-      <div style={styles.area}>
-        <div style={styles.popup}>
-          <div style={{marginBottom: '12px'}}>
+      <div className='new-version-area-wrapper'>
+        <div className='new-version-area'>
+          <div className='new-version-area-description'>
             <h2>A new version is available</h2>
             <div
               className='markdown'
@@ -72,21 +57,31 @@ export class NewVersionArea extends React.PureComponent<NewVersionAreaProps> {
               ref={ x => { this.patchNotesRenderer = x } }
             />
           </div>
+          {
+            progress != null &&
+            <progress
+              className={`new-version-area-progress${progress ? ' global-invisible' : ''}`}
+              value={progress}
+            ></progress>
+          }
           <SMMButton
             link={versionUrl} external
             text='Download'
             iconSrc='img/net64.svg'
           />
-          <SMMButton
-            onClick={this.onClose}
-            text='Ignore'
-            iconSrc='img/cancel.svg'
-            styles={{
-              icon: {
-                padding: '4px'
-              }
-            }}
-          />
+          {
+            canClose &&
+            <SMMButton
+              onClick={this.onClose}
+              text='Ignore'
+              iconSrc='img/cancel.svg'
+              styles={{
+                icon: {
+                  padding: '4px'
+                }
+              }}
+            />
+          }
         </div>
       </div>
     )

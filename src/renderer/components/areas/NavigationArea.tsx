@@ -10,13 +10,13 @@ interface NavigationAreaProps {
 }
 
 export class NavigationArea extends React.PureComponent<NavigationAreaProps> {
-  render () {
-    const display = this.props.display
+  public render (): JSX.Element {
+    const { display, onClick } = this.props
     const styles: React.CSSProperties = {
       navigation: {
         display: 'flex',
         width: '200px',
-        maxHeight: display ? '240px' : '0',
+        maxHeight: display ? '280px' : '0',
         position: 'absolute',
         top: '40px',
         left: '10px',
@@ -34,37 +34,43 @@ export class NavigationArea extends React.PureComponent<NavigationAreaProps> {
         onMouseLeave={this.props.onMouseLeave}
       >
         <NavigationButton
-          onClick={this.props.onClick}
+          onClick={onClick}
           link='/'
           text='Home'
           iconSrc='img/home.svg'
         />
         <NavigationButton
-          onClick={this.props.onClick}
+          onClick={onClick}
           link='/settings'
           text='Settings'
           iconSrc='img/settings.svg'
         />
         <NavigationButton
-          onClick={this.props.onClick}
+          onClick={onClick}
           link='/emulator'
           text='Change Emulator'
           iconSrc='img/n64.svg'
         />
         <NavigationButton
-          onClick={this.props.onClick}
+          onClick={onClick}
           link='/browse'
           text='Browse Servers'
           iconSrc='img/browse.svg'
         />
         <NavigationButton
-          onClick={this.props.onClick}
+          onClick={onClick}
           link='/connect'
           text='Direct Connect'
           iconSrc='img/connect.svg'
         />
         <NavigationButton
-          onClick={this.props.onClick}
+          onClick={onClick}
+          link='/host'
+          text='Host Server'
+          iconSrc='img/host.svg'
+        />
+        <NavigationButton
+          onClick={onClick}
           link='/faq'
           text='FAQ'
           iconSrc='img/help.png'

@@ -28,7 +28,6 @@ class Area extends React.PureComponent<TopBarAreaProps, TopBarAreaState> {
     this.state = {
       buttonHover: false,
       navHover: false
-      // showApiKey: false
     }
     this.onClick = this.onClick.bind(this)
     this.onMouseLeave = this.onMouseLeave.bind(this)
@@ -36,15 +35,15 @@ class Area extends React.PureComponent<TopBarAreaProps, TopBarAreaState> {
     this.onMouseLeaveButton = this.onMouseLeave.bind(this, 'buttonHover')
     this.onMouseEnterNav = this.onMouseEnter.bind(this, 'navHover')
     this.onMouseLeaveNav = this.onMouseLeave.bind(this, 'navHover')
-    // this.showApiKey = this.showApiKey.bind(this)
-    // this.hideApiKey = this.hideApiKey.bind(this)
   }
-  onClick () {
+
+  private onClick () {
     this.setState(prevState => ({
       buttonHover: !prevState.buttonHover
     }))
   }
-  onMouseEnter (type: 'buttonHover' | 'navHover') {
+
+  private onMouseEnter (type: 'buttonHover' | 'navHover') {
     switch (type) {
       case 'buttonHover':
         this.setState({
@@ -58,7 +57,8 @@ class Area extends React.PureComponent<TopBarAreaProps, TopBarAreaState> {
         break
     }
   }
-  onMouseLeave (type?: 'buttonHover' | 'navHover') {
+
+  private onMouseLeave (type?: 'buttonHover' | 'navHover') {
     if (typeof type === 'string') {
       switch (type) {
         case 'buttonHover':
@@ -79,20 +79,8 @@ class Area extends React.PureComponent<TopBarAreaProps, TopBarAreaState> {
       })
     }
   }
-  /*
-  showApiKey () {
-    this.setState({
-      showApiKey: true
-    })
-  }
-  hideApiKey () {
-    this.setState({
-      showApiKey: false
-    })
-  }
-  */
-  render () {
-    const apiKey = this.props.apiKey
+
+  public render (): JSX.Element {
     const hover = this.state.buttonHover || this.state.navHover
     const styles: React.CSSProperties = {
       topbar: {
@@ -108,11 +96,6 @@ class Area extends React.PureComponent<TopBarAreaProps, TopBarAreaState> {
       },
       bar: {
         flex: '1 0 0%'
-      },
-      button: {
-        width: 'auto',
-        height: 'auto',
-        flexShrink: '0'
       },
       icon: {
         position: 'fixed',
@@ -157,23 +140,7 @@ class Area extends React.PureComponent<TopBarAreaProps, TopBarAreaState> {
               onClick={this.onMouseLeave}
             />
           </div>
-          <div style={styles.button}>
-            {
-              /* false &&
-              <SMMButton
-                text={`${apiKey ? 'Change' : 'Add'} API Key`}
-                iconSrc='img/api.png'
-                fontSize='13px'
-                padding='3px'
-                onClick={this.showApiKey}
-              /> */
-            }
-          </div>
         </div>
-        {
-          // this.state.showApiKey &&
-          // <ApiKeyArea apiKey={apiKey} onClose={this.hideApiKey} />
-        }
       </div>
     )
   }

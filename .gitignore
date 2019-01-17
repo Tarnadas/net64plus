@@ -1,3 +1,4 @@
+.credentials
 /.idea/
 /node_modules/
 /build/*
