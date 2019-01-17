@@ -83,7 +83,7 @@ class Area extends React.PureComponent<HostAreaProps, HostAreaState> {
           <NewVersionArea
             versionUrl={newVersionUrl}
             patchNotes={patchNotes}
-            canClose={false}
+            autoUpdate={true}
             progress={progress}
           />
         }

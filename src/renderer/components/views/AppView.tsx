@@ -70,14 +70,14 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
   }
 
   private forcePath (props: AppViewProps) {
-    const pathName = props.location.pathname
-    if (pathName !== '/' && pathName !== '/about' && pathName !== '/faq') {
-      if (!props.username) {
-        props.dispatch(push('/settings'))
-      } else if (!props.isConnectedToEmulator && pathName !== '/settings') {
-        props.dispatch(push('/emulator'))
-      }
-    }
+    // const pathName = props.location.pathname
+    // if (pathName !== '/' && pathName !== '/about' && pathName !== '/faq') {
+    //   if (!props.username) {
+    //     props.dispatch(push('/settings'))
+    //   } else if (!props.isConnectedToEmulator && pathName !== '/settings') {
+    //     props.dispatch(push('/emulator'))
+    //   }
+    // }
   }
 
   private onClosePatchNotes () {
@@ -145,6 +145,7 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
           <NewVersionArea
             versionUrl={newVersionUrl}
             patchNotes={patchNotes}
+            autoUpdate={false}
             onClose={this.onClosePatchNotes}
           />
         }

@@ -9,16 +9,23 @@ import { SMMButton } from '../buttons/SMMButton'
 interface NewVersionAreaProps {
   patchNotes: string
   versionUrl: string
-  canClose?: boolean
+  autoUpdate: boolean
   progress?: number
   onClose?: () => void
 }
 
-export class NewVersionArea extends React.PureComponent<NewVersionAreaProps> {
+interface NewVersionAreaState {
+  progress: number
+}
+
+export class NewVersionArea extends React.PureComponent<NewVersionAreaProps, NewVersionAreaState> {
   private patchNotesRenderer: HTMLDivElement | null = null
 
   constructor (props: NewVersionAreaProps) {
     super(props)
+    this.state = {
+      progress: 0
+    }
     this.onClose = this.onClose.bind(this)
   }
 
@@ -42,7 +49,8 @@ export class NewVersionArea extends React.PureComponent<NewVersionAreaProps> {
   }
 
   public render (): JSX.Element {
-    const { canClose, versionUrl, progress } = this.props
+    const { autoUpdate, versionUrl } = this.props
+    const { progress } = this.state
     return (
       <div className='new-version-area-wrapper'>
         <div className='new-version-area'>
@@ -58,7 +66,7 @@ export class NewVersionArea extends React.PureComponent<NewVersionAreaProps> {
             />
           </div>
           {
-            progress != null &&
+            autoUpdate &&
             <progress
               className={`new-version-area-progress${progress ? ' global-invisible' : ''}`}
               value={progress}
@@ -70,7 +78,7 @@ export class NewVersionArea extends React.PureComponent<NewVersionAreaProps> {
             iconSrc='img/net64.svg'
           />
           {
-            canClose &&
+            !autoUpdate &&
             <SMMButton
               onClick={this.onClose}
               text='Ignore'
