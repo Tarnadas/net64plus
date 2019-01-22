@@ -143,7 +143,7 @@ module.exports = [
     ],
     externals: {
       winprocess: 'require(require("path").resolve(__dirname, "winprocess"))',
-      'process-list': 'require(require("path").resolve(__dirname, "processlist"))'
+      'process-list': 'require(require("path").resolve(__dirname, process.platform === "win32" ? "processlist" : "processlist-linux))'
     },
     resolve: {
       extensions: [ '.ts', '.js', '.json' ]

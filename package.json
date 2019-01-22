@@ -10,7 +10,9 @@
     "build": "webpack --env=prod && node ./build-app",
     "build:dev": "webpack --env=dev && node ./build-app",
     "build:proto": "pbjs -t static-module -w commonjs -p ./proto -o ./proto/ServerClientMessage.js ./proto/ServerClientMessage.proto && pbts -o ./proto/ServerClientMessage.d.ts ./proto/ServerClientMessage.js && pbjs -t static-module -w commonjs -p ./proto -o ./proto/ClientServerMessage.js ./proto/ClientServerMessage.proto && pbts -o ./proto/ClientServerMessage.d.ts ./proto/ClientServerMessage.js",
-    "rebuild": "electron-rebuild -v 1.8.3 -f -w winprocess,process-list",
+    "prebuild:win": "electron-rebuild -v 1.8.3 -f -w winprocess,process-list",
+    "prebuild:linux": "electron-rebuild -v 1.8.3 -f -w process-list",
+    "prebuild:move": "mv node_modules/process-list/bin/linux-x64-57/process-list.node build/processlist-linux.node",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
     "test": "jest spec"
   },
@@ -71,7 +73,6 @@
     "redux": "^3.7.2",
     "rimraf": "^2.6.2",
     "utf-8-validate": "^4.0.0",
-    "winprocess": "0.0.2",
     "ws": "^3.2.0"
   },
   "devDependencies": {
@@ -104,7 +105,7 @@
     "devtron": "^1.4.0",
     "electron-debug": "^1.4.0",
     "electron-packager": "^9.1.0",
-    "electron-rebuild": "^1.6.0",
+    "electron-rebuild": "^1.8.2",
     "eslint": "4.15.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-config-standard-with-typescript": "^2.0.1",
@@ -132,5 +133,8 @@
     "url-loader": "^0.6.2",
     "webpack": "^3.6.0",
     "webpack-sources": "^1.0.1"
+  },
+  "optionalDependencies": {
+    "winprocess": "0.0.2"
   }
 }
