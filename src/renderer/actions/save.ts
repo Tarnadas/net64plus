@@ -5,8 +5,10 @@ import {
   SetCharacterAction,
   SetEmuChatAction,
   AddApiKeyAction,
-  SetVersionAction
+  SetVersionAction,
+  SetServerOptionsAction
 } from './models/save.model'
+import { ElectronServerSaveData } from '../../models/State.model'
 
 export function setUsername (username: string): SetUsernameAction {
   return {
@@ -45,5 +47,13 @@ export function setVersion (version: string): SetVersionAction {
   return {
     type: 'SET_VERSION',
     version
+  }
+}
+
+export function saveServerOptions (serverOptions: ElectronServerSaveData, apiKey: string): SetServerOptionsAction {
+  return {
+    type: 'SAVE_SERVER_OPTIONS',
+    serverOptions,
+    apiKey
   }
 }

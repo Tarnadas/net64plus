@@ -1,6 +1,6 @@
 {
   "name": "net64plus",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "compatVersion": "1.0.0",
   "description": "Net64+ client",
   "main": "index.js",
@@ -72,6 +72,7 @@
     "react-router-redux": "^5.0.0-alpha.6",
     "redux": "^3.7.2",
     "rimraf": "^2.6.2",
+    "tar": "^4.4.8",
     "utf-8-validate": "^4.0.0",
     "ws": "^3.2.0"
   },
@@ -90,6 +91,7 @@
     "@types/react-router-dom": "^4.2.3",
     "@types/react-router-redux": "^5.0.11",
     "@types/rimraf": "^2.0.2",
+    "@types/tar": "^4.0.0",
     "@types/text-encoding": "^0.0.32",
     "@types/ws": "^4.0.0",
     "autoprefixer": "^8.2.0",

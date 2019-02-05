@@ -1,4 +1,4 @@
-.new-version-area {
+.new-version-dialog {
   display: flex;
   flex-wrap: wrap;
   width: 80%;
@@ -24,8 +24,20 @@
     width: 100%;
   }
 
-  progress {
+  &-progress {
+    display: flex;
     width: 100%;
     margin: 10px 0;
+
+    progress {
+      flex: 1 1 auto;
+    }
+
+    div {
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      white-space: nowrap;
+    }
   }
 }

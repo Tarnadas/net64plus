@@ -1,5 +1,4 @@
-import axios, { AxiosInstance } from 'axios'
-import { remote } from 'electron'
+import axios, { AxiosInstance, AxiosPromise } from 'axios'
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -11,6 +10,7 @@ interface UpdateCheck {
   foundUpdate: boolean
   newVersionUrl?: string
   patchNotes?: string
+  version?: string
 }
 
 class Request {
@@ -81,7 +81,8 @@ class Request {
     try {
       return (await this.github.request({
         method: 'get',
-        url: '/repos/tarnadas/net64plus/releases'
+        url: '/repos/tarnadas/net64plus/releases',
+        timeout: 10000
       })).data
     } catch (err) {
       console.error(err)
@@ -98,7 +99,6 @@ class Request {
       }
     }
     const version = getCurrentServerVersion()
-    console.log('CURRENT VERSION', version, releases)
     return this.getMostRecentRelease(version, releases)
   }
 
@@ -106,7 +106,8 @@ class Request {
     try {
       return (await this.github.request({
         method: 'get',
-        url: '/repos/tarnadas/net64plus-server/releases'
+        url: '/repos/tarnadas/net64plus-server/releases',
+        timeout: 10000
       })).data
     } catch (err) {
       console.error(err)
@@ -125,13 +126,21 @@ class Request {
         return {
           foundUpdate: true,
           newVersionUrl,
-          patchNotes: release.body
+          patchNotes: release.body,
+          version: release.tag_name
         }
       }
     }
     return {
       foundUpdate: false
     }
+  }
+
+  public downloadServerVersion (url: string, onDownloadProgress: (progressEvent: any) => void): AxiosPromise<ArrayBuffer> {
+    return axios.get<ArrayBuffer>(url, {
+      onDownloadProgress,
+      responseType: 'arraybuffer'
+    })
   }
 }
 export const request = new Request()

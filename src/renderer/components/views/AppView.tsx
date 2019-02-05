@@ -13,7 +13,7 @@ import { HostView } from './HostView'
 import { AboutView } from './AboutView'
 import { FaqView } from './FaqView'
 import { TopBarArea } from '../areas/TopBarArea'
-import { NewVersionArea } from '../areas/NewVersionArea'
+import { NewVersionDialog } from '../dialogs/NewVersionDialog'
 import { request } from '../../Request'
 import { State } from '../../../models/State.model'
 
@@ -142,7 +142,7 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
       <div style={styles.global}>
         {
           newVersionUrl && patchNotes &&
-          <NewVersionArea
+          <NewVersionDialog
             versionUrl={newVersionUrl}
             patchNotes={patchNotes}
             autoUpdate={false}

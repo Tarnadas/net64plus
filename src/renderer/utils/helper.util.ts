@@ -1,9 +1,15 @@
 import { remote } from 'electron'
+import { extract } from 'tar'
 
 import * as fs from 'fs'
 import * as path from 'path'
+import { promisify } from 'util'
 
 import { Release } from '../../models/Release.model'
+
+const mkdir = promisify(fs.mkdir)
+const readdir = promisify(fs.readdir)
+const writeFile = promisify(fs.writeFile)
 
 export function getCurrentServerVersion (): string | undefined {
   const serverPath = getServerPath()
@@ -13,7 +19,37 @@ export function getCurrentServerVersion (): string | undefined {
     if (isVersionNewer(serverVersionTag, currentVersion)) continue
     currentVersion = serverPathVersion
   }
+  if (currentVersion) saveAndExtractServer(currentVersion)
   return currentVersion
+}
+
+export async function saveAndExtractServer (version: string, buffer?: ArrayBuffer): Promise<string> {
+  const serverPath = getServerPath()
+  const serverVersionPath = path.join(serverPath, version)
+  try {
+    await mkdir(serverVersionPath)
+  } catch (err) {}
+  const gzFile = path.join(serverVersionPath, 'net64plus-server.tar.gz')
+  if (buffer) await writeFile(gzFile, Buffer.from(buffer))
+  let files = await readdir(serverVersionPath)
+  for (const file of files) {
+    if (file.includes('net64plus-server') && !file.includes('tar.gz')) {
+      return path.join(serverVersionPath, file)
+    }
+  }
+  await extract({
+    cwd: serverVersionPath,
+    file: gzFile,
+    newer: true
+  })
+  console.log('EXTRACT FINISH')
+  files = await readdir(serverVersionPath)
+  for (const file of files) {
+    if (file.includes('net64plus-server') && !file.includes('tar.gz')) {
+      return path.join(serverVersionPath, file)
+    }
+  }
+  return ''
 }
 
 function getServerPath (): string {

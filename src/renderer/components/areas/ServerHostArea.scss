@@ -1,0 +1,11 @@
+.server-host-area {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  margin: 0 2rem 2rem 2rem;
+
+  &-buttons {
+    display: flex;
+    justify-content: space-between;
+  }
+}

@@ -1,10 +1,12 @@
+import './HostView.scss'
+
 import * as React from 'react'
 import { connect, Dispatch } from 'react-redux'
 
 import { ConnectionArea } from '../areas/ConnectionArea'
+import { HostArea } from '../areas/HostArea'
 import { State } from '../../../models/State.model'
 import { Server } from '../../../models/Server.model'
-import { HostArea } from './HostArea'
 
 interface ConnectViewProps {
   dispatch: Dispatch<State>

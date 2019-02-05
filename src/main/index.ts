@@ -1,5 +1,4 @@
 import { app, BrowserWindow } from 'electron'
-import * as rimraf from 'rimraf'
 
 import * as path from 'path'
 import * as fs from 'fs'
@@ -50,36 +49,7 @@ export const deleteConnection = () => {
   connection = undefined
 }
 
-;(async () => {
-  const appSavePath = path.resolve(`${app.getPath('appData')}/net64plus`)
-  if (!fs.existsSync(appSavePath)) {
-    fs.mkdirSync(appSavePath)
-  }
-  (global as Global).save = {
-    appSavePath
-  }
-  if (fs.existsSync(path.join(appSavePath, 'save.json'))) {
-    try {
-      const appSaveData = JSON.parse(fs.readFileSync(path.join(appSavePath, 'save.json'), {
-        encoding: 'utf8'
-      }))
-      if (appSaveData == null) {
-        await new Promise(resolve => {
-          rimraf(appSavePath, err => {
-            if (err) {
-              console.error(err)
-            } else {
-              fs.mkdirSync(appSavePath)
-            }
-            resolve()
-          })
-        })
-      } else {
-        (global as Global).save.appSaveData = appSaveData
-      }
-    } catch (err) {}
-  }
-
+;(() => {
   const onReady = () => {
     const mainWindow = new BrowserWindow({
       width: process.env.NODE_ENV === 'development' ? 1400 : 670,
