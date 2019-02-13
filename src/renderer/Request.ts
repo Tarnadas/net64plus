@@ -120,7 +120,7 @@ class Request {
       if (!isReleaseValid(release)) continue
       if (!isVersionNewer(release.tag_name, version)) continue
       for (const asset of release.assets) {
-        if (asset.name == null || !asset.name.includes('64plus')) continue
+        if (asset.name == null || !asset.name.includes('64plus') || !asset.name.includes(process.platform)) continue
         const newVersionUrl = asset.browser_download_url
         if (!newVersionUrl) continue
         return {
