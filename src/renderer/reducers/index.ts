@@ -35,9 +35,15 @@ const APP_SAVE_DATA: ElectronSaveData = {
 }
 
 export function initReducer (history: History, electronSave: SaveState): Store<State> {
-  let appSaveData: ElectronSaveData = Object.assign({}, APP_SAVE_DATA, JSON.parse(JSON.stringify(electronSave.appSaveData)))
-  Object.assign(appSaveData.serverOptions, APP_SAVE_DATA.serverOptions, electronSave.appSaveData
-    ? electronSave.appSaveData.serverOptions : undefined)
+  let appSaveData: ElectronSaveData = Object.assign({}, APP_SAVE_DATA)
+  try {
+    if (electronSave.appSaveData) {
+      appSaveData = Object.assign(appSaveData, JSON.parse(JSON.stringify(electronSave.appSaveData)))
+      Object.assign(appSaveData.serverOptions, APP_SAVE_DATA.serverOptions, electronSave.appSaveData.serverOptions)
+    }
+  } catch (err) {
+    appSaveData = Object.assign({}, APP_SAVE_DATA)
+  }
   const username = appSaveData.username.replace(/\W/g, '')
   if (
     username !== appSaveData.username ||
