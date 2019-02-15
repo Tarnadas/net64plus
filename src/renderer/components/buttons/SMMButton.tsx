@@ -7,9 +7,9 @@ import { shell } from 'electron'
 // TODO https://github.com/KyleAMathews/deepmerge/issues/87
 const deepMerge = require('deepmerge').default
 
-export type COLOR_SCHEME = 'yellow' | 'green' | 'red'
+export type ColorScheme = 'yellow' | 'green' | 'red'
 
-export type ICON_STYLE = 'dark' | 'bright'
+export type IconStyle = 'dark' | 'bright'
 
 interface SMMButtonProps {
   text: string
@@ -17,8 +17,8 @@ interface SMMButtonProps {
   iconSrcHover?: string
   link?: string
   styles?: React.CSSProperties
-  colorScheme?: COLOR_SCHEME
-  iconStyle?: ICON_STYLE
+  colorScheme?: ColorScheme
+  iconStyle?: IconStyle
   // @deprecated
   enabled?: boolean
   disabled?: boolean

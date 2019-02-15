@@ -19,10 +19,10 @@ class View extends React.PureComponent<ConnectViewProps> {
     const server = this.props.server
     return (
       <div className='host-view'>
+        <HostArea />
         {
-          server
-            ? <ConnectionArea server={server} />
-            : <HostArea />
+          server &&
+          <ConnectionArea server={server} />
         }
       </div>
     )

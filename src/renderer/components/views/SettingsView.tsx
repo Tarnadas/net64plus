@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
 
 import { connector } from '../..'
-import { SMMButton, ICON_STYLE } from '../buttons/SMMButton'
+import { SMMButton } from '../buttons/SMMButton'
 import { WarningPanel } from '../panels/WarningPanel'
 import { setUsername, setCharacter, setEmuChat } from '../../actions/save'
 import { State, ElectronSaveData } from '../../../models/State.model'
