@@ -42,6 +42,7 @@ class Area extends React.PureComponent<HostAreaProps, HostAreaState> {
   }
 
   public async componentDidMount (): Promise<void> {
+    if (this.props.serverProcess) return
     await this.serverUpdateCheck()
     this.setState({
       loading: false
