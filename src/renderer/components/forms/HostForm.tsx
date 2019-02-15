@@ -95,7 +95,7 @@ class Form extends React.PureComponent<ServerFormProps, ServerFormState> {
 
   private onSubmit (): void {
     this.saveServerOptions()
-    this.props.onSubmit()
+    setTimeout(() => this.props.onSubmit())
   }
 
   private onNameChange ({ target }: React.ChangeEvent<HTMLInputElement>): void {

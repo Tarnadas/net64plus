@@ -6,7 +6,7 @@ import { spawn, ChildProcess } from 'child_process'
 
 import { request } from '../../Request'
 import { ProgressSpinner } from '../helpers/ProgressSpinner'
-import { State } from '../../../models/State.model'
+import { State, ElectronServerSaveData } from '../../../models/State.model'
 import { setConnectionError } from '../../actions/connection'
 import { getCurrentServerVersion, saveAndExtractServer } from '../../utils/helper.util'
 import { NewVersionDialog } from '../dialogs/NewVersionDialog'
@@ -18,12 +18,15 @@ import { setServerProcess } from '../../actions/server'
 interface HostAreaProps {
   dispatch: Dispatch<State>
   serverProcess: ChildProcess | null
+  serverOptions: ElectronServerSaveData
+  apiKey: string
   exitCode: number | null
 }
 
 interface HostAreaState {
   loading: boolean
   serverExecutable?: string
+  serverProcessArgs?: string[]
   version?: string
   newVersionUrl?: string
   patchNotes?: string
@@ -87,9 +90,49 @@ class Area extends React.PureComponent<HostAreaProps, HostAreaState> {
     if (!serverExecutable) {
       throw new Error('HostArea: server executable not found.')
     }
+    const processArgs = this.getServerProcessArgs()
     this.props.dispatch(setConnectionError(''))
-    const serverProcess = spawn(serverExecutable)
+    const serverProcess = spawn(serverExecutable, processArgs)
     this.props.dispatch(setServerProcess(serverProcess))
+  }
+
+  private getServerProcessArgs (): string[] {
+    const { serverOptions, apiKey } = this.props
+    const args: string[] = []
+    if (serverOptions.port) {
+      args.push('--port')
+      args.push(String(serverOptions.port))
+    }
+    if (serverOptions.gamemode) {
+      args.push('--gamemode')
+      args.push(String(serverOptions.gamemode))
+    }
+    if (!serverOptions.enableGamemodeVote) {
+      args.push('--disableGamemodeVote')
+    }
+    if (serverOptions.passwordRequired) {
+      args.push('--passwordRequired')
+    }
+    if (serverOptions.password) {
+      args.push('--password')
+      args.push(serverOptions.password)
+    }
+    if (serverOptions.name) {
+      args.push('--name')
+      args.push(serverOptions.name)
+    }
+    if (serverOptions.description) {
+      args.push('--description')
+      args.push(serverOptions.description)
+    }
+    if (serverOptions.enableWebHook) {
+      args.push('--enableWebHook')
+    }
+    if (apiKey) {
+      args.push('--apiKey')
+      args.push(apiKey)
+    }
+    return args
   }
 
   public render (): JSX.Element {
@@ -132,5 +175,7 @@ class Area extends React.PureComponent<HostAreaProps, HostAreaState> {
 }
 export const HostArea = connect((state: State) => ({
   serverProcess: state.server.process,
+  serverOptions: state.save.appSaveData.serverOptions,
+  apiKey: state.save.appSaveData.apiKey,
   exitCode: state.server.exitCode
 }))(Area)
