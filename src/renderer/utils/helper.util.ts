@@ -42,7 +42,6 @@ export async function saveAndExtractServer (version: string, buffer?: ArrayBuffe
     file: gzFile,
     newer: true
   })
-  console.log('EXTRACT FINISH')
   files = await readdir(serverVersionPath)
   for (const file of files) {
     if (file.includes('net64plus-server') && !file.includes('tar.gz')) {

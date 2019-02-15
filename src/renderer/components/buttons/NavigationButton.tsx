@@ -1,94 +1,25 @@
+import './NavigationButton.scss'
+
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 
 interface NavigationButtonProps {
   text: string
   iconSrc: string
-  blank?: boolean
   link: string
-  onClick: () => void
+  isActive: boolean
+  isEnabled: boolean
 }
 
-interface NavigationButtonState {
-  hover: boolean
-}
-
-export class NavigationButton extends React.PureComponent<NavigationButtonProps, NavigationButtonState> {
-  constructor (props: NavigationButtonProps) {
-    super(props)
-    this.state = {
-      hover: false
-    }
-    this.onClick = this.onClick.bind(this)
-    this.onMouseEnter = this.onMouseEnter.bind(this)
-    this.onMouseLeave = this.onMouseLeave.bind(this)
-  }
-  onClick () {
-    this.props.onClick()
-  }
-  onMouseEnter () {
-    this.setState({
-      hover: true
-    })
-  }
-  onMouseLeave () {
-    this.setState({
-      hover: false
-    })
-  }
-  render () {
-    const hover = this.state.hover
-    const styles: React.CSSProperties = {
-      button: {
-        width: 'auto',
-        height: '40px',
-        minHeight: '40px',
-        lineHeight: '40px',
-        backgroundColor: hover ? '#d19b05' : 'rgba(255,229,0,0.7)',
-        boxShadow: '0px 0px 5px 0px rgba(0,0,0,0.75)',
-        cursor: 'pointer',
-        overflow: 'hidden'
-      },
-      icon: {
-        margin: '4px',
-        width: '32px',
-        height: '32px',
-        float: 'left',
-        padding: '4px'
-      },
-      img: {
-        width: '100%',
-        height: '100%'
-      },
-      text: {
-        color: '#323245',
-        float: 'left',
-        width: 'auto',
-        paddingRight: '5px'
-      }
-    }
-    const content = (
-      <div style={{ width: '100%' }}>
-        <div style={styles.icon}>
-          <img style={styles.img} src={this.props.iconSrc} />
-        </div>
-        <div style={styles.text}>
-          { this.props.text }
-        </div>
-      </div>
-    )
-    return (
-      <div style={styles.button} onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave} onClick={this.onClick}>
-        {
-          this.props.blank
-            ? <a href={this.props.link} target='_blank'>
-              { content }
-            </a>
-            : <Link to={this.props.link}>
-              { content }
-            </Link>
-        }
-      </div>
-    )
-  }
-}
+export const NavigationButton = (props: NavigationButtonProps) =>
+  <Link
+    className={`navigation-button${props.isActive ? ' navigation-button-active' : ''}${!props.isEnabled ? ' navigation-button-disabled' : ''}`}
+    to={props.link}
+  >
+    <div className='navigation-button-icon'>
+      <img src={props.iconSrc} />
+    </div>
+    <div className='navigation-button-label'>
+      { props.text }
+    </div>
+  </Link>

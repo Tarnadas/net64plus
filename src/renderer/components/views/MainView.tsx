@@ -14,12 +14,9 @@ interface MainViewProps {
 class View extends React.PureComponent<MainViewProps> {
   constructor (public props: MainViewProps) {
     super(props)
-    this.onStartClick = this.onStartClick.bind(this)
   }
-  onStartClick () {
-    this.props.dispatch(push('/browse'))
-  }
-  render () {
+
+  public render (): JSX.Element {
     const styles: React.CSSProperties = {
       main: {
         display: 'flex',
@@ -36,7 +33,6 @@ class View extends React.PureComponent<MainViewProps> {
     return (
       <div style={styles.main}>
         <SMMButton
-          link='https://discord.gg/k9QMFaB'
           text='Start'
           styles={{
             button: {
@@ -44,7 +40,7 @@ class View extends React.PureComponent<MainViewProps> {
             }
           }}
           iconSrc='img/net64.svg'
-          onClick={this.onStartClick}
+          link='/settings'
         />
         <h2>Thank you for downloading Net64+</h2>
         <div>

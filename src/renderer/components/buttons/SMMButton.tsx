@@ -23,6 +23,7 @@ interface SMMButtonProps {
   enabled?: boolean
   disabled?: boolean
   external?: boolean
+  className?: string
   onMouseEnter?: () => void
   onMouseLeave?: () => void
   onClick?: () => void
@@ -68,7 +69,7 @@ export class SMMButton extends React.PureComponent<SMMButtonProps, SMMButtonStat
     )
   }
   render () {
-    const { disabled } = this.props
+    const { className, disabled } = this.props
     const { hover } = this.state
     const colorScheme = this.props.colorScheme || 'yellow'
     const enabled = this.props.enabled == null
@@ -142,7 +143,7 @@ export class SMMButton extends React.PureComponent<SMMButtonProps, SMMButtonStat
     )
     return (
       <div
-        className={`smm-button${disabled ? ' smm-button-disabled' : ''}`}
+        className={`smm-button${disabled ? ' smm-button-disabled' : ''}${className ? ` ${className}` : ''}`}
         style={styles.button}
         onMouseEnter={this.mouseEnter}
         onMouseLeave={this.mouseLeave}

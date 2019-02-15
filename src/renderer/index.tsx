@@ -53,7 +53,6 @@ async function loadSaveData (): Promise<SaveStateDraft<ElectronSaveData>> {
       const appSaveData = JSON.parse(fs.readFileSync(path.join(appSavePath, 'save.json'), {
         encoding: 'utf8'
       }))
-      console.log(appSaveData)
       if (appSaveData == null) {
         await new Promise(resolve => {
           rimraf(appSavePath, err => {

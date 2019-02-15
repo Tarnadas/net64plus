@@ -35,7 +35,6 @@ export const save = (state: SaveState = initialState.save, action: SaveAction) =
     }
   })
   saveState(nextState)
-  console.log('SAVE', JSON.stringify(nextState.appSaveData))
   return nextState
 }
 

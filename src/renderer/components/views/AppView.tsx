@@ -21,9 +21,7 @@ interface AppViewProps {
   dispatch: Dispatch<State>
   version: string
   location: Location
-  username: string
   route: Readonly<RouterState>
-  isConnectedToEmulator: boolean
 }
 
 interface AppViewState {
@@ -39,7 +37,6 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
       requestedPath: ''
     }
     this.updateCheck = this.updateCheck.bind(this)
-    this.forcePath = this.forcePath.bind(this)
     this.onClosePatchNotes = this.onClosePatchNotes.bind(this)
   }
 
@@ -48,11 +45,6 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
     if (this.props.version !== process.env.VERSION) {
       this.props.dispatch(push('/faq'))
     }
-  }
-
-  public componentWillReceiveProps (nextProps: AppViewProps) {
-    if (nextProps.location.pathname === this.props.location.pathname && nextProps.isConnectedToEmulator === this.props.isConnectedToEmulator) return
-    this.forcePath(nextProps)
   }
 
   private async updateCheck () {
@@ -67,17 +59,6 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
       console.error(err)
       setTimeout(this.updateCheck, 15000)
     }
-  }
-
-  private forcePath (props: AppViewProps) {
-    // const pathName = props.location.pathname
-    // if (pathName !== '/' && pathName !== '/about' && pathName !== '/faq') {
-    //   if (!props.username) {
-    //     props.dispatch(push('/settings'))
-    //   } else if (!props.isConnectedToEmulator && pathName !== '/settings') {
-    //     props.dispatch(push('/emulator'))
-    //   }
-    // }
   }
 
   private onClosePatchNotes () {
@@ -149,11 +130,11 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
             onClose={this.onClosePatchNotes}
           />
         }
-        <TopBarArea />
         <div style={styles.logo}>
           <div style={styles.logoFont}>
             Net64+ { process.env.VERSION }
           </div>
+          <TopBarArea />
         </div>
         <Route exact path='/' component={MainView} />
         <Route path='/settings' component={SettingsView} />
@@ -177,8 +158,6 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
   }
 }
 export const AppView = connect((state: State) => ({
-  username: state.save.appSaveData.username,
   version: state.save.appSaveData.version,
-  route: state.router,
-  isConnectedToEmulator: state.emulator.isConnectedToEmulator
+  route: state.router
 }))(View)
