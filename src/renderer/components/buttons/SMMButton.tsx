@@ -64,12 +64,15 @@ export class SMMButton extends React.PureComponent<SMMButtonProps, SMMButtonStat
         <div style={iconStyle}>
           <img style={styles.img} src={this.props.iconSrc} />
         </div>
-        <div style={styles.text}>{this.props.text}</div>
+        {
+          this.props.text &&
+          <div style={styles.text}>{this.props.text}</div>
+        }
       </div>
     )
   }
   render () {
-    const { className, disabled } = this.props
+    const { className, disabled, text } = this.props
     const { hover } = this.state
     const colorScheme = this.props.colorScheme || 'yellow'
     const enabled = this.props.enabled == null
@@ -102,9 +105,9 @@ export class SMMButton extends React.PureComponent<SMMButtonProps, SMMButtonStat
         fontSize: '13px'
       },
       icon: {
-        margin: '4px',
-        width: '32px',
-        height: '32px',
+        padding: '4px',
+        width: '40px',
+        height: '40px',
         float: 'left',
         borderRadius: '4px'
       },
