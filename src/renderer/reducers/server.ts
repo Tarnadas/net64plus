@@ -1,7 +1,7 @@
 import produce from 'immer'
 
 import { initialState } from '.'
-import { ServerState, ServerStateDraft } from '../../models/State.model'
+import { ServerState, ServerStateDraft, IoChannel, ConsoleServerMessage } from '../../models/State.model'
 import { ServerActionType, ServerAction } from '../actions/models/server.model'
 
 export const server = (state: ServerState = initialState.server, action: ServerAction) =>
@@ -26,13 +26,21 @@ export const server = (state: ServerState = initialState.server, action: ServerA
         draft.exitCode = action.code
         break
       case ServerActionType.ADD_SERVER_MESSAGE:
+        const messages = action.message.split('\n')
+        const chatMessages: ConsoleServerMessage[] = []
+        for (const message of messages) {
+          if (!message) continue
+          const isWarn = action.isStdErr
+          const isErr = isWarn && message.startsWith('ERROR')
+          chatMessages.push({
+            key: Math.random().toString(36).substr(0, 6),
+            message,
+            channel: isErr ? IoChannel.Err : isWarn ? IoChannel.Warn : IoChannel.Out
+          })
+        }
         draft.messages = [
           ...draft.messages,
-          {
-            key: Math.random().toString(36).substr(0, 6),
-            message: action.message,
-            isStdErr: action.isStdErr
-          }
+          ...chatMessages
         ]
         break
     }

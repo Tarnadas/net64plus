@@ -54,10 +54,14 @@ export interface EmulatorStateDraft {
 
 export type EmulatorState = Readonly<EmulatorStateDraft>
 
+export enum IoChannel {
+  Out, Warn, Err
+}
+
 export interface ConsoleServerMessage {
   key: string
   message: string
-  isStdErr: boolean
+  channel: IoChannel
 }
 
 export interface ServerStateDraft {
