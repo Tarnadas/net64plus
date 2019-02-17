@@ -85,6 +85,11 @@ export interface ChatStateDraft {
 }
 export type ChatState = Readonly<ChatStateDraft>
 
+export interface SnackbarStateDraft {
+  message: string | null
+}
+export type SnackbarState = Readonly<SnackbarStateDraft>
+
 export interface StateDraft {
   save: SaveState
   router: RouterState
@@ -92,5 +97,6 @@ export interface StateDraft {
   emulator: EmulatorState
   server: ServerState
   chat: ChatState
+  snackbar: SnackbarState
 }
 export type State = Readonly<StateDraft>

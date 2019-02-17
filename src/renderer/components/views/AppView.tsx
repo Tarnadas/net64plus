@@ -16,12 +16,14 @@ import { TopBarArea } from '../areas/TopBarArea'
 import { NewVersionDialog } from '../dialogs/NewVersionDialog'
 import { request } from '../../Request'
 import { State } from '../../../models/State.model'
+import { SnackbarPanel } from '../panels/SnackbarPanel'
 
 interface AppViewProps {
   dispatch: Dispatch<State>
   version: string
   location: Location
   route: Readonly<RouterState>
+  snackbarMessage: string | null
 }
 
 interface AppViewState {
@@ -68,6 +70,7 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
   }
 
   public render (): JSX.Element {
+    const { snackbarMessage } = this.props
     const newVersionUrl = this.state.newVersionUrl
     const patchNotes = this.state.patchNotes
     const styles: React.CSSProperties = {
@@ -130,6 +133,12 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
             onClose={this.onClosePatchNotes}
           />
         }
+        {
+          snackbarMessage &&
+          <SnackbarPanel
+            message={snackbarMessage}
+          />
+        }
         <div style={styles.logo}>
           <div style={styles.logoFont}>
             Net64+ { process.env.VERSION }
@@ -159,5 +168,6 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
 }
 export const AppView = connect((state: State) => ({
   version: state.save.appSaveData.version,
-  route: state.router
+  route: state.router,
+  snackbarMessage: state.snackbar.message
 }))(View)

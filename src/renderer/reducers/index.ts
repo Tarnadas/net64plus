@@ -8,7 +8,9 @@ import { connection } from './connection'
 import { emulator } from './emulator'
 import { server } from './server'
 import { chat } from './chat'
+import { snackbar } from './snackbar'
 import { serverMiddleware } from '../middlewares/server-middleware'
+import { snackbarMiddleware } from '../middlewares/snackbar-middleware'
 import { MIN_LENGTH_USERNAME, MAX_LENGTH_USERNAME } from '../components/views/SettingsView'
 import { State, SaveState, ElectronSaveData } from '../../models/State.model'
 
@@ -81,6 +83,9 @@ export function initReducer (history: History, electronSave: SaveState): Store<S
     },
     chat: {
       global: []
+    },
+    snackbar: {
+      message: null
     }
   }
   const reducers = {
@@ -89,8 +94,9 @@ export function initReducer (history: History, electronSave: SaveState): Store<S
     connection,
     emulator,
     server,
-    chat
+    chat,
+    snackbar
   }
-  const middleware = applyMiddleware(serverMiddleware, routerMiddleware(history))
+  const middleware = applyMiddleware(serverMiddleware, snackbarMiddleware, routerMiddleware(history))
   return createStore(combineReducers(reducers as any), initialState, middleware)
 }
