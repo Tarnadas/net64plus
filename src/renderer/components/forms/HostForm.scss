@@ -1,11 +1,9 @@
 .host-form {
-  display: flex;
-  align-items: stretch;
-  flex-direction: column;
   width: 100%;
   padding: 0 40px 20px 40px;
   font-size: 16px;
-  flex: 1 0 auto;
+  flex: 1 1 auto;
+  overflow-y: auto;
 
   &-field {
     font-size: 16px;

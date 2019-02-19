@@ -194,7 +194,7 @@ class Form extends React.PureComponent<ServerFormProps, ServerFormState> {
       apiKey
     } = this.state
     return (
-      <div className='host-form'>
+      <div className='host-form scroll'>
         <div className='host-form-wrapper host-form-field'>
           <div>
             <div>Name:</div>
