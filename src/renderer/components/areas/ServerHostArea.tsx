@@ -37,12 +37,6 @@ class Area extends React.PureComponent<ServerHostAreaProps> {
     const { exitCode, server, messages } = this.props
     return (
       <div className='server-host-area'>
-        {
-          server &&
-          <ServerPanel
-            server={server}
-          />
-        }
         <ConsolePanel
           messages={messages}
         />

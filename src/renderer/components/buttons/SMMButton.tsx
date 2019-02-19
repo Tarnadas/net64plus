@@ -124,7 +124,7 @@ export class SMMButton extends React.PureComponent<SMMButtonProps, SMMButtonStat
             : '#fff',
           float: 'left',
           width: 'auto',
-          paddingRight: '5px'
+          padding: '0 5px'
         }
       }
     }

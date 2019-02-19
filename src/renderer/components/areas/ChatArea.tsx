@@ -102,9 +102,10 @@ class Area extends React.PureComponent<ChatAreaProps, ChatAreaState> {
         overflowX: 'hidden',
         flexDirection: 'column',
         backgroundColor: '#fff',
-        flex: '1 0 250px',
+        flex: '1 1 0',
         width: '100%',
-        fontFamily: 'arial'
+        fontFamily: 'arial',
+        minHeight: '100px'
       },
       input: {
         fontSize: '18px',

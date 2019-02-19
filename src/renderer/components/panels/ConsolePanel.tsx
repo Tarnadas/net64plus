@@ -33,7 +33,7 @@ export class ConsolePanel extends React.PureComponent<ConsolePanelProps> {
   public render (): JSX.Element {
     return (
       <div className='console-panel'>
-        <div className='console-panel-messages'>
+        <div className='console-panel-messages scroll'>
           { this.renderConsoleMessages() }
         </div>
       </div>
