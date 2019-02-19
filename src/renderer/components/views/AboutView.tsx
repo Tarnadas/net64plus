@@ -23,7 +23,7 @@ export class AboutView extends React.PureComponent {
       }
     }
     return (
-      <div style={styles.view} className='scroll'>
+      <div style={styles.view}>
         <h2>Credits</h2>
         <div>
           <h3>Net64 Online Team</h3>

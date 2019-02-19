@@ -23,7 +23,7 @@ class View extends React.PureComponent<BrowseViewProps> {
     const server = this.props.server
     const connectionError = this.props.connectionError
     return (
-      <div className='browse-view scroll'>
+      <div className='browse-view'>
         <h1>Browse Servers</h1>
         {
           server && !connectionError

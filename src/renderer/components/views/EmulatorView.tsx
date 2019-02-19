@@ -183,7 +183,7 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
       }
     }
     return (
-      <div style={styles.main} className='scroll'>
+      <div style={styles.main}>
         {
           warning &&
           <WarningPanel warning={warning} />

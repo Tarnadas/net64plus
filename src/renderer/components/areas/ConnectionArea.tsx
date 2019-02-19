@@ -29,7 +29,7 @@ class Area extends React.PureComponent<ConnectionAreaProps, {}> {
       }
     }
     return (
-      <div className='scroll' style={styles.area}>
+      <div style={styles.area}>
         <ServerPanel server={server} isConnected />
         <ChatArea />
         {
