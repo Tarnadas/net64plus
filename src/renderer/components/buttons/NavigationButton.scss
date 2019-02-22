@@ -66,6 +66,14 @@ $button-color-disabled: #8f8f8f;
 
   &-label {
     overflow: hidden;
+    position: relative;
+    width: 100%;
+    z-index: 101;
+
+    div {
+      position: absolute;
+      bottom: 0;
+    }
   }
 
   &-active {

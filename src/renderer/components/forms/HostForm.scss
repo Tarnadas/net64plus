@@ -1,9 +1,15 @@
 .host-form {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   padding: 0 40px 20px 40px;
   font-size: 16px;
   flex: 1 1 auto;
   overflow-y: auto;
+
+  > * {
+    flex: 0 0 auto;
+  }
 
   &-field {
     font-size: 16px;
@@ -34,8 +40,9 @@
   &-description {
     display: flex;
     flex-direction: column;
-    flex: 1 1 auto;
+    flex: 1 0 auto;
     margin: 0.8rem 1rem;
+    min-height: 80px;
   }
 
   input:not([type=checkbox]), textarea {

@@ -20,6 +20,6 @@ export const NavigationButton = (props: NavigationButtonProps) =>
       <img src={props.iconSrc} />
     </div>
     <div className='navigation-button-label'>
-      { props.text }
+      <div>{ props.text }</div>
     </div>
   </Link>
