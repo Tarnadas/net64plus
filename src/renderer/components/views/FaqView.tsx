@@ -1,28 +1,23 @@
 import * as React from 'react'
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
-import { push } from 'react-router-redux'
 
 import { SMMButton } from '../buttons/SMMButton'
 import { setVersion } from '../../actions/save'
 import { State } from '../../../models/State.model'
+import { Link } from 'react-router-dom'
+import { ExternalLink } from '../helpers/ExternalLink'
 
 interface FaqViewProps {
   dispatch: Dispatch<State>
 }
 
 class View extends React.PureComponent<FaqViewProps> {
-  constructor (public props: FaqViewProps) {
-    super(props)
-    this.onDone = this.onDone.bind(this)
-  }
-  componentDidMount () {
+  public componentDidMount (): void {
     this.props.dispatch(setVersion(process.env.VERSION || ''))
   }
-  onDone () {
-    this.props.dispatch(push('/'))
-  }
-  render () {
+
+  public render (): JSX.Element {
     const styles: React.CSSProperties = {
       view: {
         display: 'flex',
@@ -51,7 +46,7 @@ class View extends React.PureComponent<FaqViewProps> {
         <SMMButton
           iconSrc='img/net64.svg'
           text='Got it!'
-          onClick={this.onDone}
+          link='/'
         />
         <div style={{marginTop: '40px'}}></div>
         <div style={styles.text}>
@@ -69,6 +64,25 @@ class View extends React.PureComponent<FaqViewProps> {
         </div>
         <div style={styles.imgWrapper}>
           <img style={styles.img} src='img/pj64_help2.png' />
+        </div>
+        <h2>Server Hosting</h2>
+        <div>
+          You can host your own server by visiting the <Link to='/host'>hosting page</Link>.<br />
+          Joining via LAN can be done by using the LAN IP address which looks like 192.X.X.X.<br />
+          Joining via internet is only possible, if you correctly port forwarded. Port forwarding must be done at your router&#39;s web interface.<br />
+        </div>
+        <h3>Here is a short summary:</h3>
+        <ul>
+          <li>open a terminal (Win + &#34;cmd&#34; + enter)</li>
+          <li>type &#34;ipconfig&#34;</li>
+          <li>find the entry from your Ethernet or Wifi adapter showing your default gateway, which should look like 192.X.X.1/0</li>
+          <li>open a browser and type in this address</li>
+          <li>this is your router&#39;s web interface. You will have to log in with your credentials</li>
+          <li>the next steps heavily depend on the router you are using. You will have to find an entry about port forwarding and set it up for the respective port that you want to use</li>
+        </ul>
+        <div>
+          If you want your server to be publicly visibile, you will have to get an API key from <ExternalLink href='https://smmdb.ddns.net/profile'>SMMDB profile page</ExternalLink>.
+          Never share your API key with anyone!
         </div>
       </div>
     )

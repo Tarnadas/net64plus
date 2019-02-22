@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
-import { push } from 'react-router-redux'
 
 import { SMMButton } from '../buttons/SMMButton'
 import { ExternalLink } from '../helpers/ExternalLink'
@@ -47,10 +46,6 @@ class View extends React.PureComponent<MainViewProps> {
           Net64 aka SM64O allows playing Super Mario 64 in an online multiplayer mode.
           Net64+ is the official continuation of the program and features an integrated server list.
           You can also play with your friends by hosting your own server with the server software provided.
-        </div>
-        <h3>Want to host your own server?</h3>
-        <div>
-          If you want your server to be listed, please visit <ExternalLink href='https://github.com/tarnadas/net64plus-server'>the GitHub repository of the server software</ExternalLink> and follow its instructions.
         </div>
         <h3>Join our community</h3>
         <div>
