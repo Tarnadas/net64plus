@@ -11,7 +11,6 @@ export const snackbar = (state: SnackbarState = initialState.snackbar, action: S
         draft.message = action.message
         break
       case SnackbarActionType.HIDE_SNACKBAR:
-        console.log('HIDE RED')
         draft.message = null
         break
     }
