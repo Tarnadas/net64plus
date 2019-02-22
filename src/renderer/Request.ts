@@ -26,10 +26,10 @@ class Request {
       baseURL: 'https://smmdb.ddns.net/api/',
       responseType: 'json'
     })
-    let { github: githubApiKey } = process.env.NODE_ENV === 'development'
+    let githubApiKey = process.env.NODE_ENV === 'development'
       ? JSON.parse(fs.readFileSync(path.join(__dirname, '../../../.credentials'), {
         encoding: 'utf8'
-      }))
+      })).github
       : undefined
     this.github = axios.create({
       baseURL: 'https://api.github.com/',
