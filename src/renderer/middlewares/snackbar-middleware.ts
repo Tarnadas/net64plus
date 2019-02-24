@@ -1,12 +1,11 @@
-import { MiddlewareAPI, Action, Dispatch } from 'redux'
+import { MiddlewareAPI, AnyAction, Dispatch } from 'redux'
 
-import { State } from '../../models/State.model'
 import { SnackbarActionType } from '../actions/models/snackbar.model'
 import { hideSnackbar } from '../actions/snackbar'
 
 let timer: NodeJS.Timer | undefined
 
-export const snackbarMiddleware: any = ({ dispatch }: MiddlewareAPI<State>) => (next: Dispatch<State>) => (action: Action) => {
+export const snackbarMiddleware = ({ dispatch }: MiddlewareAPI<any>) => (next: Dispatch<any>) => (action: AnyAction) => {
   const nextAction = next(action)
   if (!nextAction) return nextAction
   switch (nextAction.type) {

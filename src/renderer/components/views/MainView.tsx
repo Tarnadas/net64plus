@@ -1,9 +1,7 @@
 import * as React from 'react'
-import { Dispatch } from 'redux'
-import { connect } from 'react-redux'
+import { connect, Dispatch } from 'react-redux'
 
 import { SMMButton } from '../buttons/SMMButton'
-import { ExternalLink } from '../helpers/ExternalLink'
 import { State } from '../../../models/State.model'
 
 interface MainViewProps {
@@ -16,7 +14,7 @@ class View extends React.PureComponent<MainViewProps> {
   }
 
   public render (): JSX.Element {
-    const styles: React.CSSProperties = {
+    const styles: Record<string, React.CSSProperties> = {
       main: {
         display: 'flex',
         flexDirection: 'column',

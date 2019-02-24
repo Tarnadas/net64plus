@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { Dispatch } from 'redux'
-import { connect } from 'react-redux'
+import { connect, Dispatch } from 'react-redux'
 import { ChildProcess } from 'child_process'
 
 import { connector } from '../..'
@@ -43,6 +42,7 @@ class Area extends React.PureComponent<ConnectAreaProps, ConnectAreaState> {
     this.onConnectLocally = this.onConnectLocally.bind(this)
   }
 
+  // eslint-disable-next-line
   public componentWillReceiveProps (nextProps: ConnectAreaProps): void {
     if (
       !nextProps.connectionError ||
@@ -103,7 +103,7 @@ class Area extends React.PureComponent<ConnectAreaProps, ConnectAreaState> {
   public render (): JSX.Element {
     const { serverProcess, exitCode } = this.props
     const { warning, loading, ip, port } = this.state
-    const styles: React.CSSProperties = {
+    const styles: Record<string, React.CSSProperties> = {
       area: {
         display: 'flex',
         flexWrap: 'wrap',

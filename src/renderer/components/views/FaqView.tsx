@@ -1,11 +1,10 @@
 import * as React from 'react'
-import { Dispatch } from 'redux'
-import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
+import { connect, Dispatch } from 'react-redux'
 
 import { SMMButton } from '../buttons/SMMButton'
 import { setVersion } from '../../actions/save'
 import { State } from '../../../models/State.model'
-import { Link } from 'react-router-dom'
 import { ExternalLink } from '../helpers/ExternalLink'
 
 interface FaqViewProps {
@@ -18,7 +17,7 @@ class View extends React.PureComponent<FaqViewProps> {
   }
 
   public render (): JSX.Element {
-    const styles: React.CSSProperties = {
+    const styles: Record<string, React.CSSProperties> = {
       view: {
         display: 'flex',
         flexDirection: 'column',

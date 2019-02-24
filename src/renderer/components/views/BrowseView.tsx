@@ -16,7 +16,7 @@ interface BrowseViewProps {
 }
 
 class View extends React.PureComponent<BrowseViewProps> {
-  componentWillMount () {
+  componentDidMount () {
     this.props.dispatch(setConnectionError(''))
   }
   render () {

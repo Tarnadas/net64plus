@@ -1,10 +1,8 @@
 import './NavigationArea.scss'
 
 import * as React from 'react'
-import { Location } from 'history'
-import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
-import { push, RouterState } from 'react-router-redux'
+import { RouterState } from 'react-router-redux'
 import produce from 'immer'
 
 import { NavigationButton } from '../buttons/NavigationButton'

@@ -1,8 +1,7 @@
 import './SendPasswordArea.scss'
 
 import * as React from 'react'
-import { Dispatch } from 'redux'
-import { connect } from 'react-redux'
+import { connect, Dispatch } from 'react-redux'
 
 import { connector } from '../..'
 import { SMMButton } from '../buttons/SMMButton'
@@ -42,6 +41,7 @@ class Area extends React.PureComponent<SendPasswordProps, SendPasswordAreaState>
     this.startThrottleUpdate()
   }
 
+  // eslint-disable-next-line
   public componentWillReceiveProps (nextProps: SendPasswordProps): void {
     if (nextProps.throttle == null || this.throttleUpdateInterval) return
     this.startThrottleUpdate()

@@ -1,4 +1,3 @@
-import { Reducer } from 'redux'
 import { LOCATION_CHANGE } from 'react-router-redux'
 import produce from 'immer'
 

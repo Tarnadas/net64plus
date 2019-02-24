@@ -2,7 +2,7 @@ import * as React from 'react'
 
 export class AboutView extends React.PureComponent {
   render () {
-    const styles: React.CSSProperties = {
+    const styles: Record<string, React.CSSProperties> = {
       view: {
         display: 'flex',
         flexDirection: 'column',

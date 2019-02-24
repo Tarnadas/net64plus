@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { Dispatch } from 'redux'
-import { connect } from 'react-redux'
+import { connect, Dispatch } from 'react-redux'
 import { push } from 'react-router-redux'
 
 import { connector } from '../..'
@@ -51,6 +50,7 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
     this.timer = setInterval(this.scan, 10000)
   }
 
+  // eslint-disable-next-line
   public componentWillReceiveProps (nextProps: EmulatorViewProps) {
     if (nextProps.error) {
       if (this.timerTimeout) {
@@ -161,7 +161,7 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
   public render (): JSX.Element {
     const { emulators } = this.props
     const { loading, warning } = this.state
-    const styles: React.CSSProperties = {
+    const styles: Record<string, React.CSSProperties> = {
       main: {
         display: 'flex',
         flexWrap: 'wrap',

@@ -16,7 +16,7 @@ interface ConnectViewProps {
 }
 
 class View extends React.PureComponent<ConnectViewProps> {
-  public componentWillMount (): void {
+  public componentDidMount (): void {
     this.props.dispatch(setConnectionError(''))
   }
 

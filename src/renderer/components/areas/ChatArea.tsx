@@ -80,7 +80,7 @@ class Area extends React.PureComponent<ChatAreaProps, ChatAreaState> {
     )
   }
   render () {
-    const styles: React.CSSProperties = {
+    const styles: Record<string, React.CSSProperties> = {
       area: {
         display: 'flex',
         flexDirection: 'column',

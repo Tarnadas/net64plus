@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { Dispatch } from 'redux'
-import { connect } from 'react-redux'
+import { connect, Dispatch } from 'react-redux'
 import { Route, Link } from 'react-router-dom'
 import { push, RouterState } from 'react-router-redux'
 
@@ -42,7 +41,7 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
     this.onClosePatchNotes = this.onClosePatchNotes.bind(this)
   }
 
-  public componentWillMount () {
+  public componentDidMount () {
     this.updateCheck()
     if (this.props.version !== process.env.VERSION) {
       this.props.dispatch(push('/faq'))
@@ -73,7 +72,7 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
     const { snackbarMessage } = this.props
     const newVersionUrl = this.state.newVersionUrl
     const patchNotes = this.state.patchNotes
-    const styles: React.CSSProperties = {
+    const styles: Record<string, React.CSSProperties> = {
       global: {
         width: '100%',
         maxWidth: '100%',
@@ -87,7 +86,7 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
         fontSize: '44px',
         textAlign: 'center',
         boxShadow: '0px 10px 20px 0px rgba(0,0,0,0.3)',
-        zIndex: '1',
+        zIndex: 1,
         flex: '0 0',
         margin: '5px 0'
       },

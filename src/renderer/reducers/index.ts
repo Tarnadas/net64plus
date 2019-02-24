@@ -97,6 +97,6 @@ export function initReducer (history: History, electronSave: SaveState): Store<S
     chat,
     snackbar
   }
-  const middleware = applyMiddleware(serverMiddleware, snackbarMiddleware, routerMiddleware(history))
-  return createStore(combineReducers(reducers as any), initialState, middleware)
+  const middleware = applyMiddleware(serverMiddleware as any, snackbarMiddleware as any, routerMiddleware(history))
+  return createStore(combineReducers(reducers as any), initialState, middleware) as any
 }

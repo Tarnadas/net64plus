@@ -1,15 +1,13 @@
-import { MiddlewareAPI, Action } from 'redux'
-import { Dispatch } from 'react-redux'
+import { MiddlewareAPI, Action, Dispatch } from 'redux'
 
 import { ChildProcess } from 'child_process'
 
-import { State } from '../../models/State.model'
 import { ServerActionType, SetServerProcessAction } from '../actions/models/server.model'
 import { addServerMessage, exitServerProcess } from '../actions/server'
 
 const decoder = new TextDecoder('utf8')
 
-export const serverMiddleware: any = ({ dispatch }: MiddlewareAPI<State>) => (next: Dispatch<State>) => (action: Action) => {
+export const serverMiddleware = ({ dispatch }: MiddlewareAPI<any>) => (next: Dispatch<any>) => (action: Action) => {
   const nextAction = next(action)
   if (!nextAction) return nextAction
   switch (nextAction.type) {
@@ -21,7 +19,7 @@ export const serverMiddleware: any = ({ dispatch }: MiddlewareAPI<State>) => (ne
   return nextAction
 }
 
-function listenToProcessOutput (process: ChildProcess, dispatch: Dispatch<State>): void {
+function listenToProcessOutput (process: ChildProcess, dispatch: Dispatch<any>): void {
   process.on('exit', (code: number) => {
     if (code != null) dispatch(exitServerProcess(code))
   })

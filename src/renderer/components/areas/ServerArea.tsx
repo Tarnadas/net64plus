@@ -1,8 +1,7 @@
 import './ServerArea.scss'
 
 import * as React from 'react'
-import { Dispatch } from 'redux'
-import { connect } from 'react-redux'
+import { connect, Dispatch } from 'react-redux'
 import { ChildProcess } from 'child_process'
 
 import { connector } from '../..'
@@ -47,7 +46,7 @@ class Area extends React.PureComponent<ServerAreaProps, ServerAreaState> {
     this.renderServers = this.renderServers.bind(this)
   }
 
-  public componentWillMount (): void {
+  public componentDidMount (): void {
     this.mounted = true
     this.updateServers()
   }
@@ -56,6 +55,7 @@ class Area extends React.PureComponent<ServerAreaProps, ServerAreaState> {
     this.mounted = false
   }
 
+  // eslint-disable-next-line
   public componentWillReceiveProps (nextProps: ServerAreaProps): void {
     if (!nextProps.connectionError || nextProps.connectionError === this.props.connectionError) return
     this.setState({

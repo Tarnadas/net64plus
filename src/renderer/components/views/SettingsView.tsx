@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { Dispatch } from 'redux'
-import { connect } from 'react-redux'
+import { connect, Dispatch } from 'react-redux'
 
 import { connector } from '../..'
 import { SMMButton } from '../buttons/SMMButton'
@@ -78,7 +77,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
   render () {
     const warning = this.state.warning
     const connectionError = this.props.connectionError
-    const styles: React.CSSProperties = {
+    const styles: Record<string, React.CSSProperties> = {
       view: {
         display: 'flex',
         flexDirection: 'column',
