@@ -2,7 +2,7 @@
   "presets": [
     ["env", {
       "targets": {
-        "electron": "1.8.3"
+        "electron": "2.0.17"
       },
       "useBuiltIns": true
     }]
