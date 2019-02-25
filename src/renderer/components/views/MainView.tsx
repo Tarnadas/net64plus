@@ -37,7 +37,7 @@ class View extends React.PureComponent<MainViewProps> {
             }
           }}
           iconSrc='img/net64.svg'
-          link='/settings'
+          link='/emulator'
         />
         <h2>Thank you for downloading Net64+</h2>
         <div>

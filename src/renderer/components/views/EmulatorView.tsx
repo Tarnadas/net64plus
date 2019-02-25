@@ -19,6 +19,7 @@ interface EmulatorViewProps {
   characterId: number
   emuChat: boolean
   error: string
+  username: string
 }
 
 interface EmulatorViewState {
@@ -46,6 +47,11 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
   }
 
   public componentDidMount (): void {
+    const { username } = this.props
+    if (!username) {
+      this.props.dispatch(push('/settings'))
+      return
+    }
     this.scan()
     this.timer = setInterval(this.scan, 10000)
   }
@@ -208,5 +214,6 @@ export const EmulatorView = connect((state: State) => ({
   isConnectedToEmulator: state.emulator.isConnectedToEmulator,
   characterId: state.save.appSaveData.character,
   emuChat: state.save.appSaveData.emuChat,
-  error: state.emulator.error
+  error: state.emulator.error,
+  username: state.save.appSaveData.username
 }))(View)
