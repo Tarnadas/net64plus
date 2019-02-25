@@ -55,6 +55,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "bufferutil": "^4.0.1",
     "csv-parse": "3",
     "deepmerge": "^2.0.1",
     "dompurify": "^1.0.4",
@@ -74,7 +75,7 @@
     "redux": "^4.0.1",
     "rimraf": "^2.6.2",
     "tar": "^4.4.8",
-    "utf-8-validate": "^4.0.0",
+    "utf-8-validate": "^5.0.2",
     "ws": "^3.2.0"
   },
   "devDependencies": {
