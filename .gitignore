@@ -2,8 +2,7 @@
 /.idea/
 /node_modules/
 /build/*
-#!/build/patches/
-!/build/winprocess/
+!/build/patches/
 !/build/img/
 !/build/styles/
 /build/styles/renderer.*

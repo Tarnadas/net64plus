@@ -29,5 +29,4 @@ packager({
     fs.createReadStream(file).pipe(fs.createWriteStream(path.join(appPaths[0], `patches/${file.split('patches/')[1]}`)))
   })
   rimraf(path.join(appPaths[0], 'resources/app/patches'), () => {})
-  rimraf(path.join(appPaths[0], 'resources/app/package-lock.json'), () => {})
 })
