@@ -11,6 +11,7 @@ export const connection = (state: ConnectionState = initialState.connection, act
       case ConnectionActionType.SET_SERVER:
         draft.server = action.server
         draft.error = ''
+        draft.authenticated = true
         break
       case ConnectionActionType.SET_CONNECTION_ERROR:
         draft.error = action.error
