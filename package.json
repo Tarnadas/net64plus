@@ -53,9 +53,8 @@
     ]
   },
   "dependencies": {
-    "axios": "^0.17.1",
-    "bufferutil": "^3.0.3",
-    "csv-parse": "https://github.com/Tarnadas/node-csv-parse.git",
+    "axios": "^0.18.0",
+    "csv-parse": "3",
     "deepmerge": "^2.0.1",
     "dompurify": "^1.0.4",
     "electron": "2",

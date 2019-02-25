@@ -61,7 +61,7 @@ export class Emulator {
             console.warn(`tasklist process exited with code ${code}`)
             return
           }
-          parse(stdout, {}, (err: Error, data: string[][]) => {
+          parse(stdout, {}, (err: Error | undefined, data: string[][]) => {
             if (err) reject(err)
             resolve(data)
           })
@@ -86,7 +86,7 @@ export class Emulator {
             if (code !== 0) {
               console.warn(`tasklist process exited with code ${code}`)
             }
-            parse(stdout, {}, (err: Error, data: string[][]) => {
+            parse(stdout, {}, (err: Error | undefined, data: string[][]) => {
               if (err) reject(err)
               if (data.length === 0) reject(new Error(`tasklist couldn't find process with PID ${process[1]}`))
               resolve(data[0])
