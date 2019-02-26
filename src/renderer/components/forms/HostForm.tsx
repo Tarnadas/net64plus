@@ -108,8 +108,15 @@ class Form extends React.PureComponent<ServerFormProps, ServerFormState> {
 
   private onPortChange ({ target }: React.ChangeEvent<HTMLInputElement>): void {
     try {
+      let port = parseInt(String(target.value).replace(/[^0-9]/g, ''))
+      if (isNaN(port)) {
+        port = 0
+      }
+      if (port > 65535) {
+        port = 65535
+      }
       this.setState({
-        port: parseInt(String(target.value).replace(/[^0-9]/g, ''))
+        port
       })
     } catch (err) {}
   }
