@@ -1,15 +1,27 @@
 import './ServerArea.scss'
 
 import * as React from 'react'
+import { connect, Dispatch } from 'react-redux'
+import { ChildProcess } from 'child_process'
 
+import { connector } from '../..'
+import { SMMButton } from '../buttons/SMMButton'
 import { ServerPanel } from '../panels/ServerPanel'
 import { WarningPanel } from '../panels/WarningPanel'
 import { ProgressSpinner } from '../helpers/ProgressSpinner'
+import { setConnectionError } from '../../actions/connection'
 import { request } from '../../Request'
 import { Server } from '../../../models/Server.model'
+import { State } from '../../../models/State.model'
 
 interface ServerAreaProps {
+  dispatch: Dispatch<State>
   connectionError: string
+  serverProcess: ChildProcess | null
+  exitCode: number | null
+  port: number
+  username: string
+  characterId: number
 }
 
 interface ServerAreaState {
@@ -18,7 +30,7 @@ interface ServerAreaState {
   loading: boolean
 }
 
-export class ServerArea extends React.PureComponent<ServerAreaProps, ServerAreaState> {
+class Area extends React.PureComponent<ServerAreaProps, ServerAreaState> {
   private mounted: boolean = false
 
   constructor (props: ServerAreaProps) {
@@ -29,11 +41,12 @@ export class ServerArea extends React.PureComponent<ServerAreaProps, ServerAreaS
       loading: false
     }
     this.onConnect = this.onConnect.bind(this)
+    this.onConnectLocally = this.onConnectLocally.bind(this)
     this.updateServers = this.updateServers.bind(this)
     this.renderServers = this.renderServers.bind(this)
   }
 
-  public componentWillMount (): void {
+  public componentDidMount (): void {
     this.mounted = true
     this.updateServers()
   }
@@ -42,6 +55,7 @@ export class ServerArea extends React.PureComponent<ServerAreaProps, ServerAreaS
     this.mounted = false
   }
 
+  // eslint-disable-next-line
   public componentWillReceiveProps (nextProps: ServerAreaProps): void {
     if (!nextProps.connectionError || nextProps.connectionError === this.props.connectionError) return
     this.setState({
@@ -53,6 +67,17 @@ export class ServerArea extends React.PureComponent<ServerAreaProps, ServerAreaS
   private onConnect (): void {
     this.setState({
       loading: true
+    })
+  }
+
+  private onConnectLocally (): void {
+    const { port, username, characterId } = this.props
+    this.props.dispatch(setConnectionError(''))
+    connector.createConnection({
+      ip: '127.0.0.1',
+      port,
+      username,
+      characterId
     })
   }
 
@@ -96,6 +121,7 @@ export class ServerArea extends React.PureComponent<ServerAreaProps, ServerAreaS
   }
 
   public render (): JSX.Element {
+    const { serverProcess, exitCode } = this.props
     const { servers, loading, warning } = this.state
     const initialLoading = servers.length === 0 && !warning
     return (
@@ -116,9 +142,29 @@ export class ServerArea extends React.PureComponent<ServerAreaProps, ServerAreaS
           <WarningPanel warning={warning} />
         }
         {
+          !initialLoading && serverProcess && exitCode == null &&
+          <SMMButton
+            text='Connect to local server'
+            iconSrc='img/net64.svg'
+            onClick={this.onConnectLocally}
+            styles={{
+              button: {
+                alignSelf: 'center'
+              }
+            }}
+          />
+        }
+        {
           this.renderServers(servers)
         }
       </div>
     )
   }
 }
+export const ServerArea = connect((state: State) => ({
+  serverProcess: state.server.process,
+  exitCode: state.server.exitCode,
+  port: state.save.appSaveData.serverOptions.port,
+  username: state.save.appSaveData.username,
+  characterId: state.save.appSaveData.character
+}))(Area)

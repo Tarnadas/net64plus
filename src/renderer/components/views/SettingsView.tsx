@@ -1,13 +1,12 @@
 import * as React from 'react'
-import { Dispatch } from 'redux'
-import { connect } from 'react-redux'
-import { push } from 'react-router-redux'
+import { connect, Dispatch } from 'react-redux'
 
 import { connector } from '../..'
-import { SMMButton, ICON_STYLE } from '../buttons/SMMButton'
+import { SMMButton } from '../buttons/SMMButton'
 import { WarningPanel } from '../panels/WarningPanel'
 import { setUsername, setCharacter, setEmuChat } from '../../actions/save'
 import { State, ElectronSaveData } from '../../../models/State.model'
+import { showSnackbar } from '../../actions/snackbar'
 
 interface SettingsViewProps {
   dispatch: Dispatch<State>
@@ -67,17 +66,18 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
         warning: 'Your username is too short'
       })
     } else {
+      const { dispatch } = this.props
       connector.playerUpdate({ username, characterId: this.state.characterId })
-      this.props.dispatch(setUsername(username))
-      this.props.dispatch(setCharacter(this.state.characterId))
-      this.props.dispatch(setEmuChat(this.state.emuChat))
-      this.props.dispatch(push('/browse'))
+      dispatch(setUsername(username))
+      dispatch(setCharacter(this.state.characterId))
+      dispatch(setEmuChat(this.state.emuChat))
+      dispatch(showSnackbar('Saved'))
     }
   }
   render () {
     const warning = this.state.warning
     const connectionError = this.props.connectionError
-    const styles: React.CSSProperties = {
+    const styles: Record<string, React.CSSProperties> = {
       view: {
         display: 'flex',
         flexDirection: 'column',

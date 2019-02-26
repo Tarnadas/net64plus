@@ -1,4 +1,3 @@
-import winProcess, { Process } from 'winprocess'
 import { snapshot } from 'process-list'
 import * as parse from 'csv-parse'
 
@@ -10,8 +9,13 @@ import { spawn } from 'child_process'
 import { connector, deleteEmulator } from '.'
 import { FilteredEmulator } from '../models/Emulator.model'
 import { buf2hex } from '../utils/Buffer.util'
+import winprocess, { Process } from '../declarations/winprocess'
 
 const tasklist = promisify(snapshot)
+let winProcess: winprocess
+if (process.platform === 'win32') {
+  winProcess = require('winprocess')
+}
 
 enum ConnectionFlag {
   IS_DISCONNECTED = 0,
@@ -57,7 +61,7 @@ export class Emulator {
             console.warn(`tasklist process exited with code ${code}`)
             return
           }
-          parse(stdout, {}, (err: Error, data: string[][]) => {
+          parse(stdout, {}, (err: Error | undefined, data: string[][]) => {
             if (err) reject(err)
             resolve(data)
           })
@@ -82,7 +86,7 @@ export class Emulator {
             if (code !== 0) {
               console.warn(`tasklist process exited with code ${code}`)
             }
-            parse(stdout, {}, (err: Error, data: string[][]) => {
+            parse(stdout, {}, (err: Error | undefined, data: string[][]) => {
               if (err) reject(err)
               if (data.length === 0) reject(new Error(`tasklist couldn't find process with PID ${process[1]}`))
               resolve(data[0])

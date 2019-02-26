@@ -1,8 +1,7 @@
 import './ServerPanel.scss'
 
 import * as React from 'react'
-import { Dispatch } from 'redux'
-import { connect } from 'react-redux'
+import { connect, Dispatch } from 'react-redux'
 import { shell } from 'electron'
 import * as marked from 'marked'
 import { emojify } from 'node-emoji'
@@ -163,7 +162,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
     const { display, displayDescription, warning } = this.state
     const players = server.players || []
     const gameMode: string | undefined = this.getGameModeImgSrc(server)
-    const styles: React.CSSProperties = {
+    const styles: Record<string, React.CSSProperties> = {
       name: {
         flex: '1 1 auto',
         wordWrap: 'break-word',
@@ -190,12 +189,19 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
           className='server-panel-header'
           onClick={this.onToggle}
         >
+          <div className='server-panel-header-img'>
+            <img src={`${
+              server.isDedicated
+                ? 'img/server.svg'
+                : 'img/pc.svg'
+            }`} />
+          </div>
           <div style={{ flex: '0 0 40px' }}>
             { server.countryCode || '' }
           </div>
           {
             gameMode &&
-            <div className='server-panel-header-gamemode'>
+            <div className='server-panel-header-img'>
               <img src={gameMode} />
             </div>
           }

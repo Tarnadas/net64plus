@@ -7,22 +7,23 @@ import { shell } from 'electron'
 // TODO https://github.com/KyleAMathews/deepmerge/issues/87
 const deepMerge = require('deepmerge').default
 
-export type COLOR_SCHEME = 'yellow' | 'green' | 'red'
+export type ColorScheme = 'yellow' | 'green' | 'red'
 
-export type ICON_STYLE = 'dark' | 'bright'
+export type IconStyle = 'dark' | 'bright'
 
 interface SMMButtonProps {
   text: string
   iconSrc: string
   iconSrcHover?: string
   link?: string
-  styles?: React.CSSProperties
-  colorScheme?: COLOR_SCHEME
-  iconStyle?: ICON_STYLE
+  styles?: Record<string, React.CSSProperties>
+  colorScheme?: ColorScheme
+  iconStyle?: IconStyle
   // @deprecated
   enabled?: boolean
   disabled?: boolean
   external?: boolean
+  className?: string
   onMouseEnter?: () => void
   onMouseLeave?: () => void
   onClick?: () => void
@@ -57,24 +58,27 @@ export class SMMButton extends React.PureComponent<SMMButtonProps, SMMButtonStat
     })
     if (this.props.onMouseLeave) this.props.onMouseLeave()
   }
-  renderSubButton (styles: React.CSSProperties, iconStyle: React.CSSProperties) {
+  renderSubButton (styles: Record<string, React.CSSProperties>, iconStyle: React.CSSProperties) {
     return (
       <div>
         <div style={iconStyle}>
           <img style={styles.img} src={this.props.iconSrc} />
         </div>
-        <div style={styles.text}>{this.props.text}</div>
+        {
+          this.props.text &&
+          <div style={styles.text}>{this.props.text}</div>
+        }
       </div>
     )
   }
   render () {
-    const { disabled } = this.props
+    const { className, disabled, text } = this.props
     const { hover } = this.state
     const colorScheme = this.props.colorScheme || 'yellow'
     const enabled = this.props.enabled == null
       ? true
       : this.props.enabled
-    let styles: React.CSSProperties = {
+    let styles: any = {
       button: {
         flex: '0 0 auto',
         margin: '0 10px 10px 10px',
@@ -101,9 +105,9 @@ export class SMMButton extends React.PureComponent<SMMButtonProps, SMMButtonStat
         fontSize: '13px'
       },
       icon: {
-        margin: '4px',
-        width: '32px',
-        height: '32px',
+        padding: '4px',
+        width: '40px',
+        height: '40px',
         float: 'left',
         borderRadius: '4px'
       },
@@ -120,14 +124,14 @@ export class SMMButton extends React.PureComponent<SMMButtonProps, SMMButtonStat
             : '#fff',
           float: 'left',
           width: 'auto',
-          paddingRight: '5px'
+          padding: '0 5px'
         }
       }
     }
     if (this.props.styles) {
       styles = deepMerge(styles, this.props.styles)
     }
-    const iconStyle: React.CSSProperties = Object.assign({},
+    const iconStyle: any = Object.assign({},
       styles.icon,
       this.props.iconStyle === 'dark'
         ? { backgroundColor: 'rgb(50, 50, 69)' }
@@ -142,7 +146,7 @@ export class SMMButton extends React.PureComponent<SMMButtonProps, SMMButtonStat
     )
     return (
       <div
-        className={`smm-button${disabled ? ' smm-button-disabled' : ''}`}
+        className={`smm-button${disabled ? ' smm-button-disabled' : ''}${className ? ` ${className}` : ''}`}
         style={styles.button}
         onMouseEnter={this.mouseEnter}
         onMouseLeave={this.mouseLeave}

@@ -1,0 +1,14 @@
+.snackbar-panel {
+  position: fixed;
+  left: 0;
+  bottom: 60px;
+  height: 46px;
+  width: 250px;
+  max-width: 70%;
+  background-color: black;
+  color: white;
+  padding: 8px 12px;
+  line-height: 30px;
+  z-index: 1000;
+  border-radius: 0 6px 6px 0;
+}

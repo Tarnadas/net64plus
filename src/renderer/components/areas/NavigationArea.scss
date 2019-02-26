@@ -1,0 +1,7 @@
+.navigation-area {
+  display: flex;
+
+  > * {
+    flex: 1 1 160px;
+  }
+}

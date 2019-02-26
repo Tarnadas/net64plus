@@ -7,8 +7,8 @@ import { initialState } from '.'
 import { SaveAction } from '../actions/models/save.model'
 import { SaveState, SaveStateDraft, ElectronSaveDataDraft } from '../../models/State.model'
 
-export const save = (state: SaveState = initialState.save, action: SaveAction) =>
-  produce<SaveState>(state, (draft: SaveStateDraft<ElectronSaveDataDraft>) => {
+export const save = (state: SaveState = initialState.save, action: SaveAction) => {
+  const nextState = produce<SaveState>(state, (draft: SaveStateDraft<ElectronSaveDataDraft>) => {
     switch (action.type) {
       case 'SET_USERNAME':
         draft.appSaveData.username = action.username
@@ -28,9 +28,15 @@ export const save = (state: SaveState = initialState.save, action: SaveAction) =
       case 'SET_VERSION':
         draft.appSaveData.version = action.version
         break
+      case 'SAVE_SERVER_OPTIONS':
+        draft.appSaveData.apiKey = action.apiKey
+        draft.appSaveData.serverOptions = action.serverOptions
+        break
     }
-    saveState(state)
   })
+  saveState(nextState)
+  return nextState
+}
 
 function saveState (state: SaveState): void {
   fs.writeFile(path.join(state.appSavePath, 'save.json'), JSON.stringify(state.appSaveData, null, 2), () => {})

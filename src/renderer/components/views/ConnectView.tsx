@@ -1,3 +1,5 @@
+import './ConnectView.scss'
+
 import * as React from 'react'
 import { connect, Dispatch } from 'react-redux'
 
@@ -14,22 +16,15 @@ interface ConnectViewProps {
 }
 
 class View extends React.PureComponent<ConnectViewProps> {
-  componentWillMount () {
+  public componentDidMount (): void {
     this.props.dispatch(setConnectionError(''))
   }
-  render () {
-    const server = this.props.server
-    const connectionError = this.props.connectionError
-    const styles: React.CSSProperties = {
-      main: {
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: '#24997e',
-        flex: '1 1 auto'
-      }
-    }
+
+  public render (): JSX.Element {
+    const { server, connectionError } = this.props
     return (
-      <div style={styles.main}>
+      <div className='connect-view'>
+        <h1>Direct Connect</h1>
         {
           server
             ? <ConnectionArea server={server} />

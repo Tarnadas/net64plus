@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { Dispatch } from 'redux'
-import { connect } from 'react-redux'
+import { connect, Dispatch } from 'react-redux'
 
 import { SendPasswordArea } from './SendPasswordArea'
 import { ServerPanel } from '../panels/ServerPanel'
@@ -18,7 +17,7 @@ interface ConnectionAreaProps {
 class Area extends React.PureComponent<ConnectionAreaProps, {}> {
   public render (): JSX.Element {
     const { server, authenticated, authenticationThrottle } = this.props
-    const styles: React.CSSProperties = {
+    const styles: Record<string, React.CSSProperties> = {
       area: {
         overflowY: 'auto',
         padding: '4px',
@@ -29,7 +28,7 @@ class Area extends React.PureComponent<ConnectionAreaProps, {}> {
       }
     }
     return (
-      <div className='scroll' style={styles.area}>
+      <div style={styles.area}>
         <ServerPanel server={server} isConnected />
         <ChatArea />
         {

@@ -1,7 +1,6 @@
 {
   "parser": "typescript-eslint-parser",
   "extends": [
-    "standard-with-typescript",
     "plugin:react/recommended"
   ],
   "plugins": [
@@ -10,13 +9,17 @@
     "jsdoc"
   ],
   "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module",
     "ecmaFeatures": {
-      "jsx": true
+      "jsx": true,
+      "modules": true
     }
   },
   "rules": {
     "indent": "off",
     "indent-legacy": ["error", 2, { "SwitchCase": 1 }],
+    "no-unused-vars": "off",
     "react/prop-types": "off",
     "react/jsx-no-target-blank": "off",
     "jsdoc/check-param-names": 1,
@@ -30,11 +33,17 @@
     "jsdoc/require-param-type": 1,
     "jsdoc/require-returns-description": 1,
     "jsdoc/require-returns-type": 1,
-    "typescript/explicit-member-accessibility": "off"
+    "typescript/explicit-member-accessibility": "off",
+    "typescript/no-empty-interface": "off"
   },
   "env": {
     "browser": true,
     "worker": true,
     "jest": true
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
   }
 }

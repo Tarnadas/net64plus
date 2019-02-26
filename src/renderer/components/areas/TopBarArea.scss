@@ -1,0 +1,22 @@
+.top-bar-area {
+  width: 100%;
+  font-size: 12px;
+  flex: 0 0 auto;
+  position: relative;
+
+  &-settings {
+    position: absolute;
+    z-index: 100;
+    top: 44px;
+    left: 6px;
+    min-width: auto !important;
+  }
+
+  &-host {
+    position: absolute;
+    z-index: 100;
+    top: 44px;
+    right: 6px;
+    min-width: auto !important;
+  }
+}

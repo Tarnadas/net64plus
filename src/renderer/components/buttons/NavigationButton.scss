@@ -1,0 +1,108 @@
+$button-color-primary: #ffe500;
+$button-color-active: #daaa26;
+$button-color-hover: #c0951e;
+$button-color-disabled: #8f8f8f;
+
+.navigation-button {
+  display: flex;
+  height: 36px;
+  min-height: 36px;
+  line-height: 36px;
+  background-color: $button-color-primary;
+  cursor: pointer;
+  padding-right: 10px;
+  text-decoration: none;
+  position: relative;
+
+  &:not(:last-child) {
+    margin-right: 18px;
+  }
+
+  &:not(:last-child):after {
+    position: absolute;
+    left: calc(100% - 18px);
+    top: 5px;
+    width: 26px;
+    height: 26px;
+    content: '';
+    transform: rotate(45deg);
+    box-shadow: 4px -4px 4px -2px rgba(0,0,0,0.75);
+    background-color: $button-color-primary;
+    z-index: 100;
+  }
+
+  &:not(:first-child):before {
+    position: absolute;
+    left: -18px;
+    width: 18px;
+    height: 36px;
+    content: '';
+    background-color: $button-color-primary;
+  }
+
+  &:hover {
+    background-color: $button-color-hover;
+
+    &:not(:last-child):after {
+      background-color: $button-color-hover;
+    }
+
+    &:not(:first-child):before {
+      background-color: $button-color-hover;
+    }
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+  }
+
+  &-icon {
+    margin: 4px;
+    width: 28px;
+    height: 28px;
+    padding: 4px;
+  }
+
+  &-label {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    z-index: 101;
+
+    div {
+      position: absolute;
+      bottom: 0;
+    }
+  }
+
+  &-active {
+    background-color: $button-color-active;
+
+    &:not(:last-child):after {
+      background-color: $button-color-active;
+    }
+
+    &:not(:first-child):before {
+      background-color: $button-color-active;
+    }
+  }
+
+  &-disabled {
+    background-color: $button-color-disabled;
+    pointer-events: none;
+    cursor: default;
+
+    &:not(:last-child):after {
+      background-color: $button-color-disabled;
+      pointer-events: none;
+      cursor: default;
+    }
+
+    &:not(:first-child):before {
+      background-color: $button-color-disabled;
+      pointer-events: none;
+      cursor: default;
+    }
+  }
+}

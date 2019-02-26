@@ -2,6 +2,19 @@ import { RouterState as ReactRouterState } from 'react-router-redux'
 
 import { Server } from './Server.model'
 import { FilteredEmulator } from './Emulator.model'
+import { ChildProcess } from 'child_process'
+
+export interface ElectronServerSaveDataDraft {
+  name: string
+  description: string
+  gamemode: number
+  enableGamemodeVote: boolean
+  passwordRequired: boolean
+  password: string
+  port: number
+  enableWebHook: boolean
+}
+export type ElectronServerSaveData = Readonly<ElectronServerSaveDataDraft>
 
 export interface ElectronSaveDataDraft {
   apiKey: string
@@ -11,6 +24,7 @@ export interface ElectronSaveDataDraft {
   lastIp: string
   lastPort: number
   version: string
+  serverOptions: ElectronServerSaveData
 }
 export type ElectronSaveData = Readonly<ElectronSaveDataDraft>
 
@@ -40,6 +54,24 @@ export interface EmulatorStateDraft {
 
 export type EmulatorState = Readonly<EmulatorStateDraft>
 
+export enum IoChannel {
+  Out, Warn, Err
+}
+
+export interface ConsoleServerMessage {
+  key: string
+  message: string
+  channel: IoChannel
+}
+
+export interface ServerStateDraft {
+  process: ChildProcess | null
+  exitCode: number | null
+  server: Server | null
+  messages: ConsoleServerMessage[]
+}
+export type ServerState = Readonly<ServerStateDraft>
+
 export interface ChatMessage {
   key: number
   time: string
@@ -53,11 +85,18 @@ export interface ChatStateDraft {
 }
 export type ChatState = Readonly<ChatStateDraft>
 
+export interface SnackbarStateDraft {
+  message: string | null
+}
+export type SnackbarState = Readonly<SnackbarStateDraft>
+
 export interface StateDraft {
   save: SaveState
   router: RouterState
   connection: ConnectionState
   emulator: EmulatorState
+  server: ServerState
   chat: ChatState
+  snackbar: SnackbarState
 }
 export type State = Readonly<StateDraft>

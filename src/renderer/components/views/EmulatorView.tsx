@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { Dispatch } from 'redux'
-import { connect } from 'react-redux'
+import { connect, Dispatch } from 'react-redux'
 import { push } from 'react-router-redux'
 
 import { connector } from '../..'
@@ -20,6 +19,7 @@ interface EmulatorViewProps {
   characterId: number
   emuChat: boolean
   error: string
+  username: string
 }
 
 interface EmulatorViewState {
@@ -47,10 +47,16 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
   }
 
   public componentDidMount (): void {
+    const { username } = this.props
+    if (!username) {
+      this.props.dispatch(push('/settings'))
+      return
+    }
     this.scan()
     this.timer = setInterval(this.scan, 10000)
   }
 
+  // eslint-disable-next-line
   public componentWillReceiveProps (nextProps: EmulatorViewProps) {
     if (nextProps.error) {
       if (this.timerTimeout) {
@@ -161,7 +167,7 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
   public render (): JSX.Element {
     const { emulators } = this.props
     const { loading, warning } = this.state
-    const styles: React.CSSProperties = {
+    const styles: Record<string, React.CSSProperties> = {
       main: {
         display: 'flex',
         flexWrap: 'wrap',
@@ -183,7 +189,7 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
       }
     }
     return (
-      <div style={styles.main} className='scroll'>
+      <div style={styles.main}>
         {
           warning &&
           <WarningPanel warning={warning} />
@@ -208,5 +214,6 @@ export const EmulatorView = connect((state: State) => ({
   isConnectedToEmulator: state.emulator.isConnectedToEmulator,
   characterId: state.save.appSaveData.character,
   emuChat: state.save.appSaveData.emuChat,
-  error: state.emulator.error
+  error: state.emulator.error,
+  username: state.save.appSaveData.username
 }))(View)

@@ -13,11 +13,11 @@
     display: flex;
     flex-wrap: wrap;
 
-    &-gamemode {
+    &-img {
       height: 18px;
-      width: 36px;
+      width: 27px;
 
-      & > img {
+      > img {
         height: 100%;
       }
     }

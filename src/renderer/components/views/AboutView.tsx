@@ -2,7 +2,7 @@ import * as React from 'react'
 
 export class AboutView extends React.PureComponent {
   render () {
-    const styles: React.CSSProperties = {
+    const styles: Record<string, React.CSSProperties> = {
       view: {
         display: 'flex',
         flexDirection: 'column',
@@ -23,7 +23,7 @@ export class AboutView extends React.PureComponent {
       }
     }
     return (
-      <div style={styles.view} className='scroll'>
+      <div style={styles.view}>
         <h2>Credits</h2>
         <div>
           <h3>Net64 Online Team</h3>
@@ -59,7 +59,7 @@ export class AboutView extends React.PureComponent {
         <code style={styles.text}>
 MIT License<br/><br/>
 
-Copyright (c) 2017 Mario Reder<br/><br/>
+Copyright (c) 2017-2019 Mario Reder<br/><br/>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the &quot;Software&quot;), to deal

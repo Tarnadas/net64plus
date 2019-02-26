@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { Dispatch } from 'redux'
-import { connect } from 'react-redux'
+import { connect, Dispatch } from 'react-redux'
 import { Route, Link } from 'react-router-dom'
 import { push, RouterState } from 'react-router-redux'
 
@@ -9,20 +8,21 @@ import { SettingsView } from './SettingsView'
 import { EmulatorView } from './EmulatorView'
 import { BrowseView } from './BrowseView'
 import { ConnectView } from './ConnectView'
+import { HostView } from './HostView'
 import { AboutView } from './AboutView'
 import { FaqView } from './FaqView'
 import { TopBarArea } from '../areas/TopBarArea'
-import { NewVersionArea } from '../areas/NewVersionArea'
+import { NewVersionDialog } from '../dialogs/NewVersionDialog'
 import { request } from '../../Request'
 import { State } from '../../../models/State.model'
+import { SnackbarPanel } from '../panels/SnackbarPanel'
 
 interface AppViewProps {
   dispatch: Dispatch<State>
   version: string
   location: Location
-  username: string
   route: Readonly<RouterState>
-  isConnectedToEmulator: boolean
+  snackbarMessage: string | null
 }
 
 interface AppViewState {
@@ -38,80 +38,41 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
       requestedPath: ''
     }
     this.updateCheck = this.updateCheck.bind(this)
-    this.forcePath = this.forcePath.bind(this)
     this.onClosePatchNotes = this.onClosePatchNotes.bind(this)
   }
-  componentWillMount () {
+
+  public componentDidMount () {
     this.updateCheck()
     if (this.props.version !== process.env.VERSION) {
       this.props.dispatch(push('/faq'))
     }
   }
-  componentWillReceiveProps (nextProps: AppViewProps) {
-    if (nextProps.location.pathname === this.props.location.pathname && nextProps.isConnectedToEmulator === this.props.isConnectedToEmulator) return
-    this.forcePath(nextProps)
-  }
-  async updateCheck () {
-    const version: string = process.env.VERSION || ''
+
+  private async updateCheck () {
     try {
-      const releases = await request.getGithubReleases()
-      if (!releases) {
-        console.warn('Update check failed. You might be offline')
-        return
-      }
-      const mapVersionToNumber = (versionNumber: string) => versionNumber != null ? parseInt(versionNumber) : 0
-      let [currentMajor, currentMinor, currentPatch] = version.split('.')
-        .map(mapVersionToNumber)
-      if (currentPatch == null) currentPatch = 0
-      for (const release of releases) {
-        if (release.draft == null || release.draft) continue
-        if (release.prerelease == null || release.prerelease) continue
-        if (release.assets == null || release.assets.length === 0) continue
-        if (!release.tag_name) continue
-        let [major, minor, patch] = release.tag_name.split('.')
-          .map(mapVersionToNumber)
-        if (patch == null) patch = 0
-        const versionValue = major * 10000 + minor * 100 + patch
-        const currentVersionValue = currentMajor * 10000 + currentMinor * 100 + currentPatch
-        if (versionValue <= currentVersionValue) continue
-        let foundUpdate = false
-        for (const asset of release.assets) {
-          if (asset.name == null || !asset.name.includes('win32-x64')) continue
-          const newVersionUrl = asset.browser_download_url
-          if (!newVersionUrl) continue
-          this.setState({
-            newVersionUrl,
-            patchNotes: release.body
-          })
-          foundUpdate = true
-          break
-        }
-        if (foundUpdate) break
-      }
+      const { foundUpdate, newVersionUrl, patchNotes } = await request.updateCheck()
+      if (!foundUpdate) return
+      this.setState({
+        newVersionUrl,
+        patchNotes
+      })
     } catch (err) {
       console.error(err)
       setTimeout(this.updateCheck, 15000)
     }
   }
-  forcePath (props: AppViewProps) {
-    const pathName = props.location.pathname
-    if (pathName !== '/' && pathName !== '/about' && pathName !== '/faq') {
-      if (!props.username) {
-        props.dispatch(push('/settings'))
-      } else if (!props.isConnectedToEmulator && pathName !== '/settings') {
-        props.dispatch(push('/emulator'))
-      }
-    }
-  }
-  onClosePatchNotes () {
+
+  private onClosePatchNotes () {
     this.setState({
       newVersionUrl: ''
     })
   }
-  render () {
+
+  public render (): JSX.Element {
+    const { snackbarMessage } = this.props
     const newVersionUrl = this.state.newVersionUrl
     const patchNotes = this.state.patchNotes
-    const styles: React.CSSProperties = {
+    const styles: Record<string, React.CSSProperties> = {
       global: {
         width: '100%',
         maxWidth: '100%',
@@ -125,7 +86,7 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
         fontSize: '44px',
         textAlign: 'center',
         boxShadow: '0px 10px 20px 0px rgba(0,0,0,0.3)',
-        zIndex: '1',
+        zIndex: 1,
         flex: '0 0',
         margin: '5px 0'
       },
@@ -164,23 +125,31 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
       <div style={styles.global}>
         {
           newVersionUrl && patchNotes &&
-          <NewVersionArea
+          <NewVersionDialog
             versionUrl={newVersionUrl}
             patchNotes={patchNotes}
+            autoUpdate={false}
             onClose={this.onClosePatchNotes}
           />
         }
-        <TopBarArea />
+        {
+          snackbarMessage &&
+          <SnackbarPanel
+            message={snackbarMessage}
+          />
+        }
         <div style={styles.logo}>
           <div style={styles.logoFont}>
             Net64+ { process.env.VERSION }
           </div>
+          <TopBarArea />
         </div>
         <Route exact path='/' component={MainView} />
         <Route path='/settings' component={SettingsView} />
         <Route path='/emulator' component={EmulatorView} />
         <Route path='/browse' component={BrowseView} />
         <Route path='/connect' component={ConnectView} />
+        <Route path='/host' component={HostView} />
         <Route path='/about' component={AboutView} />
         <Route path='/faq' component={FaqView} />
         <div style={styles.footer}>
@@ -197,8 +166,7 @@ class View extends React.PureComponent<AppViewProps, AppViewState> {
   }
 }
 export const AppView = connect((state: State) => ({
-  username: state.save.appSaveData.username,
   version: state.save.appSaveData.version,
   route: state.router,
-  isConnectedToEmulator: state.emulator.isConnectedToEmulator
+  snackbarMessage: state.snackbar.message
 }))(View)

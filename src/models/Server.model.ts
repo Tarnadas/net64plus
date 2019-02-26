@@ -12,4 +12,5 @@ export interface Server {
   gameMode?: number
   version?: string
   passwordRequired?: boolean | null
+  isDedicated?: boolean
 }

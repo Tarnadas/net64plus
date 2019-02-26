@@ -80,7 +80,7 @@ class Area extends React.PureComponent<ChatAreaProps, ChatAreaState> {
     )
   }
   render () {
-    const styles: React.CSSProperties = {
+    const styles: Record<string, React.CSSProperties> = {
       area: {
         display: 'flex',
         flexDirection: 'column',
@@ -102,9 +102,10 @@ class Area extends React.PureComponent<ChatAreaProps, ChatAreaState> {
         overflowX: 'hidden',
         flexDirection: 'column',
         backgroundColor: '#fff',
-        flex: '1 0 250px',
+        flex: '1 1 0',
         width: '100%',
-        fontFamily: 'arial'
+        fontFamily: 'arial',
+        minHeight: '100px'
       },
       input: {
         fontSize: '18px',
@@ -117,7 +118,7 @@ class Area extends React.PureComponent<ChatAreaProps, ChatAreaState> {
           <input style={styles.input} value={this.state.message} onChange={this.onMessageChange} onKeyPress={this.onKeyPress} />
           <SMMButton text='Send' iconSrc='img/submit.png' onClick={this.onSend} />
         </div>
-        <div className='chat scroll' style={styles.chat} ref={x => { this.chat = x }}>
+        <div className='chat' style={styles.chat} ref={x => { this.chat = x }}>
           {
             this.renderChatMessages(this.props.chat)
           }
