@@ -189,12 +189,19 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
           className='server-panel-header'
           onClick={this.onToggle}
         >
+          <div className='server-panel-header-img'>
+            <img src={`${
+              server.isDedicated
+                ? 'img/server.svg'
+                : 'img/pc.svg'
+            }`} />
+          </div>
           <div style={{ flex: '0 0 40px' }}>
             { server.countryCode || '' }
           </div>
           {
             gameMode &&
-            <div className='server-panel-header-gamemode'>
+            <div className='server-panel-header-img'>
               <img src={gameMode} />
             </div>
           }
