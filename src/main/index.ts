@@ -69,7 +69,7 @@ export function updateRPC(update: Object, clean?: boolean) {
       }
     })
     connector = new Connector(mainWindow)
-    updateRPC({state: "Ready", details: "Ready", largeImageKey: "net64", largeImageText: `Net64+ ${process.env.VERSION}`})
+    updateRPC({state: 'Ready', details: 'Ready', largeImageKey: 'net64', largeImageText: `Net64+ ${process.env.VERSION}`})
     mainWindow.loadURL(path.normalize(`file://${__dirname}/index.html`))
 
     if (process.env.NODE_ENV === 'development') {

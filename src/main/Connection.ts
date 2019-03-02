@@ -34,36 +34,36 @@ function getGameModeString(gamemodeInteger: number) {
   var retObj: {[k: string]: any} = {};
   switch(gamemodeInteger) {
     case 1:
-      retObj.name = "Regular"
-      retObj.imageName = "regular"
+      retObj.name = 'Regular'
+      retObj.imageName = 'regular'
       break
     case 2:
-      retObj.name = "Third Person Shooter"
-      retObj.imageName = "shooter"
+      retObj.name = 'Third Person Shooter'
+      retObj.imageName = 'shooter'
       break
     case 3:
-      retObj.name = "Interactionless"
-      retObj.imageName = "interactionless"
+      retObj.name = 'Interactionless'
+      retObj.imageName = 'interactionless'
       break
     case 4:
-      retObj.name = "Prop Hunt"
-      retObj.imageName = "prop_hunt"
+      retObj.name = 'Prop Hunt'
+      retObj.imageName = 'prop_hunt'
       break
     case 5:
-      retObj.name = "Boss Rush"
-      retObj.imageName = "boss_rush"
+      retObj.name = 'Boss Rush'
+      retObj.imageName = 'boss_rush'
       break
     case 6:
-      retObj.name = "Tag"
-      retObj.imageName = "tag"
+      retObj.name = 'Tag'
+      retObj.imageName = 'tag'
       break
     case 8:
-      retObj.name = "Wario Ware"
-      retObj.imageName = "wario_ware"
+      retObj.name = 'Wario Ware'
+      retObj.imageName = 'wario_ware'
       break
     default:
-      retObj.name = "None"
-      retObj.imageName = ""
+      retObj.name = 'None'
+      retObj.imageName = ''
       break
   }
   return retObj
@@ -172,7 +172,7 @@ export class Connection {
       this.loop = null
     }
     connector.closeWebSocket(code, this.hasError)
-    updateRPC({state: "Ready", details: "Ready", largeImageKey: "net64", largeImageText: `Net64+ ${process.env.VERSION}`}, true)
+    updateRPC({state: 'Ready', details: 'Ready', largeImageKey: 'net64', largeImageText: `Net64+ ${process.env.VERSION}`}, true)
     if (!emulator) return
     emulator.reset()
   }
