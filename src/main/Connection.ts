@@ -172,7 +172,7 @@ export class Connection {
       this.loop = null
     }
     connector.closeWebSocket(code, this.hasError)
-    updateRPC({state: "Ready", details: "", smallImageKey: "", smallImageText: "", startTimestamp: "", partySize: null, partyMax: null})
+    updateRPC({state: "Ready", details: "Ready"}, true)
     if (!emulator) return
     emulator.reset()
   }
