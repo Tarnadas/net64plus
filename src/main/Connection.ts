@@ -172,7 +172,7 @@ export class Connection {
       this.loop = null
     }
     connector.closeWebSocket(code, this.hasError)
-    updateRPC({state: "Ready", details: "Ready"}, true)
+    updateRPC({state: "Ready", details: "Ready", largeImageKey: "net64", largeImageText: `Net64+ ${process.env.VERSION}`}, true)
     if (!emulator) return
     emulator.reset()
   }
