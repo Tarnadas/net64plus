@@ -2,6 +2,7 @@ import { app, BrowserWindow } from 'electron'
 
 import * as path from 'path'
 import * as fs from 'fs'
+import * as RPCClientInstance from 'discord-rich-presence'
 
 import { Connector } from './Connector'
 import { Emulator } from './Emulator'
@@ -48,7 +49,12 @@ export const deleteConnection = () => {
   if (connection) connection.disconnect()
   connection = undefined
 }
-
+export const RPCClient = new RPCClientInstance('550708311582834700')
+export const RPCState = {}
+export function updateRPC(update: Object) {
+  Object.assign(RPCState, update)
+  RPCClient.updatePresence(RPCState)
+}
 ;(() => {
   const onReady = () => {
     const mainWindow = new BrowserWindow({
@@ -62,7 +68,7 @@ export const deleteConnection = () => {
       }
     })
     connector = new Connector(mainWindow)
-
+    updateRPC({state: "Ready", largeImageKey: "net64", largeImageText: `Net64+ ${process.env.VERSION}`})
     mainWindow.loadURL(path.normalize(`file://${__dirname}/index.html`))
 
     if (process.env.NODE_ENV === 'development') {
@@ -76,6 +82,7 @@ export const deleteConnection = () => {
   app.on('ready', onReady)
 
   app.on('window-all-closed', () => {
+    RPCClient.disconnect()
     app.quit()
   })
 

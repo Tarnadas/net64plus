@@ -2,7 +2,7 @@ import * as WS from 'ws'
 
 import * as zlib from 'zlib'
 
-import { connector, emulator } from '.'
+import { connector, emulator, updateRPC } from '.'
 import { buf2hex } from '../utils/Buffer.util'
 import {
   Compression,
@@ -23,7 +23,51 @@ import {
 } from '../../proto/ServerClientMessage'
 
 const UPDATE_INTERVAL = 32
+const MAX_SERVER_PLAYER = 24
 
+/**
+ * Helper function to sort gamemode as the DRPC image and gamemode as readable name
+ * @param {number} gamemodeInteger - The integer of the gamemode ranging from 1-6, 8
+ */
+
+function getGameModeString(gamemodeInteger: number) {
+  var retObj: {[k: string]: any} = {};
+  switch(gamemodeInteger) {
+    case 1:
+      retObj.name = "Regular"
+      retObj.imageName = "regular"
+      break
+    case 2:
+      retObj.name = "Third Person Shooter"
+      retObj.imageName = "shooter"
+      break
+    case 3:
+      retObj.name = "Interactionless"
+      retObj.imageName = "interactionless"
+      break
+    case 4:
+      retObj.name = "Prop Hunt"
+      retObj.imageName = "prop_hunt"
+      break
+    case 5:
+      retObj.name = "Boss Rush"
+      retObj.imageName = "boss_rush"
+      break
+    case 6:
+      retObj.name = "Tag"
+      retObj.imageName = "tag"
+      break
+    case 8:
+      retObj.name = "Wario Ware"
+      retObj.imageName = "wario_ware"
+      break
+    default:
+      retObj.name = "None"
+      retObj.imageName = ""
+      break
+  }
+  return retObj
+}
 /**
  * A Connection object represents the connection to an actual
  * Net64+ server.
@@ -128,6 +172,7 @@ export class Connection {
       this.loop = null
     }
     connector.closeWebSocket(code, this.hasError)
+    updateRPC({state: "Ready", details: "", smallImageKey: "", smallImageText: "", startTimestamp: "", partySize: null, partyMax: null})
     if (!emulator) return
     emulator.reset()
   }
@@ -235,6 +280,16 @@ export class Connection {
         players,
         passwordRequired: handshake.passwordRequired
       })
+      var gamemodeObj = getGameModeString(handshake.gameMode)
+      updateRPC({
+        state: `Playing in ${handshake.name}`,
+        details: `Playing in ${gamemodeObj.name} mode`,
+        smallImageKey: gamemodeObj.imageName,
+        smallImageText: gamemodeObj.name,
+        startTimestamp: Date.now(),
+        partySize: players.length,
+        partyMax: MAX_SERVER_PLAYER
+      })
     }
     emulator!.setPlayerId(this.playerId)
     emulator!.setGameMode(handshake.gameMode)
@@ -326,6 +381,8 @@ export class Connection {
     if (!gameMode || !gameMode.gameMode) return
     emulator!.setGameMode(gameMode.gameMode)
     connector.setGameMode(gameMode.gameMode)
+    var gamemodeObj = getGameModeString(gameMode.gameMode)
+    updateRPC({details: `Playing in ${gamemodeObj.name} mode`, smallImageKey: gamemodeObj.imageName, smallImageText: gamemodeObj.name})
     connector.commandMessage(`Gamemode changed to ${gameMode.gameMode}`)
   }
 
@@ -381,6 +438,7 @@ export class Connection {
     const players = messageData.playerListUpdate.playerUpdates
     if (!players) return
     connector.setPlayers(players)
+    updateRPC({partySize: players.length})
   }
 
   /**
