@@ -58,6 +58,7 @@
     "bufferutil": "^4.0.1",
     "csv-parse": "3",
     "deepmerge": "^2.0.1",
+    "discord-rich-presence": "0.0.8",
     "dompurify": "^1.0.4",
     "electron": "2",
     "history": "^4.7.2",
