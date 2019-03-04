@@ -29,9 +29,8 @@ const MAX_SERVER_PLAYER = 24
  * Helper function to sort gamemode as the DRPC image and gamemode as readable name
  * @param {number} gamemodeInteger - The integer of the gamemode ranging from 1-6, 8
  */
-
-function getGameModeString(gamemodeInteger: number) {
-  var retObj: {[k: string]: any} = {};
+function getGameModeString(gamemodeInteger: number): {[k: string]: string} {
+  var retObj: {[k: string]: string} = {}
   switch(gamemodeInteger) {
     case 1:
       retObj.name = 'Regular'
@@ -280,7 +279,7 @@ export class Connection {
         players,
         passwordRequired: handshake.passwordRequired
       })
-      var gamemodeObj = getGameModeString(handshake.gameMode)
+      const gamemodeObj = getGameModeString(handshake.gameMode)
       updateRPC({
         state: `Playing in ${handshake.name}`,
         details: `Playing in ${gamemodeObj.name} mode`,
@@ -381,7 +380,7 @@ export class Connection {
     if (!gameMode || !gameMode.gameMode) return
     emulator!.setGameMode(gameMode.gameMode)
     connector.setGameMode(gameMode.gameMode)
-    var gamemodeObj = getGameModeString(gameMode.gameMode)
+    const gamemodeObj = getGameModeString(gameMode.gameMode)
     updateRPC({details: `Playing in ${gamemodeObj.name} mode`, smallImageKey: gamemodeObj.imageName, smallImageText: gamemodeObj.name})
     connector.commandMessage(`Gamemode changed to ${gameMode.gameMode}`)
   }

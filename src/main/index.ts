@@ -50,8 +50,8 @@ export const deleteConnection = () => {
   connection = undefined
 }
 export const RPCClient = new RPCClientInstance('550708311582834700')
-export var RPCState = {}
-export function updateRPC(update: Object, clean?: boolean) {
+export let RPCState = {}
+export function updateRPC(update: Object, clean?: boolean): void {
   if (clean) {RPCState = {}}
   Object.assign(RPCState, update)
   RPCClient.updatePresence(RPCState)
