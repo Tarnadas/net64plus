@@ -50,6 +50,11 @@ export const deleteConnection = () => {
   connection = undefined
 }
 export const RPCClient = new RPCClientInstance('550708311582834700')
+RPCClient.on("error", (err: Error) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.error(err)
+  }
+})
 export let RPCState = {}
 export function updateRPC(update: Object, clean?: boolean): void {
   if (clean) {RPCState = {}}
