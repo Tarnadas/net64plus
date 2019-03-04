@@ -30,7 +30,7 @@ const MAX_SERVER_PLAYER = 24
  * @param {number} gamemodeInteger - The integer of the gamemode ranging from 1-6, 8
  */
 function getGameModeString(gamemodeInteger: number): {[k: string]: string} {
-  var retObj: {[k: string]: string} = {}
+  const retObj: {[k: string]: string} = {}
   switch(gamemodeInteger) {
     case 1:
       retObj.name = 'Regular'
