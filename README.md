@@ -1,6 +1,6 @@
 # Net64+ Client
 
-[![Discord](https://discordapp.com/api/guilds/354358899328942081/widget.png)](https://discord.gg/net64)
+[![Discord](https://discordapp.com/api/guilds/559982917049253898/widget.png)](https://discord.gg/GgGUKH8)
 [![Build Status](https://api.travis-ci.org/Tarnadas/net64plus.svg?branch=master)](https://travis-ci.org/Tarnadas/net64plus)
 
 Net64 aka SM64O allows playing Super Mario 64 in an online multiplayer mode.
