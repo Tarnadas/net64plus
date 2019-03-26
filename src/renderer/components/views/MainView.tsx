@@ -48,19 +48,14 @@ class View extends React.PureComponent<MainViewProps> {
         <h3>Join our community</h3>
         <div>
           <SMMButton
-            link='https://discord.gg/net64' external
+            link='https://discord.gg/GgGUKH8' external
             text='Net64 Discord'
             iconSrc='img/discord.svg'
           />
           <SMMButton
-            link='https://smmdb.ddns.net/' external
+            link='https://net64-mod.github.io/' external
             text='Net64 Website'
             iconSrc='img/net64.svg'
-          />
-          <SMMButton
-            link='https://reddit.com/r/Net64' external
-            text='Net64 SubReddit'
-            iconSrc='img/reddit.svg'
           />
         </div>
       </div>

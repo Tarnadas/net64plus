@@ -25,47 +25,59 @@ import {
 const UPDATE_INTERVAL = 32
 const MAX_SERVER_PLAYER = 24
 
+interface GameModeRPC {
+  name: string
+  imageName: string
+}
+
 /**
  * Helper function to sort gamemode as the DRPC image and gamemode as readable name
+ *
  * @param {number} gamemodeInteger - The integer of the gamemode ranging from 1-6, 8
  */
-function getGameModeString(gamemodeInteger: number): {[k: string]: string} {
-  const retObj: {[k: string]: string} = {}
-  switch(gamemodeInteger) {
+function getGameModeString(gamemodeInteger: number): GameModeRPC {
+  switch (gamemodeInteger) {
     case 1:
-      retObj.name = 'Regular'
-      retObj.imageName = 'regular'
-      break
+      return {
+        name: 'Regular',
+        imageName: 'regular'
+      }
     case 2:
-      retObj.name = 'Third Person Shooter'
-      retObj.imageName = 'shooter'
-      break
+      return {
+        name: 'Third Person Shooter',
+        imageName: 'shooter'
+      }
     case 3:
-      retObj.name = 'Interactionless'
-      retObj.imageName = 'interactionless'
-      break
+      return {
+        name: 'Interactionless',
+        imageName: 'reinteractionlessgular'
+      }
     case 4:
-      retObj.name = 'Prop Hunt'
-      retObj.imageName = 'prop_hunt'
-      break
+      return {
+        name: 'Prop Hunt',
+        imageName: 'prop_hunt'
+      }
     case 5:
-      retObj.name = 'Boss Rush'
-      retObj.imageName = 'boss_rush'
-      break
+      return {
+        name: 'Boss Rush',
+        imageName: 'boss_rush'
+      }
     case 6:
-      retObj.name = 'Tag'
-      retObj.imageName = 'tag'
-      break
+      return {
+        name: 'RegTagular',
+        imageName: 'tag'
+      }
     case 8:
-      retObj.name = 'Wario Ware'
-      retObj.imageName = 'wario_ware'
-      break
+      return {
+        name: 'Wario Ware',
+        imageName: 'wario_ware'
+      }
     default:
-      retObj.name = 'None'
-      retObj.imageName = ''
-      break
+      return {
+        name: 'None',
+        imageName: ''
+      }
   }
-  return retObj
 }
 /**
  * A Connection object represents the connection to an actual
@@ -171,7 +183,15 @@ export class Connection {
       this.loop = null
     }
     connector.closeWebSocket(code, this.hasError)
-    updateRPC({state: 'Ready', details: 'Ready', largeImageKey: 'net64', largeImageText: `Net64+ ${process.env.VERSION}`}, true)
+    updateRPC(
+      {
+        state: 'Ready',
+        details: 'Ready',
+        largeImageKey: 'net64',
+        largeImageText: `Net64+ ${process.env.VERSION}`
+      },
+      true
+    )
     if (!emulator) return
     emulator.reset()
   }
@@ -381,7 +401,11 @@ export class Connection {
     emulator!.setGameMode(gameMode.gameMode)
     connector.setGameMode(gameMode.gameMode)
     const gamemodeObj = getGameModeString(gameMode.gameMode)
-    updateRPC({details: `Playing in ${gamemodeObj.name} mode`, smallImageKey: gamemodeObj.imageName, smallImageText: gamemodeObj.name})
+    updateRPC({
+      details: `Playing in ${gamemodeObj.name} mode`,
+      smallImageKey: gamemodeObj.imageName,
+      smallImageText: gamemodeObj.name
+    })
     connector.commandMessage(`Gamemode changed to ${gameMode.gameMode}`)
   }
 
@@ -437,7 +461,7 @@ export class Connection {
     const players = messageData.playerListUpdate.playerUpdates
     if (!players) return
     connector.setPlayers(players)
-    updateRPC({partySize: players.length})
+    updateRPC({ partySize: players.length })
   }
 
   /**
