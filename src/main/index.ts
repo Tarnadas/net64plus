@@ -49,18 +49,22 @@ export const deleteConnection = () => {
   if (connection) connection.disconnect()
   connection = undefined
 }
-export const RPCClient = new RPCClientInstance('550708311582834700')
+
+export const RPCClient = new RPCClientInstance('560060224321355811')
 RPCClient.on("error", (err: Error) => {
   if (process.env.NODE_ENV === 'development') {
     console.error(err)
   }
 })
+
 export let RPCState = {}
+
 export function updateRPC(update: Object, clean?: boolean): void {
   if (clean) {RPCState = {}}
   Object.assign(RPCState, update)
   RPCClient.updatePresence(RPCState)
 }
+
 ;(() => {
   const onReady = () => {
     const mainWindow = new BrowserWindow({
@@ -74,7 +78,12 @@ export function updateRPC(update: Object, clean?: boolean): void {
       }
     })
     connector = new Connector(mainWindow)
-    updateRPC({state: 'Ready', details: 'Ready', largeImageKey: 'net64', largeImageText: `Net64+ ${process.env.VERSION}`})
+    updateRPC({
+      state: 'Ready',
+      details: 'Ready',
+      largeImageKey: 'net64',
+      largeImageText: `Net64+ ${process.env.VERSION}`
+    })
     mainWindow.loadURL(path.normalize(`file://${__dirname}/index.html`))
 
     if (process.env.NODE_ENV === 'development') {
