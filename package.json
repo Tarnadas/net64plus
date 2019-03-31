@@ -60,7 +60,7 @@
     "deepmerge": "^2.0.1",
     "discord-rich-presence": "0.0.8",
     "dompurify": "^1.0.4",
-    "electron": "2",
+    "electron": "2.0.18",
     "history": "^4.7.2",
     "immer": "^2.0.0",
     "marked": "^0.4.0",
