@@ -65,6 +65,8 @@ export function updateRPC(update: Object, clean?: boolean): void {
   RPCClient.updatePresence(RPCState)
 }
 
+import { globalShortcut } from 'electron'
+
 ;(() => {
   const onReady = () => {
     const mainWindow = new BrowserWindow({
@@ -77,6 +79,11 @@ export function updateRPC(update: Object, clean?: boolean): void {
         nodeIntegrationInWorker: true
       }
     })
+    console.log(globalShortcut)
+    globalShortcut.register('A', () => {
+      console.log('CommandOrControl+X is pressed')
+    })
+
     connector = new Connector(mainWindow)
     updateRPC({
       state: 'Ready',

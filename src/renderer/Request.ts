@@ -26,7 +26,7 @@ class Request {
       baseURL: 'https://smmdb.ddns.net/api/',
       responseType: 'json'
     })
-    let githubApiKey = process.env.NODE_ENV === 'development'
+    let githubApiKey = false // process.env.NODE_ENV === 'development'
       ? JSON.parse(fs.readFileSync(path.join(__dirname, '../../../.credentials'), {
         encoding: 'utf8'
       })).github

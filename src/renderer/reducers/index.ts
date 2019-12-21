@@ -21,6 +21,21 @@ const APP_SAVE_DATA: ElectronSaveData = {
   username: '',
   character: 0,
   emuChat: false,
+  globalHotkeys: false,
+  globalHotkeysBindings: {
+    0: undefined, // Mario
+    1: undefined, // Luigi
+    2: undefined, // Yoshi
+    3: undefined, // Wario
+    4: undefined, // Peach
+    5: undefined, // Toad
+    6: undefined, // Waluigi
+    7: undefined, // Rosalina
+    8: undefined, // Sonic
+    9: undefined, // Knuckles
+    10: undefined, // Goomba
+    11: undefined // Kirby
+  },
   lastIp: 'smmdb.ddns.net',
   lastPort: 3678,
   version: '',

@@ -19,6 +19,9 @@ export const save = (state: SaveState = initialState.save, action: SaveAction) =
       case 'SET_EMU_CHAT':
         draft.appSaveData.emuChat = action.emuChat
         break
+      case 'SET_GLOBAL_HOTKEYS':
+        draft.appSaveData.globalHotkeys = action.globalHotkeys
+        break
       case 'ADD_API_KEY':
         draft.appSaveData.apiKey = action.apiKey
         break
@@ -39,5 +42,6 @@ export const save = (state: SaveState = initialState.save, action: SaveAction) =
 }
 
 function saveState (state: SaveState): void {
+  console.log(state.appSavePath)
   fs.writeFile(path.join(state.appSavePath, 'save.json'), JSON.stringify(state.appSaveData, null, 2), () => {})
 }

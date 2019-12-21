@@ -4,7 +4,7 @@ import { connect, Dispatch } from 'react-redux'
 import { connector } from '../..'
 import { SMMButton } from '../buttons/SMMButton'
 import { WarningPanel } from '../panels/WarningPanel'
-import { setUsername, setCharacter, setEmuChat } from '../../actions/save'
+import { setUsername, setCharacter, setEmuChat, setGlobalHotkeys } from '../../actions/save'
 import { State, ElectronSaveData } from '../../../models/State.model'
 import { showSnackbar } from '../../actions/snackbar'
 
@@ -18,6 +18,8 @@ interface SettingsViewState {
   username: string
   characterId: number
   emuChat: boolean
+  globalHotkeys: boolean
+  globalHotkeysBindings: { [characterId: number]: string | undefined }
   warning: string
 }
 
@@ -31,11 +33,15 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       username: props.saveData.username,
       characterId: props.saveData.character,
       emuChat: props.saveData.emuChat,
+      globalHotkeys: props.saveData.globalHotkeys,
+      globalHotkeysBindings: props.saveData.globalHotkeysBindings,
       warning: props.saveData.username ? '' : 'You must set a username'
     }
     this.onUsernameChange = this.onUsernameChange.bind(this)
     this.onCharacterChange = this.onCharacterChange.bind(this)
     this.onEmuChatChange = this.onEmuChatChange.bind(this)
+    this.onGlobalHotkeysChange = this.onGlobalHotkeysChange.bind(this)
+    this.onGlobalHotkeysBindingsChange = this.onGlobalHotkeysBindingsChange.bind(this)
     this.onSave = this.onSave.bind(this)
   }
   onUsernameChange (e: React.ChangeEvent<any>) {
@@ -59,6 +65,21 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       emuChat
     })
   }
+  onGlobalHotkeysChange (e: React.ChangeEvent<any>) {
+    const globalHotkeys = e.target.checked
+    this.setState({
+      globalHotkeys
+    })
+  }
+  onGlobalHotkeysBindingsChange (characterId: number, e: React.ChangeEvent<any>) {
+    // Convert value to accelerator
+    const value = (e.target.value as string).substring(-1) || undefined;
+    const globalHotkeysBindings = this.state.globalHotkeysBindings;
+    globalHotkeysBindings[characterId] = value;
+    this.setState({
+      globalHotkeysBindings
+    })
+  }
   onSave () {
     const username = this.state.username.replace(/\W/g, '')
     if (username.length < MIN_LENGTH_USERNAME) {
@@ -71,6 +92,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       dispatch(setUsername(username))
       dispatch(setCharacter(this.state.characterId))
       dispatch(setEmuChat(this.state.emuChat))
+      dispatch(setGlobalHotkeys(this.state.globalHotkeys))
       dispatch(showSnackbar('Saved'))
     }
   }
@@ -147,6 +169,21 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
             checked={this.state.emuChat}
             onChange={this.onEmuChatChange}
           />
+          <div style={styles.label}>Enable global character hotkeys:</div>
+          <input
+            style={styles.checkBox}
+            type='checkbox'
+            checked={this.state.globalHotkeys}
+            onChange={this.onGlobalHotkeysChange}
+          />
+        </div>
+        <div style={styles.setting}>
+          <div style={styles.label}>Global Character Hotkeys:</div>
+          <div style={styles.setting}>
+            <div style={styles.label}>Mario:</div>
+            <input style={styles.input} value={this.state.globalHotkeysBindings[0]} onChange={(event) => this.onGlobalHotkeysBindingsChange(0, event)} />
+          </div>
+          
         </div>
         <SMMButton
           text='Save'
