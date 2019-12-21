@@ -22,7 +22,7 @@ export interface ElectronSaveDataDraft {
   character: number
   emuChat: boolean
   globalHotkeys: boolean
-  globalHotkeysBindings: { [characterId: number]: string | undefined }
+  hotkeyBindings: { [characterId: number]: string | undefined }
   lastIp: string
   lastPort: number
   version: string

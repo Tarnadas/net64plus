@@ -22,7 +22,7 @@ const APP_SAVE_DATA: ElectronSaveData = {
   character: 0,
   emuChat: false,
   globalHotkeys: false,
-  globalHotkeysBindings: {
+  hotkeyBindings: {
     0: undefined, // Mario
     1: undefined, // Luigi
     2: undefined, // Yoshi

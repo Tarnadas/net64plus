@@ -19,7 +19,7 @@ interface SettingsViewState {
   characterId: number
   emuChat: boolean
   globalHotkeys: boolean
-  globalHotkeysBindings: { [characterId: number]: string | undefined }
+  hotkeyBindings: { [characterId: number]: string | undefined }
   warning: string
 }
 
@@ -34,14 +34,14 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       characterId: props.saveData.character,
       emuChat: props.saveData.emuChat,
       globalHotkeys: props.saveData.globalHotkeys,
-      globalHotkeysBindings: props.saveData.globalHotkeysBindings,
+      hotkeyBindings: props.saveData.hotkeyBindings,
       warning: props.saveData.username ? '' : 'You must set a username'
     }
     this.onUsernameChange = this.onUsernameChange.bind(this)
     this.onCharacterChange = this.onCharacterChange.bind(this)
     this.onEmuChatChange = this.onEmuChatChange.bind(this)
     this.onGlobalHotkeysChange = this.onGlobalHotkeysChange.bind(this)
-    this.onGlobalHotkeysBindingsChange = this.onGlobalHotkeysBindingsChange.bind(this)
+    this.onHotkeyBindingChange = this.onHotkeyBindingChange.bind(this)
     this.onSave = this.onSave.bind(this)
   }
   onUsernameChange (e: React.ChangeEvent<any>) {
@@ -71,14 +71,18 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       globalHotkeys
     })
   }
-  onGlobalHotkeysBindingsChange (characterId: number, e: React.ChangeEvent<any>) {
-    // Convert value to accelerator
-    const value = (e.target.value as string).substring(-1) || undefined;
-    const globalHotkeysBindings = this.state.globalHotkeysBindings;
-    globalHotkeysBindings[characterId] = value;
-    this.setState({
-      globalHotkeysBindings
+  onHotkeyBindingChange (characterId: number, any?: any) {
+    console.log(any);
+    console.log(this);
+    document.addEventListener("keydown", (event) => {
+      console.log(event)
     })
+    // const value = (e.target.value as string).substring(-1) || undefined;
+    // const hotkeyBindings = this.state.hotkeyBindings;
+    // hotkeyBindings[characterId] = value;
+    // this.setState({
+    //   hotkeyBindings
+    // })
   }
   onSave () {
     const username = this.state.username.replace(/\W/g, '')
@@ -178,10 +182,18 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
           />
         </div>
         <div style={styles.setting}>
-          <div style={styles.label}>Global Character Hotkeys:</div>
+          <div style={styles.label}>Character Hotkeys:</div>
           <div style={styles.setting}>
             <div style={styles.label}>Mario:</div>
-            <input style={styles.input} value={this.state.globalHotkeysBindings[0]} onChange={(event) => this.onGlobalHotkeysBindingsChange(0, event)} />
+            <button
+              onClick={() => this.onHotkeyBindingChange(0)}
+            >{this.state.hotkeyBindings[0] || 'None'}</button>
+            <SMMButton
+              text=''
+              iconSrc='img/submit.png'
+              onClick={() => this.onHotkeyBindingChange(0, this)}
+            />
+            {/* <input style={styles.input} value={this.state.hotkeyBindings[0]} onChange={(event) => this.onHotkeyBindingChange(0, event)} /> */}
           </div>
           
         </div>

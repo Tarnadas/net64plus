@@ -79,10 +79,10 @@ import { globalShortcut } from 'electron'
         nodeIntegrationInWorker: true
       }
     })
-    console.log(globalShortcut)
-    globalShortcut.register('A', () => {
-      console.log('CommandOrControl+X is pressed')
-    })
+    // console.log(globalShortcut)
+    // globalShortcut.register('A', () => {
+    //   console.log('CommandOrControl+X is pressed')
+    // })
 
     connector = new Connector(mainWindow)
     updateRPC({
