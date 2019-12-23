@@ -113,6 +113,8 @@ import { globalShortcut } from 'electron'
   })
 
   process.on('uncaughtException', (err: Error) => {
+    console.error(err)
+    process.stdout.write(err.message)
     const errorFolderPath = path.resolve(__dirname, 'error')
     const filePath = path.resolve(
       errorFolderPath,

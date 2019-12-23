@@ -3,6 +3,7 @@ import { connect, Dispatch } from 'react-redux'
 
 import { connector } from '../..'
 import { SMMButton } from '../buttons/SMMButton'
+import { HotkeyButton } from '../buttons/HotkeyButton'
 import { WarningPanel } from '../panels/WarningPanel'
 import { setUsername, setCharacter, setEmuChat, setGlobalHotkeys } from '../../actions/save'
 import { State, ElectronSaveData } from '../../../models/State.model'
@@ -71,18 +72,10 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       globalHotkeys
     })
   }
-  onHotkeyBindingChange (characterId: number, any?: any) {
-    console.log(any);
-    console.log(this);
-    document.addEventListener("keydown", (event) => {
-      console.log(event)
-    })
-    // const value = (e.target.value as string).substring(-1) || undefined;
-    // const hotkeyBindings = this.state.hotkeyBindings;
-    // hotkeyBindings[characterId] = value;
-    // this.setState({
-    //   hotkeyBindings
-    // })
+  onHotkeyBindingChange (characterId: number, hotkey?: string) {
+    const { hotkeyBindings } = this.state
+    hotkeyBindings[characterId] = hotkey
+    this.setState({ hotkeyBindings })
   }
   onSave () {
     const username = this.state.username.replace(/\W/g, '')
@@ -99,6 +92,19 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       dispatch(setGlobalHotkeys(this.state.globalHotkeys))
       dispatch(showSnackbar('Saved'))
     }
+  }
+  renderHokeyButtons () {
+    const buttons = []
+    for (let i = 0; i < 12; i++) {
+      buttons.push(<HotkeyButton
+        key={i}
+        characterId={i}
+        hotkey={this.state.hotkeyBindings[i]}
+        onClick={this.onHotkeyBindingChange}
+        onRightClick={this.onHotkeyBindingChange}
+      />)
+    }
+    return buttons;
   }
   render () {
     const warning = this.state.warning
@@ -181,21 +187,9 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
             onChange={this.onGlobalHotkeysChange}
           />
         </div>
-        <div style={styles.setting}>
-          <div style={styles.label}>Character Hotkeys:</div>
-          <div style={styles.setting}>
-            <div style={styles.label}>Mario:</div>
-            <button
-              onClick={() => this.onHotkeyBindingChange(0)}
-            >{this.state.hotkeyBindings[0] || 'None'}</button>
-            <SMMButton
-              text=''
-              iconSrc='img/submit.png'
-              onClick={() => this.onHotkeyBindingChange(0, this)}
-            />
-            {/* <input style={styles.input} value={this.state.hotkeyBindings[0]} onChange={(event) => this.onHotkeyBindingChange(0, event)} /> */}
-          </div>
-          
+        <div>Character Hotkeys (right click to unassign):</div>
+        <div>
+          {this.renderHokeyButtons()}
         </div>
         <SMMButton
           text='Save'
