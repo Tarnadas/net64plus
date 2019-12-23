@@ -10,4 +10,4 @@
 !/build/processlist.node
 /release/
 yarn-error.log
-.vscode/
+.vscode/settings.json
