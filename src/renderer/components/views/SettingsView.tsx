@@ -5,7 +5,7 @@ import { connector } from '../..'
 import { SMMButton } from '../buttons/SMMButton'
 import { HotkeyButton } from '../buttons/HotkeyButton'
 import { WarningPanel } from '../panels/WarningPanel'
-import { setUsername, setCharacter, setEmuChat, setGlobalHotkeys } from '../../actions/save'
+import { setUsername, setCharacter, setEmuChat, setGlobalHotkeysEnabled } from '../../actions/save'
 import { State, ElectronSaveData } from '../../../models/State.model'
 import { showSnackbar } from '../../actions/snackbar'
 
@@ -19,7 +19,7 @@ interface SettingsViewState {
   username: string
   characterId: number
   emuChat: boolean
-  globalHotkeys: boolean
+  globalHotkeysEnabled: boolean
   hotkeyBindings: { [characterId: number]: string | undefined }
   warning: string
 }
@@ -34,7 +34,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       username: props.saveData.username,
       characterId: props.saveData.character,
       emuChat: props.saveData.emuChat,
-      globalHotkeys: props.saveData.globalHotkeys,
+      globalHotkeysEnabled: props.saveData.globalHotkeysEnabled,
       hotkeyBindings: props.saveData.hotkeyBindings,
       warning: props.saveData.username ? '' : 'You must set a username'
     }
@@ -67,9 +67,9 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     })
   }
   onGlobalHotkeysChange (e: React.ChangeEvent<any>) {
-    const globalHotkeys = e.target.checked
+    const globalHotkeysEnabled = e.target.checked
     this.setState({
-      globalHotkeys
+      globalHotkeysEnabled
     })
   }
   onHotkeyBindingChange (characterId: number, hotkey?: string) {
@@ -79,6 +79,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
   }
   onSave () {
     const username = this.state.username.replace(/\W/g, '')
+    const { hotkeyBindings, globalHotkeysEnabled } = this.state
     if (username.length < MIN_LENGTH_USERNAME) {
       this.setState({
         warning: 'Your username is too short'
@@ -86,10 +87,11 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     } else {
       const { dispatch } = this.props
       connector.playerUpdate({ username, characterId: this.state.characterId })
+      connector.changeHotkeyBindings({ hotkeyBindings, globalHotkeysEnabled })
       dispatch(setUsername(username))
       dispatch(setCharacter(this.state.characterId))
       dispatch(setEmuChat(this.state.emuChat))
-      dispatch(setGlobalHotkeys(this.state.globalHotkeys))
+      dispatch(setGlobalHotkeysEnabled(this.state.globalHotkeysEnabled))
       dispatch(showSnackbar('Saved'))
     }
   }
@@ -183,7 +185,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
           <input
             style={styles.checkBox}
             type='checkbox'
-            checked={this.state.globalHotkeys}
+            checked={this.state.globalHotkeysEnabled}
             onChange={this.onGlobalHotkeysChange}
           />
         </div>

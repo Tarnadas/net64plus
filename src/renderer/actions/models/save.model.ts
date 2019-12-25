@@ -14,8 +14,8 @@ export interface SetEmuChatAction extends Action {
   emuChat: boolean
 }
 
-export interface SetGlobalHotkeysAction extends Action {
-  globalHotkeys: boolean
+export interface SetGlobalHotkeysEnabledAction extends Action {
+  globalHotkeysEnabled: boolean
 }
 
 export interface AddApiKeyAction extends Action {
@@ -35,7 +35,7 @@ export type SaveAction =
   SetUsernameAction
   & SetCharacterAction
   & SetEmuChatAction
-  & SetGlobalHotkeysAction
+  & SetGlobalHotkeysEnabledAction
   & AddApiKeyAction
   & SetVersionAction
   & SetServerOptionsAction

@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, globalShortcut, ipcMain } from 'electron'
 
 import * as path from 'path'
 import * as fs from 'fs'
@@ -8,6 +8,7 @@ import { Connector } from './Connector'
 import { Emulator } from './Emulator'
 import { Connection } from './Connection'
 import { ElectronSaveData } from '../models/State.model'
+import { RendererMessage, MainMessage } from '../models/Message.model'
 
 interface Global extends NodeJS.Global {
   save: {
@@ -65,8 +66,6 @@ export function updateRPC(update: Object, clean?: boolean): void {
   RPCClient.updatePresence(RPCState)
 }
 
-import { globalShortcut } from 'electron'
-
 ;(() => {
   const onReady = () => {
     const mainWindow = new BrowserWindow({
@@ -79,6 +78,7 @@ import { globalShortcut } from 'electron'
         nodeIntegrationInWorker: true
       }
     })
+
     // console.log(globalShortcut)
     // globalShortcut.register('A', () => {
     //   console.log('CommandOrControl+X is pressed')

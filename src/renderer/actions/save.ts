@@ -7,7 +7,7 @@ import {
   AddApiKeyAction,
   SetVersionAction,
   SetServerOptionsAction,
-  SetGlobalHotkeysAction
+  SetGlobalHotkeysEnabledAction
 } from './models/save.model'
 import { ElectronServerSaveData } from '../../models/State.model'
 
@@ -30,10 +30,10 @@ export function setEmuChat (emuChat: boolean): SetEmuChatAction {
     emuChat
   }
 }
-export function setGlobalHotkeys (globalHotkeys: boolean): SetGlobalHotkeysAction {
+export function setGlobalHotkeysEnabled (globalHotkeysEnabled: boolean): SetGlobalHotkeysEnabledAction {
   return {
     type: 'SET_GLOBAL_HOTKEYS',
-    globalHotkeys
+    globalHotkeysEnabled
   }
 }
 

@@ -20,7 +20,7 @@ export const save = (state: SaveState = initialState.save, action: SaveAction) =
         draft.appSaveData.emuChat = action.emuChat
         break
       case 'SET_GLOBAL_HOTKEYS':
-        draft.appSaveData.globalHotkeys = action.globalHotkeys
+        draft.appSaveData.globalHotkeysEnabled = action.globalHotkeysEnabled
         break
       case 'ADD_API_KEY':
         draft.appSaveData.apiKey = action.apiKey

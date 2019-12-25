@@ -190,4 +190,11 @@ export class Connector {
   public sendCommandMessage (message: string, args: string[]): void {
     ipcRenderer.send(RendererMessage.CHAT_COMMAND, { message, args })
   }
+
+  public changeHotkeyBindings (
+    { hotkeyBindings, globalHotkeysEnabled }:
+    { hotkeyBindings: { [characterId: number]: string | undefined }, globalHotkeysEnabled: boolean }) {
+    ipcRenderer.send(RendererMessage.HOTKEYS_CHANGED, { hotkeyBindings, globalHotkeysEnabled })
+  }
+
 }

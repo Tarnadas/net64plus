@@ -1,7 +1,8 @@
-import { ipcMain } from 'electron'
+import { ipcMain, globalShortcut } from 'electron'
 
 import { emulator, createEmulator, deleteEmulator, connection, createConnection, deleteConnection } from '.'
 import { Emulator } from './Emulator'
+import { HotkeyManager } from './HotkeyManager'
 import { FilteredEmulator } from '../models/Emulator.model'
 import { MainMessage, RendererMessage } from '../models/Message.model'
 import { Server } from '../models/Server.model'
@@ -18,7 +19,11 @@ export class Connector {
     ipcMain.on(RendererMessage.PASSWORD, this.onSendPassword)
     ipcMain.on(RendererMessage.CHAT_GLOBAL, this.onSendGlobalChatMessage)
     ipcMain.on(RendererMessage.CHAT_COMMAND, this.onSendCommandMessage)
+    ipcMain.on(RendererMessage.HOTKEYS_CHANGED, this.onHotkeysChanged)
+    this.hotkeyManager = new HotkeyManager(window)
   }
+
+  private hotkeyManager: HotkeyManager
 
   private onCreateConnection = (
     _: Electron.Event,
@@ -60,6 +65,16 @@ export class Connector {
     if (!connection) return
     connection.sendPlayerUpdate({ username, characterId })
   }
+
+  private onHotkeysChanged = (
+    _: Electron.Event,
+    { hotkeyBindings, globalHotkeysEnabled }:
+    { hotkeyBindings: { [characterId: number]: string | undefined }, globalHotkeysEnabled: boolean }) => {
+      console.log({ hotkeyBindings, globalHotkeysEnabled })
+      // Remove all existing listeners
+      console.log(globalShortcut)
+      this.hotkeyManager.setHotkeys(hotkeyBindings, globalHotkeysEnabled)
+    }
 
   private onSendPassword = (_: Electron.Event, password: string) => {
     if (!connection) return
