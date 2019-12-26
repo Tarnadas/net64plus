@@ -25,6 +25,11 @@ export const connector = new Connector()
 ;(async () => {
   const history: History = createHistory()
   const save: SaveState = await loadSaveData()
+  connector.changeHotkeyBindings({
+    hotkeyBindings: save.appSaveData.hotkeyBindings || {},
+    globalHotkeysEnabled: !!save.appSaveData.globalHotkeysEnabled,
+    username: save.appSaveData.username
+  })
   store = initReducer(history, save)
 
   render(

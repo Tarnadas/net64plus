@@ -1,4 +1,4 @@
-import { ipcMain, globalShortcut } from 'electron'
+import { ipcMain } from 'electron'
 
 import { emulator, createEmulator, deleteEmulator, connection, createConnection, deleteConnection } from '.'
 import { Emulator } from './Emulator'
@@ -20,10 +20,9 @@ export class Connector {
     ipcMain.on(RendererMessage.CHAT_GLOBAL, this.onSendGlobalChatMessage)
     ipcMain.on(RendererMessage.CHAT_COMMAND, this.onSendCommandMessage)
     ipcMain.on(RendererMessage.HOTKEYS_CHANGED, this.onHotkeysChanged)
-    this.hotkeyManager = new HotkeyManager(window)
   }
 
-  private hotkeyManager: HotkeyManager
+  private hotkeyManager = new HotkeyManager()
 
   private onCreateConnection = (
     _: Electron.Event,
@@ -56,25 +55,32 @@ export class Connector {
   }
 
   private onPlayerUpdate = (
-    _: Electron.Event,
+    _: Electron.Event | undefined,
     { username, characterId }:
     { username: string, characterId: number }
   ) => {
+    this.hotkeyManager.username = username
     if (!emulator) return
     emulator.changeCharacter(characterId)
     if (!connection) return
     connection.sendPlayerUpdate({ username, characterId })
   }
 
+  public sendPlayerUpdate(
+    { username, characterId }:
+    { username: string, characterId: number }
+  ) {
+    this.onPlayerUpdate(undefined, { username, characterId })
+  }
+
   private onHotkeysChanged = (
     _: Electron.Event,
-    { hotkeyBindings, globalHotkeysEnabled }:
-    { hotkeyBindings: { [characterId: number]: string | undefined }, globalHotkeysEnabled: boolean }) => {
-      console.log({ hotkeyBindings, globalHotkeysEnabled })
-      // Remove all existing listeners
-      console.log(globalShortcut)
-      this.hotkeyManager.setHotkeys(hotkeyBindings, globalHotkeysEnabled)
-    }
+    { hotkeyBindings, globalHotkeysEnabled, username }:
+    { hotkeyBindings: { [characterId: number]: string | undefined }, globalHotkeysEnabled: boolean, username: string }
+  ) => {
+    if (!!username) this.hotkeyManager.username = username
+    this.hotkeyManager.setHotkeys(hotkeyBindings, globalHotkeysEnabled, this, this.window)
+  }
 
   private onSendPassword = (_: Electron.Event, password: string) => {
     if (!connection) return
@@ -166,5 +172,9 @@ export class Connector {
 
   public consoleInfo (...messages: string[]): void {
     this.window.webContents.send(MainMessage.CONSOLE_INFO, messages)
+  }
+
+  public setCharacter (characterId: number): void {
+    this.window.webContents.send(MainMessage.SET_CHARACTER, characterId)
   }
 }

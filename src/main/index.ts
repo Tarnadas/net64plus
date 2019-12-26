@@ -8,7 +8,6 @@ import { Connector } from './Connector'
 import { Emulator } from './Emulator'
 import { Connection } from './Connection'
 import { ElectronSaveData } from '../models/State.model'
-import { RendererMessage, MainMessage } from '../models/Message.model'
 
 interface Global extends NodeJS.Global {
   save: {
@@ -78,11 +77,6 @@ export function updateRPC(update: Object, clean?: boolean): void {
         nodeIntegrationInWorker: true
       }
     })
-
-    // console.log(globalShortcut)
-    // globalShortcut.register('A', () => {
-    //   console.log('CommandOrControl+X is pressed')
-    // })
 
     connector = new Connector(mainWindow)
     updateRPC({

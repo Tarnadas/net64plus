@@ -19,6 +19,7 @@ import { MainMessage, RendererMessage } from '../models/Message.model'
 import { Server } from '../models/Server.model'
 import { IPlayer, IPlayerUpdate } from '../../proto/ServerClientMessage'
 import { FilteredEmulator } from '../models/Emulator.model'
+import { setCharacter } from './actions/save'
 
 export class Connector {
   constructor () {
@@ -40,6 +41,7 @@ export class Connector {
     ipcRenderer.on(MainMessage.SET_CONNECTION_ERROR, this.onConnectionError)
     ipcRenderer.on(MainMessage.SET_EMULATOR_ERROR, this.onEmulatorError)
     ipcRenderer.on(MainMessage.CONSOLE_INFO, this.onConsoleInfo)
+    ipcRenderer.on(MainMessage.SET_CHARACTER, this.onSetCharacter)
   }
 
   private onWebSocketClose = (
@@ -147,6 +149,10 @@ export class Connector {
     console.info(...messages)
   }
 
+  private onSetCharacter = (_: Electron.Event, characterId: number) => {
+    store.dispatch(setCharacter(characterId))
+  }
+
   public createConnection (
     { domain, ip, port, username, characterId }:
     {
@@ -192,9 +198,9 @@ export class Connector {
   }
 
   public changeHotkeyBindings (
-    { hotkeyBindings, globalHotkeysEnabled }:
-    { hotkeyBindings: { [characterId: number]: string | undefined }, globalHotkeysEnabled: boolean }) {
-    ipcRenderer.send(RendererMessage.HOTKEYS_CHANGED, { hotkeyBindings, globalHotkeysEnabled })
+    { hotkeyBindings, globalHotkeysEnabled, username }:
+    { hotkeyBindings: { [characterId: number]: string | undefined }, globalHotkeysEnabled: boolean, username?: string }) {
+    ipcRenderer.send(RendererMessage.HOTKEYS_CHANGED, { hotkeyBindings, globalHotkeysEnabled, username })
   }
 
 }

@@ -1,4 +1,4 @@
-/*eslint-disable block-scoped-var, no-redeclare, no-control-regex, no-prototype-builtins*/
+/*eslint-disable block-scoped-var, id-length, no-control-regex, no-magic-numbers, no-prototype-builtins, no-redeclare, no-shadow, no-var, sort-vars*/
 "use strict";
 
 var $protobuf = require("protobufjs/minimal");
@@ -2054,7 +2054,13 @@ $root.PlayerBytes = (function() {
         var object = {};
         if (options.defaults) {
             object.playerId = 0;
-            object.playerData = options.bytes === String ? "" : [];
+            if (options.bytes === String)
+                object.playerData = "";
+            else {
+                object.playerData = [];
+                if (options.bytes !== Array)
+                    object.playerData = $util.newBuffer(object.playerData);
+            }
         }
         if (message.playerId != null && message.hasOwnProperty("playerId"))
             object.playerId = message.playerId;
@@ -2287,7 +2293,13 @@ $root.Meta = (function() {
         if (options.defaults) {
             object.length = 0;
             object.address = 0;
-            object.data = options.bytes === String ? "" : [];
+            if (options.bytes === String)
+                object.data = "";
+            else {
+                object.data = [];
+                if (options.bytes !== Array)
+                    object.data = $util.newBuffer(object.data);
+            }
         }
         if (message.length != null && message.hasOwnProperty("length"))
             object.length = message.length;
