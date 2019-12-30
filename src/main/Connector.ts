@@ -20,6 +20,7 @@ export class Connector {
     ipcMain.on(RendererMessage.CHAT_GLOBAL, this.onSendGlobalChatMessage)
     ipcMain.on(RendererMessage.CHAT_COMMAND, this.onSendCommandMessage)
     ipcMain.on(RendererMessage.HOTKEYS_CHANGED, this.onHotkeysChanged)
+    ipcMain.on(RendererMessage.CHARACTER_CYCLING_ORDER_CHANGED, this.onCharacterCyclingOrderChanged)
   }
 
   private hotkeyManager = new HotkeyManager()
@@ -76,10 +77,18 @@ export class Connector {
   private onHotkeysChanged = (
     _: Electron.Event,
     { hotkeyBindings, globalHotkeysEnabled, username }:
-    { hotkeyBindings: { [characterId: number]: string | undefined }, globalHotkeysEnabled: boolean, username: string }
+    { hotkeyBindings: { [shortcut: string]: string | undefined }, globalHotkeysEnabled: boolean, username: string }
   ) => {
     if (!!username) this.hotkeyManager.username = username
     this.hotkeyManager.setHotkeys(hotkeyBindings, globalHotkeysEnabled, this, this.window)
+  }
+
+  public onCharacterCyclingOrderChanged = (
+    _: Electron.Event,
+    { characterCyclingOrder }:
+    { characterCyclingOrder: Array<{characterId: number, on: boolean}> }
+  ) => {
+    this.hotkeyManager.setCharacterCyclingOrder(characterCyclingOrder)
   }
 
   private onSendPassword = (_: Electron.Event, password: string) => {

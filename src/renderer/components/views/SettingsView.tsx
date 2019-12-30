@@ -1,9 +1,12 @@
 import * as React from 'react'
 import { connect, Dispatch } from 'react-redux'
+import { SortableContainer, SortableHandle, SortableElement } from 'react-sortable-hoc'
+import arrayMove from 'array-move'
 
 import { connector } from '../..'
 import { SMMButton } from '../buttons/SMMButton'
 import { HotkeyButton } from '../buttons/HotkeyButton'
+import { ToggleButton } from '../buttons/ToggleButton'
 import { WarningPanel } from '../panels/WarningPanel'
 import { setUsername, setCharacter, setEmuChat, setGlobalHotkeysEnabled } from '../../actions/save'
 import { State, ElectronSaveData } from '../../../models/State.model'
@@ -20,12 +23,60 @@ interface SettingsViewState {
   characterId: number
   emuChat: boolean
   globalHotkeysEnabled: boolean
-  hotkeyBindings: { [characterId: number]: string | undefined }
+  hotkeyBindings: { [shortcut: string]: string | undefined }
+  characterCyclingOrder: Array<{characterId: number, on: boolean}>
   warning: string
 }
 
 export const MIN_LENGTH_USERNAME = 3
 export const MAX_LENGTH_USERNAME = 24
+
+const CHARACTER_ICONS: { [characterId: number]: string } = {
+  0: 'img/mario.png',
+  1: 'img/luigi.png',
+  2: 'img/yoshi.png',
+  3: 'img/wario.png',
+  4: 'img/peach.png',
+  5: 'img/toad.png',
+  6: 'img/waluigi.png',
+  7: 'img/rosalina.png',
+  8: 'img/sonic.png',
+  9: 'img/knuckles.png',
+  10: 'img/goomba.png',
+  11: 'img/kirby.png',
+}
+
+const DragHandle = SortableHandle(() => <span>::::::&nbsp;</span>);
+
+const SortableItem = SortableElement(({iconSrc, on}: {iconSrc: string, on: boolean}) => {
+  let styles: any = {
+    icon: {
+      padding: '4px',
+      width: '40px',
+      height: '40px',
+      float: 'left',
+      borderRadius: '4px',
+    },
+  }
+  return (
+    <ToggleButton
+      on={on}
+    >
+      <DragHandle />
+      <img style={styles.icon} src={iconSrc} />
+    </ToggleButton>
+  )}
+);
+
+const SortableList = SortableContainer(({characterCyclingOrder}: {characterCyclingOrder: Array<{characterId: number, on: boolean}>}) => {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      {characterCyclingOrder.map(({characterId, on}, index) => (
+        <SortableItem key={index} index={index} iconSrc={CHARACTER_ICONS[characterId]} on={on} />
+      ))}
+    </div>
+  );
+});
 
 class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
   constructor (public props: SettingsViewProps) {
@@ -36,6 +87,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       emuChat: props.saveData.emuChat,
       globalHotkeysEnabled: props.saveData.globalHotkeysEnabled,
       hotkeyBindings: props.saveData.hotkeyBindings,
+      characterCyclingOrder: props.saveData.characterCylingOrder,
       warning: props.saveData.username ? '' : 'You must set a username'
     }
     this.onUsernameChange = this.onUsernameChange.bind(this)
@@ -43,6 +95,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     this.onEmuChatChange = this.onEmuChatChange.bind(this)
     this.onGlobalHotkeysChange = this.onGlobalHotkeysChange.bind(this)
     this.onHotkeyBindingChange = this.onHotkeyBindingChange.bind(this)
+    this.onCharacterCyclingOrderChange = this.onCharacterCyclingOrderChange.bind(this)
     this.onSave = this.onSave.bind(this)
   }
   onUsernameChange (e: React.ChangeEvent<any>) {
@@ -72,14 +125,18 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       globalHotkeysEnabled
     })
   }
-  onHotkeyBindingChange (characterId: number, hotkey?: string) {
+  onHotkeyBindingChange (shortcut: string, hotkey?: string) {
     const { hotkeyBindings } = this.state
-    hotkeyBindings[characterId] = hotkey
+    hotkeyBindings[shortcut] = hotkey
     this.setState({ hotkeyBindings })
+  }
+  onCharacterCyclingOrderChange ({newIndex, oldIndex}: {newIndex: number, oldIndex: number}) {
+    const characterCyclingOrder = arrayMove(this.state.characterCyclingOrder, oldIndex, newIndex)
+    this.setState({ characterCyclingOrder })
   }
   onSave () {
     const username = this.state.username.replace(/\W/g, '')
-    const { hotkeyBindings, globalHotkeysEnabled } = this.state
+    const { characterCyclingOrder, hotkeyBindings, globalHotkeysEnabled } = this.state
     if (username.length < MIN_LENGTH_USERNAME) {
       this.setState({
         warning: 'Your username is too short'
@@ -88,6 +145,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       const { dispatch } = this.props
       connector.playerUpdate({ username, characterId: this.state.characterId })
       connector.changeHotkeyBindings({ hotkeyBindings, globalHotkeysEnabled })
+      connector.changeCharacterCyclingOrder({ characterCyclingOrder })
       dispatch(setUsername(username))
       dispatch(setCharacter(this.state.characterId))
       dispatch(setEmuChat(this.state.emuChat))
@@ -95,13 +153,14 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       dispatch(showSnackbar('Saved'))
     }
   }
-  renderHokeyButtons () {
+  renderCharacterHotkeyButtons () {
     const buttons = []
     for (let i = 0; i < 12; i++) {
       buttons.push(<HotkeyButton
         key={i}
-        characterId={i}
-        hotkey={this.state.hotkeyBindings[i]}
+        shortcut={`${i}`}
+        iconSrc={CHARACTER_ICONS[i]}
+        hotkey={this.state.hotkeyBindings[`${i}`]}
         onClick={this.onHotkeyBindingChange}
         onRightClick={this.onHotkeyBindingChange}
       />)
@@ -117,15 +176,23 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'space-around',
-        flex: '1 1 auto',
+        flex: '1 0 auto',
         padding: '40px',
         backgroundColor: '#24997e',
         fontSize: '18px',
+        overflow: 'auto',
         color: '#000'
       },
       setting: {
         width: '100%',
         display: 'flex'
+      },
+      flexCenter: {
+        alignItems: 'center',
+        justifyContent: 'center'
+      },
+      gap: {
+        flex: '1 0 10px'
       },
       label: {
         width: '30%'
@@ -144,6 +211,8 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     }
     return (
       <div style={styles.view}>
+
+        <div style={styles.gap}></div>
         {
           warning &&
           <WarningPanel warning={warning} />
@@ -152,10 +221,14 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
           connectionError &&
           <WarningPanel warning={connectionError} />
         }
+
+        <div style={styles.gap}></div>
         <div style={styles.setting}>
           <div style={styles.label}>Username:</div>
           <input style={styles.input} value={this.state.username} onChange={this.onUsernameChange} />
         </div>
+
+        <div style={styles.gap}></div>
         <div style={styles.setting}>
           <div style={styles.label}>Character:</div>
           <select style={styles.input} value={this.state.characterId} onChange={this.onCharacterChange}>
@@ -173,6 +246,8 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
             <option value='11'>Kirby</option>
           </select>
         </div>
+
+        <div style={styles.gap}></div>
         <div style={styles.setting}>
           <div style={styles.label}>In-Game Chat View:</div>
           <input
@@ -189,10 +264,44 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
             onChange={this.onGlobalHotkeysChange}
           />
         </div>
+
+        <div style={styles.gap}></div>
         <div>Character Hotkeys (right click to unassign):</div>
+
+        <div style={styles.gap}></div>
         <div>
-          {this.renderHokeyButtons()}
+          {this.renderCharacterHotkeyButtons()}
         </div>
+
+        <div style={styles.gap}></div>
+        <div style={Object.assign({}, styles.setting, styles.flexCenter)}>
+          <div style={Object.assign({}, styles.setting, styles.flexCenter, { flexDirection: 'column' })}>
+            <div>Previous Character</div>
+            <HotkeyButton
+              shortcut={'previousCharacter'}
+              hotkey={this.state.hotkeyBindings[`previousCharacter`]}
+              onClick={this.onHotkeyBindingChange}
+              onRightClick={this.onHotkeyBindingChange}
+            />
+          </div>
+          <div style={Object.assign({}, styles.setting, styles.flexCenter, { flexDirection: 'column' })}>
+            <div>Next Character</div>
+            <HotkeyButton
+              shortcut={'nextCharacter'}
+              hotkey={this.state.hotkeyBindings[`nextCharacter`]}
+              onClick={this.onHotkeyBindingChange}
+              onRightClick={this.onHotkeyBindingChange}
+            />
+          </div>
+        </div>
+
+        <div style={styles.gap}></div>
+        <div>Character Cycling Order (click to toggle, drag to reorder)</div>
+
+        <div style={styles.gap}></div>
+        <SortableList useDragHandle characterCyclingOrder={this.state.characterCyclingOrder} onSortEnd={this.onCharacterCyclingOrderChange} />
+
+        <div style={styles.gap}></div>
         <SMMButton
           text='Save'
           iconSrc='img/submit.png'

@@ -22,7 +22,8 @@ export interface ElectronSaveDataDraft {
   character: number
   emuChat: boolean
   globalHotkeysEnabled: boolean
-  hotkeyBindings: { [characterId: number]: string | undefined }
+  hotkeyBindings: { [shortcut: string]: string | undefined }
+  characterCylingOrder: Array<{characterId: number, on: boolean}>
   lastIp: string
   lastPort: number
   version: string

@@ -199,8 +199,16 @@ export class Connector {
 
   public changeHotkeyBindings (
     { hotkeyBindings, globalHotkeysEnabled, username }:
-    { hotkeyBindings: { [characterId: number]: string | undefined }, globalHotkeysEnabled: boolean, username?: string }) {
+    { hotkeyBindings: { [shortcut: string]: string | undefined }, globalHotkeysEnabled: boolean, username?: string }
+  ) {
     ipcRenderer.send(RendererMessage.HOTKEYS_CHANGED, { hotkeyBindings, globalHotkeysEnabled, username })
+  }
+
+  public changeCharacterCyclingOrder (
+    { characterCyclingOrder }:
+    { characterCyclingOrder: Array<{characterId: number, on: boolean}> }
+  ) {
+    ipcRenderer.send(RendererMessage.CHARACTER_CYCLING_ORDER_CHANGED, { characterCyclingOrder })
   }
 
 }

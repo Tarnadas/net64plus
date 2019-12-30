@@ -36,6 +36,20 @@ const APP_SAVE_DATA: ElectronSaveData = {
     10: undefined, // Goomba
     11: undefined // Kirby
   },
+  characterCylingOrder: [
+    { characterId: 0, on: true }, // Mario
+    { characterId: 1, on: true }, // Luigi
+    { characterId: 2, on: true }, // Yoshi
+    { characterId: 3, on: true }, // Wario
+    { characterId: 4, on: true }, // Peach
+    { characterId: 5, on: true }, // Toad
+    { characterId: 6, on: true }, // Waluigi
+    { characterId: 7, on: true }, // Rosalina
+    { characterId: 8, on: true }, // Sonic
+    { characterId: 9, on: true }, // Knuckles
+    { characterId: 10, on: true }, // Goomba
+    { characterId: 11, on: true }, // Kirby
+  ],
   lastIp: 'smmdb.ddns.net',
   lastPort: 3678,
   version: '',

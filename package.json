@@ -8,7 +8,7 @@
     "start": "webpack --env=dev && cd ./build && electron .",
     "start:debug": "webpack --env=dev",
     "build": "webpack --env=prod && node ./build-app",
-    "build:dev": "yarn clean && webpack --env=dev && node ./build-app",
+    "build:dev": "webpack --env=dev && node ./build-app",
     "build:proto": "pbjs -t static-module -w commonjs -p ./proto -o ./proto/ServerClientMessage.js ./proto/ServerClientMessage.proto && pbts -o ./proto/ServerClientMessage.d.ts ./proto/ServerClientMessage.js && pbjs -t static-module -w commonjs -p ./proto -o ./proto/ClientServerMessage.js ./proto/ClientServerMessage.proto && pbts -o ./proto/ClientServerMessage.d.ts ./proto/ClientServerMessage.js",
     "prebuild:win": "electron-rebuild -v 2.0.17 -f -w winprocess,process-list",
     "prebuild:linux": "electron-rebuild -v 2.0.17 -f -w process-list",
@@ -54,6 +54,7 @@
     ]
   },
   "dependencies": {
+    "array-move": "^2.2.1",
     "axios": "^0.18.0",
     "bufferutil": "^4.0.1",
     "csv-parse": "3",
@@ -74,6 +75,7 @@
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
     "react-router-redux": "^5.0.0-alpha.9",
+    "react-sortable-hoc": "^1.10.1",
     "redux": "^4.0.1",
     "rimraf": "^2.6.2",
     "tar": "^4.4.8",

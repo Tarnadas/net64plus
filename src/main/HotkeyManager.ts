@@ -7,37 +7,75 @@ export class HotkeyManager {
   public set username(value: string) { this._username = value }
   public get username(): string { return this._username }
 
-  public setHotkeys(hotkeyBindings: { [characterId: number]: string | undefined }, globalHotkeysEnabled: boolean, connector: Connector, window: BrowserWindow) {
-    this.setLocalHotkeys(globalHotkeysEnabled ? {} : hotkeyBindings, connector, window)
-    this.setGlobalHotkeys(globalHotkeysEnabled ? hotkeyBindings : {}, connector)
-  }
+  private _characterCyclingOrder: Array<{characterId: number, on: boolean}> = [];
+  private _characterCyclingIndex: number = 0;
 
-  private setLocalHotkeys(hotkeyBindings: { [characterId: number]: string | undefined }, connector: Connector, window: BrowserWindow) {
+  public validCharacterHotkeys = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+
+  public setHotkeys(hotkeyBindings: { [shortcut: string]: string | undefined }, globalHotkeysEnabled: boolean, connector: Connector, window: BrowserWindow) {
     electronLocalshortcut.unregisterAll(window)
-    Object.entries(hotkeyBindings).forEach(([characterIdString, hotkey]) => {
-      if (!!hotkey) {       
-        electronLocalshortcut.register(window, hotkey.toLocaleUpperCase(), () => {
-          const username = this.username
-          const characterId = parseInt(characterIdString, 10)
-          connector.setCharacter(characterId)
-          connector.sendPlayerUpdate({ username, characterId })
-        })
-      }
-    })
-  }
-
-  private setGlobalHotkeys(hotkeyBindings: { [characterId: number]: string | undefined }, connector: Connector) {
     globalShortcut.unregisterAll()
     Object.entries(hotkeyBindings).forEach(([characterIdString, hotkey]) => {
+      const username = this.username
       if (!!hotkey) {
-        globalShortcut.register(hotkey.toLocaleUpperCase(), () => {
-          const username = this.username
-          const characterId = parseInt(characterIdString, 10)
-          connector.setCharacter(characterId)
-          connector.sendPlayerUpdate({ username, characterId })
-        })
+        if (hotkey.length === 1 && this.validCharacterHotkeys.includes(hotkey)) {
+          const callback = () => {
+            const characterId = parseInt(characterIdString, 10)
+            connector.setCharacter(characterId)
+            connector.sendPlayerUpdate({ username, characterId })
+          }
+          if (globalHotkeysEnabled) {
+            globalShortcut.register(hotkey.toLocaleUpperCase(), callback)
+          } else {
+            electronLocalshortcut.register(window, hotkey.toLocaleUpperCase(), callback)
+          }
+        } else if (hotkey === 'nextCharacter') {
+          if (this._characterCyclingOrder.length > 0 && this._characterCyclingOrder.some((value) => value.on)) {
+            let nextIndex = this._characterCyclingOrder.findIndex((value, index) => value.on && index > this._characterCyclingIndex)
+            if (nextIndex === undefined) {
+              nextIndex = this._characterCyclingOrder.findIndex((value) => value.on)
+            }
+            if (nextIndex !== undefined) {
+              this._characterCyclingIndex = nextIndex
+              const characterId = this._characterCyclingOrder[this._characterCyclingIndex].characterId
+              connector.setCharacter(characterId)
+              connector.sendPlayerUpdate({ username, characterId })
+            }
+          }
+        } else if (hotkey === 'previousCharacter') {
+          if (this._characterCyclingOrder.length > 0 && this._characterCyclingOrder.some((value) => value.on)) {
+            let prevIndex
+            for (let i = this._characterCyclingIndex - 1; i > 0; i--) {
+              const value = this._characterCyclingOrder[i]
+              if (value.on) {
+                prevIndex = i
+                break
+              }
+            }
+            if (prevIndex === undefined) {
+              for (let i = this._characterCyclingOrder.length - 1; i >= this._characterCyclingIndex; i--) {
+                const value = this._characterCyclingOrder[i]
+                if (value.on) {
+                  prevIndex = i
+                  break
+                }
+              }
+            }
+            if (prevIndex !== undefined) {
+              this._characterCyclingIndex = prevIndex
+              const characterId = this._characterCyclingOrder[this._characterCyclingIndex].characterId
+              connector.setCharacter(characterId)
+              connector.sendPlayerUpdate({ username, characterId })
+            }
+          }
+        }
       }
     })
+  }
+
+  public setCharacterCyclingOrder(characterCyclingOrder: Array<{characterId: number, on: boolean}>) {
+    this._characterCyclingOrder = characterCyclingOrder
+    this._characterCyclingIndex = 0
   }
 
 }

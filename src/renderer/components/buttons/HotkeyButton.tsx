@@ -3,31 +3,17 @@ import './HotkeyButton.scss'
 import * as React from 'react'
 
 interface HotkeyButtonProps {
-  characterId: number,
+  shortcut: string,
   hotkey?: string,
   className?: string,
-  onClick?: (characterId: number, hotkey: string) => void,
-  onRightClick?: (characterId: number) => void,
+  iconSrc?: string,
+  onClick?: (shortcut: string, hotkey: string) => void,
+  onRightClick?: (shortcut: string) => void,
 }
 
 interface HotkeyButtonState {
   hotkey?: string,
   listening: boolean,
-}
-
-const CHARACTER_ICONS: { [characterId: number]: string } = {
-  0: 'img/mario.png',
-  1: 'img/luigi.png',
-  2: 'img/yoshi.png',
-  3: 'img/wario.png',
-  4: 'img/peach.png',
-  5: 'img/toad.png',
-  6: 'img/waluigi.png',
-  7: 'img/rosalina.png',
-  8: 'img/sonic.png',
-  9: 'img/knuckles.png',
-  10: 'img/goomba.png',
-  11: 'img/kirby.png',
 }
 
 export class HotkeyButton extends React.PureComponent<HotkeyButtonProps, HotkeyButtonState> {
@@ -47,7 +33,7 @@ export class HotkeyButton extends React.PureComponent<HotkeyButtonProps, HotkeyB
       // Disablde listening mode
       this.setState({ hotkey: event.key, listening: false })
       if (!!this.props.onClick) {
-        this.props.onClick(this.props.characterId, event.key)
+        this.props.onClick(this.props.shortcut, event.key)
       }
       document.removeEventListener('keydown', keyDownListener)
     };
@@ -59,12 +45,12 @@ export class HotkeyButton extends React.PureComponent<HotkeyButtonProps, HotkeyB
     // Remove hotkey
     this.setState({ hotkey: undefined, listening: false })
     if (!!this.props.onRightClick) {
-      this.props.onRightClick(this.props.characterId)
+      this.props.onRightClick(this.props.shortcut)
     }
   }
 
   render () {
-    const { characterId, className } = this.props
+    const { iconSrc, className } = this.props
     const { hotkey, listening } = this.state
     let styles: any = {
       button: {
@@ -84,7 +70,7 @@ export class HotkeyButton extends React.PureComponent<HotkeyButtonProps, HotkeyB
         borderRadius: '5px',
         boxShadow: '1px 4px 13px 0 rgba(0,0,0,0.5)',
         display: 'inline-block',
-        fontSize: '13px'
+        fontSize: '13px',
       },
       icon: {
         padding: '4px',
@@ -101,7 +87,7 @@ export class HotkeyButton extends React.PureComponent<HotkeyButtonProps, HotkeyB
         onClick={this.onClick}
         onContextMenu={this.onRightClick}
       >
-        <img style={styles.icon} src={CHARACTER_ICONS[characterId]} />
+        {!!iconSrc ? <img style={styles.icon} src={iconSrc} /> : ''}
         <div>{listening ? '...' : hotkey || 'None'}</div>
       </div>
     )
