@@ -1846,7 +1846,7 @@ nop
 addiu a1, r0, $0096
 lui a2, $1300
 jal $29edcc
-ori a2, a2, $31ac
+ori a2, a2, $2AD0
 
 !checkcoll22244:
 !nowings44:
