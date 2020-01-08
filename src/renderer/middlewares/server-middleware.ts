@@ -26,10 +26,10 @@ function listenToProcessOutput (process: ChildProcess, dispatch: Dispatch<any>):
   process.on('error', (err: Error) => {
     console.error(err)
   })
-  process.stdout.on('data', (chunk: Buffer) => {
+  process.stdout!.on('data', (chunk: Buffer) => {
     dispatch(addServerMessage(decoder.decode(chunk)))
   })
-  process.stderr.on('data', (chunk: Buffer) => {
+  process.stderr!.on('data', (chunk: Buffer) => {
     dispatch(addServerMessage(decoder.decode(chunk), true))
   })
 }
