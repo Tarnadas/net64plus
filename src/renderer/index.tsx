@@ -18,9 +18,11 @@ import { initReducer } from './reducers'
 import { Connector } from './Connector'
 import { AppView } from './components/views/AppView'
 import { State, SaveState, SaveStateDraft, ElectronSaveData } from '../models/State.model'
+import { GamepadManager } from './GamepadManager'
 
 export let store: Store<State>
 export const connector = new Connector()
+export const gamepadManager = new GamepadManager(window, connector)
 
 ;(async () => {
   const history: History = createHistory()

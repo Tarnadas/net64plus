@@ -42,6 +42,5 @@ export const save = (state: SaveState = initialState.save, action: SaveAction) =
 }
 
 function saveState (state: SaveState): void {
-  console.log(state.appSavePath)
   fs.writeFile(path.join(state.appSavePath, 'save.json'), JSON.stringify(state.appSaveData, null, 2), () => {})
 }

@@ -22,6 +22,13 @@ export class ToggleButton extends React.PureComponent<ToggleButtonProps, ToggleB
     this.onClick = this.onClick.bind(this)
   }
 
+  componentWillReceiveProps (nextProps: ToggleButtonProps) {
+    const { on } = nextProps
+    if (on !== undefined && on !== this.state.on) {
+      this.setState({ on })
+    }
+  }
+
   onClick () {
     const on = !this.state.on
     this.setState({ on })

@@ -3,7 +3,7 @@ import { connect, Dispatch } from 'react-redux'
 import { SortableContainer, SortableHandle, SortableElement } from 'react-sortable-hoc'
 import arrayMove from 'array-move'
 
-import { connector } from '../..'
+import { connector, gamepadManager } from '../..'
 import { SMMButton } from '../buttons/SMMButton'
 import { HotkeyButton } from '../buttons/HotkeyButton'
 import { ToggleButton } from '../buttons/ToggleButton'
@@ -60,7 +60,6 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
         borderRadius: '4px',
       },
     }
-    console.log({iconSrc,on})
     return (
       <ToggleButton
         on={on}
@@ -142,7 +141,6 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
   }
   onCharacterCyclingOrderChange ({newIndex, oldIndex}: {newIndex: number, oldIndex: number}) {
     const characterCyclingOrder = arrayMove(this.state.characterCyclingOrder, oldIndex, newIndex)
-    console.log(characterCyclingOrder)
     this.setState({ characterCyclingOrder })
   }
   onSave () {
@@ -179,7 +177,6 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     return buttons;
   }
   render () {
-    console.log(this.state.characterCyclingOrder)
     const warning = this.state.warning
     const connectionError = this.props.connectionError
     const styles: Record<string, React.CSSProperties> = {

@@ -20,6 +20,7 @@ import { Server } from '../models/Server.model'
 import { IPlayer, IPlayerUpdate } from '../../proto/ServerClientMessage'
 import { FilteredEmulator } from '../models/Emulator.model'
 import { setCharacter } from './actions/save'
+import { ButtonState } from './GamepadManager'
 
 export class Connector {
   constructor () {
@@ -209,6 +210,13 @@ export class Connector {
     { characterCyclingOrder: Array<{characterId: number, on: boolean}> }
   ) {
     ipcRenderer.send(RendererMessage.CHARACTER_CYCLING_ORDER_CHANGED, { characterCyclingOrder })
+  }
+
+  public emitButtonState (
+    { buttonState }:
+    { buttonState: ButtonState }
+  ): void {
+    ipcRenderer.send(RendererMessage.GAMEPAD_BUTTON_STATE_CHANGED, { buttonState })
   }
 
 }

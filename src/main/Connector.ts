@@ -7,6 +7,7 @@ import { FilteredEmulator } from '../models/Emulator.model'
 import { MainMessage, RendererMessage } from '../models/Message.model'
 import { Server } from '../models/Server.model'
 import { IPlayerUpdate, IPlayer } from '../../proto/ServerClientMessage'
+import { ButtonState } from '../renderer/GamepadManager'
 
 export class Connector {
   constructor (private window: Electron.BrowserWindow) {
@@ -21,6 +22,7 @@ export class Connector {
     ipcMain.on(RendererMessage.CHAT_COMMAND, this.onSendCommandMessage)
     ipcMain.on(RendererMessage.HOTKEYS_CHANGED, this.onHotkeysChanged)
     ipcMain.on(RendererMessage.CHARACTER_CYCLING_ORDER_CHANGED, this.onCharacterCyclingOrderChanged)
+    ipcMain.on(RendererMessage.GAMEPAD_BUTTON_STATE_CHANGED, this.onGamepadButtonStateChanged)
   }
 
   private hotkeyManager = new HotkeyManager()
@@ -89,6 +91,14 @@ export class Connector {
     { characterCyclingOrder: Array<{characterId: number, on: boolean}> }
   ) => {
     this.hotkeyManager.setCharacterCyclingOrder(characterCyclingOrder)
+  }
+
+  public onGamepadButtonStateChanged = (
+    _: Electron.Event,
+    { buttonState }:
+    { buttonState: ButtonState }
+  ) => {
+    this.hotkeyManager.onGamepadButtonStateChanged(buttonState, this)
   }
 
   private onSendPassword = (_: Electron.Event, password: string) => {
