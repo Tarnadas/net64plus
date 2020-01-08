@@ -30,6 +30,7 @@ export const connector = new Connector()
     globalHotkeysEnabled: !!save.appSaveData.globalHotkeysEnabled,
     username: save.appSaveData.username
   })
+  connector.changeCharacterCyclingOrder({ characterCyclingOrder: save.appSaveData.characterCylingOrder })
   store = initReducer(history, save)
 
   render(

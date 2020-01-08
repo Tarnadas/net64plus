@@ -46,39 +46,43 @@ const CHARACTER_ICONS: { [characterId: number]: string } = {
   11: 'img/kirby.png',
 }
 
-const DragHandle = SortableHandle(() => <span>::::::&nbsp;</span>);
-
-const SortableItem = SortableElement(({iconSrc, on}: {iconSrc: string, on: boolean}) => {
-  let styles: any = {
-    icon: {
-      padding: '4px',
-      width: '40px',
-      height: '40px',
-      float: 'left',
-      borderRadius: '4px',
-    },
-  }
-  return (
-    <ToggleButton
-      on={on}
-    >
-      <DragHandle />
-      <img style={styles.icon} src={iconSrc} />
-    </ToggleButton>
-  )}
-);
-
-const SortableList = SortableContainer(({characterCyclingOrder}: {characterCyclingOrder: Array<{characterId: number, on: boolean}>}) => {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-      {characterCyclingOrder.map(({characterId, on}, index) => (
-        <SortableItem key={index} index={index} iconSrc={CHARACTER_ICONS[characterId]} on={on} />
-      ))}
-    </div>
-  );
-});
-
 class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
+
+  private DragHandle = SortableHandle(() => <span>::::::&nbsp;</span>);
+
+  private SortableItem = SortableElement(({iconSrc, on, cycleIndex}: {iconSrc: string, on: boolean, cycleIndex: number}) => {
+    let styles: any = {
+      icon: {
+        padding: '4px',
+        width: '40px',
+        height: '40px',
+        float: 'left',
+        borderRadius: '4px',
+      },
+    }
+    console.log({iconSrc,on})
+    return (
+      <ToggleButton
+        on={on}
+        onClick={(toggled) => this.onCharacterCyclingToggled({cycleIndex, toggled})}
+      >
+        <this.DragHandle />
+        <img style={styles.icon} src={iconSrc} />
+      </ToggleButton>
+    )}
+  );
+
+  private SortableList = SortableContainer(({characterCyclingOrder}: {characterCyclingOrder: Array<{characterId: number, on: boolean}>}) => {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        {characterCyclingOrder.map(({characterId, on}, index) => (
+          <this.SortableItem key={index} index={index} cycleIndex={index} iconSrc={CHARACTER_ICONS[characterId]} on={on} />
+        ))}
+      </div>
+    );
+  });
+
+
   constructor (public props: SettingsViewProps) {
     super(props)
     this.state = {
@@ -95,6 +99,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     this.onEmuChatChange = this.onEmuChatChange.bind(this)
     this.onGlobalHotkeysChange = this.onGlobalHotkeysChange.bind(this)
     this.onHotkeyBindingChange = this.onHotkeyBindingChange.bind(this)
+    this.onCharacterCyclingToggled = this.onCharacterCyclingToggled.bind(this)
     this.onCharacterCyclingOrderChange = this.onCharacterCyclingOrderChange.bind(this)
     this.onSave = this.onSave.bind(this)
   }
@@ -130,8 +135,14 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     hotkeyBindings[shortcut] = hotkey
     this.setState({ hotkeyBindings })
   }
+  onCharacterCyclingToggled ({cycleIndex, toggled} : {cycleIndex: number, toggled: boolean}) {
+    const { characterCyclingOrder } = this.state
+    characterCyclingOrder[cycleIndex].on = toggled
+    this.setState({ characterCyclingOrder })
+  }
   onCharacterCyclingOrderChange ({newIndex, oldIndex}: {newIndex: number, oldIndex: number}) {
     const characterCyclingOrder = arrayMove(this.state.characterCyclingOrder, oldIndex, newIndex)
+    console.log(characterCyclingOrder)
     this.setState({ characterCyclingOrder })
   }
   onSave () {
@@ -168,6 +179,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     return buttons;
   }
   render () {
+    console.log(this.state.characterCyclingOrder)
     const warning = this.state.warning
     const connectionError = this.props.connectionError
     const styles: Record<string, React.CSSProperties> = {
@@ -299,7 +311,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
         <div>Character Cycling Order (click to toggle, drag to reorder)</div>
 
         <div style={styles.gap}></div>
-        <SortableList useDragHandle characterCyclingOrder={this.state.characterCyclingOrder} onSortEnd={this.onCharacterCyclingOrderChange} />
+        <this.SortableList useDragHandle characterCyclingOrder={this.state.characterCyclingOrder} onSortEnd={this.onCharacterCyclingOrderChange} />
 
         <div style={styles.gap}></div>
         <SMMButton
