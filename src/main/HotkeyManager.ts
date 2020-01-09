@@ -29,7 +29,7 @@ export class HotkeyManager {
             connector.sendPlayerUpdate({ username, characterId })
           }
 
-          if (this.validKeyboardHotkeys.includes(hotkey)) {
+          if (this.validKeyboardHotkeys.includes(hotkey.toLocaleUpperCase())) {
             if (globalHotkeysEnabled) {
               globalShortcut.register(hotkey.toLocaleUpperCase(), callback)
             } else {
@@ -49,7 +49,7 @@ export class HotkeyManager {
             }
           }
 
-          if (this.validKeyboardHotkeys.includes(hotkey)) {
+          if (this.validKeyboardHotkeys.includes(hotkey.toLocaleUpperCase())) {
             if (globalHotkeysEnabled) {
               globalShortcut.register(hotkey.toLocaleUpperCase(), callback)
             } else {
@@ -69,7 +69,7 @@ export class HotkeyManager {
             }
           }
 
-          if (this.validKeyboardHotkeys.includes(hotkey)) {
+          if (this.validKeyboardHotkeys.includes(hotkey.toLocaleUpperCase())) {
             if (globalHotkeysEnabled) {
               globalShortcut.register(hotkey.toLocaleUpperCase(), callback)
             } else {

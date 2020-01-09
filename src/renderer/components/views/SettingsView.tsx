@@ -81,7 +81,6 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     );
   });
 
-
   constructor (public props: SettingsViewProps) {
     super(props)
     this.state = {
