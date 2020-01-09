@@ -101,6 +101,11 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     this.onCharacterCyclingOrderChange = this.onCharacterCyclingOrderChange.bind(this)
     this.onSave = this.onSave.bind(this)
   }
+  componentWillReceiveProps (nextProps: SettingsViewProps) {
+    if (nextProps.saveData.character !== this.state.characterId) { // Update dropdown option menu
+      this.setState({ characterId: nextProps.saveData.character })
+    }
+  }
   onUsernameChange (e: React.ChangeEvent<any>) {
     let value = e.target.value.replace(/\W/g, '')
     if (value.length > MAX_LENGTH_USERNAME) {
