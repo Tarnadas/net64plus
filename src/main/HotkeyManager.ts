@@ -8,7 +8,7 @@ export class HotkeyManager {
   public set username(value: string) { this._username = value }
   public get username(): string { return this._username }
 
-  private _characterCyclingOrder: Array<{characterId: number, on: boolean}> = [];
+  private _characterCyclingOrder: Array<{characterId: number, on: boolean}> = []
   private _characterCyclingIndex: number = 0;
 
   private _hotkeyBindings: { [shortcut: string]: string | undefined } = {}
@@ -151,7 +151,7 @@ export class HotkeyManager {
   }
 
   private isNumeric(value: string): boolean {
-    return +value === +value;
+    return +value === +value
   }
 
 }
