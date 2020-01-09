@@ -12,7 +12,7 @@
     "build:proto": "pbjs -t static-module -w commonjs -p ./proto -o ./proto/ServerClientMessage.js ./proto/ServerClientMessage.proto && pbts -o ./proto/ServerClientMessage.d.ts ./proto/ServerClientMessage.js && pbjs -t static-module -w commonjs -p ./proto -o ./proto/ClientServerMessage.js ./proto/ClientServerMessage.proto && pbts -o ./proto/ClientServerMessage.d.ts ./proto/ClientServerMessage.js",
     "prebuild:win": "electron-rebuild -v 2.0.17 -f -w winprocess,process-list",
     "prebuild:linux": "electron-rebuild -v 2.0.17 -f -w process-list",
-    "prebuild:move": "mv node_modules/process-list/bin/linux-x64-57/process-list.node build/processlist-linux.node",
+    "prebuild:move": "mv node_modules/process-list/build/Release/processlist.node build/processlist-linux.node",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
     "test": "jest spec",
     "tsc": "tsc --noEmit",
