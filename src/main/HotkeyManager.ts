@@ -22,7 +22,7 @@ export class HotkeyManager {
     Object.entries(hotkeyBindings).forEach(([characterIdString, hotkey]) => {
       const username = this.username
       if (!!hotkey) {
-        if (characterIdString.length === 1) {
+        if (this.isNumeric(characterIdString)) {
           const callback = () => {
             const characterId = parseInt(characterIdString, 10)
             connector.setCharacter(characterId)
@@ -94,7 +94,7 @@ export class HotkeyManager {
         .forEach(([characterIdString, hotkey]) => {
           if (!!hotkey) {
             if (buttonState.some((button) => hotkey === `button${button.key}` && button.pressed)) { // Check if button was pressed
-              if (characterIdString.length === 1) { // Character hotkey
+              if (this.isNumeric(characterIdString)) { // Character hotkey
                 const characterId = parseInt(characterIdString, 10)
                 connector.setCharacter(characterId)
                 connector.sendPlayerUpdate({ username, characterId })
@@ -148,6 +148,10 @@ export class HotkeyManager {
       }
     }
     return prevIndex
+  }
+
+  private isNumeric(value: string): boolean {
+    return +value === +value;
   }
 
 }
