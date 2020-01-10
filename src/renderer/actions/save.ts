@@ -7,7 +7,8 @@ import {
   AddApiKeyAction,
   SetVersionAction,
   SetServerOptionsAction,
-  SetGlobalHotkeysEnabledAction
+  SetGlobalHotkeysEnabledAction,
+  SetGamepadIdAction
 } from './models/save.model'
 import { ElectronServerSaveData } from '../../models/State.model'
 
@@ -34,6 +35,12 @@ export function setGlobalHotkeysEnabled (globalHotkeysEnabled: boolean): SetGlob
   return {
     type: 'SET_GLOBAL_HOTKEYS',
     globalHotkeysEnabled
+  }
+}
+export function setGamepadId (gamepadId: string | undefined): SetGamepadIdAction {
+  return {
+    type: 'SET_GAMEPAD_ID',
+    gamepadId
   }
 }
 

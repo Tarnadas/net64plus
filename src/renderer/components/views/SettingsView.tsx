@@ -1,14 +1,13 @@
 import * as React from 'react'
 import { connect, Dispatch } from 'react-redux'
 import { SortableContainer, SortableHandle, SortableElement } from 'react-sortable-hoc'
-import arrayMove from 'array-move'
 
 import { connector, gamepadManager } from '../..'
 import { SMMButton } from '../buttons/SMMButton'
 import { HotkeyButton } from '../buttons/HotkeyButton'
 import { ToggleButton } from '../buttons/ToggleButton'
 import { WarningPanel } from '../panels/WarningPanel'
-import { setUsername, setCharacter, setEmuChat, setGlobalHotkeysEnabled } from '../../actions/save'
+import { setUsername, setCharacter, setEmuChat, setGlobalHotkeysEnabled, setGamepadId } from '../../actions/save'
 import { State, ElectronSaveData } from '../../../models/State.model'
 import { showSnackbar } from '../../actions/snackbar'
 
@@ -25,6 +24,7 @@ interface SettingsViewState {
   globalHotkeysEnabled: boolean
   hotkeyBindings: { [shortcut: string]: string | undefined }
   characterCyclingOrder: Array<{characterId: number, on: boolean}>
+  gamepadId: string | undefined
   warning: string
 }
 
@@ -90,6 +90,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       globalHotkeysEnabled: props.saveData.globalHotkeysEnabled,
       hotkeyBindings: props.saveData.hotkeyBindings,
       characterCyclingOrder: props.saveData.characterCylingOrder,
+      gamepadId: props.saveData.gamepadId,
       warning: props.saveData.username ? '' : 'You must set a username'
     }
     this.onUsernameChange = this.onUsernameChange.bind(this)
@@ -144,12 +145,14 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     this.setState({ characterCyclingOrder })
   }
   onCharacterCyclingOrderChange ({newIndex, oldIndex}: {newIndex: number, oldIndex: number}) {
-    const characterCyclingOrder = arrayMove(this.state.characterCyclingOrder, oldIndex, newIndex)
-    this.setState({ characterCyclingOrder })
+    const { characterCyclingOrder } = this.state
+    const oldItem = characterCyclingOrder.splice(oldIndex, 1)[0] // remove item from old index
+    characterCyclingOrder.splice(newIndex, 0, oldItem) // reinsert item at new index
+    this.setState({ characterCyclingOrder: characterCyclingOrder.slice() })
   }
   onSave () {
     const username = this.state.username.replace(/\W/g, '')
-    const { characterCyclingOrder, hotkeyBindings, globalHotkeysEnabled } = this.state
+    const { characterCyclingOrder, hotkeyBindings, globalHotkeysEnabled, gamepadId } = this.state
     if (username.length < MIN_LENGTH_USERNAME) {
       this.setState({
         warning: 'Your username is too short'
@@ -159,10 +162,12 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       connector.playerUpdate({ username, characterId: this.state.characterId })
       connector.changeHotkeyBindings({ hotkeyBindings, globalHotkeysEnabled })
       connector.changeCharacterCyclingOrder({ characterCyclingOrder })
+      gamepadManager.selectedGamepad = gamepadManager.getConnectedGamepads().find((gamepad) => (!!gamepad ? gamepad.id : undefined) === gamepadId) || undefined
       dispatch(setUsername(username))
       dispatch(setCharacter(this.state.characterId))
       dispatch(setEmuChat(this.state.emuChat))
-      dispatch(setGlobalHotkeysEnabled(this.state.globalHotkeysEnabled))
+      dispatch(setGlobalHotkeysEnabled(globalHotkeysEnabled))
+      dispatch(setGamepadId(gamepadId))
       dispatch(showSnackbar('Saved'))
     }
   }
@@ -181,8 +186,9 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     return buttons;
   }
   render () {
-    const warning = this.state.warning
+    const { gamepadId, warning } = this.state
     const connectionError = this.props.connectionError
+    const gamepads = gamepadManager.getConnectedGamepads()
     const styles: Record<string, React.CSSProperties> = {
       view: {
         display: 'flex',
@@ -257,6 +263,22 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
             <option value='9'>Knuckles</option>
             <option value='10'>Goomba</option>
             <option value='11'>Kirby</option>
+          </select>
+        </div>
+
+        <div style={styles.gap}></div>
+        <div style={styles.setting}>
+          <div style={styles.label}>Gamepad:</div>
+          <select style={styles.input} value={!!gamepadId ? gamepadId : undefined} onChange={(e) => {
+            this.setState({ gamepadId: e.target.value })
+          }}>
+            {
+              gamepads && [
+                <option key={-1} value={undefined}>None</option>
+              ].concat(gamepads.filter((gamepad) => !!gamepad).map((gamepad, index) => (
+                <option key={index} value={gamepad!.id}>{gamepad!.id}</option>
+              )))
+            }
           </select>
         </div>
 

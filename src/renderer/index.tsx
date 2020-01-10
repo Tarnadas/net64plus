@@ -22,7 +22,7 @@ import { GamepadManager } from './GamepadManager'
 
 export let store: Store<State>
 export const connector = new Connector()
-export const gamepadManager = new GamepadManager(window, connector)
+export let gamepadManager: GamepadManager
 
 ;(async () => {
   const history: History = createHistory()
@@ -33,6 +33,7 @@ export const gamepadManager = new GamepadManager(window, connector)
     username: save.appSaveData.username
   })
   connector.changeCharacterCyclingOrder({ characterCyclingOrder: save.appSaveData.characterCylingOrder })
+  gamepadManager = new GamepadManager(window, connector, save.appSaveData.gamepadId)
   store = initReducer(history, save)
 
   render(

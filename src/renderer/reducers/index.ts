@@ -50,6 +50,7 @@ const APP_SAVE_DATA: ElectronSaveData = {
     { characterId: 10, on: true }, // Goomba
     { characterId: 11, on: true }, // Kirby
   ],
+  gamepadId: undefined,
   lastIp: 'smmdb.ddns.net',
   lastPort: 3678,
   version: '',

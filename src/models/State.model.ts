@@ -24,6 +24,7 @@ export interface ElectronSaveDataDraft {
   globalHotkeysEnabled: boolean
   hotkeyBindings: { [shortcut: string]: string | undefined }
   characterCylingOrder: Array<{characterId: number, on: boolean}>
+  gamepadId: string | undefined
   lastIp: string
   lastPort: number
   version: string
