@@ -1,6 +1,8 @@
 import './HotkeyButton.scss'
 
 import * as React from 'react'
+const ReactDOM = require('react-dom') // @types/react-dom is out of date
+
 import { GamepadManager, ButtonState } from '../../GamepadManager'
 import { gamepadManager } from '../..'
 
@@ -28,44 +30,65 @@ export class HotkeyButton extends React.PureComponent<HotkeyButtonProps, HotkeyB
     }
     this.onClick = this.onClick.bind(this)
     this.onRightClick = this.onRightClick.bind(this)
+    this.keyDownListener = this.keyDownListener.bind(this)
+    this.buttonDownListener = this.buttonDownListener.bind(this)
+    this.clickOutsideListener = this.clickOutsideListener.bind(this)
+    this.removeListeners = this.removeListeners.bind(this)
+  }
+
+  private node: Node | undefined
+
+  componentDidMount () {
+    this.node = ReactDOM.findDOMNode(this);
   }
 
   onClick () {
-    // Keyboard listener
-    const keyDownListener = (event: KeyboardEvent) => {
-      this.setState({ hotkey: event.key, listening: false })
-      if (!!this.props.onClick) {
-        this.props.onClick(this.props.shortcut, event.key)
-      }
-      document.removeEventListener('keydown', keyDownListener)
-      if (!!gamepadManager) { gamepadManager.removeButtonStateListener(buttonDownListener) }
-    };
-    document.addEventListener('keydown', keyDownListener)
-
-    // Gamepad listener
-    const buttonDownListener = (buttonState: ButtonState) => {
-      const button = buttonState.find((button) => button.pressed)
-      if (button !== undefined) {
-        const hotkey = `button${button.key}`
-        this.setState({ hotkey, listening: false })
-        if (!!this.props.onClick) {
-          this.props.onClick(this.props.shortcut, hotkey)
-        }
-        document.removeEventListener('keydown', keyDownListener)
-        if (!!gamepadManager) { gamepadManager.removeButtonStateListener(buttonDownListener) }
-      }
-    };
-    if (!!gamepadManager) { gamepadManager.addButtonStateListener(buttonDownListener) }
-
+    document.addEventListener('keydown', this.keyDownListener)
+    document.addEventListener('click', this.clickOutsideListener)
+    if (!!gamepadManager) { gamepadManager.addButtonStateListener(this.buttonDownListener) }
     this.setState({ listening: true })
   }
 
   onRightClick () {
     // Remove hotkey
-    this.setState({ hotkey: undefined, listening: false })
+    this.setState({ hotkey: undefined })  
     if (!!this.props.onRightClick) {
       this.props.onRightClick(this.props.shortcut)
     }
+    this.removeListeners()
+  }
+
+  keyDownListener (event: KeyboardEvent) {
+    this.setState({ hotkey: event.key })
+    if (!!this.props.onClick) {
+      this.props.onClick(this.props.shortcut, event.key)
+    }
+    this.removeListeners()
+  }   
+
+  buttonDownListener (buttonState: ButtonState) {
+    const button = buttonState.find((button) => button.pressed)
+    if (button !== undefined) {
+      const hotkey = `button${button.key}`
+      this.setState({ hotkey })
+      if (!!this.props.onClick) {
+        this.props.onClick(this.props.shortcut, hotkey)
+      }
+      this.removeListeners()
+    }
+  }
+
+  clickOutsideListener (event: MouseEvent) {
+    if (!!this.node && !this.node.contains(event.target as Node)) {
+      this.removeListeners()
+    }
+  }
+
+  removeListeners () {
+    this.setState({ listening: false })
+    document.removeEventListener('keydown', this.keyDownListener)
+    document.removeEventListener('click', this.clickOutsideListener)
+    if (!!gamepadManager) { gamepadManager.removeButtonStateListener(this.buttonDownListener) }
   }
 
   render () {
