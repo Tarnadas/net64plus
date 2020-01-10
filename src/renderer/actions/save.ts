@@ -37,6 +37,12 @@ export function setGlobalHotkeysEnabled (globalHotkeysEnabled: boolean): SetGlob
     globalHotkeysEnabled
   }
 }
+export function setHotkeyBindings (hotkeyBindings: { [shortcut: string]: string | undefined }) {
+  return {
+    type: 'SET_HOTKEY_BINDINGS',
+    hotkeyBindings
+  }
+}
 export function setGamepadId (gamepadId: string | undefined): SetGamepadIdAction {
   return {
     type: 'SET_GAMEPAD_ID',

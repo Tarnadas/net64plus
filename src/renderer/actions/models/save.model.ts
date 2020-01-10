@@ -18,6 +18,10 @@ export interface SetGlobalHotkeysEnabledAction extends Action {
   globalHotkeysEnabled: boolean
 }
 
+export interface SetHotkeyBindingsAction extends Action {
+  hotkeyBindings: { [shortcut: string]: string | undefined }
+}
+
 export interface SetGamepadIdAction extends Action {
   gamepadId: string | undefined
 }
@@ -40,6 +44,7 @@ export type SaveAction =
   & SetCharacterAction
   & SetEmuChatAction
   & SetGlobalHotkeysEnabledAction
+  & SetHotkeyBindingsAction
   & SetGamepadIdAction
   & AddApiKeyAction
   & SetVersionAction

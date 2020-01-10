@@ -7,7 +7,7 @@ import { SMMButton } from '../buttons/SMMButton'
 import { HotkeyButton } from '../buttons/HotkeyButton'
 import { ToggleButton } from '../buttons/ToggleButton'
 import { WarningPanel } from '../panels/WarningPanel'
-import { setUsername, setCharacter, setEmuChat, setGlobalHotkeysEnabled, setGamepadId } from '../../actions/save'
+import { setUsername, setCharacter, setEmuChat, setGlobalHotkeysEnabled, setHotkeyBindings, setGamepadId } from '../../actions/save'
 import { State, ElectronSaveData } from '../../../models/State.model'
 import { showSnackbar } from '../../actions/snackbar'
 
@@ -167,6 +167,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       dispatch(setCharacter(this.state.characterId))
       dispatch(setEmuChat(this.state.emuChat))
       dispatch(setGlobalHotkeysEnabled(globalHotkeysEnabled))
+      dispatch(setHotkeyBindings(hotkeyBindings))
       dispatch(setGamepadId(gamepadId))
       dispatch(showSnackbar('Saved'))
     }
@@ -337,6 +338,21 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
         <this.SortableList useDragHandle characterCyclingOrder={this.state.characterCyclingOrder} onSortEnd={this.onCharacterCyclingOrderChange} />
 
         <div style={styles.gap}></div>
+        <SMMButton
+          text='Unbind all'
+          onClick={() => {
+            this.setState({ hotkeyBindings: {} })
+          }}
+          styles={{
+            subButton: {
+              text: {
+                textAlign: 'center',
+                width: '100%'
+              }
+            }
+          }}
+        />
+
         <SMMButton
           text='Save'
           iconSrc='img/submit.png'

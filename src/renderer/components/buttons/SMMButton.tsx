@@ -13,10 +13,14 @@ export type IconStyle = 'dark' | 'bright'
 
 interface SMMButtonProps {
   text: string
-  iconSrc: string
+  iconSrc?: string
   iconSrcHover?: string
   link?: string
-  styles?: Record<string, React.CSSProperties>
+  styles?: {
+    button?: React.CSSProperties,
+    icon?: React.CSSProperties,
+    subButton?: { [key: string]: React.CSSProperties }
+  }
   colorScheme?: ColorScheme
   iconStyle?: IconStyle
   // @deprecated
@@ -61,9 +65,12 @@ export class SMMButton extends React.PureComponent<SMMButtonProps, SMMButtonStat
   renderSubButton (styles: Record<string, React.CSSProperties>, iconStyle: React.CSSProperties) {
     return (
       <div>
-        <div style={iconStyle}>
-          <img style={styles.img} src={this.props.iconSrc} />
-        </div>
+        {
+          this.props.iconSrc &&
+          <div style={iconStyle}>
+            <img style={styles.img} src={this.props.iconSrc} />
+          </div>
+        }
         {
           this.props.text &&
           <div style={styles.text}>{this.props.text}</div>

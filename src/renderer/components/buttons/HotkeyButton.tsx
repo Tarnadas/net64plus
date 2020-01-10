@@ -42,6 +42,13 @@ export class HotkeyButton extends React.PureComponent<HotkeyButtonProps, HotkeyB
     this.node = ReactDOM.findDOMNode(this);
   }
 
+  componentWillReceiveProps (nextProps: HotkeyButtonProps) {
+    const { hotkey } = nextProps
+    if (hotkey !== this.state.hotkey) {
+      this.setState({ hotkey })
+    }
+  }
+
   onClick () {
     document.addEventListener('keydown', this.keyDownListener)
     document.addEventListener('click', this.clickOutsideListener)

@@ -22,6 +22,9 @@ export const save = (state: SaveState = initialState.save, action: SaveAction) =
       case 'SET_GLOBAL_HOTKEYS':
         draft.appSaveData.globalHotkeysEnabled = action.globalHotkeysEnabled
         break
+      case 'SET_HOTKEY_BINDINGS':
+        draft.appSaveData.hotkeyBindings = action.hotkeyBindings
+        break
       case 'SET_GAMEPAD_ID':
         draft.appSaveData.gamepadId = action.gamepadId
         break
