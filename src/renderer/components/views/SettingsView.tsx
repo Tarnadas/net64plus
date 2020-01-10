@@ -162,7 +162,6 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       connector.playerUpdate({ username, characterId: this.state.characterId })
       connector.changeHotkeyBindings({ hotkeyBindings, globalHotkeysEnabled })
       connector.changeCharacterCyclingOrder({ characterCyclingOrder })
-      gamepadManager.selectedGamepad = gamepadManager.getConnectedGamepads().find((gamepad) => (!!gamepad ? gamepad.id : undefined) === gamepadId) || undefined
       dispatch(setUsername(username))
       dispatch(setCharacter(this.state.characterId))
       dispatch(setEmuChat(this.state.emuChat))
@@ -272,6 +271,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
         <div style={styles.setting}>
           <div style={styles.label}>Gamepad:</div>
           <select style={styles.input} value={!!gamepadId ? gamepadId : undefined} onChange={(e) => {
+            gamepadManager.selectedGamepad = gamepadManager.getConnectedGamepads().find((gamepad) => (!!gamepad ? gamepad.id : undefined) === e.target.value) || undefined
             this.setState({ gamepadId: e.target.value })
           }}>
             {
