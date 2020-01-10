@@ -43,6 +43,12 @@ export function setHotkeyBindings (hotkeyBindings: { [shortcut: string]: string 
     hotkeyBindings
   }
 }
+export function setCharacterCyclingOrder (characterCyclingOrder: Array<{characterId: number, on: boolean}>) {
+  return {
+    type: 'SET_CHARACTER_CYCLING_ORDER',
+    characterCyclingOrder
+  }
+}
 export function setGamepadId (gamepadId: string | undefined): SetGamepadIdAction {
   return {
     type: 'SET_GAMEPAD_ID',

@@ -7,7 +7,7 @@ import { SMMButton } from '../buttons/SMMButton'
 import { HotkeyButton } from '../buttons/HotkeyButton'
 import { ToggleButton } from '../buttons/ToggleButton'
 import { WarningPanel } from '../panels/WarningPanel'
-import { setUsername, setCharacter, setEmuChat, setGlobalHotkeysEnabled, setHotkeyBindings, setGamepadId } from '../../actions/save'
+import { setUsername, setCharacter, setEmuChat, setGlobalHotkeysEnabled, setHotkeyBindings, setCharacterCyclingOrder, setGamepadId } from '../../actions/save'
 import { State, ElectronSaveData } from '../../../models/State.model'
 import { showSnackbar } from '../../actions/snackbar'
 
@@ -168,6 +168,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       dispatch(setEmuChat(this.state.emuChat))
       dispatch(setGlobalHotkeysEnabled(globalHotkeysEnabled))
       dispatch(setHotkeyBindings(hotkeyBindings))
+      dispatch(setCharacterCyclingOrder(characterCyclingOrder))
       dispatch(setGamepadId(gamepadId))
       dispatch(showSnackbar('Saved'))
     }
@@ -342,6 +343,38 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
           text='Unbind all'
           onClick={() => {
             this.setState({ hotkeyBindings: {} })
+          }}
+          styles={{
+            subButton: {
+              text: {
+                textAlign: 'center',
+                width: '100%'
+              }
+            }
+          }}
+        />
+        <SMMButton
+          text='Enable all'
+          onClick={() => {
+            const { characterCyclingOrder } = this.state
+            characterCyclingOrder.forEach((_, index) => characterCyclingOrder[index].on = true)
+            this.setState({ characterCyclingOrder: characterCyclingOrder.slice() })
+          }}
+          styles={{
+            subButton: {
+              text: {
+                textAlign: 'center',
+                width: '100%'
+              }
+            }
+          }}
+        />
+        <SMMButton
+          text='Disable all'
+          onClick={() => {
+            const { characterCyclingOrder } = this.state
+            characterCyclingOrder.forEach((_, index) => characterCyclingOrder[index].on = false)
+            this.setState({ characterCyclingOrder: characterCyclingOrder.slice() })
           }}
           styles={{
             subButton: {

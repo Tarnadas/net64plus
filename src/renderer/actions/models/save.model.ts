@@ -22,6 +22,10 @@ export interface SetHotkeyBindingsAction extends Action {
   hotkeyBindings: { [shortcut: string]: string | undefined }
 }
 
+export interface SetCharacterCyclingOrderAction extends Action {
+  characterCyclingOrder: Array<{characterId: number, on: boolean}>
+}
+
 export interface SetGamepadIdAction extends Action {
   gamepadId: string | undefined
 }
@@ -45,6 +49,7 @@ export type SaveAction =
   & SetEmuChatAction
   & SetGlobalHotkeysEnabledAction
   & SetHotkeyBindingsAction
+  & SetCharacterCyclingOrderAction
   & SetGamepadIdAction
   & AddApiKeyAction
   & SetVersionAction
