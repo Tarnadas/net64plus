@@ -23,7 +23,7 @@ class Request {
   constructor () {
     this.smmdb = axios.create({
       // baseURL: 'http://localhost:8080/api',
-      baseURL: 'https://smmdb.ddns.net/api/',
+      baseURL: 'https://smmdb.net/api/',
       responseType: 'json'
     })
     let githubApiKey = process.env.NODE_ENV === 'development'

@@ -35,7 +35,7 @@
   "bugs": {
     "url": "https://github.com/Tarnadas/net64plus/issues"
   },
-  "homepage": "http://smmdb.ddns.net/net64",
+  "homepage": "https://net64-mod.github.io/",
   "jest": {
     "setupFiles": [
       "./jest-browser-setup.js"
