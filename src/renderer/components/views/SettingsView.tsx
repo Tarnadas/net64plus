@@ -307,7 +307,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
             checked={this.state.emuChat}
             onChange={this.onEmuChatChange}
           />
-          <div style={styles.label}>Enable global character hotkeys:</div>
+          <div style={styles.label}>Enable global character keyboard shortcuts:</div>
           <input
             style={styles.checkBox}
             type='checkbox'
