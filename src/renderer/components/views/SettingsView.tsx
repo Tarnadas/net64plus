@@ -93,6 +93,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       gamepadId: props.saveData.gamepadId,
       warning: props.saveData.username ? '' : 'You must set a username'
     }
+    this.onGamepadsChanged = this.onGamepadsChanged.bind(this)
     this.onUsernameChange = this.onUsernameChange.bind(this)
     this.onCharacterChange = this.onCharacterChange.bind(this)
     this.onEmuChatChange = this.onEmuChatChange.bind(this)
@@ -101,6 +102,19 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     this.onCharacterCyclingToggled = this.onCharacterCyclingToggled.bind(this)
     this.onCharacterCyclingOrderChange = this.onCharacterCyclingOrderChange.bind(this)
     this.onSave = this.onSave.bind(this)
+  }
+  componentDidMount () {
+    // Attach gamepad connection/disconnection listeners
+    window.addEventListener('gamepadconnected', this.onGamepadsChanged)
+    window.addEventListener('gamepaddisconnected', this.onGamepadsChanged)
+  }
+  componentWillUnmount () {
+    // Detach gamepad connection/disconnection listeners
+    window.removeEventListener('gamepadconnected', this.onGamepadsChanged)
+    window.removeEventListener('gamepaddisconnected', this.onGamepadsChanged)
+  }
+  onGamepadsChanged () {
+    this.forceUpdate()
   }
   componentWillReceiveProps (nextProps: SettingsViewProps) {
     if (nextProps.saveData.character !== this.state.characterId) { // Update dropdown option menu
