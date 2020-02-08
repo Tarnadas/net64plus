@@ -8,6 +8,7 @@ import { spawn } from 'child_process'
 
 import { connector, deleteEmulator } from '.'
 import { FilteredEmulator } from '../models/Emulator.model'
+import { testEmulatorPid, TestProcess } from '../models/Emulator.mock'
 import { buf2hex } from '../utils/Buffer.util'
 import winprocess, { Process } from '../declarations/winprocess'
 
@@ -118,7 +119,7 @@ export class Emulator {
    */
   constructor (processId: number, characterId: number, inGameChatEnabled = false) {
     this.inGameChatEnabled = inGameChatEnabled
-    this.process = winProcess.Process(processId)
+    this.process = processId === testEmulatorPid ? new TestProcess() : winProcess.Process(processId)
     this.process.open()
     this.baseAddress = -1
     for (let i = 0x00000000; i <= 0x72D00000; i += 0x1000) {
@@ -201,7 +202,7 @@ export class Emulator {
         errorMessage = 'Insufficient permission to read memory. Try starting Net64+ with admin privileges'
         break
       case 299:
-        errorMessage = 'Your memory is not set to 16MB. RTFM!'
+        errorMessage = 'Your memory is not set to 16MB. You are either not using the shipped emulator or you did not restart the emulator after chaning your settings to 16MB'
         break
     }
     connector.setEmulatorError(errorMessage)

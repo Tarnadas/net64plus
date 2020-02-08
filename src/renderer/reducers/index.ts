@@ -51,7 +51,7 @@ const APP_SAVE_DATA: ElectronSaveData = {
     { characterId: 11, on: true }, // Kirby
   ],
   gamepadId: undefined,
-  lastIp: 'smmdb.ddns.net',
+  lastIp: 'smmdb.net',
   lastPort: 3678,
   version: '',
   serverOptions: {
