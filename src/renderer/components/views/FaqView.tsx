@@ -80,7 +80,7 @@ class View extends React.PureComponent<FaqViewProps> {
           <li>the next steps heavily depend on the router you are using. You will have to find an entry about port forwarding and set it up for the respective port that you want to use</li>
         </ul>
         <div>
-          If you want your server to be publicly visibile, you will have to get an API key from <ExternalLink href='https://smmdb.ddns.net/profile'>SMMDB profile page</ExternalLink>.
+          If you want your server to be publicly visibile, you will have to get an API key from <ExternalLink href='https://smmdb.net/profile'>SMMDB profile page</ExternalLink>.
           Never share your API key with anyone!
         </div>
       </div>

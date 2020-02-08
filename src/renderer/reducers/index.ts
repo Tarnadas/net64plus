@@ -21,7 +21,7 @@ const APP_SAVE_DATA: ElectronSaveData = {
   username: '',
   character: 0,
   emuChat: false,
-  lastIp: 'smmdb.ddns.net',
+  lastIp: 'smmdb.net',
   lastPort: 3678,
   version: '',
   serverOptions: {

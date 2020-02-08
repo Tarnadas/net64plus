@@ -19,6 +19,7 @@ import { MainMessage, RendererMessage } from '../models/Message.model'
 import { Server } from '../models/Server.model'
 import { IPlayer, IPlayerUpdate } from '../../proto/ServerClientMessage'
 import { FilteredEmulator } from '../models/Emulator.model'
+import { testEmulator } from '../models/Emulator.mock'
 
 export class Connector {
   constructor () {
@@ -67,6 +68,9 @@ export class Connector {
   }
 
   private onUpdateEmulators = (_: Electron.Event, emulators: FilteredEmulator[]) => {
+    if (process.env.NODE_ENV === 'development') {
+      emulators.push(testEmulator)
+    }
     store.dispatch(updateEmulators(emulators))
   }
 

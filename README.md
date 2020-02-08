@@ -14,4 +14,4 @@ Download the client/server/emulator bundle in the [release section](https://gith
 
 ## Server List
 
-There is a [public server list](https://smmdb.ddns.net/net64) of all Net64+ server, that have enabled listing.
+There is a [public server list](https://net64-mod.github.io/servers) of all Net64+ server, that have enabled listing.
