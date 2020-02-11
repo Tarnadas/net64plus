@@ -10,6 +10,8 @@ export const testEmulator: FilteredEmulator = {
 }
 
 const MEMORY_SIZE = 0xFFFFFF;
+const PLAYER_DATA_OFFSET = 0xFF7706;
+const PLAYER_DATA_OFFSET_END = 0xFF770C;
 
 export class TestProcess implements Process {
   private memory = Buffer.alloc(MEMORY_SIZE)
@@ -17,20 +19,28 @@ export class TestProcess implements Process {
   constructor() {
     this.memory.writeUInt32LE(0x3C1A8032, 0)
     this.memory.writeUInt32LE(0x275A7650, 4)
+    setInterval(this.updatePlayerLocation.bind(this), 500)
   }
 
-  public open() {}
+  private updatePlayerLocation () {
+    for (let i = PLAYER_DATA_OFFSET; i < PLAYER_DATA_OFFSET_END; i++) {
+      this.memory.writeUInt8((this.memory.readUInt8(i) + 1) % 255, i)
+    }
+  }
 
-  public readMemory(offset: number, length: number): number | Buffer {
+  public open () {}
+
+  public readMemory (offset: number, length: number): number | Buffer {
     let buffer: Buffer
     if (offset + length > MEMORY_SIZE) {
       buffer = Buffer.alloc(length)
     } else {
       buffer = this.memory.slice(offset, offset + length)
     }
-    // console.log('READ', offset, length, buffer)
     return buffer
   }
 
-  public writeMemory() {}
+  public writeMemory (offset: number, buffer: Buffer) {
+    this.memory.fill(buffer, offset, offset + buffer.length)
+  }
 }
