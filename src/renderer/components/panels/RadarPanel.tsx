@@ -18,6 +18,9 @@ interface RadarPanelState {
 
 const RADIUS = 90
 const DEFAULT_VIEW_DISTANCE = 0x200
+const MIN_VIEW_DISTANCE = 0x80
+const MAX_VIEW_DISTANCE = 0x400
+const VIEW_DISTANCE_STEP = 0x20
 const STROKE_WIDTH = 2
 const FILL = '#eee'
 const STROKE = 'rgba(0, 0, 0, 0.3)'
@@ -29,14 +32,31 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
     this.state = {
       viewDistance: DEFAULT_VIEW_DISTANCE
     }
+    this.handleSetViewDistance = this.handleSetViewDistance.bind(this)
     this.renderPlayers = this.renderPlayers.bind(this)
   }
 
-  private renderPlayers (playerId: number | null, selfPos: Position, players: (Player | null)[]): JSX.Element {
+  private handleSetViewDistance (event: React.ChangeEvent<HTMLInputElement>): void {
+    let value = Number(event.target.value)
+    if (value > MAX_VIEW_DISTANCE) {
+      value = MAX_VIEW_DISTANCE
+    } else if (value < MIN_VIEW_DISTANCE) {
+      value = MIN_VIEW_DISTANCE
+    }
+    this.setState({
+      viewDistance: value
+    })
+  }
+
+  private renderPlayers (
+    playerId: number | null,
+    selfPos: Position,
+    viewDistance: number,
+    players: (Player | null)[]
+  ): JSX.Element {
     const rotation = selfPos.rotation * 2 * Math.PI / 0xFFFF
     const rotSin = Math.sin(rotation)
     const rotCos = Math.cos(rotation)
-    const { viewDistance } = this.state
     return <>
       {
         players
@@ -74,6 +94,7 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
 
   public render (): JSX.Element {
     const { playerId, self, players } = this.props
+    const { viewDistance } = this.state
     let playersMock: (Player | null)[]
     if (process.env.NODE_ENV === 'development') {
       playersMock = [ ...players ]
@@ -116,7 +137,16 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
             <line stroke={STROKE} strokeWidth={STROKE_WIDTH} x1={RADIUS} x2={RADIUS} y1="0" y2={RADIUS * 2} />
           </g>
         </svg>
-        { self.position && this.renderPlayers(playerId, self.position, process.env.NODE_ENV === 'development' ? playersMock! : players) }
+        { self.position && this.renderPlayers(playerId, self.position, viewDistance, process.env.NODE_ENV === 'development' ? playersMock! : players) }
+        <input
+          className='radar-panel-range'
+          type='range'
+          min={MIN_VIEW_DISTANCE}
+          max={MAX_VIEW_DISTANCE}
+          value={viewDistance}
+          step={VIEW_DISTANCE_STEP}
+          onChange={this.handleSetViewDistance}
+        ></input>
       </div>
     )
   }
