@@ -3,6 +3,7 @@ import {
   SetConnectionErrorAction,
   SetPlayersAction,
   SetPlayerAction,
+  SetPlayerIdAction,
   SetGameModeAction,
   AuthenticationRequired,
   AuthenticationAccepted,
@@ -41,6 +42,13 @@ export function setPlayer (playerId: number, player: IPlayer): SetPlayerAction {
     type: ConnectionActionType.SET_PLAYER,
     playerId,
     player
+  }
+}
+
+export function setPlayerId (playerId: number): SetPlayerIdAction {
+  return {
+    type: ConnectionActionType.SET_PLAYER_ID,
+    playerId
   }
 }
 

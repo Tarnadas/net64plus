@@ -21,6 +21,10 @@ export interface SetPlayerAction extends Action {
   player: IPlayer
 }
 
+export interface SetPlayerIdAction extends Action {
+  playerId: number
+}
+
 export interface UpdatePlayerPositionAction extends Action {
   self: Position
   positions: (Position | null)[]
@@ -45,6 +49,7 @@ export type ConnectionAction =
   & SetConnectionErrorAction
   & SetPlayersAction
   & SetPlayerAction
+  & SetPlayerIdAction
   & UpdatePlayerPositionAction
   & SetGameModeAction
   & AuthenticationRequired
@@ -57,6 +62,7 @@ export enum ConnectionActionType {
   SET_CONNECTION_ERROR = 'SET_CONNECTION_ERROR',
   SET_PLAYERS = 'SET_PLAYERS',
   SET_PLAYER = 'SET_PLAYER',
+  SET_PLAYER_ID = 'SET_PLAYER_ID',
   UPDATE_PLAYER_POSITIONS = 'UPDATE_PLAYER_POSITIONS',
   GAME_MODE = 'GAME_MODE',
   AUTHENTICATION_REQUIRED = 'AUTHENTICATION_REQUIRED',

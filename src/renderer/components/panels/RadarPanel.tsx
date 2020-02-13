@@ -3,36 +3,49 @@ import './RadarPanel.scss'
 import * as React from 'react'
 
 import { Position, Player, CHARACTER_IMAGES } from '../../../models/Emulator.model'
+import { connect } from 'react-redux'
+import { State } from '../../../models/State.model'
 
 interface RadarPanelProps {
+  playerId: number | null
   self: Player
   players: (Player | null)[]
 }
 
+interface RadarPanelState {
+  viewDistance: number
+}
+
 const RADIUS = 90
-const VIEW_DISTANCE = 0x200
+const DEFAULT_VIEW_DISTANCE = 0x200
 const STROKE_WIDTH = 2
 const FILL = '#eee'
-const ICON_SIZE = 20
+const STROKE = 'rgba(0, 0, 0, 0.3)'
+const ICON_SIZE = 18
 
-export class RadarPanel extends React.PureComponent<RadarPanelProps> {
+class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
   constructor (props: RadarPanelProps) {
     super(props)
+    this.state = {
+      viewDistance: DEFAULT_VIEW_DISTANCE
+    }
     this.renderPlayers = this.renderPlayers.bind(this)
   }
 
-  private renderPlayers (selfPos: Position, players: (Player | null)[]): JSX.Element {
+  private renderPlayers (playerId: number | null, selfPos: Position, players: (Player | null)[]): JSX.Element {
     const rotation = selfPos.rotation * 2 * Math.PI / 0xFFFF
     const rotSin = Math.sin(rotation)
     const rotCos = Math.cos(rotation)
+    const { viewDistance } = this.state
     return <>
       {
         players
+          .filter((_, index) => index !== playerId)
           .filter(player => !!player)
           .filter(player => !!player!.position)
           .map((player, index) => {
-            const x = this.normalize(rotCos * player!.position!.x - rotSin * player!.position!.y)
-            const y = this.normalize(rotSin * player!.position!.x + rotCos * player!.position!.y)
+            const x = this.normalize(rotCos * player!.position!.x - rotSin * player!.position!.y, viewDistance)
+            const y = this.normalize(rotSin * player!.position!.x + rotCos * player!.position!.y, viewDistance)
             return <div
               key={player!.username || index}
               className='radar-panel-icon-wrapper'
@@ -47,6 +60,7 @@ export class RadarPanel extends React.PureComponent<RadarPanelProps> {
                 className='radar-panel-icon'
                 src={`img/${CHARACTER_IMAGES[player!.characterId || 0]}`}
               />
+              <span className='radar-panel-label'>{ player!.username }</span>
             </div>
           })
 
@@ -54,12 +68,12 @@ export class RadarPanel extends React.PureComponent<RadarPanelProps> {
     </>
   }
 
-  private normalize (val: number): number {
-    return val * RADIUS / VIEW_DISTANCE
+  private normalize (val: number, viewDistance: number): number {
+    return val * RADIUS / viewDistance
   }
 
   public render (): JSX.Element {
-    const { self, players } = this.props
+    const { playerId, self, players } = this.props
     let playersMock: (Player | null)[]
     if (process.env.NODE_ENV === 'development') {
       playersMock = [ ...players ]
@@ -77,7 +91,7 @@ export class RadarPanel extends React.PureComponent<RadarPanelProps> {
         username: 'Player 4',
         position: {
           x: -0x80,
-          y: 0x1a0,
+          y: 0x1d0,
           rotation: 0
         }
       }
@@ -95,15 +109,18 @@ export class RadarPanel extends React.PureComponent<RadarPanelProps> {
       <div className='radar-panel'>
         <svg width={RADIUS * 2} height={RADIUS * 2}>
           <g>
-            <circle cx={RADIUS} cy={RADIUS} fill={FILL} r={RADIUS} stroke="#000" strokeWidth={STROKE_WIDTH} />
-            <circle cx={RADIUS} cy={RADIUS} fill={FILL} r={RADIUS * 2 / 3} stroke="#000" strokeWidth={STROKE_WIDTH} />
-            <circle cx={RADIUS} cy={RADIUS} fill={FILL} r={RADIUS / 3} stroke="#000" strokeWidth={STROKE_WIDTH} />
-            <line stroke="#000" strokeWidth={STROKE_WIDTH} x1="0" x2={RADIUS * 2} y1={RADIUS} y2={RADIUS} />
-            <line stroke="#000" strokeWidth={STROKE_WIDTH} x1={RADIUS} x2={RADIUS} y1="0" y2={RADIUS * 2} />
+            <circle cx={RADIUS} cy={RADIUS} fill={FILL} r={RADIUS} stroke={STROKE} strokeWidth={STROKE_WIDTH} />
+            <circle cx={RADIUS} cy={RADIUS} fill={FILL} r={RADIUS * 2 / 3} stroke={STROKE} strokeWidth={STROKE_WIDTH} />
+            <circle cx={RADIUS} cy={RADIUS} fill={FILL} r={RADIUS / 3} stroke={STROKE} strokeWidth={STROKE_WIDTH} />
+            <line stroke={STROKE} strokeWidth={STROKE_WIDTH} x1="0" x2={RADIUS * 2} y1={RADIUS} y2={RADIUS} />
+            <line stroke={STROKE} strokeWidth={STROKE_WIDTH} x1={RADIUS} x2={RADIUS} y1="0" y2={RADIUS * 2} />
           </g>
         </svg>
-        { self.position && this.renderPlayers(self.position, process.env.NODE_ENV === 'development' ? playersMock! : players) }
+        { self.position && this.renderPlayers(playerId, self.position, process.env.NODE_ENV === 'development' ? playersMock! : players) }
       </div>
     )
   }
 }
+export const RadarPanel = connect((state: State) => ({
+  playerId: state.connection.playerId
+}))(Panel)

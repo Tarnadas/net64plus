@@ -39,6 +39,7 @@ export type RouterState = Readonly<RouterStateDraft>
 
 export interface ConnectionStateDraft {
   server: Server | null
+  playerId: number | null
   selfPos: Position
   authenticated: boolean
   authenticationThrottle: number

@@ -65,6 +65,7 @@ export function initReducer (history: History, electronSave: SaveState): Store<S
     },
     connection: {
       server: null,
+      playerId: null,
       selfPos: { x: 0, y: 0, rotation: 0 },
       authenticated: true,
       authenticationThrottle: 0,

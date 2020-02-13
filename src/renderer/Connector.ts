@@ -13,13 +13,14 @@ import {
   setPlayer,
   setPlayers,
   setServer,
-  updatePlayerPositions
+  updatePlayerPositions,
+  setPlayerId
 } from './actions/connection'
 import { isConnectedToEmulator, setEmulatorError, updateEmulators } from './actions/emulator'
 import { MainMessage, RendererMessage } from '../models/Message.model'
 import { Server } from '../models/Server.model'
 import { IPlayer, IPlayerUpdate } from '../../proto/ServerClientMessage'
-import { FilteredEmulator, Player, Position } from '../models/Emulator.model'
+import { FilteredEmulator, Position } from '../models/Emulator.model'
 import { testEmulator } from '../models/Emulator.mock'
 
 export class Connector {
@@ -100,6 +101,7 @@ export class Connector {
 
   private onSetPlayerId = (_: Electron.Event, playerId: number) => {
     addGlobalMessage('Connected', '[SERVER]', true)
+    store.dispatch(setPlayerId(playerId))
   }
 
   private onSetGameMode = (_: Electron.Event, gameMode: number) => {

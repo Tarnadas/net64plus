@@ -3,7 +3,6 @@ import produce from 'immer'
 import { initialState } from '.'
 import { ConnectionAction, ConnectionActionType } from '../actions/models/connection.model'
 import { ConnectionState, ConnectionStateDraft } from '../../models/State.model'
-import { IPlayer } from '../../../proto/ServerClientMessage'
 import { Player } from '../../models/Emulator.model'
 
 export const connection = (state: ConnectionState = initialState.connection, action: ConnectionAction) =>
@@ -31,6 +30,9 @@ export const connection = (state: ConnectionState = initialState.connection, act
         if (!draft.server.players) draft.server.players = []
         draft.server.players[action.playerId] = action.player
         break
+      case ConnectionActionType.SET_PLAYER_ID:
+        draft.playerId = action.playerId
+        break
       case ConnectionActionType.UPDATE_PLAYER_POSITIONS:
         draft.selfPos = action.self
         for (let i = 0; i < action.positions.length; i++) {
@@ -57,6 +59,7 @@ export const connection = (state: ConnectionState = initialState.connection, act
         break
       case ConnectionActionType.DISCONNECT:
         draft.server = null
+        draft.playerId = null
         break
     }
   })

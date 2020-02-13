@@ -12,10 +12,18 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
+      overflow: visible;
       border-radius: 50%;
       position: absolute;
-      background-color: #d04444;
+      background-color: rgba(160, 70, 70, 0.7);
     }
+  }
+
+  &-label {
+    position: absolute;
+    margin-top: 16px;
+    font-size: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.4)    ;
+    white-space: pre;
   }
 }
