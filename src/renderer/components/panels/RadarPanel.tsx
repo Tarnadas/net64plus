@@ -25,6 +25,7 @@ const STROKE_WIDTH = 2
 const FILL = '#eee'
 const STROKE = 'rgba(0, 0, 0, 0.3)'
 const ICON_SIZE = 18
+const ICON_SIZE_OUTSIDE_VIEW = 12
 
 class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
   constructor (props: RadarPanelProps) {
@@ -64,28 +65,46 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
           .filter(player => !!player)
           .filter(player => !!player!.position)
           .map((player, index) => {
-            const x = this.normalize(rotCos * player!.position!.x - rotSin * player!.position!.y, viewDistance)
-            const y = this.normalize(rotSin * player!.position!.x + rotCos * player!.position!.y, viewDistance)
+            const distance = this.distance(selfPos, player!.position!)
+            const withinViewDistance = distance <= viewDistance
+            let normalizedViewDistance = viewDistance
+            if (!withinViewDistance) {
+              normalizedViewDistance = distance
+            }
+            const x = this.normalize(rotCos * player!.position!.x - rotSin * player!.position!.y, normalizedViewDistance)
+            const y = this.normalize(rotSin * player!.position!.x + rotCos * player!.position!.y, normalizedViewDistance)
+            const iconSize = withinViewDistance ? ICON_SIZE : ICON_SIZE_OUTSIDE_VIEW
             return <div
               key={player!.username || index}
               className='radar-panel-icon-wrapper'
               style={{
-                top: RADIUS - y - ICON_SIZE / 2,
-                left: RADIUS - x - ICON_SIZE / 2,
-                width: ICON_SIZE,
-                height: ICON_SIZE
+                top: RADIUS - y - iconSize / 2,
+                left: RADIUS - x - iconSize / 2,
+                width: iconSize,
+                height: iconSize
               }}
             >
               <img
                 className='radar-panel-icon'
+                style={{
+                  maxWidth: iconSize,
+                  maxHeight: iconSize
+                }}
                 src={`img/${CHARACTER_IMAGES[player!.characterId || 0]}`}
               />
-              <span className='radar-panel-label'>{ player!.username }</span>
+              {
+                withinViewDistance &&
+                <span className='radar-panel-label'>{ player!.username }</span>              
+              }
             </div>
           })
 
       }
     </>
+  }
+
+  private distance (selfPos: Position, pos: Position): number {
+    return Math.sqrt((selfPos.x - pos.x) * (selfPos.x - pos.x) + (selfPos.y - pos.y) * (selfPos.y - pos.y))
   }
 
   private normalize (val: number, viewDistance: number): number {
