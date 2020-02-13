@@ -1,3 +1,5 @@
+import './ConnectionArea.scss'
+
 import * as React from 'react'
 import { connect, Dispatch } from 'react-redux'
 
@@ -17,18 +19,8 @@ interface ConnectionAreaProps {
 class Area extends React.PureComponent<ConnectionAreaProps, {}> {
   public render (): JSX.Element {
     const { server, authenticated, authenticationThrottle } = this.props
-    const styles: Record<string, React.CSSProperties> = {
-      area: {
-        overflowY: 'auto',
-        padding: '4px',
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        flex: '1 1 auto'
-      }
-    }
     return (
-      <div style={styles.area}>
+      <div className='connection-area'>
         <ServerPanel server={server} isConnected />
         <ChatArea />
         {

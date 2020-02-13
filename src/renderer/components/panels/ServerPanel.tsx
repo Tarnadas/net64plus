@@ -8,11 +8,13 @@ import { emojify } from 'node-emoji'
 
 import { connector } from '../..'
 import { SMMButton } from '../buttons/SMMButton'
-import { WarningPanel } from '../panels/WarningPanel'
+import { WarningPanel } from './WarningPanel'
+import { RadarPanel } from './RadarPanel'
 import { disconnect, setConnectionError } from '../../actions/connection'
 import { State } from '../../../models/State.model'
 import { Server } from '../../../models/Server.model'
-import { IPlayer, GameModeType } from '../../../../proto/ServerClientMessage'
+import { Position, Player } from '../../../models/Emulator.model'
+import { GameModeType } from '../../../../proto/ServerClientMessage'
 
 const { sanitize } = require('dompurify').default
 
@@ -21,6 +23,7 @@ interface ServerPanelProps {
   server: Server
   username: string
   characterId: number
+  selfPos: Position
   connectionError: string
   onConnect?: () => void
   isConnected?: boolean
@@ -138,9 +141,9 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
     }
   }
 
-  private renderPlayers (players: IPlayer[]): JSX.Element[] {
+  private renderPlayers (players: (Player | null)[]): JSX.Element[] {
     return players
-      .filter(player => player)
+      .filter(player => !!player)
       .map(
         (player, index) =>
           <div
@@ -148,17 +151,17 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
             className='server-panel-player'
           >
             <div className='server-panel-player-img'>
-              <img src={`img/${CHARACTER_IMAGES[player.characterId || 0]}`} />
+              <img src={`img/${CHARACTER_IMAGES[player!.characterId || 0]}`} />
             </div>
             <div className='server-panel-player-name'>
-              { player.username }
+              { player!.username }
             </div>
           </div>
       )
   }
 
   public render (): JSX.Element {
-    const { server, isConnected } = this.props
+    const { selfPos, server, username, characterId, isConnected } = this.props
     const { display, displayDescription, warning } = this.state
     const players = server.players || []
     const gameMode: string | undefined = this.getGameModeImgSrc(server)
@@ -177,7 +180,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
         display: 'flex',
         wordWrap: 'break-word',
         maxWidth: '100%',
-        flex: displayDescription ? '1 1 0' : undefined
+        flex: displayDescription ? '1 1 250px' : undefined
       },
       el: {
         margin: '6px'
@@ -247,6 +250,19 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
                 />
               </div>
             </div>
+            {
+              isConnected &&
+              <div className='server-panel-details-radar'>
+                <RadarPanel
+                  self={{
+                    username,
+                    characterId,
+                    position: selfPos
+                  }}
+                  players={server.players || []}
+                />
+              </div>
+            }
             <div className='server-panel-details-playerlist'>
               {
                 this.renderPlayers(players)
@@ -276,5 +292,6 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
 export const ServerPanel = connect((state: State) => ({
   username: state.save.appSaveData.username,
   characterId: state.save.appSaveData.character,
+  selfPos: state.connection.selfPos,
   connectionError: state.connection.error
 }))(Panel)

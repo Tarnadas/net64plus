@@ -562,6 +562,7 @@ export class Connection {
       if (process.env.NODE_ENV === 'development') {
         this.printPlayerData()
       }
+      this.updatePlayerPositions()
     } catch (err) {
       this.catchError()
     }
@@ -658,6 +659,12 @@ export class Connection {
       }
       throw err
     }
+  }
+
+  private updatePlayerPositions (): void {
+    if (!emulator) return
+    const positions = emulator.getPlayerPositions()
+    connector.updatePlayerPositions(positions)
   }
 
   /**

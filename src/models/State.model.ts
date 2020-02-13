@@ -1,7 +1,7 @@
 import { RouterState as ReactRouterState } from 'react-router-redux'
 
 import { Server } from './Server.model'
-import { FilteredEmulator } from './Emulator.model'
+import { FilteredEmulator, Position } from './Emulator.model'
 import { ChildProcess } from 'child_process'
 
 export interface ElectronServerSaveDataDraft {
@@ -39,6 +39,7 @@ export type RouterState = Readonly<RouterStateDraft>
 
 export interface ConnectionStateDraft {
   server: Server | null
+  selfPos: Position
   authenticated: boolean
   authenticationThrottle: number
   hasToken: boolean

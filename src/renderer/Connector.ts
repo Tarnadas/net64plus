@@ -12,13 +12,14 @@ import {
   setGameMode,
   setPlayer,
   setPlayers,
-  setServer
+  setServer,
+  updatePlayerPositions
 } from './actions/connection'
 import { isConnectedToEmulator, setEmulatorError, updateEmulators } from './actions/emulator'
 import { MainMessage, RendererMessage } from '../models/Message.model'
 import { Server } from '../models/Server.model'
 import { IPlayer, IPlayerUpdate } from '../../proto/ServerClientMessage'
-import { FilteredEmulator } from '../models/Emulator.model'
+import { FilteredEmulator, Player, Position } from '../models/Emulator.model'
 import { testEmulator } from '../models/Emulator.mock'
 
 export class Connector {
@@ -31,6 +32,7 @@ export class Connector {
     ipcRenderer.on(MainMessage.SET_PLAYERS, this.onSetPlayers)
     ipcRenderer.on(MainMessage.SET_PLAYER, this.onSetPlayer)
     ipcRenderer.on(MainMessage.SET_PLAYER_ID, this.onSetPlayerId)
+    ipcRenderer.on(MainMessage.UPDATE_PLAYER_POSITIONS, this.onUpdatePlayerPositions)
     ipcRenderer.on(MainMessage.GAME_MODE, this.onSetGameMode)
     ipcRenderer.on(MainMessage.SERVER_FULL, this.onServerFull)
     ipcRenderer.on(MainMessage.WRONG_VERSION, this.onWrongVersion)
@@ -72,6 +74,10 @@ export class Connector {
       emulators.push(testEmulator)
     }
     store.dispatch(updateEmulators(emulators))
+  }
+
+  private onUpdatePlayerPositions = (_: Electron.Event, positions: {self: Position, positions: (Position | null)[]}) => {
+    store.dispatch(updatePlayerPositions(positions))
   }
 
   private onSetServer = (_: Electron.Event, server: Server) => {
@@ -127,8 +133,8 @@ export class Connector {
     { message: string, senderId: number }
   ) => {
     const server = store.getState().connection.server
-    if (!server || !server.players) return
-    const username = server.players[senderId] && server.players[senderId].username
+    if (!server || !server.players || !server.players[senderId]) return
+    const username = server.players[senderId] && server.players[senderId]!.username
     addGlobalMessage(message, username || '?', false)
   }
 

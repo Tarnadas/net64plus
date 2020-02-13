@@ -7,7 +7,7 @@ import { promisify } from 'util'
 import { spawn } from 'child_process'
 
 import { connector, deleteEmulator } from '.'
-import { FilteredEmulator } from '../models/Emulator.model'
+import { FilteredEmulator, Position } from '../models/Emulator.model'
 import { testEmulatorPid, TestProcess } from '../models/Emulator.mock'
 import { buf2hex } from '../utils/Buffer.util'
 import winprocess, { Process } from '../declarations/winprocess'
@@ -277,5 +277,37 @@ export class Emulator {
       // TODO
       console.error(err)
     }
+  }
+
+  public getPlayerRotation (): number {
+    return this.readMemory(0xFF7709, 1).readUInt8(0)
+  }
+
+  public getPlayerPositions (): {self: Position, positions: (Position | null)[]} {
+    const positions: (Position | null)[] = new Array(24).fill(null)
+    const playerId = this.readMemory(0xFF7703, 1).readUInt8(0)
+    const x = this.readMemory(0xFF7706, 2).readInt16LE(0)
+    const y = this.readMemory(0xFF770A, 2).readInt16LE(0)
+    const rotation = this.readMemory(0xFF7708, 2).readUInt16LE(0)
+    const self = {
+      x,
+      y,
+      rotation
+    }
+    for (let offset = 0xFF7800, i = 0; offset < 0xFF9100; offset += 0x100, i++) {
+      if (playerId === i + 1) {
+        positions[i] = null
+      } else {
+        const x = this.readMemory(offset + 6, 2).readInt16LE(0)
+        const y = this.readMemory(offset + 0xA, 2).readInt16LE(0)
+        const rotation = this.readMemory(offset + 8, 2).readUInt16LE(0)
+        positions[i] = {
+          x,
+          y,
+          rotation
+        }
+      }
+    }
+    return {self, positions}
   }
 }
