@@ -15,3 +15,7 @@ export interface Position {
 export interface Player extends IPlayer {
   position?: Position
 }
+
+export const CHARACTER_IMAGES = [
+  'mario.png', 'luigi.png', 'yoshi.png', 'wario.png', 'peach.png', 'toad.png', 'waluigi.png', 'rosalina.png', 'sonic.png', 'knuckles.png', 'goomba.png', 'kirby.png'
+]

@@ -9,9 +9,10 @@ export const testEmulator: FilteredEmulator = {
   windowName: 'Test Super Mario 64 - Project64'
 }
 
-const MEMORY_SIZE = 0xFFFFFF;
-const PLAYER_DATA_OFFSET = 0xFF7706;
-const PLAYER_DATA_OFFSET_END = 0xFF770C;
+const MEMORY_SIZE = 0xFFFFFF
+const PLAYER_POS_X_OFFSET = 0xFF7706
+const PLAYER_POS_Y_OFFSET = 0xFF770A
+const PLAYER_ROTATION_OFFSET = 0xFF7708
 
 export class TestProcess implements Process {
   private memory = Buffer.alloc(MEMORY_SIZE)
@@ -23,9 +24,9 @@ export class TestProcess implements Process {
   }
 
   private updatePlayerLocation () {
-    for (let i = PLAYER_DATA_OFFSET; i < PLAYER_DATA_OFFSET_END; i++) {
-      this.memory.writeUInt8((this.memory.readUInt8(i) + 1) % 255, i)
-    }
+    this.memory.writeInt16LE((Math.abs(this.memory.readInt16LE(PLAYER_POS_X_OFFSET)) - 1), PLAYER_POS_X_OFFSET)
+    this.memory.writeInt16LE((Math.abs(this.memory.readInt16LE(PLAYER_POS_Y_OFFSET)) - 1), PLAYER_POS_Y_OFFSET)
+    this.memory.writeUInt16LE(((this.memory.readUInt16LE(PLAYER_ROTATION_OFFSET) + 0x80) % 0xFFFF), PLAYER_ROTATION_OFFSET)
   }
 
   public open () {}

@@ -13,7 +13,7 @@ import { RadarPanel } from './RadarPanel'
 import { disconnect, setConnectionError } from '../../actions/connection'
 import { State } from '../../../models/State.model'
 import { Server } from '../../../models/Server.model'
-import { Position, Player } from '../../../models/Emulator.model'
+import { Position, Player, CHARACTER_IMAGES } from '../../../models/Emulator.model'
 import { GameModeType } from '../../../../proto/ServerClientMessage'
 
 const { sanitize } = require('dompurify').default
@@ -34,10 +34,6 @@ interface ServerPanelState {
   displayDescription: boolean
   warning: string
 }
-
-const CHARACTER_IMAGES = [
-  'mario.png', 'luigi.png', 'yoshi.png', 'wario.png', 'peach.png', 'toad.png', 'waluigi.png', 'rosalina.png', 'sonic.png', 'knuckles.png', 'goomba.png', 'kirby.png'
-]
 
 class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
   constructor (public props: ServerPanelProps) {
