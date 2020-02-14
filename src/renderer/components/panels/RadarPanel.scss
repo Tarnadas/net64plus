@@ -18,7 +18,10 @@
     margin-top: 16px;
     font-size: 10px;
     border: 1px solid rgba(0, 0, 0, 0.4)    ;
-    white-space: pre;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100px;
   }
 
   &-range {

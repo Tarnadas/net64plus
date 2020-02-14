@@ -125,7 +125,7 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
           x: 0x100,
           y: 0x100,
           rotation: 0,
-          course: 0
+          course: 4
         }
       }
       playersMock[4] = {
@@ -135,17 +135,17 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
           x: -0x80,
           y: 0x1d0,
           rotation: 0,
-          course: 0
+          course: 4
         }
       }
       playersMock[7] = {
         characterId: 7,
-        username: 'Player 7',
+        username: 'Very Long Player Name ASDASDASD',
         position: {
           x: 0x50,
           y: -0xf0,
           rotation: 0,
-          course: 0
+          course: 4
         }
       }
     }
