@@ -289,10 +289,12 @@ export class Emulator {
     const x = this.readMemory(0xFF7706, 2).readInt16LE(0)
     const y = this.readMemory(0xFF770A, 2).readInt16LE(0)
     const rotation = this.readMemory(0xFF7708, 2).readUInt16LE(0)
-    const self = {
+    const map = this.readMemory(0xFF770F, 2).readUInt8(0)
+    const self: Position = {
       x,
       y,
-      rotation
+      rotation,
+      map
     }
     for (let offset = 0xFF7800, i = 0; offset < 0xFF9100; offset += 0x100, i++) {
       if (playerId === i + 1) {
@@ -301,10 +303,12 @@ export class Emulator {
         const x = this.readMemory(offset + 6, 2).readInt16LE(0)
         const y = this.readMemory(offset + 0xA, 2).readInt16LE(0)
         const rotation = this.readMemory(offset + 8, 2).readUInt16LE(0)
+        const map = this.readMemory(offset + 0xF, 1).readUInt8(0)
         positions[i] = {
           x,
           y,
-          rotation
+          rotation,
+          map
         }
       }
     }

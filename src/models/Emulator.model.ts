@@ -10,6 +10,7 @@ export interface Position {
   x: number
   y: number
   rotation: number
+  map: number
 }
 
 export interface Player extends IPlayer {
