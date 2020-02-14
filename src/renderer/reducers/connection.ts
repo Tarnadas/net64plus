@@ -40,8 +40,8 @@ export const connection = (state: ConnectionState = initialState.connection, act
           if (!position) continue
           if (!draft.server) return
           if (!draft.server.players) return
-          if (!draft.server.players[i]) return
-          draft.server.players[i]!.position = position
+          if (!draft.server.players[i + 1]) return
+          draft.server.players[i + 1]!.position = position
         }
         break
       case ConnectionActionType.GAME_MODE:

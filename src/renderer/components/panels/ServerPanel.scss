@@ -94,6 +94,12 @@
     min-width: 50%;
     overflow: hidden;
 
+    &-course {
+      min-width: 60px;
+      max-width: 60px;
+      margin: 0 3px;
+    }
+
     &-img {
       width: 24px;
       height: 24px;

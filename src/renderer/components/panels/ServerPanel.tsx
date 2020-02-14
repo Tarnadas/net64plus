@@ -142,7 +142,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
       return {
         short: '???',
         long: 'Unknown',
-        icon: 'img.help.png'
+        icon: 'img/help.png'
       }
     }
     switch (position.course) {
@@ -226,7 +226,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
         }
       case 17:
         return {
-          short: 'BITDW',
+          short: 'BitDW',
           long: 'Bowser in the Dark World',
           icon: 'img/courses/16-bitdw.png'
         }
@@ -238,7 +238,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
         }
       case 19: 
         return {
-          short: 'BITFS',
+          short: 'BitFS',
           long: 'Bowser in the Fire Sea',
           icon: 'img/courses/17-bitfs.png'
         }
@@ -250,7 +250,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
         }
       case 21:
         return {
-          short: 'BITS',
+          short: 'BitS',
           long: 'Bowser in the Sky',
           icon: 'img/courses/18-bits.png'
         }
@@ -298,7 +298,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
         }
       case 30:
         return {
-          short: 'BITDW',
+          short: 'BitDW',
           long: 'Bowser in the Dark World',
           icon: 'img/courses/16-bitdw.png'
         }
@@ -310,13 +310,13 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
         }
       case 33:
         return {
-          short: 'BITFS',
+          short: 'BitFS',
           long: 'Bowser in the Fire Sea',
           icon: 'img/courses/17-bitfs.png'
         }
       case 34:
         return {
-          short: 'BITS',
+          short: 'BitS',
           long: 'Bowser in the Sky',
           icon: 'img/courses/18-bits.png'
         }
@@ -330,7 +330,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
     return {
       short: '???',
       long: 'Unknown',
-      icon: 'img.help.png'
+      icon: 'img/help.png'
     }
   }
 
@@ -338,13 +338,17 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
     return players
       .filter(player => !!player)
       .map(
-        (player, index) =>
-          <div
+        (player, index) => {
+          const course = this.getPlayerCourse(player!.position)
+          return <div
             key={index}
             className='server-panel-player'
           >
-            <div className='server=panel-player-course'>
-              { this.getPlayerCourse(player!.position) }
+            <div className='server-panel-player-img'>
+              <img src={course.icon} />
+            </div>
+            <div className='server-panel-player-course'>
+              { course.short }
             </div>
             <div className='server-panel-player-img'>
               <img src={`img/${CHARACTER_IMAGES[player!.characterId || 0]}`} />
@@ -353,6 +357,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
               { player!.username }
             </div>
           </div>
+        }
       )
   }
 
@@ -455,7 +460,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
                     characterId,
                     position: selfPos
                   }}
-                  players={server.players || []}
+                  players={players}
                 />
               </div>
             }

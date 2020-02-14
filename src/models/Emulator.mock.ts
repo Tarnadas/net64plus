@@ -13,6 +13,7 @@ const MEMORY_SIZE = 0xFFFFFF
 const PLAYER_POS_X_OFFSET = 0xFF7706
 const PLAYER_POS_Y_OFFSET = 0xFF770A
 const PLAYER_ROTATION_OFFSET = 0xFF7708
+const PLAYER_COURSE_OFFSET = 0xFF770F
 
 export class TestProcess implements Process {
   private memory = Buffer.alloc(MEMORY_SIZE)
@@ -24,9 +25,12 @@ export class TestProcess implements Process {
   }
 
   private updatePlayerLocation () {
-    this.memory.writeInt16LE((Math.abs(this.memory.readInt16LE(PLAYER_POS_X_OFFSET)) - 1), PLAYER_POS_X_OFFSET)
-    this.memory.writeInt16LE((Math.abs(this.memory.readInt16LE(PLAYER_POS_Y_OFFSET)) - 1), PLAYER_POS_Y_OFFSET)
-    this.memory.writeUInt16LE(((this.memory.readUInt16LE(PLAYER_ROTATION_OFFSET) + 0x80) % 0xFFFF), PLAYER_ROTATION_OFFSET)
+    for (let offset = 0; offset <= 0x100; offset += 0x100) {
+      this.memory.writeInt16LE((Math.abs(this.memory.readInt16LE(PLAYER_POS_X_OFFSET + offset)) - 1), PLAYER_POS_X_OFFSET + offset)
+      this.memory.writeInt16LE((Math.abs(this.memory.readInt16LE(PLAYER_POS_Y_OFFSET + offset)) - 1), PLAYER_POS_Y_OFFSET + offset)
+      this.memory.writeUInt16LE(((this.memory.readUInt16LE(PLAYER_ROTATION_OFFSET + offset) + 0x80) % 0xFFFF), PLAYER_ROTATION_OFFSET + offset)
+      this.memory.writeUInt8(4, PLAYER_COURSE_OFFSET + offset)
+    }
   }
 
   public open () {}
