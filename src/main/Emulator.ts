@@ -294,7 +294,7 @@ export class Emulator {
       x,
       y,
       rotation,
-      map
+      course: map
     }
     for (let offset = 0xFF7800, i = 0; offset < 0xFF9100; offset += 0x100, i++) {
       if (playerId === i + 1) {
@@ -308,7 +308,7 @@ export class Emulator {
           x,
           y,
           rotation,
-          map
+          course: map
         }
       }
     }

@@ -64,7 +64,7 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
           .filter((_, index) => index !== playerId)
           .filter(player => !!player)
           .filter(player => !!player!.position)
-          .filter(player => player!.position!.map === selfPos.map)
+          .filter(player => player!.position!.course === selfPos.course)
           .map((player, index) => {
             const distance = this.distance(selfPos, player!.position!)
             const withinViewDistance = distance <= viewDistance
@@ -125,7 +125,7 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
           x: 0x100,
           y: 0x100,
           rotation: 0,
-          map: 0
+          course: 0
         }
       }
       playersMock[4] = {
@@ -135,7 +135,7 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
           x: -0x80,
           y: 0x1d0,
           rotation: 0,
-          map: 0
+          course: 0
         }
       }
       playersMock[7] = {
@@ -145,7 +145,7 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
           x: 0x50,
           y: -0xf0,
           rotation: 0,
-          map: 0
+          course: 0
         }
       }
     }

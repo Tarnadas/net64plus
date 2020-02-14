@@ -14,3 +14,9 @@ export interface Server {
   passwordRequired?: boolean | null
   isDedicated?: boolean
 }
+
+export interface Course {
+  short: string
+  long: string
+  icon: string
+}

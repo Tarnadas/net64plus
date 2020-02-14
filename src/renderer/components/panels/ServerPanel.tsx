@@ -12,7 +12,7 @@ import { WarningPanel } from './WarningPanel'
 import { RadarPanel } from './RadarPanel'
 import { disconnect, setConnectionError } from '../../actions/connection'
 import { State } from '../../../models/State.model'
-import { Server } from '../../../models/Server.model'
+import { Server, Course } from '../../../models/Server.model'
 import { Position, Player, CHARACTER_IMAGES } from '../../../models/Emulator.model'
 import { GameModeType } from '../../../../proto/ServerClientMessage'
 
@@ -137,6 +137,203 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
     }
   }
 
+  private getPlayerCourse (position?: Position): Course {
+    if (!position) {
+      return {
+        short: '???',
+        long: 'Unknown',
+        icon: 'img.help.png'
+      }
+    }
+    switch (position.course) {
+      case 4:
+        return {
+          short: 'BBH',
+          long: 'Boo\'s Big Haunt',
+          icon: 'img/courses/05-bbh.png'
+        }
+      case 5:
+        return {
+          short: 'CCM',
+          long: 'Cool, Cool Mountain',
+          icon: 'img/courses/04-ccm.png'
+        }
+      case 6:
+        return {
+          short: 'CASTL',
+          long: 'Castle Lobby',
+          icon: 'img/courses/00-castle.png'
+        }
+      case 7:
+        return {
+          short: 'HMC',
+          long: 'Hazy Maze Cave',
+          icon: 'img/courses/06-hmc.png'
+        }
+      case 8:
+        return {
+          short: 'SSL',
+          long: 'Shifting Sand Land',
+          icon: 'img/courses/08-ssl.png'
+        }
+      case 9:
+        return {
+          short: 'BOB',
+          long: 'Bob-omb\'s Battlefield',
+          icon: 'img/courses/01-bob.png'
+        }
+      case 10:
+        return {
+          short: 'SL',
+          long: 'Snowman\'s Land',
+          icon: 'img/courses/10-sl.png'
+        }
+      case 11:
+        return {
+          short: 'WDW',
+          long: 'Wet-Dry World',
+          icon: 'img/courses/11-wdw.png'
+        }
+      case 12:
+        return {
+          short: 'JRB',
+          long: 'Jolly Roger Bay',
+          icon: 'img/courses/03-jrb.png'
+        }
+      case 13:
+        return {
+          short: 'THI',
+          long: 'Tiny-Huge Island',
+          icon: 'img/courses/13-thi.png'
+        }
+      case 14:
+        return {
+          short: 'TTC',
+          long: 'Tick Tock Clock',
+          icon: 'img/courses/14-ttc.png'
+        }
+      case 15:
+        return {
+          short: 'RR',
+          long: 'Rainbow Ride',
+          icon: 'img/courses/15-rr.png'
+        }
+      case 16:
+        return {
+          short: 'START',
+          long: 'Outside Castle',
+          icon: 'img/courses/00-castle.png'
+        }
+      case 17:
+        return {
+          short: 'BITDW',
+          long: 'Bowser in the Dark World',
+          icon: 'img/courses/16-bitdw.png'
+        }
+      case 18:
+        return {
+          short: 'VC',
+          long: 'Vanish Cap Under the Moat',
+          icon: 'img/courses/22-vanish.png'
+        }
+      case 19: 
+        return {
+          short: 'BITFS',
+          long: 'Bowser in the Fire Sea',
+          icon: 'img/courses/17-bitfs.png'
+        }
+      case 20:
+        return {
+          short: 'AQUA',
+          long: 'Secret Aquarium',
+          icon: 'img/courses/24-aqua.png'
+        }
+      case 21:
+        return {
+          short: 'BITS',
+          long: 'Bowser in the Sky',
+          icon: 'img/courses/18-bits.png'
+        }
+      case 22:
+        return {
+          short: 'LLL',
+          long: 'Lethal Lava Land',
+          icon: 'img/courses/07-lll.png'
+        }
+      case 23:
+        return {
+          short: 'DDD',
+          long: 'Dire, Dire Docks',
+          icon: 'img/courses/09-ddd.png'
+        }
+      case 24:
+        return {
+          short: 'WF',
+          long: 'Whomp\'s Fortress',
+          icon: 'img/courses/02-wf.png'
+        }
+      case 26:
+        return {
+          short: 'COURT',
+          long: 'Courtyard',
+          icon: 'img/courses/00-castle.png'
+        }
+      case 27:
+        return {
+          short: 'PSS',
+          long: 'Peach\'s Secret Slide',
+          icon: 'img/courses/19-pss.png'
+        }
+      case 28:
+        return {
+          short: 'MC',
+          long: 'Cavern of the Metal Cap',
+          icon: 'img/courses/20-metal.png'
+        }
+      case 29:
+        return {
+          short: 'WC',
+          long: 'Tower of the Wing Cap',
+          icon: 'img/courses/21-wing.png'
+        }
+      case 30:
+        return {
+          short: 'BITDW',
+          long: 'Bowser in the Dark World',
+          icon: 'img/courses/16-bitdw.png'
+        }
+      case 31:
+        return {
+          short: 'SKY',
+          long: 'Wing Mario Over the Rainbow',
+          icon: 'img/courses/23-sky.png'
+        }
+      case 33:
+        return {
+          short: 'BITFS',
+          long: 'Bowser in the Fire Sea',
+          icon: 'img/courses/17-bitfs.png'
+        }
+      case 34:
+        return {
+          short: 'BITS',
+          long: 'Bowser in the Sky',
+          icon: 'img/courses/18-bits.png'
+        }
+      case 36:
+        return {
+          short: 'TTM',
+          long: 'Tall, Tall Mountain',
+          icon: 'img/courses/12-ttm.png'
+        }
+    }
+    return {
+      short: '???',
+      long: 'Unknown',
+      icon: 'img.help.png'
+    }
+  }
+
   private renderPlayers (players: (Player | null)[]): JSX.Element[] {
     return players
       .filter(player => !!player)
@@ -146,6 +343,9 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
             key={index}
             className='server-panel-player'
           >
+            <div className='server=panel-player-course'>
+              { this.getPlayerCourse(player!.position) }
+            </div>
             <div className='server-panel-player-img'>
               <img src={`img/${CHARACTER_IMAGES[player!.characterId || 0]}`} />
             </div>
