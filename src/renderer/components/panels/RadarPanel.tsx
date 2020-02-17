@@ -22,6 +22,7 @@ const DEFAULT_VIEW_DISTANCE = 0x2000
 const MIN_VIEW_DISTANCE = 0x800
 const MAX_VIEW_DISTANCE = 0x4000
 const VIEW_DISTANCE_STEP = 0x200
+const ROTATION_OFFSET = 0x9E00
 const STROKE_WIDTH = 2
 const FILL = '#eee'
 const STROKE = 'rgba(0, 0, 0, 0.2)'
@@ -59,8 +60,8 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
     players: (Player | null)[]
   ): JSX.Element {
     const rotation = selfPos.rotation * 2 * Math.PI / 0xFFFF
-    const rotSin = Math.sin(rotation + 0x4000)
-    const rotCos = Math.cos(rotation + 0x4000)
+    const rotSin = Math.sin(rotation + ROTATION_OFFSET)
+    const rotCos = Math.cos(rotation + ROTATION_OFFSET)
     return <>
       {
         players
