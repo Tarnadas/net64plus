@@ -14,16 +14,17 @@ interface RadarPanelProps {
 
 interface RadarPanelState {
   viewDistance: number
+  viewDistanceValue: number
 }
 
 const RADIUS = 90
-const DEFAULT_VIEW_DISTANCE = 0x200
-const MIN_VIEW_DISTANCE = 0x80
-const MAX_VIEW_DISTANCE = 0x400
-const VIEW_DISTANCE_STEP = 0x20
+const DEFAULT_VIEW_DISTANCE = 0x2000
+const MIN_VIEW_DISTANCE = 0x800
+const MAX_VIEW_DISTANCE = 0x4000
+const VIEW_DISTANCE_STEP = 0x200
 const STROKE_WIDTH = 2
 const FILL = '#eee'
-const STROKE = 'rgba(0, 0, 0, 0.3)'
+const STROKE = 'rgba(0, 0, 0, 0.2)'
 const ICON_SIZE = 18
 const ICON_SIZE_OUTSIDE_VIEW = 12
 
@@ -31,7 +32,8 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
   constructor (props: RadarPanelProps) {
     super(props)
     this.state = {
-      viewDistance: DEFAULT_VIEW_DISTANCE
+      viewDistance: MAX_VIEW_DISTANCE - DEFAULT_VIEW_DISTANCE,
+      viewDistanceValue: DEFAULT_VIEW_DISTANCE
     }
     this.handleSetViewDistance = this.handleSetViewDistance.bind(this)
     this.renderPlayers = this.renderPlayers.bind(this)
@@ -45,7 +47,8 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
       value = MIN_VIEW_DISTANCE
     }
     this.setState({
-      viewDistance: value
+      viewDistance: MAX_VIEW_DISTANCE - value,
+      viewDistanceValue: value
     })
   }
 
@@ -56,8 +59,8 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
     players: (Player | null)[]
   ): JSX.Element {
     const rotation = selfPos.rotation * 2 * Math.PI / 0xFFFF
-    const rotSin = Math.sin(rotation)
-    const rotCos = Math.cos(rotation)
+    const rotSin = Math.sin(rotation + 0x4000)
+    const rotCos = Math.cos(rotation + 0x4000)
     return <>
       {
         players
@@ -72,8 +75,10 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
             if (!withinViewDistance) {
               normalizedViewDistance = distance
             }
-            const x = this.normalize(rotCos * player!.position!.x - rotSin * player!.position!.y, normalizedViewDistance)
-            const y = this.normalize(rotSin * player!.position!.x + rotCos * player!.position!.y, normalizedViewDistance)
+            const dX = player!.position!.x - selfPos.x
+            const dY = player!.position!.y - selfPos.y
+            const x = this.normalize(rotCos * dX - rotSin * dY, normalizedViewDistance)
+            const y = this.normalize(rotSin * dX + rotCos * dY, normalizedViewDistance)
             const iconSize = withinViewDistance ? ICON_SIZE : ICON_SIZE_OUTSIDE_VIEW
             return <div
               key={player!.username || index}
@@ -114,7 +119,7 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
 
   public render (): JSX.Element {
     const { playerId, self, players } = this.props
-    const { viewDistance } = this.state
+    const { viewDistance, viewDistanceValue } = this.state
     let playersMock: (Player | null)[]
     if (process.env.NODE_ENV === 'development') {
       playersMock = [ ...players ]
@@ -122,8 +127,8 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
         characterId: 2,
         username: 'Player 2',
         position: {
-          x: 0x100,
-          y: 0x100,
+          x: 0x2000,
+          y: 0x800,
           rotation: 0,
           course: 4
         }
@@ -132,8 +137,8 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
         characterId: 4,
         username: 'Player 4',
         position: {
-          x: -0x80,
-          y: 0x1d0,
+          x: 0x800,
+          y: 0x1500,
           rotation: 0,
           course: 4
         }
@@ -142,8 +147,8 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
         characterId: 7,
         username: 'Very Long Player Name ASDASDASD',
         position: {
-          x: 0x50,
-          y: -0xf0,
+          x: 0x1500,
+          y: -0x1700,
           rotation: 0,
           course: 4
         }
@@ -166,7 +171,7 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
           type='range'
           min={MIN_VIEW_DISTANCE}
           max={MAX_VIEW_DISTANCE}
-          value={viewDistance}
+          value={viewDistanceValue}
           step={VIEW_DISTANCE_STEP}
           onChange={this.handleSetViewDistance}
         ></input>
