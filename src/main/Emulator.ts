@@ -283,7 +283,7 @@ export class Emulator {
     return this.readMemory(0xFF7709, 1).readUInt8(0)
   }
 
-  public getPlayerPositions (): {self: Position, positions: (Position | null)[]} {
+  public getPlayerPositions (): {self: Position, cameraAngle: number, positions: (Position | null)[]} {
     const positions: (Position | null)[] = new Array(24).fill(null)
     const x = this.readMemory(0xFF7706, 2).readInt16LE(0)
     const y = this.readMemory(0xFF770A, 2).readInt16LE(0)
@@ -307,6 +307,7 @@ export class Emulator {
         course: map
       }
     }
-    return {self, positions}
+    const cameraAngle = this.readMemory(0x33c6e4, 2).readUInt16LE(0)
+    return {self, cameraAngle, positions}
   }
 }

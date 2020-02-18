@@ -35,6 +35,7 @@ export const connection = (state: ConnectionState = initialState.connection, act
         break
       case ConnectionActionType.UPDATE_PLAYER_POSITIONS:
         draft.selfPos = action.self
+        draft.cameraAngle = action.cameraAngle
         for (let i = 0; i < action.positions.length; i++) {
           const position = action.positions[i]
           if (!position) continue

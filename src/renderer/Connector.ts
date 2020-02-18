@@ -77,7 +77,7 @@ export class Connector {
     store.dispatch(updateEmulators(emulators))
   }
 
-  private onUpdatePlayerPositions = (_: Electron.Event, positions: {self: Position, positions: (Position | null)[]}) => {
+  private onUpdatePlayerPositions = (_: Electron.Event, positions: {self: Position, cameraAngle: number, positions: (Position | null)[]}) => {
     store.dispatch(updatePlayerPositions(positions))
   }
 

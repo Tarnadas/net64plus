@@ -1,6 +1,12 @@
 .radar-panel {
   margin: 6px 12px;
 
+  &-stroke {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
   &-icon {
     &-wrapper {
       display: flex;
@@ -60,5 +66,11 @@
     &:focus {
       outline: none;
     }
+  }
+
+  &-view-indicator {
+    position: absolute;
+    width: 40px;
+    height: 40px;
   }
 }

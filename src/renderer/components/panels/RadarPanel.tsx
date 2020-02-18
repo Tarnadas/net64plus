@@ -9,6 +9,7 @@ import { State } from '../../../models/State.model'
 interface RadarPanelProps {
   playerId: number | null
   self: Player
+  cameraAngle: number
   players: (Player | null)[]
 }
 
@@ -22,7 +23,8 @@ const DEFAULT_VIEW_DISTANCE = 0x2000
 const MIN_VIEW_DISTANCE = 0x800
 const MAX_VIEW_DISTANCE = 0x4000
 const VIEW_DISTANCE_STEP = 0x200
-const ROTATION_OFFSET = 0x9E00
+const FOV_SIZE = 40
+const FOV_FILL = 'rgba(247,195,52,1)'
 const STROKE_WIDTH = 2
 const FILL = '#eee'
 const STROKE = 'rgba(0, 0, 0, 0.2)'
@@ -56,12 +58,12 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
   private renderPlayers (
     playerId: number | null,
     selfPos: Position,
+    rotation: number,
     viewDistance: number,
     players: (Player | null)[]
   ): JSX.Element {
-    const rotation = selfPos.rotation * 2 * Math.PI / 0xFFFF
-    const rotSin = Math.sin(rotation + ROTATION_OFFSET)
-    const rotCos = Math.cos(rotation + ROTATION_OFFSET)
+    const rotSin = Math.sin(rotation)
+    const rotCos = Math.cos(rotation)
     return <>
       {
         players
@@ -118,9 +120,13 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
     return val * RADIUS / viewDistance
   }
 
-  public render (): JSX.Element {
-    const { playerId, self, players } = this.props
+  public render (): JSX.Element | null {
+    const { playerId, self, cameraAngle, players } = this.props
     const { viewDistance, viewDistanceValue } = this.state
+    if (!self.position) return null
+    const selfRotation = self.position.rotation * 2 * Math.PI / 0x10000
+    const rotation = cameraAngle * 2 * Math.PI / 0x10000
+    const rotationDiff = rotation - selfRotation
     let playersMock: (Player | null)[]
     if (process.env.NODE_ENV === 'development') {
       playersMock = [ ...players ]
@@ -166,7 +172,42 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
             <line stroke={STROKE} strokeWidth={STROKE_WIDTH} x1={RADIUS} x2={RADIUS} y1="0" y2={RADIUS * 2} />
           </g>
         </svg>
-        { self.position && this.renderPlayers(playerId, self.position, viewDistance, process.env.NODE_ENV === 'development' ? playersMock! : players) }
+        <svg
+          className='radar-panel-stroke'
+          style={{
+            transform: `rotate(${rotationDiff}rad)`
+          }}
+          width={RADIUS * 2}
+          height={RADIUS * 2}
+        >
+          <defs>
+            <filter id="dropshadow-left">                                          
+              <feGaussianBlur stdDeviation={5} />
+              <feOffset dx={5} dy={-5} result="offsetblur"/>
+              <feComposite operator="out" in2="SourceGraphic"/>
+            </filter>
+            <filter id="dropshadow-right">                                          
+              <feGaussianBlur stdDeviation={5} />
+              <feOffset dx={-5} dy={-5} result="offsetblur"/>
+              <feComposite operator="out" in2="SourceGraphic"/>
+            </filter>
+          </defs>
+          <path
+            style={{
+              filter: 'url(#dropshadow-left)'
+            }}
+            fill={FOV_FILL}
+            d={`M ${RADIUS} ${RADIUS} H ${RADIUS - FOV_SIZE} V ${RADIUS - FOV_SIZE} Z`}
+          />
+          <path
+            style={{
+              filter: 'url(#dropshadow-right)'
+            }}
+            fill={FOV_FILL}
+            d={`M ${RADIUS} ${RADIUS} H ${RADIUS + FOV_SIZE} V ${RADIUS - FOV_SIZE} Z`}
+          />
+        </svg>
+        { this.renderPlayers(playerId, self.position, rotation, viewDistance, process.env.NODE_ENV === 'development' ? playersMock! : players) }
         <input
           className='radar-panel-range'
           type='range'
@@ -181,5 +222,6 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
   }
 }
 export const RadarPanel = connect((state: State) => ({
-  playerId: state.connection.playerId
+  playerId: state.connection.playerId,
+  cameraAngle: state.connection.cameraAngle
 }))(Panel)

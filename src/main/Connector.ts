@@ -113,7 +113,7 @@ export class Connector {
     this.window.webContents.send(MainMessage.SET_PLAYER_ID, playerId)
   }
 
-  public updatePlayerPositions (positions: {self: Position, positions: (Position | null)[]}): void {
+  public updatePlayerPositions (positions: {self: Position, cameraAngle: number, positions: (Position | null)[]}): void {
     this.window.webContents.send(MainMessage.UPDATE_PLAYER_POSITIONS, positions)
   }
 

@@ -52,10 +52,11 @@ export function setPlayerId (playerId: number): SetPlayerIdAction {
   }
 }
 
-export function updatePlayerPositions ({self, positions}: {self: Position, positions: (Position | null)[]}): UpdatePlayerPositionAction {
+export function updatePlayerPositions ({self, cameraAngle, positions}: {self: Position, cameraAngle: number, positions: (Position | null)[]}): UpdatePlayerPositionAction {
   return {
     type: ConnectionActionType.UPDATE_PLAYER_POSITIONS,
     self,
+    cameraAngle,
     positions
   }
 }

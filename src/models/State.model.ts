@@ -41,6 +41,7 @@ export interface ConnectionStateDraft {
   server: Server | null
   playerId: number | null
   selfPos: Position
+  cameraAngle: number
   authenticated: boolean
   authenticationThrottle: number
   hasToken: boolean
