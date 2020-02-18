@@ -42,7 +42,11 @@ export const connection = (state: ConnectionState = initialState.connection, act
           if (!draft.server) return
           if (!draft.server.players) return
           if (!draft.server.players[i + 1]) return
+          const prevCourse = draft.server.players[i + 1]!.position != null ? draft.server.players[i + 1]!.position!.course : 0
           draft.server.players[i + 1]!.position = position
+          if (draft.server.players[i + 1]!.position!.course === 0) {
+            draft.server.players[i + 1]!.position!.course = prevCourse
+          }
         }
         break
       case ConnectionActionType.GAME_MODE:
