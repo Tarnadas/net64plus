@@ -437,6 +437,7 @@ export class Connection {
     if (playerId == null) return
     this.playerId = playerId
     emulator!.setPlayerId(playerId)
+    connector.setPlayerId(playerId)
   }
 
   /**
