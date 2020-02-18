@@ -20,7 +20,7 @@ interface RadarPanelState {
 
 const RADIUS = 90
 const DEFAULT_VIEW_DISTANCE = 0x2000
-const MIN_VIEW_DISTANCE = 0x800
+const MIN_VIEW_DISTANCE = 0x2000
 const MAX_VIEW_DISTANCE = 0x4000
 const VIEW_DISTANCE_STEP = 0x200
 const FOV_SIZE = 40
@@ -207,7 +207,7 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
             d={`M ${RADIUS} ${RADIUS} H ${RADIUS + FOV_SIZE} V ${RADIUS - FOV_SIZE} Z`}
           />
         </svg>
-        { this.renderPlayers(playerId, self.position, rotation, viewDistance, process.env.NODE_ENV === 'development' ? playersMock! : players) }
+        { this.renderPlayers(playerId, self.position, rotation, viewDistance, process.env.NODE_ENV === 'asd' ? playersMock! : players) }
         <input
           className='radar-panel-range'
           type='range'
