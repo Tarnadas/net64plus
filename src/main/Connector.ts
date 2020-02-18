@@ -2,7 +2,7 @@ import { ipcMain } from 'electron'
 
 import { emulator, createEmulator, deleteEmulator, connection, createConnection, deleteConnection } from '.'
 import { Emulator } from './Emulator'
-import { FilteredEmulator } from '../models/Emulator.model'
+import { FilteredEmulator, Position } from '../models/Emulator.model'
 import { MainMessage, RendererMessage } from '../models/Message.model'
 import { Server } from '../models/Server.model'
 import { IPlayerUpdate, IPlayer } from '../../proto/ServerClientMessage'
@@ -111,6 +111,10 @@ export class Connector {
 
   public setPlayerId (playerId: number): void {
     this.window.webContents.send(MainMessage.SET_PLAYER_ID, playerId)
+  }
+
+  public updatePlayerPositions (positions: {self: Position, cameraAngle: number, positions: (Position | null)[]}): void {
+    this.window.webContents.send(MainMessage.UPDATE_PLAYER_POSITIONS, positions)
   }
 
   public setGameMode (gameMode: number): void {

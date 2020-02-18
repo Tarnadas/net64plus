@@ -3,15 +3,18 @@ import {
   SetConnectionErrorAction,
   SetPlayersAction,
   SetPlayerAction,
+  SetPlayerIdAction,
   SetGameModeAction,
   AuthenticationRequired,
   AuthenticationAccepted,
   AuthenticationDenied,
   DisconnectAction,
-  ConnectionActionType
+  ConnectionActionType,
+  UpdatePlayerPositionAction
 } from './models/connection.model'
 import { Server } from '../../models/Server.model'
 import { IPlayer, IPlayerUpdate } from '../../../proto/ServerClientMessage'
+import { Position } from '../../models/Emulator.model'
 
 export function setServer (server: Server): SetServerAction {
   return {
@@ -39,6 +42,22 @@ export function setPlayer (playerId: number, player: IPlayer): SetPlayerAction {
     type: ConnectionActionType.SET_PLAYER,
     playerId,
     player
+  }
+}
+
+export function setPlayerId (playerId: number): SetPlayerIdAction {
+  return {
+    type: ConnectionActionType.SET_PLAYER_ID,
+    playerId
+  }
+}
+
+export function updatePlayerPositions ({self, cameraAngle, positions}: {self: Position, cameraAngle: number, positions: (Position | null)[]}): UpdatePlayerPositionAction {
+  return {
+    type: ConnectionActionType.UPDATE_PLAYER_POSITIONS,
+    self,
+    cameraAngle,
+    positions
   }
 }
 

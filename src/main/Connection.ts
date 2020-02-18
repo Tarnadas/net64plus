@@ -23,6 +23,7 @@ import {
 } from '../../proto/ServerClientMessage'
 
 const UPDATE_INTERVAL = 32
+const SLOW_UPDATE_INTERVAL = 200
 const MAX_SERVER_PLAYER = 24
 
 interface GameModeRPC {
@@ -90,6 +91,8 @@ export class Connection {
 
   private loop: NodeJS.Timer | null = null
 
+  private slowLoop: NodeJS.Timer | null = null
+
   private hasError: boolean = false
 
   private timer = Date.now()
@@ -111,6 +114,7 @@ export class Connection {
   }) {
     this.disconnect = this.disconnect.bind(this)
     this.sendAll = this.sendAll.bind(this)
+    this.updatePlayerPositions = this.updatePlayerPositions.bind(this)
     this.ws = new WS(`ws://${domain || ip || '127.0.0.1'}:${port || 3678}`)
     this.ws.on('open', this.onOpen.bind(this, characterId, username))
     this.ws.on('error', this.onError.bind(this))
@@ -181,6 +185,10 @@ export class Connection {
     if (this.loop) {
       clearInterval(this.loop)
       this.loop = null
+    }
+    if (this.slowLoop) {
+      clearInterval(this.slowLoop)
+      this.slowLoop = null
     }
     connector.closeWebSocket(code, this.hasError)
     updateRPC(
@@ -314,6 +322,7 @@ export class Connection {
     emulator!.setGameMode(handshake.gameMode)
     connector.setPlayerId(this.playerId)
     this.loop = setInterval(this.sendAll, UPDATE_INTERVAL)
+    this.slowLoop = setInterval(this.updatePlayerPositions, SLOW_UPDATE_INTERVAL)
   }
 
   /**
@@ -428,6 +437,7 @@ export class Connection {
     if (playerId == null) return
     this.playerId = playerId
     emulator!.setPlayerId(playerId)
+    connector.setPlayerId(playerId)
   }
 
   /**
@@ -658,6 +668,12 @@ export class Connection {
       }
       throw err
     }
+  }
+
+  private updatePlayerPositions (): void {
+    if (!emulator) return
+    const positions = emulator.getPlayerPositions()
+    connector.updatePlayerPositions(positions)
   }
 
   /**

@@ -37,6 +37,10 @@
       border-radius: 0 0 10px 10px;
     }
 
+    &-radar {
+      flex: 0 0 160px;
+    }
+
     &-playerlist {
       display: flex;
       flex: 1 1 100px;
@@ -89,6 +93,12 @@
     border-top: 1px solid black;
     min-width: 50%;
     overflow: hidden;
+
+    &-course {
+      min-width: 60px;
+      max-width: 60px;
+      margin: 0 3px;
+    }
 
     &-img {
       width: 24px;

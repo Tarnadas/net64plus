@@ -1,6 +1,6 @@
 {
   "name": "net64plus",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "compatVersion": "1.0.0",
   "description": "Net64+ client",
   "main": "index.js",
@@ -35,7 +35,7 @@
   "bugs": {
     "url": "https://github.com/Tarnadas/net64plus/issues"
   },
-  "homepage": "http://smmdb.ddns.net/net64",
+  "homepage": "https://net64-mod.github.io/",
   "jest": {
     "setupFiles": [
       "./jest-browser-setup.js"
