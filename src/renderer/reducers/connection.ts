@@ -36,12 +36,12 @@ export const connection = (state: ConnectionState = initialState.connection, act
       case ConnectionActionType.UPDATE_PLAYER_POSITIONS:
         draft.selfPos = action.self
         draft.cameraAngle = action.cameraAngle
+        if (!draft.server) return
+        if (!draft.server.players) return
         for (let i = 0; i < action.positions.length; i++) {
           const position = action.positions[i]
           if (!position) continue
-          if (!draft.server) return
-          if (!draft.server.players) return
-          if (!draft.server.players[i + 1]) return
+          if (!draft.server.players[i + 1]) continue
           const prevCourse = draft.server.players[i + 1]!.position != null ? draft.server.players[i + 1]!.position!.course : 0
           draft.server.players[i + 1]!.position = position
           if (draft.server.players[i + 1]!.position!.course === 0) {

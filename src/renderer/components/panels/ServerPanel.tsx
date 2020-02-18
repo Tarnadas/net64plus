@@ -335,6 +335,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
   }
 
   private renderPlayers (players: (Player | null)[]): JSX.Element[] {
+    const { isConnected } = this.props
     return players
       .filter(player => !!player)
       .map(
@@ -344,12 +345,17 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
             key={index}
             className='server-panel-player'
           >
-            <div className='server-panel-player-img'>
-              <img src={course.icon} />
-            </div>
-            <div className='server-panel-player-course'>
-              { course.short }
-            </div>
+            {
+              isConnected &&
+              <>
+                <div className='server-panel-player-img'>
+                  <img src={course.icon} />
+                </div>
+                <div className='server-panel-player-course'>
+                  { course.short }
+                </div>
+              </>
+            }
             <div className='server-panel-player-img'>
               <img src={`img/${CHARACTER_IMAGES[player!.characterId || 0]}`} />
             </div>
@@ -464,7 +470,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
                 />
               </div>
             }
-            <div className='server-panel-details-playerlist'>
+            <div className='server-panel-details-playerlist' style={{ minWidth: isConnected ? 450 : 300 }}>
               {
                 this.renderPlayers(players)
               }
