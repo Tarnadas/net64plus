@@ -5,6 +5,7 @@ import { ServerState, ServerStateDraft, IoChannel, ConsoleServerMessage } from '
 import { ServerActionType, ServerAction } from '../actions/models/server.model'
 
 export const server = (state: ServerState = initialState.server, action: ServerAction) =>
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
   // @ts-ignore
   produce<ServerState>(state, (draft: ServerStateDraft) => {
     switch (action.type) {

@@ -3,7 +3,7 @@ import produce from 'immer'
 import { initialState } from '.'
 import { ConnectionAction, ConnectionActionType } from '../actions/models/connection.model'
 import { ConnectionState, ConnectionStateDraft } from '../../models/State.model'
-import { IPlayer } from '../../../proto/ServerClientMessage'
+import { Player } from '../../models/Emulator.model'
 
 export const connection = (state: ConnectionState = initialState.connection, action: ConnectionAction) =>
   produce<ConnectionState>(state, (draft: ConnectionStateDraft) => {
@@ -18,7 +18,7 @@ export const connection = (state: ConnectionState = initialState.connection, act
         break
       case ConnectionActionType.SET_PLAYERS:
         if (!draft.server) return
-        const players: IPlayer[] = new Array(25).fill(null)
+        const players: Array<Player | null> = new Array(25).fill(null)
         for (const player of action.players) {
           if (!player.player || player.playerId == null) continue
           players[player.playerId] = player.player
@@ -29,6 +29,26 @@ export const connection = (state: ConnectionState = initialState.connection, act
         if (!draft.server) return
         if (!draft.server.players) draft.server.players = []
         draft.server.players[action.playerId] = action.player
+        break
+      case ConnectionActionType.SET_PLAYER_ID:
+        draft.playerId = action.playerId
+        break
+      case ConnectionActionType.UPDATE_PLAYER_POSITIONS:
+        draft.selfPos = action.self
+        draft.cameraAngle = action.cameraAngle
+        if (!draft.server) return
+        if (!draft.server.players) return
+        for (let i = 0; i < action.positions.length; i++) {
+          const position = action.positions[i]
+          if (!position) continue
+          if (!draft.server.players[i + 1]) continue
+          const player = draft.server.players[i + 1] as Player
+          const prevCourse = player.position?.course ?? 0
+          player.position = position
+          if (player.position.course === 0) {
+            player.position.course = prevCourse
+          }
+        }
         break
       case ConnectionActionType.GAME_MODE:
         if (!draft.server) return
@@ -45,6 +65,7 @@ export const connection = (state: ConnectionState = initialState.connection, act
         break
       case ConnectionActionType.DISCONNECT:
         draft.server = null
+        draft.playerId = null
         break
     }
   })

@@ -155,14 +155,14 @@ class Area extends React.PureComponent<HostAreaProps, HostAreaState> {
           />
         }
         {
-          serverProcess || exitCode != null
-          ? <ServerHostArea
-            exitCode={exitCode}
-            onRestart={this.onStartServer}
-          />
-          : <HostForm
-            onSubmit={this.onStartServer}
-          />
+          !!serverProcess || exitCode != null
+            ? <ServerHostArea
+              exitCode={exitCode}
+              onRestart={this.onStartServer}
+            />
+            : <HostForm
+              onSubmit={this.onStartServer}
+            />
         }
         {
           newVersionUrl && patchNotes &&

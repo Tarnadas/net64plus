@@ -19,6 +19,7 @@ class View extends React.PureComponent<BrowseViewProps> {
   componentDidMount () {
     this.props.dispatch(setConnectionError(''))
   }
+
   render () {
     const server = this.props.server
     const connectionError = this.props.connectionError

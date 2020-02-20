@@ -130,12 +130,14 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       username: value
     })
   }
+
   onCharacterChange (e: React.ChangeEvent<any>) {
     const characterId = parseInt(e.target.value)
     this.setState({
       characterId
     })
   }
+
   onEmuChatChange (e: React.ChangeEvent<any>) {
     const emuChat = e.target.checked
     this.setState({

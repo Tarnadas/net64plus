@@ -47,21 +47,25 @@ export class SMMButton extends React.PureComponent<SMMButtonProps, SMMButtonStat
     this.mouseEnter = this.mouseEnter.bind(this)
     this.mouseLeave = this.mouseLeave.bind(this)
   }
+
   onOpenExternal () {
     if (this.props.link) shell.openExternal(this.props.link)
   }
+
   mouseEnter () {
     this.setState({
       hover: true
     })
     if (this.props.onMouseEnter) this.props.onMouseEnter()
   }
+
   mouseLeave () {
     this.setState({
       hover: false
     })
     if (this.props.onMouseLeave) this.props.onMouseLeave()
   }
+
   renderSubButton (styles: Record<string, React.CSSProperties>, iconStyle: React.CSSProperties) {
     return (
       <div>
@@ -78,10 +82,11 @@ export class SMMButton extends React.PureComponent<SMMButtonProps, SMMButtonStat
       </div>
     )
   }
+
   render () {
-    const { className, disabled, text } = this.props
+    const { className, disabled } = this.props
     const { hover } = this.state
-    const colorScheme = this.props.colorScheme || 'yellow'
+    const colorScheme = this.props.colorScheme ?? 'yellow'
     const enabled = this.props.enabled == null
       ? true
       : this.props.enabled

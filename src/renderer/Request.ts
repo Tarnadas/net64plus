@@ -14,11 +14,11 @@ interface UpdateCheck {
 }
 
 class Request {
-  private smmdb: AxiosInstance
+  private readonly smmdb: AxiosInstance
 
-  private github: AxiosInstance
+  private readonly github: AxiosInstance
 
-  private apiKey: string = ''
+  private apiKey = ''
 
   constructor () {
     this.smmdb = axios.create({
@@ -26,7 +26,7 @@ class Request {
       baseURL: 'https://smmdb.net/api/',
       responseType: 'json'
     })
-    let githubApiKey = false // process.env.NODE_ENV === 'development'
+    const githubApiKey = false // process.env.NODE_ENV === 'development' // TODO re-enable dev mode
       ? JSON.parse(fs.readFileSync(path.join(__dirname, '../../../.credentials'), {
         encoding: 'utf8'
       })).github
@@ -73,7 +73,7 @@ class Request {
         foundUpdate: false
       }
     }
-    const version: string = process.env.VERSION || ''
+    const version: string = process.env.VERSION ?? ''
     return this.getMostRecentRelease(version, releases)
   }
 
@@ -136,7 +136,10 @@ class Request {
     }
   }
 
-  public downloadServerVersion (url: string, onDownloadProgress: (progressEvent: any) => void): AxiosPromise<ArrayBuffer> {
+  public downloadServerVersion (
+    url: string,
+    onDownloadProgress: (progressEvent: any) => void
+  ): AxiosPromise<ArrayBuffer> {
     return axios.get<ArrayBuffer>(url, {
       onDownloadProgress,
       responseType: 'arraybuffer'

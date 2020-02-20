@@ -29,10 +29,12 @@ class Area extends React.PureComponent<ChatAreaProps, ChatAreaState> {
     this.onSend = this.onSend.bind(this)
     this.renderChatMessages = this.renderChatMessages.bind(this)
   }
+
   componentDidUpdate (prevProps: ChatAreaProps) {
     if (prevProps.chat === this.props.chat || !this.chat) return
     this.chat.scrollTop = this.chat.scrollHeight
   }
+
   onMessageChange (e: React.ChangeEvent<any>) {
     let value = e.target.value
     if (value.length > MAX_LENGTH_CHAT_MESSAGE) {
@@ -42,18 +44,21 @@ class Area extends React.PureComponent<ChatAreaProps, ChatAreaState> {
       message: value
     })
   }
+
   onKeyPress (e: React.KeyboardEvent<any>) {
     if (e.key !== 'Enter') return
     if (!this.state.message) return
     this.sendChatMessage(this.state.message)
   }
+
   onSend () {
     if (!this.state.message) return
     this.sendChatMessage(this.state.message)
   }
+
   private sendChatMessage (message: string): void {
     if (message[0] === '/') {
-      const [ command, ...args ] = message.substr(1).split(' ')
+      const [command, ...args] = message.substr(1).split(' ')
       connector.sendCommandMessage(command, args)
     } else {
       connector.sendGlobalChatMessage(this.state.message)
@@ -62,6 +67,7 @@ class Area extends React.PureComponent<ChatAreaProps, ChatAreaState> {
       message: ''
     })
   }
+
   renderChatMessages (chat: ChatMessage[]) {
     return chat.map(
       message =>
@@ -70,7 +76,7 @@ class Area extends React.PureComponent<ChatAreaProps, ChatAreaState> {
             key={message.key}
             dangerouslySetInnerHTML={{
               __html: `[${message.time}] ${message.username}: ${message.message}`
-              .replace('<p>', '<p class="header">')
+                .replace('<p>', '<p class="header">')
             }}
           />
           : <ChatMessagePanel
@@ -79,6 +85,7 @@ class Area extends React.PureComponent<ChatAreaProps, ChatAreaState> {
           />
     )
   }
+
   render () {
     const styles: Record<string, React.CSSProperties> = {
       area: {
@@ -115,7 +122,12 @@ class Area extends React.PureComponent<ChatAreaProps, ChatAreaState> {
     return (
       <div style={styles.area}>
         <div style={styles.header}>
-          <input style={styles.input} value={this.state.message} onChange={this.onMessageChange} onKeyPress={this.onKeyPress} />
+          <input
+            style={styles.input}
+            value={this.state.message}
+            onChange={this.onMessageChange}
+            onKeyPress={this.onKeyPress}
+          />
           <SMMButton text='Send' iconSrc='img/submit.png' onClick={this.onSend} />
         </div>
         <div className='chat' style={styles.chat} ref={x => { this.chat = x }}>

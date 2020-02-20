@@ -4,16 +4,13 @@ import * as React from 'react'
 import { connect, Dispatch } from 'react-redux'
 
 import { SMMButton } from '../buttons/SMMButton'
-import { ServerPanel } from '../panels/ServerPanel'
 import { ConsolePanel } from '../panels/ConsolePanel'
 import { removeServerProcess } from '../../actions/server'
 import { State, ConsoleServerMessage } from '../../../models/State.model'
-import { Server } from '../../../models/Server.model'
 
 interface ServerHostAreaProps {
   dispatch: Dispatch<State>
   exitCode: number | null
-  server: Server | null
   messages: ConsoleServerMessage[]
   onRestart: () => void
 }
@@ -34,7 +31,7 @@ class Area extends React.PureComponent<ServerHostAreaProps> {
   }
 
   public render (): JSX.Element {
-    const { exitCode, server, messages } = this.props
+    const { exitCode, messages } = this.props
     return (
       <div className='server-host-area'>
         <ConsolePanel
@@ -70,6 +67,5 @@ class Area extends React.PureComponent<ServerHostAreaProps> {
   }
 }
 export const ServerHostArea = connect((state: State) => ({
-  server: state.connection.server,
   messages: state.server.messages
 }))(Area)

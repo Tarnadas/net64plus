@@ -7,7 +7,7 @@ import { promisify } from 'util'
 import { spawn } from 'child_process'
 
 import { connector, deleteEmulator } from '.'
-import { FilteredEmulator } from '../models/Emulator.model'
+import { FilteredEmulator, Position } from '../models/Emulator.model'
 import { testEmulatorPid, TestProcess } from '../models/Emulator.mock'
 import { buf2hex } from '../utils/Buffer.util'
 import winprocess, { Process } from '../declarations/winprocess'
@@ -33,7 +33,7 @@ export class Emulator {
 
   public inGameChatEnabled = false
 
-  private process: Process
+  private readonly process: Process
 
   public static async updateEmulators () {
     let emulators: FilteredEmulator[] = []
@@ -151,7 +151,7 @@ export class Emulator {
   private async patchMemory (characterId: number): Promise<void> {
     const basePath = process.env.NODE_ENV === 'test' ? './build/patches' : './patches'
     const patches = fs.readdirSync(basePath)
-    const patchBuffersPromise: Promise<{patchId: number, data: Buffer}>[] = []
+    const patchBuffersPromise: Array<Promise<{patchId: number, data: Buffer}>> = []
     for (const patch of patches) {
       patchBuffersPromise.push(
         new Promise((resolve, reject) => {
@@ -195,14 +195,15 @@ export class Emulator {
       return memory
     }
     deleteEmulator()
-    // let errorMessage = 'An error occured. Please double check whether your memory is set to 16MB and/or try starting Net64+ and PJ64 with admin privileges'
     let errorMessage = 'An unknown error occured'
     switch (memory) {
       case 6:
         errorMessage = 'Insufficient permission to read memory. Try starting Net64+ with admin privileges'
         break
       case 299:
-        errorMessage = 'Your memory is not set to 16MB. You are either not using the shipped emulator or you did not restart the emulator after chaning your settings to 16MB'
+        errorMessage = 'Your memory is not set to 16MB. '
+        errorMessage += 'You are either not using the shipped emulator or '
+        errorMessage += 'you did not restart the emulator after changing your settings to 16MB'
         break
     }
     connector.setEmulatorError(errorMessage)
@@ -277,5 +278,37 @@ export class Emulator {
       // TODO
       console.error(err)
     }
+  }
+
+  public getPlayerRotation (): number {
+    return this.readMemory(0xFF7709, 1).readUInt8(0)
+  }
+
+  public getPlayerPositions (): {self: Position, cameraAngle: number, positions: Array<Position | null>} {
+    const positions: Array<Position | null> = new Array(24).fill(null)
+    const x = this.readMemory(0xFF7706, 2).readInt16LE(0)
+    const y = this.readMemory(0xFF770A, 2).readInt16LE(0)
+    const rotation = this.readMemory(0xFF7708, 2).readUInt16LE(0)
+    const map = this.readMemory(0xFF770F, 1).readUInt8(0)
+    const self: Position = {
+      x,
+      y,
+      rotation,
+      course: map
+    }
+    for (let offset = 0xFF7800, i = 0; offset < 0xFF9100; offset += 0x100, i++) {
+      const x = this.readMemory(offset + 6, 2).readInt16LE(0)
+      const y = this.readMemory(offset + 0xA, 2).readInt16LE(0)
+      const rotation = this.readMemory(offset + 8, 2).readUInt16LE(0)
+      const map = this.readMemory(offset + 0xF, 1).readUInt8(0)
+      positions[i] = {
+        x,
+        y,
+        rotation,
+        course: map
+      }
+    }
+    const cameraAngle = this.readMemory(0x33c6e4, 2).readUInt16LE(0)
+    return { self, cameraAngle, positions }
   }
 }
