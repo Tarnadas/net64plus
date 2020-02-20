@@ -1,12 +1,11 @@
 import * as marked from 'marked'
 import { emojify } from 'node-emoji'
+import { sanitize } from 'dompurify'
 
 import { store } from '..'
 import { MAX_LENGTH_USERNAME } from '../components/views/SettingsView'
 import { addGlobalChatMessage, clearGlobalChatMessages } from '../actions/chat'
 import { ChatMessage } from '../../models/State.model'
-
-const { sanitize } = require('dompurify').default
 
 export function addGlobalMessage (message: string, username: string, isTrusted = false) {
   const date = new Date()

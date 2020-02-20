@@ -1,5 +1,4 @@
 const webpack = require('webpack')
-const BabiliPlugin = require('babili-webpack-plugin')
 const path = require('path')
 
 const HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -54,18 +53,16 @@ module.exports = [
       }),
       new webpack.optimize.ModuleConcatenationPlugin(),
       extractSass,
-      new BabiliPlugin({
-        keepFnName: true
-      })
     ],
     resolve: {
       extensions: [ '.ts', '.tsx', '.js', '.jsx', '.json' ]
     },
     module: {
-      loaders: [
+      rules: [
         {
           test: /\.tsx?$/,
-          loader: 'awesome-typescript-loader'
+          exclude: /node_modules/,
+          loader: 'babel-loader'
         },
         {
           test: /\.(png|jpg)$/,
@@ -113,7 +110,7 @@ module.exports = [
     }
   },
   {
-    target: 'electron',
+    target: 'electron-main',
     entry: path.join(__dirname, 'src/main/index.ts'),
     output: {
       filename: 'index.js',
@@ -149,10 +146,11 @@ module.exports = [
       extensions: [ '.ts', '.js', '.json' ]
     },
     module: {
-      loaders: [
+      rules: [
         {
           test: /\.tsx?$/,
-          loader: 'awesome-typescript-loader'
+          exclude: /node_modules/,
+          loader: 'babel-loader'
         }
       ]
     }

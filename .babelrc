@@ -1,13 +1,21 @@
 {
   "presets": [
-    ["env", {
+    ["@babel/env", {
       "targets": {
         "electron": "2.0.17"
       },
-      "useBuiltIns": true
-    }]
+      "corejs": "3.6.4",
+      "useBuiltIns": "usage"
+    }],
+    ["@babel/preset-typescript", {
+      "isTSX": true,
+      "allExtensions": true
+    }],
+    "@babel/react"
   ],
   "plugins": [
-    "transform-react-jsx"
+    "@babel/syntax-dynamic-import",
+    "@babel/proposal-class-properties",
+    "@babel/proposal-object-rest-spread"
   ]
 }

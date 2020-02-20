@@ -5,6 +5,7 @@ import { connect, Dispatch } from 'react-redux'
 import { shell } from 'electron'
 import * as marked from 'marked'
 import { emojify } from 'node-emoji'
+import { sanitize } from 'dompurify'
 
 import { connector } from '../..'
 import { SMMButton } from '../buttons/SMMButton'
@@ -15,8 +16,6 @@ import { State } from '../../../models/State.model'
 import { Server, Course } from '../../../models/Server.model'
 import { Position, Player, CHARACTER_IMAGES } from '../../../models/Emulator.model'
 import { GameModeType } from '../../../../proto/ServerClientMessage'
-
-const { sanitize } = require('dompurify').default
 
 interface ServerPanelProps {
   dispatch: Dispatch<State>
