@@ -23,6 +23,7 @@ import {
 } from '../../proto/ServerClientMessage'
 
 const UPDATE_INTERVAL = 32
+const SLOW_UPDATE_INTERVAL = 200
 const MAX_SERVER_PLAYER = 24
 
 interface GameModeRPC {
@@ -35,7 +36,7 @@ interface GameModeRPC {
  *
  * @param {number} gamemodeInteger - The integer of the gamemode ranging from 1-6, 8
  */
-function getGameModeString(gamemodeInteger: number): GameModeRPC {
+function getGameModeString (gamemodeInteger: number): GameModeRPC {
   switch (gamemodeInteger) {
     case 1:
       return {
@@ -84,13 +85,15 @@ function getGameModeString(gamemodeInteger: number): GameModeRPC {
  * Net64+ server.
  */
 export class Connection {
-  private ws: WS
+  private readonly ws: WS
 
   private playerId?: number
 
   private loop: NodeJS.Timer | null = null
 
-  private hasError: boolean = false
+  private slowLoop: NodeJS.Timer | null = null
+
+  private hasError = false
 
   private timer = Date.now()
 
@@ -107,11 +110,12 @@ export class Connection {
   constructor ({
     domain, ip = '127.0.0.1', port = 3678, username, characterId
   }: {
-    domain: string | undefined, ip: string | undefined, port: number | undefined, username: string, characterId: number
+    domain: string | undefined, ip: string | undefined, port: number | undefined, username: string, characterId: number,
   }) {
     this.disconnect = this.disconnect.bind(this)
     this.sendAll = this.sendAll.bind(this)
-    this.ws = new WS(`ws://${domain || ip || '127.0.0.1'}:${port || 3678}`)
+    this.updatePlayerPositions = this.updatePlayerPositions.bind(this)
+    this.ws = new WS(`ws://${(domain ?? ip) || '127.0.0.1'}:${port || 3678}`)
     this.ws.on('open', this.onOpen.bind(this, characterId, username))
     this.ws.on('error', this.onError.bind(this))
     this.ws.on('close', this.onClose.bind(this))
@@ -160,13 +164,14 @@ export class Connection {
    * @param {Error} err - Error object
    */
   private onError (err: Error): void {
-    let warning: string = String(err)
+    let warning = String(err)
     if (warning.includes('getaddrinfo')) {
       warning = 'Could not resolve host name.\nDNS lookup failed'
     } else if (warning.includes('DTIMEDOUT')) {
       warning = 'Server timed out.\nIt might be offline or you inserted a wrong IP address'
     } else if (warning.includes('ECONNREFUSED')) {
-      warning = 'Server refused connection.\nThe server might not have set up proper port forwarding or you inserted a wrong port'
+      warning = 'Server refused connection.\n'
+      warning += 'The server might not have set up proper port forwarding or you inserted a wrong port'
     }
     connector.setConnectionError(warning)
     this.hasError = true
@@ -181,6 +186,10 @@ export class Connection {
     if (this.loop) {
       clearInterval(this.loop)
       this.loop = null
+    }
+    if (this.slowLoop) {
+      clearInterval(this.slowLoop)
+      this.slowLoop = null
     }
     connector.closeWebSocket(code, this.hasError)
     updateRPC(
@@ -314,6 +323,7 @@ export class Connection {
     emulator!.setGameMode(handshake.gameMode)
     connector.setPlayerId(this.playerId)
     this.loop = setInterval(this.sendAll, UPDATE_INTERVAL)
+    this.slowLoop = setInterval(this.updatePlayerPositions, SLOW_UPDATE_INTERVAL)
   }
 
   /**
@@ -417,17 +427,18 @@ export class Connection {
   private onPlayerReorder (serverMessage: IServerMessage): void {
     const playerReorder = serverMessage.playerReorder
     if (!playerReorder) return
-    let grantToken = playerReorder.grantToken
+    const grantToken = playerReorder.grantToken
     if (grantToken) {
       emulator!.setConnectionFlag(1)
       if (process.env.NODE_ENV === 'development') {
-        connector.consoleInfo(`Granted server token`)
+        connector.consoleInfo('Granted server token')
       }
     }
     const playerId = playerReorder.playerId
     if (playerId == null) return
     this.playerId = playerId
     emulator!.setPlayerId(playerId)
+    connector.setPlayerId(playerId)
   }
 
   /**
@@ -486,7 +497,6 @@ export class Connection {
     const playerData = messageData.playerData
     if (!playerData || !playerData.dataLength || !playerData.playerBytes) return
     const playerBytes = playerData.playerBytes
-    const dataLength = playerData.dataLength
     let maxReceivedPlayerId = 1
     const ownGameMode = emulator!.readMemory(0xFF5FF7, 1).readUInt8(0)
     for (const player of playerBytes) {
@@ -660,6 +670,12 @@ export class Connection {
     }
   }
 
+  private updatePlayerPositions (): void {
+    if (!emulator) return
+    const positions = emulator.getPlayerPositions()
+    connector.updatePlayerPositions(positions)
+  }
+
   /**
    * Send password to server.
    *
@@ -730,7 +746,7 @@ export class Connection {
    * @param {string} args.username - Username to change to
    * @param {number} args.characterId - Character ID to change to
    */
-  public sendPlayerUpdate ({username, characterId}: {username: string, characterId: number}): void {
+  public sendPlayerUpdate ({ username, characterId }: {username: string, characterId: number}): void {
     const playerUpdate: IClientServerMessage = {
       compression: Compression.NONE,
       data: {

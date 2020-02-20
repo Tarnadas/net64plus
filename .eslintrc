@@ -1,10 +1,14 @@
 {
-  "parser": "typescript-eslint-parser",
+  "parser": "@typescript-eslint/parser",
   "extends": [
-    "plugin:react/recommended"
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "standard-with-typescript"
   ],
   "plugins": [
-    "typescript",
+    "@typescript-eslint",
     "react",
     "jsdoc"
   ],
@@ -14,14 +18,45 @@
     "ecmaFeatures": {
       "jsx": true,
       "modules": true
-    }
+    },
+    "project": "./tsconfig.json"
   },
   "rules": {
-    "indent": "off",
-    "indent-legacy": ["error", 2, { "SwitchCase": 1 }],
-    "no-unused-vars": "off",
-    "react/prop-types": "off",
-    "react/jsx-no-target-blank": "off",
+    "@typescript-eslint/explicit-function-return-type": 0,
+    "@typescript-eslint/default-param-last": 0,
+    "@typescript-eslint/member-delimiter-style": [2, {
+      "multiline": {
+        "delimiter": "none",
+        "requireLast": false
+      },
+      "singleline": {
+        "delimiter": "comma",
+        "requireLast": false
+      },
+      "overrides": {
+        "typeLiteral": {
+          "multiline": {
+            "delimiter": "comma",
+            "requireLast": true
+          }
+        }
+      }
+    }],
+    "@typescript-eslint/no-empty-function": 1,
+    "@typescript-eslint/no-floating-promises": 1,
+    "@typescript-eslint/no-misused-promises": 1,
+    "@typescript-eslint/no-non-null-assertion": 1,
+    "@typescript-eslint/prefer-nullish-coalescing": 1,
+    "@typescript-eslint/promise-function-async": 0,
+    "@typescript-eslint/restrict-plus-operands": 1,
+    "@typescript-eslint/restrict-template-expressions": 0,
+    "@typescript-eslint/strict-boolean-expressions": 0,
+    "max-len": [2, { "code": 120 }],
+    "no-case-declarations": 0,
+    "no-empty": [2, { "allowEmptyCatch": true }],
+    "no-unused-vars": 1,
+    "react/prop-types": 0,
+    "react/jsx-no-target-blank": 0,
     "jsdoc/check-param-names": 1,
     "jsdoc/check-tag-names": 1,
     "jsdoc/check-types": 1,
@@ -32,9 +67,7 @@
     "jsdoc/require-param-name": 1,
     "jsdoc/require-param-type": 1,
     "jsdoc/require-returns-description": 1,
-    "jsdoc/require-returns-type": 1,
-    "typescript/explicit-member-accessibility": "off",
-    "typescript/no-empty-interface": "off"
+    "jsdoc/require-returns-type": 1
   },
   "env": {
     "browser": true,

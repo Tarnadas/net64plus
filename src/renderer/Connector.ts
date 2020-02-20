@@ -12,13 +12,16 @@ import {
   setGameMode,
   setPlayer,
   setPlayers,
-  setServer
+  setServer,
+  updatePlayerPositions,
+  setPlayerId
 } from './actions/connection'
 import { isConnectedToEmulator, setEmulatorError, updateEmulators } from './actions/emulator'
 import { MainMessage, RendererMessage } from '../models/Message.model'
 import { Server } from '../models/Server.model'
 import { IPlayer, IPlayerUpdate } from '../../proto/ServerClientMessage'
-import { FilteredEmulator } from '../models/Emulator.model'
+import { FilteredEmulator, Position } from '../models/Emulator.model'
+import { testEmulator } from '../models/Emulator.mock'
 
 export class Connector {
   constructor () {
@@ -30,6 +33,7 @@ export class Connector {
     ipcRenderer.on(MainMessage.SET_PLAYERS, this.onSetPlayers)
     ipcRenderer.on(MainMessage.SET_PLAYER, this.onSetPlayer)
     ipcRenderer.on(MainMessage.SET_PLAYER_ID, this.onSetPlayerId)
+    ipcRenderer.on(MainMessage.UPDATE_PLAYER_POSITIONS, this.onUpdatePlayerPositions)
     ipcRenderer.on(MainMessage.GAME_MODE, this.onSetGameMode)
     ipcRenderer.on(MainMessage.SERVER_FULL, this.onServerFull)
     ipcRenderer.on(MainMessage.WRONG_VERSION, this.onWrongVersion)
@@ -42,7 +46,7 @@ export class Connector {
     ipcRenderer.on(MainMessage.CONSOLE_INFO, this.onConsoleInfo)
   }
 
-  private onWebSocketClose = (
+  private readonly onWebSocketClose = (
     _: Electron.Event,
     { code, hasError }:
     { code: number, hasError: boolean }
@@ -54,23 +58,33 @@ export class Connector {
     clearGlobalMessages()
   }
 
-  private onEmulatorDisconnect = () => {
+  private readonly onEmulatorDisconnect = () => {
     store.dispatch(isConnectedToEmulator(false))
     store.dispatch(setEmulatorError('Emulator disconnected or closed'))
     store.dispatch(push('/emulator'))
   }
 
-  private onEmulatorConnected = () => {
+  private readonly onEmulatorConnected = () => {
     store.dispatch(isConnectedToEmulator(true))
     store.dispatch(setEmulatorError())
     store.dispatch(push('/browse'))
   }
 
-  private onUpdateEmulators = (_: Electron.Event, emulators: FilteredEmulator[]) => {
+  private readonly onUpdateEmulators = (_: Electron.Event, emulators: FilteredEmulator[]) => {
+    if (process.env.NODE_ENV === 'development') {
+      emulators.push(testEmulator)
+    }
     store.dispatch(updateEmulators(emulators))
   }
 
-  private onSetServer = (_: Electron.Event, server: Server) => {
+  private readonly onUpdatePlayerPositions = (
+    _: Electron.Event,
+    positions: {self: Position, cameraAngle: number, positions: Array<Position | null>}
+  ) => {
+    store.dispatch(updatePlayerPositions(positions))
+  }
+
+  private readonly onSetServer = (_: Electron.Event, server: Server) => {
     if (process.env.NODE_ENV === 'development') {
       console.info('CONNECTED TO SERVER', server)
     }
@@ -80,80 +94,91 @@ export class Connector {
     }
   }
 
-  private onSetPlayers = (_: Electron.Event, players: IPlayerUpdate[]) => {
+  private readonly onSetPlayers = (_: Electron.Event, players: IPlayerUpdate[]) => {
     store.dispatch(setPlayers(players))
   }
 
-  private onSetPlayer = (_: Electron.Event, { playerId, player }: { playerId: number, player: IPlayer }) => {
+  private readonly onSetPlayer = (_: Electron.Event, { playerId, player }: { playerId: number, player: IPlayer }) => {
     store.dispatch(setPlayer(playerId, player))
   }
 
-  private onSetPlayerId = (_: Electron.Event, playerId: number) => {
+  private readonly onSetPlayerId = (_: Electron.Event, playerId: number) => {
     addGlobalMessage('Connected', '[SERVER]', true)
+    store.dispatch(setPlayerId(playerId))
   }
 
-  private onSetGameMode = (_: Electron.Event, gameMode: number) => {
+  private readonly onSetGameMode = (_: Electron.Event, gameMode: number) => {
     store.dispatch(setGameMode(gameMode))
   }
 
-  private onServerFull = () => {
-    store.dispatch(setConnectionError(`Server is full`))
+  private readonly onServerFull = () => {
+    store.dispatch(setConnectionError('Server is full'))
   }
 
-  private onWrongVersion = (
+  private readonly onWrongVersion = (
     _: Electron.Event,
     { majorVersion, minorVersion }:
     { majorVersion: number, minorVersion: number}
   ) => {
-    store.dispatch(setConnectionError(`The server's network API version (${majorVersion}.${minorVersion}) is incompatible with your client API version (${process.env.MAJOR}.${process.env.MINOR})`))
+    const error = `\
+The server's network API version (${majorVersion}.${minorVersion}) \
+is incompatible with your client API version (${process.env.MAJOR}.${process.env.MINOR})`
+    store.dispatch(setConnectionError(error))
     // TODO add server version -> client version mapping
   }
 
-  private onAuthenticationAccepted = () => {
+  private readonly onAuthenticationAccepted = () => {
     store.dispatch(authenticationAccepted())
   }
 
-  private onAuthenticationDenied = (_: Electron.Event, throttle: number) => {
+  private readonly onAuthenticationDenied = (_: Electron.Event, throttle: number) => {
     store.dispatch(authenticationDenied(throttle))
   }
 
-  private onGlobalChatMessage = (
+  private readonly onGlobalChatMessage = (
     _: Electron.Event,
     { message, senderId }:
     { message: string, senderId: number }
   ) => {
     const server = store.getState().connection.server
-    if (!server || !server.players) return
-    const username = server.players[senderId] && server.players[senderId].username
-    addGlobalMessage(message, username || '?', false)
+    if (!server || !server.players || !server.players[senderId]) return
+    const username = server.players[senderId] && server.players[senderId]!.username
+    addGlobalMessage(message, username ?? '?', false)
   }
 
-  private onCommandMessage = (_: Electron.Event, { message }: { message: string }) => {
+  private readonly onCommandMessage = (_: Electron.Event, { message }: { message: string }) => {
     addGlobalMessage(message, '[SERVER]', true)
   }
 
-  private onConnectionError = (_: Electron.Event, message: string) => {
+  private readonly onConnectionError = (_: Electron.Event, message: string) => {
     store.dispatch(setConnectionError(message))
   }
 
-  private onEmulatorError = (_: Electron.Event, message: string) => {
+  private readonly onEmulatorError = (_: Electron.Event, message: string) => {
     store.dispatch(setEmulatorError(message))
     if (message) {
       store.dispatch(push('/emulator'))
     }
   }
 
-  private onConsoleInfo = (_: Electron.Event, messages: string[]) => {
+  private readonly onConsoleInfo = (_: Electron.Event, messages: string[]) => {
     console.info(...messages)
   }
 
   public createConnection (
     { domain, ip, port, username, characterId }:
     {
-      domain?: string, ip?: string, port?: number, username: string, characterId: number
+      domain?: string,
+      ip?: string,
+      port?: number,
+      username: string,
+      characterId: number,
     }
   ): void {
-    ipcRenderer.send(RendererMessage.CREATE_CONNECTION, { domain, ip, port, username, characterId })
+    ipcRenderer.send(
+      RendererMessage.CREATE_CONNECTION,
+      { domain, ip, port, username, characterId }
+    )
   }
 
   public disconnect (): void {

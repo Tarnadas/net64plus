@@ -11,8 +11,8 @@ import { ElectronSaveData } from '../models/State.model'
 
 interface Global extends NodeJS.Global {
   save: {
-    appSaveData?: ElectronSaveData
-    appSavePath?: string
+    appSaveData?: ElectronSaveData,
+    appSavePath?: string,
   }
 }
 
@@ -39,7 +39,7 @@ export const deleteEmulator = () => {
 export const createConnection = (
   { domain, ip, port, username, characterId }:
   {
-    domain: string | undefined, ip: string | undefined, port: number | undefined, username: string, characterId: number
+    domain: string | undefined, ip: string | undefined, port: number | undefined, username: string, characterId: number,
   }
 ) => {
   connection = new Connection({ domain, ip, port, username, characterId })
@@ -51,7 +51,7 @@ export const deleteConnection = () => {
 }
 
 export const RPCClient = new RPCClientInstance('560060224321355811')
-RPCClient.on("error", (err: Error) => {
+RPCClient.on('error', (err: Error) => {
   if (process.env.NODE_ENV === 'development') {
     console.error(err)
   }
@@ -59,13 +59,13 @@ RPCClient.on("error", (err: Error) => {
 
 export let RPCState = {}
 
-export function updateRPC(update: Object, clean?: boolean): void {
-  if (clean) {RPCState = {}}
+export function updateRPC (update: Record<string, any>, clean?: boolean): void {
+  if (clean) { RPCState = {} }
   Object.assign(RPCState, update)
   RPCClient.updatePresence(RPCState)
 }
 
-;(() => {
+(() => {
   const onReady = () => {
     const mainWindow = new BrowserWindow({
       width: process.env.NODE_ENV === 'development' ? 1400 : 670,
@@ -87,6 +87,7 @@ export function updateRPC(update: Object, clean?: boolean): void {
     mainWindow.loadURL(path.normalize(`file://${__dirname}/index.html`))
 
     if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       require('electron-debug')({
         showDevTools: true
       })

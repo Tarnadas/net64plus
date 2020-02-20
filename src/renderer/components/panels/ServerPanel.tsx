@@ -5,22 +5,24 @@ import { connect, Dispatch } from 'react-redux'
 import { shell } from 'electron'
 import * as marked from 'marked'
 import { emojify } from 'node-emoji'
+import { sanitize } from 'dompurify'
 
 import { connector } from '../..'
 import { SMMButton } from '../buttons/SMMButton'
-import { WarningPanel } from '../panels/WarningPanel'
+import { WarningPanel } from './WarningPanel'
+import { RadarPanel } from './RadarPanel'
 import { disconnect, setConnectionError } from '../../actions/connection'
 import { State } from '../../../models/State.model'
-import { Server } from '../../../models/Server.model'
-import { IPlayer, GameModeType } from '../../../../proto/ServerClientMessage'
-
-const { sanitize } = require('dompurify').default
+import { Server, Course } from '../../../models/Server.model'
+import { Position, Player, CHARACTER_IMAGES } from '../../../models/Emulator.model'
+import { GameModeType } from '../../../../proto/ServerClientMessage'
 
 interface ServerPanelProps {
   dispatch: Dispatch<State>
   server: Server
   username: string
   characterId: number
+  selfPos: Position
   connectionError: string
   onConnect?: () => void
   isConnected?: boolean
@@ -31,10 +33,6 @@ interface ServerPanelState {
   displayDescription: boolean
   warning: string
 }
-
-const CHARACTER_IMAGES = [
-  'mario.png', 'luigi.png', 'yoshi.png', 'wario.png', 'peach.png', 'toad.png', 'waluigi.png', 'rosalina.png', 'sonic.png', 'knuckles.png', 'goomba.png', 'kirby.png'
-]
 
 class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
   constructor (public props: ServerPanelProps) {
@@ -51,7 +49,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
     this.renderPlayers = this.renderPlayers.bind(this)
   }
 
-  private getDescription = (): string => {
+  private readonly getDescription = (): string => {
     if (!this.props.server.description) return ''
     let description = emojify(marked(this.props.server.description))
     const document: Document = new DOMParser().parseFromString(description, 'text/html')
@@ -138,29 +136,240 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
     }
   }
 
-  private renderPlayers (players: IPlayer[]): JSX.Element[] {
+  private getPlayerCourse (position?: Position): Course {
+    if (!position) {
+      return {
+        short: '???',
+        long: 'Unknown',
+        icon: 'img/help.png'
+      }
+    }
+    switch (position.course) {
+      case 4:
+        return {
+          short: 'BBH',
+          long: 'Boo\'s Big Haunt',
+          icon: 'img/courses/05-bbh.png'
+        }
+      case 5:
+        return {
+          short: 'CCM',
+          long: 'Cool, Cool Mountain',
+          icon: 'img/courses/04-ccm.png'
+        }
+      case 6:
+        return {
+          short: 'CASTL',
+          long: 'Castle Lobby',
+          icon: 'img/courses/00-castle.png'
+        }
+      case 7:
+        return {
+          short: 'HMC',
+          long: 'Hazy Maze Cave',
+          icon: 'img/courses/06-hmc.png'
+        }
+      case 8:
+        return {
+          short: 'SSL',
+          long: 'Shifting Sand Land',
+          icon: 'img/courses/08-ssl.png'
+        }
+      case 9:
+        return {
+          short: 'BOB',
+          long: 'Bob-omb\'s Battlefield',
+          icon: 'img/courses/01-bob.png'
+        }
+      case 10:
+        return {
+          short: 'SL',
+          long: 'Snowman\'s Land',
+          icon: 'img/courses/10-sl.png'
+        }
+      case 11:
+        return {
+          short: 'WDW',
+          long: 'Wet-Dry World',
+          icon: 'img/courses/11-wdw.png'
+        }
+      case 12:
+        return {
+          short: 'JRB',
+          long: 'Jolly Roger Bay',
+          icon: 'img/courses/03-jrb.png'
+        }
+      case 13:
+        return {
+          short: 'THI',
+          long: 'Tiny-Huge Island',
+          icon: 'img/courses/13-thi.png'
+        }
+      case 14:
+        return {
+          short: 'TTC',
+          long: 'Tick Tock Clock',
+          icon: 'img/courses/14-ttc.png'
+        }
+      case 15:
+        return {
+          short: 'RR',
+          long: 'Rainbow Ride',
+          icon: 'img/courses/15-rr.png'
+        }
+      case 16:
+        return {
+          short: 'START',
+          long: 'Outside Castle',
+          icon: 'img/courses/00-castle.png'
+        }
+      case 17:
+        return {
+          short: 'BitDW',
+          long: 'Bowser in the Dark World',
+          icon: 'img/courses/16-bitdw.png'
+        }
+      case 18:
+        return {
+          short: 'VC',
+          long: 'Vanish Cap Under the Moat',
+          icon: 'img/courses/22-vanish.png'
+        }
+      case 19:
+        return {
+          short: 'BitFS',
+          long: 'Bowser in the Fire Sea',
+          icon: 'img/courses/17-bitfs.png'
+        }
+      case 20:
+        return {
+          short: 'AQUA',
+          long: 'Secret Aquarium',
+          icon: 'img/courses/24-aqua.png'
+        }
+      case 21:
+        return {
+          short: 'BitS',
+          long: 'Bowser in the Sky',
+          icon: 'img/courses/18-bits.png'
+        }
+      case 22:
+        return {
+          short: 'LLL',
+          long: 'Lethal Lava Land',
+          icon: 'img/courses/07-lll.png'
+        }
+      case 23:
+        return {
+          short: 'DDD',
+          long: 'Dire, Dire Docks',
+          icon: 'img/courses/09-ddd.png'
+        }
+      case 24:
+        return {
+          short: 'WF',
+          long: 'Whomp\'s Fortress',
+          icon: 'img/courses/02-wf.png'
+        }
+      case 26:
+        return {
+          short: 'COURT',
+          long: 'Courtyard',
+          icon: 'img/courses/00-castle.png'
+        }
+      case 27:
+        return {
+          short: 'PSS',
+          long: 'Peach\'s Secret Slide',
+          icon: 'img/courses/19-pss.png'
+        }
+      case 28:
+        return {
+          short: 'MC',
+          long: 'Cavern of the Metal Cap',
+          icon: 'img/courses/20-metal.png'
+        }
+      case 29:
+        return {
+          short: 'WC',
+          long: 'Tower of the Wing Cap',
+          icon: 'img/courses/21-wing.png'
+        }
+      case 30:
+        return {
+          short: 'BitDW',
+          long: 'Bowser in the Dark World',
+          icon: 'img/courses/16-bitdw.png'
+        }
+      case 31:
+        return {
+          short: 'SKY',
+          long: 'Wing Mario Over the Rainbow',
+          icon: 'img/courses/23-sky.png'
+        }
+      case 33:
+        return {
+          short: 'BitFS',
+          long: 'Bowser in the Fire Sea',
+          icon: 'img/courses/17-bitfs.png'
+        }
+      case 34:
+        return {
+          short: 'BitS',
+          long: 'Bowser in the Sky',
+          icon: 'img/courses/18-bits.png'
+        }
+      case 36:
+        return {
+          short: 'TTM',
+          long: 'Tall, Tall Mountain',
+          icon: 'img/courses/12-ttm.png'
+        }
+    }
+    return {
+      short: '???',
+      long: 'Unknown',
+      icon: 'img/help.png'
+    }
+  }
+
+  private renderPlayers (players: Array<Player | null>): JSX.Element[] {
+    const { isConnected } = this.props
     return players
-      .filter(player => player)
+      .filter(player => !!player)
       .map(
-        (player, index) =>
-          <div
+        (player, index) => {
+          const course = this.getPlayerCourse(player!.position)
+          return <div
             key={index}
             className='server-panel-player'
           >
+            {
+              isConnected &&
+              <>
+                <div className='server-panel-player-img'>
+                  <img src={course.icon} />
+                </div>
+                <div className='server-panel-player-course'>
+                  { course.short }
+                </div>
+              </>
+            }
             <div className='server-panel-player-img'>
-              <img src={`img/${CHARACTER_IMAGES[player.characterId || 0]}`} />
+              <img src={`img/${CHARACTER_IMAGES[player!.characterId ?? 0]}`} />
             </div>
             <div className='server-panel-player-name'>
-              { player.username }
+              { player!.username }
             </div>
           </div>
+        }
       )
   }
 
   public render (): JSX.Element {
-    const { server, isConnected } = this.props
+    const { selfPos, server, username, characterId, isConnected } = this.props
     const { display, displayDescription, warning } = this.state
-    const players = server.players || []
+    const players = server.players ?? []
     const gameMode: string | undefined = this.getGameModeImgSrc(server)
     const styles: Record<string, React.CSSProperties> = {
       name: {
@@ -177,7 +386,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
         display: 'flex',
         wordWrap: 'break-word',
         maxWidth: '100%',
-        flex: displayDescription ? '1 1 0' : undefined
+        flex: displayDescription ? '1 1 250px' : undefined
       },
       el: {
         margin: '6px'
@@ -197,7 +406,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
             }`} />
           </div>
           <div style={{ flex: '0 0 40px' }}>
-            { server.countryCode || '' }
+            { server.countryCode ?? '' }
           </div>
           {
             gameMode &&
@@ -206,7 +415,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
             </div>
           }
           <div style={styles.name}>
-            { server.name || `${server.ip}:${server.port}` }
+            { server.name ?? `${server.ip}:${server.port}` }
           </div>
           <div style={styles.players}>
             { players.filter(player => player).length } / 24
@@ -220,7 +429,9 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
             }
             <div style={styles.left}>
               <div
-                className={`server-panel-description-toggle${!displayDescription ? ' server-panel-description-toggle-inactive' : ''}`}
+                className={`server-panel-description-toggle${
+                  !displayDescription ? ' server-panel-description-toggle-inactive' : ''
+                }`}
                 onClick={this.handleDescriptionToggle}
               >
                 <img src='img/arrow.svg' style={{ width: '100%' }} />
@@ -229,7 +440,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
                 className={`server-panel-description${!displayDescription ? ' server-panel-description-inactive' : ''}`}
               >
                 <div style={styles.el}>
-                  { server.domain || server.ip }:{ server.port }
+                  { server.domain ?? server.ip }:{ server.port }
                 </div>
                 {
                   gameMode &&
@@ -247,13 +458,26 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
                 />
               </div>
             </div>
-            <div className='server-panel-details-playerlist'>
+            {
+              isConnected &&
+              <div className='server-panel-details-radar'>
+                <RadarPanel
+                  self={{
+                    username,
+                    characterId,
+                    position: selfPos
+                  }}
+                  players={players}
+                />
+              </div>
+            }
+            <div className='server-panel-details-playerlist' style={{ minWidth: isConnected ? 450 : 300 }}>
               {
                 this.renderPlayers(players)
               }
             </div>
           </div>
-          <div style={{width: '100%'}}>
+          <div style={{ width: '100%' }}>
             {
               isConnected
                 ? <SMMButton
@@ -276,5 +500,6 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
 export const ServerPanel = connect((state: State) => ({
   username: state.save.appSaveData.username,
   characterId: state.save.appSaveData.character,
+  selfPos: state.connection.selfPos,
   connectionError: state.connection.error
 }))(Panel)

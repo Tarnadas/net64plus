@@ -14,7 +14,7 @@ export const emulator = (state: EmulatorState = initialState.emulator, action: E
         draft.isConnectedToEmulator = action.isConnectedToEmulator
         break
       case EmulatorActionType.SET_ERROR:
-        draft.error = action.error || ''
+        draft.error = action.error ?? ''
         break
     }
   })

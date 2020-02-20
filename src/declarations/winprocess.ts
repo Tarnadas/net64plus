@@ -1,4 +1,4 @@
-type winProcess = {
+interface WinProcess {
   Process: (processId: number) => Process
 }
 export interface Process {
@@ -6,4 +6,4 @@ export interface Process {
   readMemory: (offset: number, length: number) => Buffer | number
   writeMemory: (offset: number, buffer: Buffer) => void
 }
-export default winProcess
+export default WinProcess

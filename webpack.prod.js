@@ -1,9 +1,8 @@
 const webpack = require('webpack')
-const BabiliPlugin = require('babili-webpack-plugin')
 const path = require('path')
 
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 const getCompatMin = require('./compat-list')
 
@@ -11,15 +10,10 @@ const [ major, minor, patch ] = process.env.npm_package_compatVersion.split('.')
 const [ packageMajor, packageMinor, packagePatch ] = process.env.npm_package_version.split('.')
 const [ compatMinMajor, compatMinMinor ] = getCompatMin(process.env.npm_package_version)
 
-const extractSass =
-  new ExtractTextPlugin({
-    filename: 'styles/[name].[contenthash].css',
-    disable: process.env.NODE_ENV === 'development'
-  })
-
 module.exports = [
   {
     target: 'electron-renderer',
+    mode: 'production',
     entry: {
       renderer: path.join(__dirname, 'src/renderer/index.tsx')
     },
@@ -53,19 +47,24 @@ module.exports = [
         template: 'src/renderer/template.html'
       }),
       new webpack.optimize.ModuleConcatenationPlugin(),
-      extractSass,
-      new BabiliPlugin({
-        keepFnName: true
-      })
+      new MiniCssExtractPlugin({
+        filename: 'styles/[name].[contenthash].css'
+      }),
     ],
     resolve: {
       extensions: [ '.ts', '.tsx', '.js', '.jsx', '.json' ]
     },
     module: {
-      loaders: [
+      rules: [
         {
           test: /\.tsx?$/,
-          loader: 'awesome-typescript-loader'
+          exclude: /node_modules/,
+          use: {
+            loader: 'babel-loader',
+            // options: {
+            //   presets: ['minify']
+            // }
+          }
         },
         {
           test: /\.(png|jpg)$/,
@@ -85,35 +84,18 @@ module.exports = [
         },
         {
           test: /\.scss$/,
-          use: extractSass.extract({
-            use: [
-              {
-                loader: 'css-loader',
-                options: {
-                  minimize: true
-                }
-              },
-              {
-                loader: 'sass-loader'
-              },
-              {
-                loader: 'postcss-loader',
-                options: {
-                  ident: 'postcss',
-                  plugins: (loader) => [
-                    require('autoprefixer')()
-                  ]
-                }
-              }
-            ],
-            fallback: 'style-loader'
-          })
+          use: [
+            MiniCssExtractPlugin.loader,
+            { loader: 'css-loader', options: { sourceMap: true, importLoaders: 1 } },
+            { loader: 'sass-loader', options: { sourceMap: true } },
+          ]
         }
       ]
     }
   },
   {
-    target: 'electron',
+    target: 'electron-main',
+    mode: 'production',
     entry: path.join(__dirname, 'src/main/index.ts'),
     output: {
       filename: 'index.js',
@@ -137,9 +119,6 @@ module.exports = [
         COMPAT_MIN_MINOR: compatMinMinor
       }),
       new webpack.optimize.ModuleConcatenationPlugin(),
-      new BabiliPlugin({
-        keepFnName: true
-      })
     ],
     externals: {
       winprocess: 'require(require("path").resolve(__dirname, "winprocess"))',
@@ -149,10 +128,11 @@ module.exports = [
       extensions: [ '.ts', '.js', '.json' ]
     },
     module: {
-      loaders: [
+      rules: [
         {
           test: /\.tsx?$/,
-          loader: 'awesome-typescript-loader'
+          exclude: /node_modules/,
+          loader: 'babel-loader'
         }
       ]
     }

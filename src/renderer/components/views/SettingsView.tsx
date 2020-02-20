@@ -38,6 +38,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     this.onEmuChatChange = this.onEmuChatChange.bind(this)
     this.onSave = this.onSave.bind(this)
   }
+
   onUsernameChange (e: React.ChangeEvent<any>) {
     let value = e.target.value.replace(/\W/g, '')
     if (value.length > MAX_LENGTH_USERNAME) {
@@ -47,18 +48,21 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       username: value
     })
   }
+
   onCharacterChange (e: React.ChangeEvent<any>) {
     const characterId = parseInt(e.target.value)
     this.setState({
       characterId
     })
   }
+
   onEmuChatChange (e: React.ChangeEvent<any>) {
     const emuChat = e.target.checked
     this.setState({
       emuChat
     })
   }
+
   onSave () {
     const username = this.state.username.replace(/\W/g, '')
     if (username.length < MIN_LENGTH_USERNAME) {
@@ -74,6 +78,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       dispatch(showSnackbar('Saved'))
     }
   }
+
   render () {
     const warning = this.state.warning
     const connectionError = this.props.connectionError

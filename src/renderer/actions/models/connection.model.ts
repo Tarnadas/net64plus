@@ -2,6 +2,7 @@ import { Action } from 'redux'
 
 import { Server } from '../../../models/Server.model'
 import { IPlayer, IPlayerUpdate } from '../../../../proto/ServerClientMessage'
+import { Position } from '../../../models/Emulator.model'
 
 export interface SetServerAction extends Action {
   server: Server
@@ -18,6 +19,16 @@ export interface SetPlayersAction extends Action {
 export interface SetPlayerAction extends Action {
   playerId: number
   player: IPlayer
+}
+
+export interface SetPlayerIdAction extends Action {
+  playerId: number
+}
+
+export interface UpdatePlayerPositionAction extends Action {
+  self: Position
+  cameraAngle: number
+  positions: Array<Position | null>
 }
 
 export interface SetGameModeAction extends Action {
@@ -39,6 +50,8 @@ export type ConnectionAction =
   & SetConnectionErrorAction
   & SetPlayersAction
   & SetPlayerAction
+  & SetPlayerIdAction
+  & UpdatePlayerPositionAction
   & SetGameModeAction
   & AuthenticationRequired
   & AuthenticationAccepted
@@ -50,6 +63,8 @@ export enum ConnectionActionType {
   SET_CONNECTION_ERROR = 'SET_CONNECTION_ERROR',
   SET_PLAYERS = 'SET_PLAYERS',
   SET_PLAYER = 'SET_PLAYER',
+  SET_PLAYER_ID = 'SET_PLAYER_ID',
+  UPDATE_PLAYER_POSITIONS = 'UPDATE_PLAYER_POSITIONS',
   GAME_MODE = 'GAME_MODE',
   AUTHENTICATION_REQUIRED = 'AUTHENTICATION_REQUIRED',
   AUTHENTICATION_ACCEPTED = 'AUTHENTICATION_ACCEPTED',

@@ -21,7 +21,7 @@ const APP_SAVE_DATA: ElectronSaveData = {
   username: '',
   character: 0,
   emuChat: false,
-  lastIp: 'smmdb.ddns.net',
+  lastIp: 'smmdb.net',
   lastPort: 3678,
   version: '',
   serverOptions: {
@@ -65,6 +65,9 @@ export function initReducer (history: History, electronSave: SaveState): Store<S
     },
     connection: {
       server: null,
+      playerId: null,
+      selfPos: { x: 0, y: 0, rotation: 0, course: 0 },
+      cameraAngle: 0,
       authenticated: true,
       authenticationThrottle: 0,
       hasToken: false,

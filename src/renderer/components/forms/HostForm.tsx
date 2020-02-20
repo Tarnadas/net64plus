@@ -178,7 +178,7 @@ class Form extends React.PureComponent<ServerFormProps, ServerFormState> {
   }
 
   private getGamemodeOptions (): JSX.Element[] {
-    return Object.entries(gameModes).map(([ key, gamemode ]) => (
+    return Object.entries(gameModes).map(([key, gamemode]) => (
       <option
         key={key}
         value={key}

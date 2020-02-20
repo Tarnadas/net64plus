@@ -13,7 +13,7 @@ interface FaqViewProps {
 
 class View extends React.PureComponent<FaqViewProps> {
   public componentDidMount (): void {
-    this.props.dispatch(setVersion(process.env.VERSION || ''))
+    this.props.dispatch(setVersion(process.env.VERSION ?? ''))
   }
 
   public render (): JSX.Element {
@@ -47,7 +47,7 @@ class View extends React.PureComponent<FaqViewProps> {
           text='Got it!'
           link='/'
         />
-        <div style={{marginTop: '40px'}}></div>
+        <div style={{ marginTop: '40px' }}></div>
         <div style={styles.text}>
           You must use the emulator which comes bundled with Net64+!
         </div>
@@ -68,19 +68,28 @@ class View extends React.PureComponent<FaqViewProps> {
         <div>
           You can host your own server by visiting the <Link to='/host'>hosting page</Link>.<br />
           Joining via LAN can be done by using the LAN IP address which looks like 192.X.X.X.<br />
-          Joining via internet is only possible, if you correctly port forwarded. Port forwarding must be done at your router&#39;s web interface.<br />
+          Joining via internet is only possible, if you correctly port forwarded.
+          Port forwarding must be done at your router&#39;s web interface.<br />
         </div>
         <h3>Here is a short summary:</h3>
         <ul>
           <li>open a terminal (Win + &#34;cmd&#34; + enter)</li>
           <li>type &#34;ipconfig&#34;</li>
-          <li>find the entry from your Ethernet or Wifi adapter showing your default gateway, which should look like 192.X.X.1/0</li>
+          <li>
+            find the entry from your Ethernet or Wifi adapter showing your default gateway,
+            which should look like 192.X.X.1/0
+          </li>
           <li>open a browser and type in this address</li>
           <li>this is your router&#39;s web interface. You will have to log in with your credentials</li>
-          <li>the next steps heavily depend on the router you are using. You will have to find an entry about port forwarding and set it up for the respective port that you want to use</li>
+          <li>
+            the next steps heavily depend on the router you are using.
+            You will have to find an entry about port forwarding and
+            set it up for the respective port that you want to use
+          </li>
         </ul>
         <div>
-          If you want your server to be publicly visibile, you will have to get an API key from <ExternalLink href='https://smmdb.ddns.net/profile'>SMMDB profile page</ExternalLink>.
+          If you want your server to be publicly visibile, you will have to get an API key from
+          <ExternalLink href='https://smmdb.net/profile'>SMMDB profile page</ExternalLink>.
           Never share your API key with anyone!
         </div>
       </div>

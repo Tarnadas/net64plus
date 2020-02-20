@@ -55,7 +55,7 @@ export class AboutView extends React.PureComponent {
             Quasmok
           </div>
         </div>
-        <h2 style={{marginTop: '20px'}}>License</h2>
+        <h2 style={{ marginTop: '20px' }}>License</h2>
         <code style={styles.text}>
 MIT License<br/><br/>
 
