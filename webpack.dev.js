@@ -2,7 +2,6 @@ const webpack = require('webpack')
 const path = require('path')
 
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-// const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 const getCompatMin = require('./compat-list')
@@ -10,12 +9,6 @@ const getCompatMin = require('./compat-list')
 const [ major, minor, patch ] = process.env.npm_package_compatVersion.split('.')
 const [ packageMajor, packageMinor, packagePatch ] = process.env.npm_package_version.split('.')
 const [ compatMinMajor, compatMinMinor ] = getCompatMin(process.env.npm_package_version)
-
-// const extractSass =
-//   new ExtractTextPlugin({
-//     filename: 'styles/[name].[contenthash].css',
-//     disable: process.env.NODE_ENV === 'development'
-//   })
 
 module.exports = [
   {
@@ -88,7 +81,7 @@ module.exports = [
         {
           test: /\.scss$/,
           use: [
-            MiniCssExtractPlugin.loader, // or MiniCssExtractPlugin.loader
+            MiniCssExtractPlugin.loader,
             { loader: 'css-loader', options: { sourceMap: true, importLoaders: 1 } },
             { loader: 'sass-loader', options: { sourceMap: true } },
           ]
