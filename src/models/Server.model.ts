@@ -7,7 +7,7 @@ export interface Server {
   port: number
   name?: string
   description?: string
-  players?: (Player | null)[]
+  players?: Array<Player | null>
   countryCode?: string
   gameMode?: number
   version?: string

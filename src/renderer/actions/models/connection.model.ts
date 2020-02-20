@@ -28,7 +28,7 @@ export interface SetPlayerIdAction extends Action {
 export interface UpdatePlayerPositionAction extends Action {
   self: Position
   cameraAngle: number
-  positions: (Position | null)[]
+  positions: Array<Position | null>
 }
 
 export interface SetGameModeAction extends Action {

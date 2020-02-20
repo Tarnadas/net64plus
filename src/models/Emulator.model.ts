@@ -1,4 +1,4 @@
-import { IPlayer } from "../../proto/ServerClientMessage";
+import { IPlayer } from '../../proto/ServerClientMessage'
 
 export interface FilteredEmulator {
   name: string
@@ -18,5 +18,16 @@ export interface Player extends IPlayer {
 }
 
 export const CHARACTER_IMAGES = [
-  'mario.png', 'luigi.png', 'yoshi.png', 'wario.png', 'peach.png', 'toad.png', 'waluigi.png', 'rosalina.png', 'sonic.png', 'knuckles.png', 'goomba.png', 'kirby.png'
+  'mario.png',
+  'luigi.png',
+  'yoshi.png',
+  'wario.png',
+  'peach.png',
+  'toad.png',
+  'waluigi.png',
+  'rosalina.png',
+  'sonic.png',
+  'knuckles.png',
+  'goomba.png',
+  'kirby.png'
 ]

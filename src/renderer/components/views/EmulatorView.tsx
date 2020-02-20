@@ -28,7 +28,7 @@ interface EmulatorViewState {
 }
 
 class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
-  private mounted: boolean = false
+  private mounted = false
 
   private timer: NodeJS.Timer | null = null
 
@@ -89,7 +89,7 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
     connector.updateEmulators()
   }
 
-  private async onSelectEmulator (emulator: FilteredEmulator): Promise<void> {
+  private onSelectEmulator (emulator: FilteredEmulator): void {
     this.setState({
       loading: true
     })
@@ -104,7 +104,8 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
       if (!this.mounted) return
       this.setState({
         loading: false,
-        warning: 'Could not inject emulator.\nDid you start Super Mario 64 (USA)?\nYou might have to start Net64+ as administrator.'
+        warning:
+'Could not inject emulator.\nDid you start Super Mario 64 (USA)?\nYou might have to start Net64+ as administrator.'
       })
     }, TIMEOUT)
   }
@@ -140,7 +141,7 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
               { emulator.name } | pid: { emulator.pid }
               {
                 windowName &&
-                ` | ${romName || 'Game is not running'}`
+                ` | ${romName ?? 'Game is not running'}`
               }
             </div>
             <SMMButton

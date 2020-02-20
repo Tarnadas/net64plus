@@ -31,7 +31,7 @@ interface ServerAreaState {
 }
 
 class Area extends React.PureComponent<ServerAreaProps, ServerAreaState> {
-  private mounted: boolean = false
+  private mounted = false
 
   constructor (props: ServerAreaProps) {
     super(props)
@@ -88,6 +88,7 @@ class Area extends React.PureComponent<ServerAreaProps, ServerAreaState> {
       if (!this.mounted) return
       if (!servers) {
         this.setState({
+          // eslint-disable-next-line max-len
           warning: 'Could not fetch server list. You or the website might be offline. This doesn\'t mean, that Nintendo sent us a DMCA. You can still search for servers on our Discord server and direct connect to them.'
         })
         return
@@ -116,8 +117,9 @@ class Area extends React.PureComponent<ServerAreaProps, ServerAreaState> {
 
   private filterIncompatibleServers (server: Server): boolean {
     if (!server.version) return false
-    const [ major, minor ] = server.version.split('.')
-    return Number(major) >= Number(process.env.COMPAT_MIN_MAJOR) && Number(minor) >= Number(process.env.COMPAT_MIN_MINOR)
+    const [major, minor] = server.version.split('.')
+    return Number(major) >= Number(process.env.COMPAT_MIN_MAJOR) &&
+      Number(minor) >= Number(process.env.COMPAT_MIN_MINOR)
   }
 
   public render (): JSX.Element {

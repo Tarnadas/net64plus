@@ -10,7 +10,7 @@ interface RadarPanelProps {
   playerId: number | null
   self: Player
   cameraAngle: number
-  players: (Player | null)[]
+  players: Array<Player | null>
 }
 
 interface RadarPanelState {
@@ -60,7 +60,7 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
     selfPos: Position,
     rotation: number,
     viewDistance: number,
-    players: (Player | null)[]
+    players: Array<Player | null>
   ): JSX.Element {
     const rotSin = Math.sin(rotation)
     const rotCos = Math.cos(rotation)
@@ -84,7 +84,7 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
             const y = this.normalize(rotSin * dX + rotCos * dY, normalizedViewDistance)
             const iconSize = withinViewDistance ? ICON_SIZE : ICON_SIZE_OUTSIDE_VIEW
             return <div
-              key={player!.username || index}
+              key={player!.username ?? index}
               className='radar-panel-icon-wrapper'
               style={{
                 top: RADIUS - y - iconSize / 2,
@@ -99,11 +99,11 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
                   maxWidth: iconSize,
                   maxHeight: iconSize
                 }}
-                src={`img/${CHARACTER_IMAGES[player!.characterId || 0]}`}
+                src={`img/${CHARACTER_IMAGES[player!.characterId ?? 0]}`}
               />
               {
                 withinViewDistance &&
-                <span className='radar-panel-label'>{ player!.username }</span>              
+                <span className='radar-panel-label'>{ player!.username }</span>
               }
             </div>
           })
@@ -127,9 +127,9 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
     const selfRotation = self.position.rotation * 2 * Math.PI / 0x10000
     const rotation = cameraAngle * 2 * Math.PI / 0x10000
     const rotationDiff = rotation - selfRotation
-    let playersMock: (Player | null)[]
+    let playersMock: Array<Player | null>
     if (process.env.NODE_ENV === 'development') {
-      playersMock = [ ...players ]
+      playersMock = [...players]
       playersMock[2] = {
         characterId: 2,
         username: 'Player 2',
@@ -181,12 +181,12 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
           height={RADIUS * 2}
         >
           <defs>
-            <filter id="dropshadow-left">                                          
+            <filter id="dropshadow-left">
               <feGaussianBlur stdDeviation={5} />
               <feOffset dx={5} dy={-5} result="offsetblur"/>
               <feComposite operator="out" in2="SourceGraphic"/>
             </filter>
-            <filter id="dropshadow-right">                                          
+            <filter id="dropshadow-right">
               <feGaussianBlur stdDeviation={5} />
               <feOffset dx={-5} dy={-5} result="offsetblur"/>
               <feComposite operator="out" in2="SourceGraphic"/>
@@ -207,7 +207,15 @@ class Panel extends React.PureComponent<RadarPanelProps, RadarPanelState> {
             d={`M ${RADIUS} ${RADIUS} H ${RADIUS + FOV_SIZE} V ${RADIUS - FOV_SIZE} Z`}
           />
         </svg>
-        { this.renderPlayers(playerId, self.position, rotation, viewDistance, process.env.NODE_ENV === 'development' ? playersMock! : players) }
+        {
+          this.renderPlayers(
+            playerId,
+            self.position,
+            rotation,
+            viewDistance,
+            process.env.NODE_ENV === 'development' ? playersMock! : players
+          )
+        }
         <input
           className='radar-panel-range'
           type='range'

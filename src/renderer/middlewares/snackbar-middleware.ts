@@ -5,7 +5,9 @@ import { hideSnackbar } from '../actions/snackbar'
 
 let timer: NodeJS.Timer | undefined
 
-export const snackbarMiddleware = ({ dispatch }: MiddlewareAPI<any>) => (next: Dispatch<any>) => (action: AnyAction) => {
+export const snackbarMiddleware = (
+  { dispatch }: MiddlewareAPI<any>
+) => (next: Dispatch<any>) => (action: AnyAction) => {
   const nextAction = next(action)
   if (!nextAction) return nextAction
   switch (nextAction.type) {

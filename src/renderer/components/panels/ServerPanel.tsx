@@ -50,7 +50,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
     this.renderPlayers = this.renderPlayers.bind(this)
   }
 
-  private getDescription = (): string => {
+  private readonly getDescription = (): string => {
     if (!this.props.server.description) return ''
     let description = emojify(marked(this.props.server.description))
     const document: Document = new DOMParser().parseFromString(description, 'text/html')
@@ -236,7 +236,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
           long: 'Vanish Cap Under the Moat',
           icon: 'img/courses/22-vanish.png'
         }
-      case 19: 
+      case 19:
         return {
           short: 'BitFS',
           long: 'Bowser in the Fire Sea',
@@ -334,7 +334,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
     }
   }
 
-  private renderPlayers (players: (Player | null)[]): JSX.Element[] {
+  private renderPlayers (players: Array<Player | null>): JSX.Element[] {
     const { isConnected } = this.props
     return players
       .filter(player => !!player)
@@ -357,7 +357,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
               </>
             }
             <div className='server-panel-player-img'>
-              <img src={`img/${CHARACTER_IMAGES[player!.characterId || 0]}`} />
+              <img src={`img/${CHARACTER_IMAGES[player!.characterId ?? 0]}`} />
             </div>
             <div className='server-panel-player-name'>
               { player!.username }
@@ -370,7 +370,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
   public render (): JSX.Element {
     const { selfPos, server, username, characterId, isConnected } = this.props
     const { display, displayDescription, warning } = this.state
-    const players = server.players || []
+    const players = server.players ?? []
     const gameMode: string | undefined = this.getGameModeImgSrc(server)
     const styles: Record<string, React.CSSProperties> = {
       name: {
@@ -407,7 +407,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
             }`} />
           </div>
           <div style={{ flex: '0 0 40px' }}>
-            { server.countryCode || '' }
+            { server.countryCode ?? '' }
           </div>
           {
             gameMode &&
@@ -416,7 +416,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
             </div>
           }
           <div style={styles.name}>
-            { server.name || `${server.ip}:${server.port}` }
+            { server.name ?? `${server.ip}:${server.port}` }
           </div>
           <div style={styles.players}>
             { players.filter(player => player).length } / 24
@@ -430,7 +430,9 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
             }
             <div style={styles.left}>
               <div
-                className={`server-panel-description-toggle${!displayDescription ? ' server-panel-description-toggle-inactive' : ''}`}
+                className={`server-panel-description-toggle${
+                  !displayDescription ? ' server-panel-description-toggle-inactive' : ''
+                }`}
                 onClick={this.handleDescriptionToggle}
               >
                 <img src='img/arrow.svg' style={{ width: '100%' }} />
@@ -439,7 +441,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
                 className={`server-panel-description${!displayDescription ? ' server-panel-description-inactive' : ''}`}
               >
                 <div style={styles.el}>
-                  { server.domain || server.ip }:{ server.port }
+                  { server.domain ?? server.ip }:{ server.port }
                 </div>
                 {
                   gameMode &&
@@ -476,7 +478,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
               }
             </div>
           </div>
-          <div style={{width: '100%'}}>
+          <div style={{ width: '100%' }}>
             {
               isConnected
                 ? <SMMButton

@@ -1,6 +1,12 @@
 import { ChildProcess } from 'child_process'
 
-import { SetServerProcessAction, ServerActionType, RemoveServerProcessAction, AddServerMessageAction, ExitServerProcessAction } from './models/server.model'
+import {
+  SetServerProcessAction,
+  ServerActionType,
+  RemoveServerProcessAction,
+  AddServerMessageAction,
+  ExitServerProcessAction
+} from './models/server.model'
 
 export function setServerProcess (process: ChildProcess): SetServerProcessAction {
   return {

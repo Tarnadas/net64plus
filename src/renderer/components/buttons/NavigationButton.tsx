@@ -13,7 +13,11 @@ interface NavigationButtonProps {
 
 export const NavigationButton = (props: NavigationButtonProps) =>
   <Link
-    className={`navigation-button${props.isActive ? ' navigation-button-active' : ''}${!props.isEnabled ? ' navigation-button-disabled' : ''}`}
+    className={
+      `navigation-button${
+        props.isActive ? ' navigation-button-active' : ''
+      }${!props.isEnabled ? ' navigation-button-disabled' : ''}`
+    }
     to={props.link}
   >
     <div className='navigation-button-icon'>

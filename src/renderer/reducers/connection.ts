@@ -18,7 +18,7 @@ export const connection = (state: ConnectionState = initialState.connection, act
         break
       case ConnectionActionType.SET_PLAYERS:
         if (!draft.server) return
-        const players: (Player | null)[] = new Array(25).fill(null)
+        const players: Array<Player | null> = new Array(25).fill(null)
         for (const player of action.players) {
           if (!player.player || player.playerId == null) continue
           players[player.playerId] = player.player
@@ -42,10 +42,11 @@ export const connection = (state: ConnectionState = initialState.connection, act
           const position = action.positions[i]
           if (!position) continue
           if (!draft.server.players[i + 1]) continue
-          const prevCourse = draft.server.players[i + 1]!.position != null ? draft.server.players[i + 1]!.position!.course : 0
-          draft.server.players[i + 1]!.position = position
-          if (draft.server.players[i + 1]!.position!.course === 0) {
-            draft.server.players[i + 1]!.position!.course = prevCourse
+          const player = draft.server.players[i + 1] as Player
+          const prevCourse = player.position?.course ?? 0
+          player.position = position
+          if (player.position.course === 0) {
+            player.position.course = prevCourse
           }
         }
         break

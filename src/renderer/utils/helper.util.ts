@@ -70,10 +70,10 @@ export function isReleaseValid (release: Release): boolean {
 export function isVersionNewer (versionTag: string, currentVersionTag?: string): boolean {
   let [major, minor, patch] = versionTag.split('.')
     .map(mapVersionToNumber)
-  let [currentMajor, currentMinor, currentPatch] = currentVersionTag
+  const [currentMajor, currentMinor, currentPatch] = currentVersionTag
     ? currentVersionTag.split('.')
       .map(mapVersionToNumber)
-    : [ 0, 0, 0 ]
+    : [0, 0, 0]
   if (patch == null) patch = 0
   const versionValue = major * 10000 + minor * 100 + patch
   const currentVersionValue = currentMajor * 10000 + currentMinor * 100 + currentPatch

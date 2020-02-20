@@ -33,7 +33,7 @@ export class Emulator {
 
   public inGameChatEnabled = false
 
-  private process: Process
+  private readonly process: Process
 
   public static async updateEmulators () {
     let emulators: FilteredEmulator[] = []
@@ -151,7 +151,7 @@ export class Emulator {
   private async patchMemory (characterId: number): Promise<void> {
     const basePath = process.env.NODE_ENV === 'test' ? './build/patches' : './patches'
     const patches = fs.readdirSync(basePath)
-    const patchBuffersPromise: Promise<{patchId: number, data: Buffer}>[] = []
+    const patchBuffersPromise: Array<Promise<{patchId: number, data: Buffer}>> = []
     for (const patch of patches) {
       patchBuffersPromise.push(
         new Promise((resolve, reject) => {
@@ -195,14 +195,15 @@ export class Emulator {
       return memory
     }
     deleteEmulator()
-    // let errorMessage = 'An error occured. Please double check whether your memory is set to 16MB and/or try starting Net64+ and PJ64 with admin privileges'
     let errorMessage = 'An unknown error occured'
     switch (memory) {
       case 6:
         errorMessage = 'Insufficient permission to read memory. Try starting Net64+ with admin privileges'
         break
       case 299:
-        errorMessage = 'Your memory is not set to 16MB. You are either not using the shipped emulator or you did not restart the emulator after chaning your settings to 16MB'
+        errorMessage = 'Your memory is not set to 16MB. '
+        errorMessage += 'You are either not using the shipped emulator or '
+        errorMessage += 'you did not restart the emulator after changing your settings to 16MB'
         break
     }
     connector.setEmulatorError(errorMessage)
@@ -283,8 +284,8 @@ export class Emulator {
     return this.readMemory(0xFF7709, 1).readUInt8(0)
   }
 
-  public getPlayerPositions (): {self: Position, cameraAngle: number, positions: (Position | null)[]} {
-    const positions: (Position | null)[] = new Array(24).fill(null)
+  public getPlayerPositions (): {self: Position, cameraAngle: number, positions: Array<Position | null>} {
+    const positions: Array<Position | null> = new Array(24).fill(null)
     const x = this.readMemory(0xFF7706, 2).readInt16LE(0)
     const y = this.readMemory(0xFF770A, 2).readInt16LE(0)
     const rotation = this.readMemory(0xFF7708, 2).readUInt16LE(0)
@@ -308,6 +309,6 @@ export class Emulator {
       }
     }
     const cameraAngle = this.readMemory(0x33c6e4, 2).readUInt16LE(0)
-    return {self, cameraAngle, positions}
+    return { self, cameraAngle, positions }
   }
 }

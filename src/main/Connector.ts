@@ -8,7 +8,7 @@ import { Server } from '../models/Server.model'
 import { IPlayerUpdate, IPlayer } from '../../proto/ServerClientMessage'
 
 export class Connector {
-  constructor (private window: Electron.BrowserWindow) {
+  constructor (private readonly window: Electron.BrowserWindow) {
     ipcMain.on(RendererMessage.CREATE_CONNECTION, this.onCreateConnection)
     ipcMain.on(RendererMessage.DISCONNECT, this.onDisconnect)
     ipcMain.on(RendererMessage.UPDATE_EMULATORS, this.onUpdateEmulators)
@@ -20,25 +20,25 @@ export class Connector {
     ipcMain.on(RendererMessage.CHAT_COMMAND, this.onSendCommandMessage)
   }
 
-  private onCreateConnection = (
+  private readonly onCreateConnection = (
     _: Electron.Event,
     { domain, ip, port, username, characterId }:
     {
-      domain?: string, ip?: string, port?: number, username: string, characterId: number
+      domain?: string, ip?: string, port?: number, username: string, characterId: number,
     }
   ) => {
     createConnection({ domain, ip, port, username, characterId })
   }
 
-  private onDisconnect = () => {
+  private readonly onDisconnect = () => {
     deleteConnection()
   }
 
-  private onUpdateEmulators = () => {
+  private readonly onUpdateEmulators = () => {
     Emulator.updateEmulators()
   }
 
-  private onCreateEmulatorConnection = (
+  private readonly onCreateEmulatorConnection = (
     _: Electron.Event,
     { processId, characterId, inGameChatEnabled }:
     { processId: number, characterId: number, inGameChatEnabled: boolean }
@@ -46,11 +46,11 @@ export class Connector {
     createEmulator({ processId, characterId, inGameChatEnabled })
   }
 
-  private onDisconnectEmulator = () => {
+  private readonly onDisconnectEmulator = () => {
     deleteEmulator()
   }
 
-  private onPlayerUpdate = (
+  private readonly onPlayerUpdate = (
     _: Electron.Event,
     { username, characterId }:
     { username: string, characterId: number }
@@ -61,17 +61,17 @@ export class Connector {
     connection.sendPlayerUpdate({ username, characterId })
   }
 
-  private onSendPassword = (_: Electron.Event, password: string) => {
+  private readonly onSendPassword = (_: Electron.Event, password: string) => {
     if (!connection) return
     connection.sendPassword(password)
   }
 
-  private onSendGlobalChatMessage = (_: Electron.Event, message: string) => {
+  private readonly onSendGlobalChatMessage = (_: Electron.Event, message: string) => {
     if (!connection) return
     connection.sendGlobalChatMessage(message)
   }
 
-  private onSendCommandMessage = (
+  private readonly onSendCommandMessage = (
     _: Electron.Event,
     { message, args }:
     { message: string, args: string[] }
@@ -113,7 +113,9 @@ export class Connector {
     this.window.webContents.send(MainMessage.SET_PLAYER_ID, playerId)
   }
 
-  public updatePlayerPositions (positions: {self: Position, cameraAngle: number, positions: (Position | null)[]}): void {
+  public updatePlayerPositions (
+    positions: {self: Position, cameraAngle: number, positions: Array<Position | null>}
+  ): void {
     this.window.webContents.send(MainMessage.UPDATE_PLAYER_POSITIONS, positions)
   }
 

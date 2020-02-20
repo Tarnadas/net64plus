@@ -10,9 +10,11 @@ export class ExternalLink extends React.PureComponent<ExternalLinkProps> {
     super(props)
     this.onClick = this.onClick.bind(this)
   }
+
   onClick () {
     shell.openExternal(this.props.href)
   }
+
   render () {
     return <span
       style={{
