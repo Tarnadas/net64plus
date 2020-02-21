@@ -225,7 +225,7 @@ is incompatible with your client API version (${process.env.MAJOR}.${process.env
 
   public changeHotkeyBindings (
     { hotkeyBindings, globalHotkeysEnabled, username }:
-    { hotkeyBindings: { [shortcut: string]: string | undefined }, globalHotkeysEnabled: boolean, username?: string }
+    { hotkeyBindings: { [shortcut: string]: string[] }, globalHotkeysEnabled: boolean, username?: string }
   ) {
     ipcRenderer.send(RendererMessage.HOTKEYS_CHANGED, { hotkeyBindings, globalHotkeysEnabled, username })
   }

@@ -18,12 +18,12 @@ export class HotkeyManager {
   private _characterCyclingOrder: Array<{characterId: number, on: boolean}> = []
   private _characterCyclingIndex = 0;
 
-  private _hotkeyBindings: { [shortcut: string]: string | undefined } = {}
+  private _hotkeyBindings: { [shortcut: string]: string[] } = {}
 
   public validKeyboardHotkeys = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 
   public setHotkeys (
-    hotkeyBindings: { [shortcut: string]: string | undefined },
+    hotkeyBindings: { [shortcut: string]: string[] },
     globalHotkeysEnabled: boolean,
     connector: Connector,
     window: BrowserWindow
@@ -31,9 +31,9 @@ export class HotkeyManager {
     this._hotkeyBindings = hotkeyBindings
     electronLocalshortcut.unregisterAll(window)
     globalShortcut.unregisterAll()
-    Object.entries(hotkeyBindings).forEach(([characterIdString, hotkey]) => {
+    Object.entries(hotkeyBindings).forEach(([characterIdString, hotkeys]) => {
       const username = this.username
-      if (hotkey) {
+      for (const hotkey of hotkeys) {
         if (this.isNumeric(characterIdString)) {
           const callback = () => {
             const characterId = parseInt(characterIdString, 10)
@@ -99,9 +99,12 @@ export class HotkeyManager {
     if (buttonState.some((button) => button.pressed)) {
       const username = this.username
       Object.entries(this._hotkeyBindings)
-        .filter(([_, hotkey]) => !!hotkey && hotkey.includes('button'))
-        .forEach(([characterIdString, hotkey]) => {
-          if (hotkey) {
+        // Filter out any bindings that don't have any button hotkeys
+        .filter(([_, hotkeys]) => hotkeys.some((hotkey) => hotkey.includes('button')))
+        .forEach(([characterIdString, hotkeys]) => {
+          // Filter out any hotkeys that are not button hotkeys
+          hotkeys = hotkeys.filter((hotkey) => hotkey.includes('button'))
+          for (const hotkey of hotkeys) {
             // Check if button was pressed
             if (buttonState.some((button) => hotkey === `button${button.key}` && button.pressed)) {
               if (this.isNumeric(characterIdString)) { // Character hotkey

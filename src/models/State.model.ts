@@ -22,7 +22,7 @@ export interface ElectronSaveDataDraft {
   character: number
   emuChat: boolean
   globalHotkeysEnabled: boolean
-  hotkeyBindings: { [shortcut: string]: string | undefined }
+  hotkeyBindings: { [shortcut: string]: string[] }
   characterCylingOrder: Array<{characterId: number, on: boolean}>
   gamepadId: string | undefined
   lastIp: string

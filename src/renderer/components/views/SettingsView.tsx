@@ -30,7 +30,7 @@ interface SettingsViewState {
   characterId: number
   emuChat: boolean
   globalHotkeysEnabled: boolean
-  hotkeyBindings: { [shortcut: string]: string | undefined }
+  hotkeyBindings: { [shortcut: string]: string[] }
   characterCyclingOrder: Array<{characterId: number, on: boolean}>
   gamepadId: string | undefined
   warning: string
@@ -134,7 +134,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
 
   onHotkeyBindingChange (shortcut: string, hotkey?: string) {
     const { hotkeyBindings } = this.state
-    hotkeyBindings[shortcut] = hotkey
+    hotkeyBindings[shortcut] = !!hotkey ? [hotkey] : []
     this.setState({ hotkeyBindings })
   }
 
@@ -181,7 +181,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
         key={i}
         shortcut={`${i}`}
         iconSrc={CHARACTER_ICONS[i]}
-        hotkey={this.state.hotkeyBindings[`${i}`]}
+        hotkey={this.state.hotkeyBindings[`${i}`]?.[0]}
         onClick={this.onHotkeyBindingChange}
         onRightClick={this.onHotkeyBindingChange}
       />)
@@ -323,7 +323,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
             <div>Previous Character</div>
             <HotkeyButton
               shortcut={'previousCharacter'}
-              hotkey={this.state.hotkeyBindings.previousCharacter}
+              hotkey={this.state.hotkeyBindings.previousCharacter?.[0]}
               onClick={this.onHotkeyBindingChange}
               onRightClick={this.onHotkeyBindingChange}
             />
@@ -332,7 +332,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
             <div>Next Character</div>
             <HotkeyButton
               shortcut={'nextCharacter'}
-              hotkey={this.state.hotkeyBindings.nextCharacter}
+              hotkey={this.state.hotkeyBindings.nextCharacter?.[0]}
               onClick={this.onHotkeyBindingChange}
               onRightClick={this.onHotkeyBindingChange}
             />

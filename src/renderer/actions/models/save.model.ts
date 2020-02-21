@@ -19,7 +19,7 @@ export interface SetGlobalHotkeysEnabledAction extends Action {
 }
 
 export interface SetHotkeyBindingsAction extends Action {
-  hotkeyBindings: { [shortcut: string]: string | undefined }
+  hotkeyBindings: { [shortcut: string]: string[] }
 }
 
 export interface SetCharacterCyclingOrderAction extends Action {

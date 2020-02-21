@@ -82,7 +82,7 @@ export class Connector {
   private readonly onHotkeysChanged = (
     _: Electron.Event,
     { hotkeyBindings, globalHotkeysEnabled, username }:
-    { hotkeyBindings: { [shortcut: string]: string | undefined }, globalHotkeysEnabled: boolean, username: string }
+    { hotkeyBindings: { [shortcut: string]: string[] }, globalHotkeysEnabled: boolean, username: string }
   ) => {
     if (username) { this.hotkeyManager.username = username }
     this.hotkeyManager.setHotkeys(hotkeyBindings, globalHotkeysEnabled, this, this.window)

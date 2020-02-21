@@ -37,7 +37,7 @@ export function setGlobalHotkeysEnabled (globalHotkeysEnabled: boolean): SetGlob
     globalHotkeysEnabled
   }
 }
-export function setHotkeyBindings (hotkeyBindings: { [shortcut: string]: string | undefined }) {
+export function setHotkeyBindings (hotkeyBindings: { [shortcut: string]: string[] }) {
   return {
     type: 'SET_HOTKEY_BINDINGS',
     hotkeyBindings

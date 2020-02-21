@@ -23,18 +23,18 @@ const APP_SAVE_DATA: ElectronSaveData = {
   emuChat: false,
   globalHotkeysEnabled: false,
   hotkeyBindings: {
-    0: undefined, // Mario
-    1: undefined, // Luigi
-    2: undefined, // Yoshi
-    3: undefined, // Wario
-    4: undefined, // Peach
-    5: undefined, // Toad
-    6: undefined, // Waluigi
-    7: undefined, // Rosalina
-    8: undefined, // Sonic
-    9: undefined, // Knuckles
-    10: undefined, // Goomba
-    11: undefined // Kirby
+    0: [], // Mario
+    1: [], // Luigi
+    2: [], // Yoshi
+    3: [], // Wario
+    4: [], // Peach
+    5: [], // Toad
+    6: [], // Waluigi
+    7: [], // Rosalina
+    8: [], // Sonic
+    9: [], // Knuckles
+    10: [], // Goomba
+    11: [] // Kirby
   },
   characterCylingOrder: [
     { characterId: 0, on: true }, // Mario
