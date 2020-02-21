@@ -77,7 +77,6 @@ export function updateRPC (update: Record<string, any>, clean?: boolean): void {
         nodeIntegrationInWorker: true
       }
     })
-
     connector = new Connector(mainWindow)
     updateRPC({
       state: 'Ready',
@@ -108,8 +107,6 @@ export function updateRPC (update: Record<string, any>, clean?: boolean): void {
   })
 
   process.on('uncaughtException', (err: Error) => {
-    console.error(err)
-    process.stdout.write(err.message)
     const errorFolderPath = path.resolve(__dirname, 'error')
     const filePath = path.resolve(
       errorFolderPath,
