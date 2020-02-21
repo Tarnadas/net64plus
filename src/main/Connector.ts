@@ -44,6 +44,7 @@ export class Connector {
   private readonly onUpdateEmulators = () => {
     Emulator.updateEmulators().catch((error) => {
       console.error(error)
+      throw error
     })
   }
 
