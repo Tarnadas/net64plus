@@ -20,7 +20,7 @@ export class HotkeyManager {
 
   private _hotkeyBindings: { [shortcut: string]: string[] } = {}
 
-  public hotkeyIsButton(hotkey: string): boolean {
+  public hotkeyIsButton (hotkey: string): boolean {
     return new RegExp(/^button\d+$/).test(hotkey)
   }
 

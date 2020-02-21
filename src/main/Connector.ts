@@ -76,6 +76,7 @@ export class Connector {
     { username: string, characterId: number }
   ) {
     // This relies on a mock unconsumed event to pass through the same workflow so we cast as any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.onPlayerUpdate({} as any, { username, characterId })
   }
 

@@ -134,7 +134,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
 
   onHotkeyBindingChange (shortcut: string, hotkey?: string) {
     const { hotkeyBindings } = this.state
-    hotkeyBindings[shortcut] = !!hotkey ? [hotkey] : []
+    hotkeyBindings[shortcut] = hotkey ? [hotkey] : []
     this.setState({ hotkeyBindings })
   }
 

@@ -26,7 +26,7 @@ class Request {
       baseURL: 'https://smmdb.net/api/',
       responseType: 'json'
     })
-    const githubApiKey = false // process.env.NODE_ENV === 'development' // TODO re-enable dev mode
+    const githubApiKey = process.env.NODE_ENV === 'development'
       ? JSON.parse(fs.readFileSync(path.join(__dirname, '../../../.credentials'), {
         encoding: 'utf8'
       })).github

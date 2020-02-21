@@ -142,192 +142,188 @@ export class HotkeyButton extends React.PureComponent<HotkeyButtonProps, HotkeyB
     )
   }
 
-    /**
+  /**
    * Converts a KeyboardEvent.key pre-defined value into an Electron accelerator value
-   * @param key - A KeyboardEvent.key value
-   * @returns An Electron accelerator value
+   *
+   * @param {string} [key] - A KeyboardEvent.key value
+   * @returns {string | undefined} An Electron accelerator value
    * @see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values
    * @see https://www.electronjs.org/docs/api/accelerator
    */
-  public static keyToAccelerator(key?: string): string | undefined {
+  public static keyToAccelerator (key?: string): string | undefined {
     if (key === undefined) {
-      return undefined;
+      return undefined
     }
 
     // If key is single alphanumeric then just use its value
     if (key.length === 1 && new RegExp(/^[a-zA-Z0-9]+$/).test(key)) {
-      return key;
+      return key
     }
 
     // If key is a function key, use its value
     if (new RegExp(/^F\d+$/).test(key)) {
-      return key;
+      return key
     }
 
     switch (key) {
-
       // Other Electron supported keys
-      case "Add":
-        return "Plus"
+      case ' ':
+        return 'Space'
 
-      case " ":
-        return "Space"
+      case 'CapsLock':
+        return 'Capslock'
 
-      case "CapsLock":
-        return "Capslock"
+      case 'NumLock':
+        return 'Numlock'
 
-      case "NumLock":
-        return "Numlock"
+      case 'ScrollLock':
+        return 'Scrolllock'
 
-      case "ScrollLock":
-        return "Scrolllock"
+      case 'ArrowDown':
+        return 'Down'
 
-      case "ArrowDown":
-        return "Down"
+      case 'ArrowLeft':
+        return 'Left'
 
-      case "ArrowLeft":
-        return "Left"
+      case 'ArrowRight':
+        return 'Right'
 
-      case "ArrowRight":
-        return "Right"
+      case 'ArrowUp':
+        return 'Up'
 
-      case "ArrowUp":
-        return "Up"
+      case 'AudioVolumeUp':
+        return 'VolumeUp'
 
-      case "AudioVolumeUp":
-        return "VolumeUp"
+      case 'AudioVolumeDown':
+        return 'VolumeDown'
 
-      case "AudioVolumeDown":
-        return "VolumeDown"
+      case 'AudioVolumeMute':
+        return 'VolumeMute'
 
-      case "AudioVolumeMute":
-        return "VolumeMute"
+      case 'MediaTrackNext':
+        return 'MediaNextTrack'
 
-      case "MediaTrackNext":
-        return "MediaNextTrack"
+      case 'MediaTrackPrevious':
+        return 'MediaPreviousTrack'
 
-      case "MediaTrackPrevious":
-        return "MediaPreviousTrack"
+      case 'Separator':
+      case 'Decimal':
+        return 'numdec'
 
-      case "Separator":
-      case "Decimal":
-        return "numdec"
+      case 'Add':
+        return 'numadd'
 
-      case "Add":
-        return "numadd"
+      case 'Subtract':
+        return 'numsub'
 
-      case "Subtract":
-        return "numsub"
+      case 'Multiply':
+        return 'nummult'
 
-      case "Multiply":
-        return "nummult"
+      case 'Divide':
+        return 'numdiv'
 
-      case "Divide":
-        return "numdiv"
-
-      case "Tab":
-      case "Backspace":
-      case "Delete":
-      case "Insert":
-      case "Enter":
-      case "Home":
-      case "End":
-      case "PageUp":
-      case "PageDown":
-      case "Escape":
-      case "PrintScreen":
-      case "MediaStop":
-      case "MediaPlayPause":
-      case "[":
-      case "{":
-      case "]":
-      case "}":
-      case "\\":
-      case "|":
-      case ";":
-      case ":":
+      case 'Tab':
+      case 'Backspace':
+      case 'Delete':
+      case 'Insert':
+      case 'Enter':
+      case 'Home':
+      case 'End':
+      case 'PageUp':
+      case 'PageDown':
+      case 'Escape':
+      case 'PrintScreen':
+      case 'MediaStop':
+      case 'MediaPlayPause':
+      case '[':
+      case '{':
+      case ']':
+      case '}':
+      case '\\':
+      case '|':
+      case ';':
+      case ':':
       case "'":
-      case "\"":
-      case ",":
-      case "<":
-      case ".":
-      case ">":
-      case "/":
-      case "?":
-      case "`":
-      case "!":
-      case "@":
-      case "#":
-      case "$":
-      case "%":
-      case "^":
-      case "&":
-      case "*":
-      case "(":
-      case ")":
-      case "-":
-      case "_":
-      case "=":
-      case "+":
+      case '"':
+      case ',':
+      case '<':
+      case '.':
+      case '>':
+      case '/':
+      case '?':
+      case '`':
+      case '!':
+      case '@':
+      case '#':
+      case '$':
+      case '%':
+      case '^':
+      case '&':
+      case '*':
+      case '(':
+      case ')':
+      case '-':
+      case '_':
+      case '=':
+      case '+':
         return key
 
       // 'Alt' modifiers
-      case "AltGraph":
-      case "Fn":
-      case "FnLock":
-      case "Alt":
+      case 'AltGraph':
+      case 'Fn':
+      case 'FnLock':
+      case 'Alt':
         // key = "Alt" // Modifiers are not available in this release
         return undefined
 
       // 'Control' modifiers
-      case "Hyper":
-      case "Meta":
-      case "Symbol":
-      case "SymbolLock":
-      case "Control":
+      case 'Hyper':
+      case 'Meta':
+      case 'Symbol':
+      case 'SymbolLock':
+      case 'Control':
         // key = "Control" // Modifiers are not available in this release
         return undefined
 
       // 'Shift' modifiers
-      case "Super":
-      case "Shift":
+      case 'Super':
+      case 'Shift':
         // key = "Shift" // Modifiers are not available in this release
         return undefined
 
       // Uncommon keys
-      case "Clear":
-      case "Cut":
-      case "Undo":
-        return "Delete"
+      case 'Clear':
+      case 'Cut':
+      case 'Undo':
+        return 'Delete'
 
-      case "Copy":
-      case "CrSel":
-      case "Paste":
-      case "Redo":
-        return "Insert"
+      case 'Copy':
+      case 'CrSel':
+      case 'Paste':
+      case 'Redo':
+        return 'Insert'
 
       // Convert all UI keys to the escape key
-      case "Accept":
-      case "Again":
-      case "Attn":
-      case "Cancel":
-      case "ContextMenu":
-      case "Execute":
-      case "Find":
-      case "Finish":
-      case "Help":
-      case "Pause":
-      case "Play":
-      case "Props":
-      case "Select":
-      case "ZoomIn":
-      case "ZoomOut":
-        return "Escape"
+      case 'Accept':
+      case 'Again':
+      case 'Attn':
+      case 'Cancel':
+      case 'ContextMenu':
+      case 'Execute':
+      case 'Find':
+      case 'Finish':
+      case 'Help':
+      case 'Pause':
+      case 'Play':
+      case 'Props':
+      case 'Select':
+      case 'ZoomIn':
+      case 'ZoomOut':
+        return 'Escape'
 
       // There are too many possible keys so I am not going to produce an exhaustive list
       default:
         return undefined
     }
   }
-
 }
