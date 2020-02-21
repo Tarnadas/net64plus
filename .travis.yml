@@ -1,0 +1,25 @@
+language: node_js
+node_js:
+  - 12.14.1
+
+env:
+  global:
+    - CXX=g++-4.8
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
+
+jobs:
+  include:
+    - stage: Lint
+      script: yarn lint
+      name: "Lint"
+    # - script: yarn test
+    #   name: "Unit Tests"
+    - stage: Build
+      script: yarn build
+      name: "Build"
