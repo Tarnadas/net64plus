@@ -46,6 +46,8 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
     this.handleDescriptionToggle = this.handleDescriptionToggle.bind(this)
     this.onConnect = this.onConnect.bind(this)
     this.onDisconnect = this.onDisconnect.bind(this)
+    this.doesGameModeAllowCoursePos = this.doesGameModeAllowCoursePos.bind(this)
+    this.doesGameModeAllowRadar = this.doesGameModeAllowRadar.bind(this)
     this.renderPlayers = this.renderPlayers.bind(this)
   }
 
@@ -333,8 +335,26 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
     }
   }
 
+  private doesGameModeAllowCoursePos (gameMode?: GameModeType): boolean {
+    switch (gameMode) {
+      case GameModeType.PROP_HUNT:
+        return false
+    }
+    return true
+  }
+
+  private doesGameModeAllowRadar (gameMode?: GameModeType): boolean {
+    switch (gameMode) {
+      case GameModeType.PROP_HUNT:
+      case GameModeType.TAG:
+      case GameModeType.THIRD_PERSON_SHOOTER:
+        return false
+    }
+    return true
+  }
+
   private renderPlayers (players: Array<Player | null>): JSX.Element[] {
-    const { isConnected } = this.props
+    const { isConnected, server } = this.props
     return players
       .filter(player => !!player)
       .map(
@@ -345,7 +365,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
             className='server-panel-player'
           >
             {
-              isConnected &&
+              isConnected && this.doesGameModeAllowCoursePos(server.gameMode) &&
               <>
                 <div className='server-panel-player-img'>
                   <img src={course.icon} />
@@ -459,7 +479,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
               </div>
             </div>
             {
-              isConnected &&
+              isConnected && this.doesGameModeAllowRadar(server.gameMode) &&
               <div className='server-panel-details-radar'>
                 <RadarPanel
                   self={{

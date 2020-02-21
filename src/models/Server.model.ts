@@ -1,4 +1,5 @@
 import { Player } from './Emulator.model'
+import { GameModeType } from '../../proto/ServerClientMessage'
 
 export interface Server {
   id?: string
@@ -9,7 +10,7 @@ export interface Server {
   description?: string
   players?: Array<Player | null>
   countryCode?: string
-  gameMode?: number
+  gameMode?: GameModeType
   version?: string
   passwordRequired?: boolean | null
   isDedicated?: boolean
