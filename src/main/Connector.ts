@@ -42,7 +42,9 @@ export class Connector {
   }
 
   private readonly onUpdateEmulators = () => {
-    Emulator.updateEmulators()
+    Emulator.updateEmulators().catch((error) => {
+      console.error(error)
+    })
   }
 
   private readonly onCreateEmulatorConnection = (
@@ -69,19 +71,20 @@ export class Connector {
     connection.sendPlayerUpdate({ username, characterId })
   }
 
-  public sendPlayerUpdate(
+  public sendPlayerUpdate (
     { username, characterId }:
     { username: string, characterId: number }
   ) {
-    this.onPlayerUpdate({} as any, { username, characterId }) // This relies on a mock unconsumed event to pass through the same workflow
+    // This relies on a mock unconsumed event to pass through the same workflow so we cast as any
+    this.onPlayerUpdate({} as any, { username, characterId })
   }
 
-  private onHotkeysChanged = (
+  private readonly onHotkeysChanged = (
     _: Electron.Event,
     { hotkeyBindings, globalHotkeysEnabled, username }:
     { hotkeyBindings: { [shortcut: string]: string | undefined }, globalHotkeysEnabled: boolean, username: string }
   ) => {
-    if (!!username) this.hotkeyManager.username = username
+    if (username) { this.hotkeyManager.username = username }
     this.hotkeyManager.setHotkeys(hotkeyBindings, globalHotkeysEnabled, this, this.window)
   }
 

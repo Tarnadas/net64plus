@@ -7,8 +7,8 @@
   "scripts": {
     "start": "webpack --env=dev && cd ./build && electron .",
     "start:debug": "webpack --env=dev",
-    "build": "webpack --env=prod && node ./build-app",
-    "build:dev": "webpack --env=dev && node ./build-app",
+    "build": "yarn clean && webpack --env=prod && node ./build-app",
+    "build:dev": "yarn clean && webpack --env=dev && node ./build-app",
     "build:proto": "pbjs -t static-module -w commonjs -p ./proto -o ./proto/ServerClientMessage.js ./proto/ServerClientMessage.proto && pbts -o ./proto/ServerClientMessage.d.ts ./proto/ServerClientMessage.js && pbjs -t static-module -w commonjs -p ./proto -o ./proto/ClientServerMessage.js ./proto/ClientServerMessage.proto && pbts -o ./proto/ClientServerMessage.d.ts ./proto/ClientServerMessage.js",
     "prebuild:win": "electron-rebuild -v 2.0.17 -f -w winprocess,process-list",
     "prebuild:linux": "electron-rebuild -v 2.0.17 -f -w process-list",

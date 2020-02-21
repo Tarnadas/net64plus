@@ -1,30 +1,28 @@
 import * as React from 'react'
 
 interface ToggleButtonProps {
-  on?: boolean,
-  onIconSrc?: string,
-  offIconSrc?: string,
-  onText?: string,
-  offText?: string,
-  onClick?: (toggled: boolean) => void,
+  on?: boolean
+  onText?: string
+  offText?: string
+  onClick?: (toggled: boolean) => void
 }
 
 interface ToggleButtonState {
-  on: boolean,
+  on: boolean
 }
 
 export class ToggleButton extends React.PureComponent<ToggleButtonProps, ToggleButtonState> {
-  constructor(props: ToggleButtonProps) {
+  constructor (props: ToggleButtonProps) {
     super(props)
     this.state = {
-      on: !!props.on,
+      on: !!props.on
     }
     this.onClick = this.onClick.bind(this)
   }
 
-  componentWillReceiveProps (nextProps: ToggleButtonProps) {
-    const { on } = nextProps
-    if (on !== undefined && on !== this.state.on) {
+  componentDidUpdate (prevProps: ToggleButtonProps) {
+    const { on } = this.props
+    if (on !== undefined && prevProps.on !== this.props.on) {
       this.setState({ on })
     }
   }
@@ -32,15 +30,15 @@ export class ToggleButton extends React.PureComponent<ToggleButtonProps, ToggleB
   onClick () {
     const on = !this.state.on
     this.setState({ on })
-    if (!!this.props.onClick) {
+    if (this.props.onClick) {
       this.props.onClick(on)
     }
   }
 
   render () {
-    const { onIconSrc, offIconSrc, onText, offText } = this.props
+    const { onText, offText } = this.props
     const { on } = this.state
-    let styles: any = {
+    const styles = {
       button: {
         flex: '0 0 auto',
         alignItems: 'center',
@@ -60,24 +58,18 @@ export class ToggleButton extends React.PureComponent<ToggleButtonProps, ToggleB
         borderRadius: '5px',
         boxShadow: '1px 4px 13px 0 rgba(0,0,0,0.5)',
         display: 'inline-block',
-        fontSize: '13px',
-      },
-    }
+        fontSize: '13px'
+      }
+    } as const
     return (
       <div
         style={styles.button}
         onClick={this.onClick}
       >
         {this.props.children}
-        {on ?
-          <div>{onText || ''}</div>
-          :
-          <div>{offText || ''}</div>
-        }
-        {on ?
-          <div>{!!onIconSrc ? <img style={styles.icon} src={onIconSrc} /> : ''}</div>
-          :
-          <div>{!!offIconSrc ? <img style={styles.icon} src={offIconSrc} /> : ''}</div>
+        {on
+          ? <div>{onText ?? ''}</div>
+          : <div>{offText ?? ''}</div>
         }
       </div>
     )

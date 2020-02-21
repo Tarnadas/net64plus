@@ -168,7 +168,7 @@ is incompatible with your client API version (${process.env.MAJOR}.${process.env
     console.info(...messages)
   }
 
-  private onSetCharacter = (_: Electron.Event, characterId: number) => {
+  private readonly onSetCharacter = (_: Electron.Event, characterId: number) => {
     store.dispatch(setCharacter(characterId))
   }
 
@@ -243,5 +243,4 @@ is incompatible with your client API version (${process.env.MAJOR}.${process.env
   ): void {
     ipcRenderer.send(RendererMessage.GAMEPAD_BUTTON_STATE_CHANGED, { buttonState })
   }
-
 }

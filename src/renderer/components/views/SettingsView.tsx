@@ -7,7 +7,15 @@ import { SMMButton } from '../buttons/SMMButton'
 import { HotkeyButton } from '../buttons/HotkeyButton'
 import { ToggleButton } from '../buttons/ToggleButton'
 import { WarningPanel } from '../panels/WarningPanel'
-import { setUsername, setCharacter, setEmuChat, setGlobalHotkeysEnabled, setHotkeyBindings, setCharacterCyclingOrder, setGamepadId } from '../../actions/save'
+import {
+  setUsername,
+  setCharacter,
+  setEmuChat,
+  setGlobalHotkeysEnabled,
+  setHotkeyBindings,
+  setCharacterCyclingOrder,
+  setGamepadId
+} from '../../actions/save'
 import { State, ElectronSaveData } from '../../../models/State.model'
 import { showSnackbar } from '../../actions/snackbar'
 
@@ -43,44 +51,10 @@ const CHARACTER_ICONS: { [characterId: number]: string } = {
   8: 'img/sonic.png',
   9: 'img/knuckles.png',
   10: 'img/goomba.png',
-  11: 'img/kirby.png',
+  11: 'img/kirby.png'
 }
 
 class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
-
-  private DragHandle = SortableHandle(() => <span>::::::&nbsp;</span>);
-
-  private SortableItem = SortableElement(({iconSrc, on, cycleIndex}: {iconSrc: string, on: boolean, cycleIndex: number}) => {
-    let styles: any = {
-      icon: {
-        padding: '4px',
-        width: '40px',
-        height: '40px',
-        float: 'left',
-        borderRadius: '4px',
-      },
-    }
-    return (
-      <ToggleButton
-        on={on}
-        onClick={(toggled) => this.onCharacterCyclingToggled({cycleIndex, toggled})}
-      >
-        <this.DragHandle />
-        <img style={styles.icon} src={iconSrc} />
-      </ToggleButton>
-    )}
-  );
-
-  private SortableList = SortableContainer(({characterCyclingOrder}: {characterCyclingOrder: Array<{characterId: number, on: boolean}>}) => {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        {characterCyclingOrder.map(({characterId, on}, index) => (
-          <this.SortableItem key={index} index={index} cycleIndex={index} iconSrc={CHARACTER_ICONS[characterId]} on={on} />
-        ))}
-      </div>
-    );
-  });
-
   constructor (public props: SettingsViewProps) {
     super(props)
     this.state = {
@@ -103,25 +77,31 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     this.onCharacterCyclingOrderChange = this.onCharacterCyclingOrderChange.bind(this)
     this.onSave = this.onSave.bind(this)
   }
+
   componentDidMount () {
     // Attach gamepad connection/disconnection listeners
     window.addEventListener('gamepadconnected', this.onGamepadsChanged)
     window.addEventListener('gamepaddisconnected', this.onGamepadsChanged)
   }
+
   componentWillUnmount () {
     // Detach gamepad connection/disconnection listeners
     window.removeEventListener('gamepadconnected', this.onGamepadsChanged)
     window.removeEventListener('gamepaddisconnected', this.onGamepadsChanged)
   }
+
   onGamepadsChanged () {
     this.forceUpdate()
   }
-  componentWillReceiveProps (nextProps: SettingsViewProps) {
-    if (nextProps.saveData.character !== this.state.characterId) { // Update dropdown option menu
-      this.setState({ characterId: nextProps.saveData.character })
+
+  componentDidUpdate (prevProps: SettingsViewProps) {
+    const character = this.props.saveData.character
+    if (prevProps.saveData.character !== character) { // Update dropdown option menu
+      this.setState({ characterId: character })
     }
   }
-  onUsernameChange (e: React.ChangeEvent<any>) {
+
+  onUsernameChange (e: React.ChangeEvent<{ value: string }>) {
     let value = e.target.value.replace(/\W/g, '')
     if (value.length > MAX_LENGTH_USERNAME) {
       value = value.substr(0, MAX_LENGTH_USERNAME)
@@ -131,41 +111,46 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     })
   }
 
-  onCharacterChange (e: React.ChangeEvent<any>) {
-    const characterId = parseInt(e.target.value)
+  onCharacterChange (e: React.ChangeEvent<{ value: string }>) {
+    const characterId = parseInt(e.target.value, 10)
     this.setState({
       characterId
     })
   }
 
-  onEmuChatChange (e: React.ChangeEvent<any>) {
+  onEmuChatChange (e: React.ChangeEvent<{ checked: boolean }>) {
     const emuChat = e.target.checked
     this.setState({
       emuChat
     })
   }
-  onGlobalHotkeysChange (e: React.ChangeEvent<any>) {
+
+  onGlobalHotkeysChange (e: React.ChangeEvent<{ checked: boolean }>) {
     const globalHotkeysEnabled = e.target.checked
     this.setState({
       globalHotkeysEnabled
     })
   }
+
   onHotkeyBindingChange (shortcut: string, hotkey?: string) {
     const { hotkeyBindings } = this.state
     hotkeyBindings[shortcut] = hotkey
     this.setState({ hotkeyBindings })
   }
-  onCharacterCyclingToggled ({cycleIndex, toggled} : {cycleIndex: number, toggled: boolean}) {
+
+  onCharacterCyclingToggled ({ cycleIndex, toggled }: {cycleIndex: number, toggled: boolean}) {
     const { characterCyclingOrder } = this.state
     characterCyclingOrder[cycleIndex].on = toggled
     this.setState({ characterCyclingOrder })
   }
-  onCharacterCyclingOrderChange ({newIndex, oldIndex}: {newIndex: number, oldIndex: number}) {
+
+  onCharacterCyclingOrderChange ({ newIndex, oldIndex }: {newIndex: number, oldIndex: number}) {
     const { characterCyclingOrder } = this.state
     const oldItem = characterCyclingOrder.splice(oldIndex, 1)[0] // remove item from old index
     characterCyclingOrder.splice(newIndex, 0, oldItem) // reinsert item at new index
     this.setState({ characterCyclingOrder: characterCyclingOrder.slice() })
   }
+
   onSave () {
     const username = this.state.username.replace(/\W/g, '')
     const { characterCyclingOrder, hotkeyBindings, globalHotkeysEnabled, gamepadId } = this.state
@@ -188,6 +173,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       dispatch(showSnackbar('Saved'))
     }
   }
+
   renderCharacterHotkeyButtons () {
     const buttons = []
     for (let i = 0; i < 12; i++) {
@@ -200,8 +186,9 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
         onRightClick={this.onHotkeyBindingChange}
       />)
     }
-    return buttons;
+    return buttons
   }
+
   render () {
     const { gamepadId, warning } = this.state
     const connectionError = this.props.connectionError
@@ -286,15 +273,19 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
         <div style={styles.gap}></div>
         <div style={styles.setting}>
           <div style={styles.label}>Gamepad:</div>
-          <select style={styles.input} value={!!gamepadId ? gamepadId : undefined} onChange={(e) => {
-            gamepadManager.selectedGamepad = gamepadManager.getConnectedGamepads().find((gamepad) => (!!gamepad ? gamepad.id : undefined) === e.target.value) || undefined
+          <select style={styles.input} value={gamepadId ?? undefined} onChange={(e) => {
+            gamepadManager.selectedGamepad = gamepadManager.getConnectedGamepads().find((gamepad) =>
+              (gamepad ? gamepad.id : undefined) === e.target.value
+            ) ?? undefined
             this.setState({ gamepadId: e.target.value })
           }}>
             {
               gamepads && [
                 <option key={-1} value={undefined}>None</option>
-              ].concat(gamepads.filter((gamepad) => !!gamepad).map((gamepad, index) => (
-                <option key={index} value={gamepad!.id}>{gamepad!.id}</option>
+              ].concat(gamepads.filter(function nonNull<Gamepad> (gamepad: Gamepad | null): gamepad is Gamepad {
+                return !!gamepad
+              }).map((gamepad, index) => (
+                <option key={index} value={gamepad.id}>{gamepad.id}</option>
               )))
             }
           </select>
@@ -332,7 +323,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
             <div>Previous Character</div>
             <HotkeyButton
               shortcut={'previousCharacter'}
-              hotkey={this.state.hotkeyBindings[`previousCharacter`]}
+              hotkey={this.state.hotkeyBindings.previousCharacter}
               onClick={this.onHotkeyBindingChange}
               onRightClick={this.onHotkeyBindingChange}
             />
@@ -341,7 +332,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
             <div>Next Character</div>
             <HotkeyButton
               shortcut={'nextCharacter'}
-              hotkey={this.state.hotkeyBindings[`nextCharacter`]}
+              hotkey={this.state.hotkeyBindings.nextCharacter}
               onClick={this.onHotkeyBindingChange}
               onRightClick={this.onHotkeyBindingChange}
             />
@@ -352,7 +343,11 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
         <div>Character Cycling Order (click to toggle, drag to reorder)</div>
 
         <div style={styles.gap}></div>
-        <this.SortableList useDragHandle characterCyclingOrder={this.state.characterCyclingOrder} onSortEnd={this.onCharacterCyclingOrderChange} />
+        <this.SortableList
+          useDragHandle
+          characterCyclingOrder={this.state.characterCyclingOrder}
+          onSortEnd={this.onCharacterCyclingOrderChange}
+        />
 
         <div style={styles.gap}></div>
         <SMMButton
@@ -373,7 +368,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
           text='Enable all'
           onClick={() => {
             const { characterCyclingOrder } = this.state
-            characterCyclingOrder.forEach((_, index) => characterCyclingOrder[index].on = true)
+            characterCyclingOrder.forEach((_, index) => { characterCyclingOrder[index].on = true })
             this.setState({ characterCyclingOrder: characterCyclingOrder.slice() })
           }}
           styles={{
@@ -389,7 +384,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
           text='Disable all'
           onClick={() => {
             const { characterCyclingOrder } = this.state
-            characterCyclingOrder.forEach((_, index) => characterCyclingOrder[index].on = false)
+            characterCyclingOrder.forEach((_, index) => { characterCyclingOrder[index].on = false })
             this.setState({ characterCyclingOrder: characterCyclingOrder.slice() })
           }}
           styles={{
@@ -421,6 +416,49 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       </div>
     )
   }
+
+  private readonly DragHandle = SortableHandle(() => <span>::::::&nbsp;</span>);
+
+  private readonly SortableItem = SortableElement((
+    { iconSrc, on, cycleIndex }: {iconSrc: string, on: boolean, cycleIndex: number}
+  ) => {
+    const styles = {
+      icon: {
+        padding: '4px',
+        width: '40px',
+        height: '40px',
+        float: 'left',
+        borderRadius: '4px'
+      }
+    } as const
+    return (
+      <ToggleButton
+        on={on}
+        onClick={(toggled) => this.onCharacterCyclingToggled({ cycleIndex, toggled })}
+      >
+        <this.DragHandle />
+        <img style={styles.icon} src={iconSrc} />
+      </ToggleButton>
+    )
+  }
+  );
+
+  private readonly SortableList = SortableContainer((
+    { characterCyclingOrder }: {characterCyclingOrder: Array<{characterId: number, on: boolean}>}
+  ) => {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        {characterCyclingOrder.map(({ characterId, on }, index) => (
+          <this.SortableItem
+            key={index} index={index}
+            cycleIndex={index}
+            iconSrc={CHARACTER_ICONS[characterId]}
+            on={on}
+          />
+        ))}
+      </div>
+    )
+  });
 }
 export const SettingsView = connect((state: State) => ({
   saveData: state.save.appSaveData,

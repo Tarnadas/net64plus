@@ -10,20 +10,21 @@ export type ButtonState = Array<{
 }>
 
 export class GamepadManager {
-  private window: Window
-  private connector: Connector
+  private readonly window: Window
+  private readonly connector: Connector
   private _buttonState: ButtonState | undefined = undefined
-  private _buttonStateListeners: ((buttonState: ButtonState) => void)[] = []
+  private readonly _buttonStateListeners: Array<(buttonState: ButtonState) => void> = []
 
   private _selectedGamepad: Gamepad | undefined = undefined
-  public set selectedGamepad(value: Gamepad | undefined) {
+  public set selectedGamepad (value: Gamepad | undefined) {
     this._selectedGamepad = value
   }
-  public get selectedGamepad(): Gamepad | undefined {
+
+  public get selectedGamepad (): Gamepad | undefined {
     return this._selectedGamepad
   }
 
-  constructor(window: Window, connector: Connector, defaultGamepadId?: string) {
+  constructor (window: Window, connector: Connector, defaultGamepadId?: string) {
     this.window = window
     this.connector = connector
     this.window.addEventListener('gamepadconnected', (event) => {
@@ -41,19 +42,24 @@ export class GamepadManager {
     requestAnimationFrame(this.updateState)
   }
 
-  updateState() {
-    if (!!this.selectedGamepad) {
-      const gamepad = this.getConnectedGamepads().find((gamepad) => (!!gamepad ? gamepad.id : undefined) === this.selectedGamepad!.id)
-      if (!!gamepad) {
+  updateState () {
+    const selectedGamepad = this.selectedGamepad
+    if (selectedGamepad) {
+      const gamepad = this.getConnectedGamepads().find((gamepad) =>
+        (gamepad ? gamepad.id : undefined) === selectedGamepad.id
+      )
+      if (gamepad) {
         // If this is the initializer, skip change detection
         if (this._buttonState === undefined) {
-          this._buttonState = gamepad.buttons.map((gamepadButton, index) => ({ key: index, pressed: gamepadButton.pressed, value: gamepadButton.value }))
+          this._buttonState = gamepad.buttons.map((gamepadButton, index) =>
+            ({ key: index, pressed: gamepadButton.pressed, value: gamepadButton.value })
+          )
           requestAnimationFrame(this.updateState)
-          return;
+          return
         }
 
         // Detect changes in button state since last poll
-        let changes: ButtonState = []
+        const changes: ButtonState = []
         for (let index = 0; index < gamepad.buttons.length; index++) {
           const button = gamepad.buttons[index]
           const oldButton = this._buttonState[index]
@@ -62,7 +68,9 @@ export class GamepadManager {
           }
         }
         if (changes.length > 0) {
-          this._buttonState = gamepad.buttons.map((gamepadButton, index) => ({ key: index, pressed: gamepadButton.pressed, value: gamepadButton.value }))
+          this._buttonState = gamepad.buttons.map((gamepadButton, index) =>
+            ({ key: index, pressed: gamepadButton.pressed, value: gamepadButton.value })
+          )
           // Emit an event to renderer and main with the changes
           this.emitButtonState(changes)
         }
@@ -71,24 +79,23 @@ export class GamepadManager {
     requestAnimationFrame(this.updateState)
   }
 
-  private emitButtonState(buttonState: ButtonState) {
+  private emitButtonState (buttonState: ButtonState) {
     this.connector.emitButtonState({ buttonState })
     this._buttonStateListeners.forEach((callback) => callback(buttonState))
   }
 
-  public addButtonStateListener(callback: ((buttonState: ButtonState) => void)) {
+  public addButtonStateListener (callback: ((buttonState: ButtonState) => void)) {
     this._buttonStateListeners.push(callback)
   }
 
-  public removeButtonStateListener(callback: ((buttonState: ButtonState) => void)) {
+  public removeButtonStateListener (callback: ((buttonState: ButtonState) => void)) {
     const index = this._buttonStateListeners.findIndex((value) => value === callback)
     if (index !== -1) {
       this._buttonStateListeners.splice(index, 1)
     }
   }
 
-  public getConnectedGamepads() {
+  public getConnectedGamepads () {
     return Array.from(this.window.navigator.getGamepads())
   }
-
 }

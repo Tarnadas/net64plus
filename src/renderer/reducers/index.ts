@@ -48,7 +48,7 @@ const APP_SAVE_DATA: ElectronSaveData = {
     { characterId: 8, on: true }, // Sonic
     { characterId: 9, on: true }, // Knuckles
     { characterId: 10, on: true }, // Goomba
-    { characterId: 11, on: true }, // Kirby
+    { characterId: 11, on: true } // Kirby
   ],
   gamepadId: undefined,
   lastIp: 'smmdb.net',

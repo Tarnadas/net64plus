@@ -1,31 +1,39 @@
 import { globalShortcut, BrowserWindow } from 'electron'
 import { Connector } from './Connector'
 import { ButtonState } from '../renderer/GamepadManager'
-const electronLocalshortcut = require('electron-localshortcut') // @types typings require a conflicting version of electron
+
+// @types typings require a conflicting version of electron
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const electronLocalshortcut = require('electron-localshortcut')
 
 export class HotkeyManager {
   private _username = ''
-  public set username(value: string) { this._username = value }
-  public get username(): string { return this._username }
+  public set username (value: string) { this._username = value }
+  public get username (): string { return this._username }
 
   private _hotkeysEnabled = true
-  public set hotkeysEnabled(value: boolean) { this._hotkeysEnabled = value }
-  public get hotkeysEnabled(): boolean { return this._hotkeysEnabled }
+  public set hotkeysEnabled (value: boolean) { this._hotkeysEnabled = value }
+  public get hotkeysEnabled (): boolean { return this._hotkeysEnabled }
 
   private _characterCyclingOrder: Array<{characterId: number, on: boolean}> = []
-  private _characterCyclingIndex: number = 0;
+  private _characterCyclingIndex = 0;
 
   private _hotkeyBindings: { [shortcut: string]: string | undefined } = {}
 
   public validKeyboardHotkeys = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 
-  public setHotkeys (hotkeyBindings: { [shortcut: string]: string | undefined }, globalHotkeysEnabled: boolean, connector: Connector, window: BrowserWindow) {
+  public setHotkeys (
+    hotkeyBindings: { [shortcut: string]: string | undefined },
+    globalHotkeysEnabled: boolean,
+    connector: Connector,
+    window: BrowserWindow
+  ) {
     this._hotkeyBindings = hotkeyBindings
     electronLocalshortcut.unregisterAll(window)
     globalShortcut.unregisterAll()
     Object.entries(hotkeyBindings).forEach(([characterIdString, hotkey]) => {
       const username = this.username
-      if (!!hotkey) {
+      if (hotkey) {
         if (this.isNumeric(characterIdString)) {
           const callback = () => {
             const characterId = parseInt(characterIdString, 10)
@@ -76,7 +84,7 @@ export class HotkeyManager {
             } else {
               electronLocalshortcut.register(window, hotkey.toLocaleUpperCase(), callback)
             }
-          }        
+          }
         }
       }
     })
@@ -93,8 +101,9 @@ export class HotkeyManager {
       Object.entries(this._hotkeyBindings)
         .filter(([_, hotkey]) => !!hotkey && hotkey.includes('button'))
         .forEach(([characterIdString, hotkey]) => {
-          if (!!hotkey) {
-            if (buttonState.some((button) => hotkey === `button${button.key}` && button.pressed)) { // Check if button was pressed
+          if (hotkey) {
+            // Check if button was pressed
+            if (buttonState.some((button) => hotkey === `button${button.key}` && button.pressed)) {
               if (this.isNumeric(characterIdString)) { // Character hotkey
                 const characterId = parseInt(characterIdString, 10)
                 this.changeCharacter({ username, characterId, connector })
@@ -115,11 +124,14 @@ export class HotkeyManager {
               }
             }
           }
-      });
+        })
     }
   }
 
-  private getNextCharacterId (characterCyclingOrder: Array<{characterId: number, on: boolean}>, characterCyclingIndex: number): number | undefined {
+  private getNextCharacterId (
+    characterCyclingOrder: Array<{characterId: number, on: boolean}>,
+    characterCyclingIndex: number
+  ): number | undefined {
     let nextIndex = characterCyclingOrder.findIndex((value, index) => value.on && index > characterCyclingIndex)
     if (nextIndex === -1) {
       nextIndex = characterCyclingOrder.findIndex((value) => value.on)
@@ -127,7 +139,10 @@ export class HotkeyManager {
     return nextIndex === -1 ? undefined : nextIndex
   }
 
-  private getPreviousCharacterId (characterCyclingOrder: Array<{characterId: number, on: boolean}>, characterCyclingIndex: number): number | undefined {
+  private getPreviousCharacterId (
+    characterCyclingOrder: Array<{characterId: number, on: boolean}>,
+    characterCyclingIndex: number
+  ): number | undefined {
     let prevIndex
     for (let i = characterCyclingIndex - 1; i >= 0; i--) {
       const value = characterCyclingOrder[i]
@@ -149,21 +164,24 @@ export class HotkeyManager {
   }
 
   private isNumeric (value: string): boolean {
+    // Self comparison is needed to check complex string values
+    // eslint-disable-next-line no-self-compare
     return +value === +value
   }
 
   /**
    * @function changeCharacter - Boilerplate logic for changing a character
-   * @param {Object} parameters
+   * @param {Object} parameters - Parameters
    * @property {string} parameters.username - Player username
    * @property {number} parameters.characterId - Id of the character to change to
    * @property {Connector} parameters.connector - Connector to emit character change data to
    */
-  private changeCharacter ({ username, characterId, connector }: { username: string, characterId: number, connector: Connector }) {
+  private changeCharacter ({ username, characterId, connector }:
+  { username: string, characterId: number, connector: Connector }
+  ) {
     if (this._hotkeysEnabled) {
       connector.setCharacter(characterId)
       connector.sendPlayerUpdate({ username, characterId })
     }
   }
-
 }

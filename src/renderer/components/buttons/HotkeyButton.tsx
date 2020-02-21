@@ -1,32 +1,32 @@
 import './HotkeyButton.scss'
 
-import * as React from 'react'
-const ReactDOM = require('react-dom') // @types/react-dom is out of date
+import * as React from 'react' // @types/react-dom is out of date
 
 import { GamepadManager, ButtonState } from '../../GamepadManager'
 import { gamepadManager } from '../..'
+import * as ReactDOM from 'react-dom'
 
 interface HotkeyButtonProps {
-  shortcut: string,
-  hotkey?: string,
-  className?: string,
-  iconSrc?: string,
-  gamepadManager?: GamepadManager,
-  onClick?: (shortcut: string, hotkey: string) => void,
-  onRightClick?: (shortcut: string) => void,
+  shortcut: string
+  hotkey?: string
+  className?: string
+  iconSrc?: string
+  gamepadManager?: GamepadManager
+  onClick?: (shortcut: string, hotkey: string) => void
+  onRightClick?: (shortcut: string) => void
 }
 
 interface HotkeyButtonState {
-  hotkey?: string,
-  listening: boolean,
+  hotkey?: string
+  listening: boolean
 }
 
 export class HotkeyButton extends React.PureComponent<HotkeyButtonProps, HotkeyButtonState> {
-  constructor(props: HotkeyButtonProps) {
+  constructor (props: HotkeyButtonProps) {
     super(props)
     this.state = {
       hotkey: props.hotkey,
-      listening: false,
+      listening: false
     }
     this.onClick = this.onClick.bind(this)
     this.onRightClick = this.onRightClick.bind(this)
@@ -39,12 +39,12 @@ export class HotkeyButton extends React.PureComponent<HotkeyButtonProps, HotkeyB
   private node: Node | undefined
 
   componentDidMount () {
-    this.node = ReactDOM.findDOMNode(this);
+    this.node = ReactDOM.findDOMNode(this) as Node
   }
 
-  componentWillReceiveProps (nextProps: HotkeyButtonProps) {
-    const { hotkey } = nextProps
-    if (hotkey !== this.state.hotkey) {
+  componentDidUpdate (prevProps: HotkeyButtonProps) {
+    const { hotkey } = this.props
+    if (hotkey !== prevProps.hotkey) {
       this.setState({ hotkey })
     }
   }
@@ -52,14 +52,14 @@ export class HotkeyButton extends React.PureComponent<HotkeyButtonProps, HotkeyB
   onClick () {
     document.addEventListener('keydown', this.keyDownListener)
     document.addEventListener('click', this.clickOutsideListener)
-    if (!!gamepadManager) { gamepadManager.addButtonStateListener(this.buttonDownListener) }
+    if (gamepadManager) { gamepadManager.addButtonStateListener(this.buttonDownListener) }
     this.setState({ listening: true })
   }
 
   onRightClick () {
     // Remove hotkey
-    this.setState({ hotkey: undefined })  
-    if (!!this.props.onRightClick) {
+    this.setState({ hotkey: undefined })
+    if (this.props.onRightClick) {
       this.props.onRightClick(this.props.shortcut)
     }
     this.removeListeners()
@@ -67,18 +67,18 @@ export class HotkeyButton extends React.PureComponent<HotkeyButtonProps, HotkeyB
 
   keyDownListener (event: KeyboardEvent) {
     this.setState({ hotkey: event.key })
-    if (!!this.props.onClick) {
+    if (this.props.onClick) {
       this.props.onClick(this.props.shortcut, event.key)
     }
     this.removeListeners()
-  }   
+  }
 
   buttonDownListener (buttonState: ButtonState) {
     const button = buttonState.find((button) => button.pressed)
     if (button !== undefined) {
       const hotkey = `button${button.key}`
       this.setState({ hotkey })
-      if (!!this.props.onClick) {
+      if (this.props.onClick) {
         this.props.onClick(this.props.shortcut, hotkey)
       }
       this.removeListeners()
@@ -95,13 +95,13 @@ export class HotkeyButton extends React.PureComponent<HotkeyButtonProps, HotkeyB
     this.setState({ listening: false })
     document.removeEventListener('keydown', this.keyDownListener)
     document.removeEventListener('click', this.clickOutsideListener)
-    if (!!gamepadManager) { gamepadManager.removeButtonStateListener(this.buttonDownListener) }
+    if (gamepadManager) { gamepadManager.removeButtonStateListener(this.buttonDownListener) }
   }
 
   render () {
     const { iconSrc, className } = this.props
     const { hotkey, listening } = this.state
-    let styles: any = {
+    const styles = {
       button: {
         flex: '0 0 auto',
         lineHeight: '40px',
@@ -119,25 +119,25 @@ export class HotkeyButton extends React.PureComponent<HotkeyButtonProps, HotkeyB
         borderRadius: '5px',
         boxShadow: '1px 4px 13px 0 rgba(0,0,0,0.5)',
         display: 'inline-block',
-        fontSize: '13px',
+        fontSize: '13px'
       },
       icon: {
         padding: '4px',
         width: '40px',
         height: '40px',
         float: 'left',
-        borderRadius: '4px',
-      },
-    }
+        borderRadius: '4px'
+      }
+    } as const
     return (
       <div
-        className={`hotkey-button${listening ? ' hotkey-button-listening': ''} ${className || ''}`.trim()}
+        className={`hotkey-button${listening ? ' hotkey-button-listening' : ''} ${className ?? ''}`.trim()}
         style={styles.button}
         onClick={this.onClick}
         onContextMenu={this.onRightClick}
       >
-        {!!iconSrc ? <img style={styles.icon} src={iconSrc} /> : ''}
-        <div>{listening ? '...' : hotkey || 'None'}</div>
+        {iconSrc ? <img style={styles.icon} src={iconSrc} /> : ''}
+        <div>{listening ? '...' : hotkey ?? 'None'}</div>
       </div>
     )
   }
