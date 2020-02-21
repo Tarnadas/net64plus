@@ -50,7 +50,6 @@ process.on('uncaughtException', (err: Error) => {
 
 async function loadSaveData (): Promise<SaveStateDraft<ElectronSaveData>> {
   const appSavePath = remote.app.getPath('userData')
-  console.log(appSavePath)
   if (!fs.existsSync(appSavePath)) {
     fs.mkdirSync(appSavePath)
   }

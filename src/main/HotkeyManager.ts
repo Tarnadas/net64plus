@@ -20,7 +20,9 @@ export class HotkeyManager {
 
   private _hotkeyBindings: { [shortcut: string]: string[] } = {}
 
-  public validKeyboardHotkeys = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+  public hotkeyIsButton(hotkey: string): boolean {
+    return new RegExp(/^button\d+$/).test(hotkey)
+  }
 
   public setHotkeys (
     hotkeyBindings: { [shortcut: string]: string[] },
@@ -40,7 +42,7 @@ export class HotkeyManager {
             this.changeCharacter({ username, characterId, connector })
           }
 
-          if (this.validKeyboardHotkeys.includes(hotkey.toLocaleUpperCase())) {
+          if (!this.hotkeyIsButton(hotkey)) {
             if (globalHotkeysEnabled) {
               globalShortcut.register(hotkey.toLocaleUpperCase(), callback)
             } else {
@@ -59,7 +61,7 @@ export class HotkeyManager {
             }
           }
 
-          if (this.validKeyboardHotkeys.includes(hotkey.toLocaleUpperCase())) {
+          if (!this.hotkeyIsButton(hotkey)) {
             if (globalHotkeysEnabled) {
               globalShortcut.register(hotkey.toLocaleUpperCase(), callback)
             } else {
@@ -78,7 +80,7 @@ export class HotkeyManager {
             }
           }
 
-          if (this.validKeyboardHotkeys.includes(hotkey.toLocaleUpperCase())) {
+          if (!this.hotkeyIsButton(hotkey)) {
             if (globalHotkeysEnabled) {
               globalShortcut.register(hotkey.toLocaleUpperCase(), callback)
             } else {

@@ -12,7 +12,7 @@ interface HotkeyButtonProps {
   className?: string
   iconSrc?: string
   gamepadManager?: GamepadManager
-  onClick?: (shortcut: string, hotkey: string) => void
+  onClick?: (shortcut: string, hotkey?: string) => void
   onRightClick?: (shortcut: string) => void
 }
 
@@ -66,9 +66,9 @@ export class HotkeyButton extends React.PureComponent<HotkeyButtonProps, HotkeyB
   }
 
   keyDownListener (event: KeyboardEvent) {
-    this.setState({ hotkey: event.key })
+    this.setState({ hotkey: HotkeyButton.keyToAccelerator(event.key) })
     if (this.props.onClick) {
-      this.props.onClick(this.props.shortcut, event.key)
+      this.props.onClick(this.props.shortcut, HotkeyButton.keyToAccelerator(event.key))
     }
     this.removeListeners()
   }
@@ -141,4 +141,193 @@ export class HotkeyButton extends React.PureComponent<HotkeyButtonProps, HotkeyB
       </div>
     )
   }
+
+    /**
+   * Converts a KeyboardEvent.key pre-defined value into an Electron accelerator value
+   * @param key - A KeyboardEvent.key value
+   * @returns An Electron accelerator value
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values
+   * @see https://www.electronjs.org/docs/api/accelerator
+   */
+  public static keyToAccelerator(key?: string): string | undefined {
+    if (key === undefined) {
+      return undefined;
+    }
+
+    // If key is single alphanumeric then just use its value
+    if (key.length === 1 && new RegExp(/^[a-zA-Z0-9]+$/).test(key)) {
+      return key;
+    }
+
+    // If key is a function key, use its value
+    if (new RegExp(/^F\d+$/).test(key)) {
+      return key;
+    }
+
+    switch (key) {
+
+      // Other Electron supported keys
+      case "Add":
+        return "Plus"
+
+      case " ":
+        return "Space"
+
+      case "CapsLock":
+        return "Capslock"
+
+      case "NumLock":
+        return "Numlock"
+
+      case "ScrollLock":
+        return "Scrolllock"
+
+      case "ArrowDown":
+        return "Down"
+
+      case "ArrowLeft":
+        return "Left"
+
+      case "ArrowRight":
+        return "Right"
+
+      case "ArrowUp":
+        return "Up"
+
+      case "AudioVolumeUp":
+        return "VolumeUp"
+
+      case "AudioVolumeDown":
+        return "VolumeDown"
+
+      case "AudioVolumeMute":
+        return "VolumeMute"
+
+      case "MediaTrackNext":
+        return "MediaNextTrack"
+
+      case "MediaTrackPrevious":
+        return "MediaPreviousTrack"
+
+      case "Separator":
+      case "Decimal":
+        return "numdec"
+
+      case "Add":
+        return "numadd"
+
+      case "Subtract":
+        return "numsub"
+
+      case "Multiply":
+        return "nummult"
+
+      case "Divide":
+        return "numdiv"
+
+      case "Tab":
+      case "Backspace":
+      case "Delete":
+      case "Insert":
+      case "Enter":
+      case "Home":
+      case "End":
+      case "PageUp":
+      case "PageDown":
+      case "Escape":
+      case "PrintScreen":
+      case "MediaStop":
+      case "MediaPlayPause":
+      case "[":
+      case "{":
+      case "]":
+      case "}":
+      case "\\":
+      case "|":
+      case ";":
+      case ":":
+      case "'":
+      case "\"":
+      case ",":
+      case "<":
+      case ".":
+      case ">":
+      case "/":
+      case "?":
+      case "`":
+      case "!":
+      case "@":
+      case "#":
+      case "$":
+      case "%":
+      case "^":
+      case "&":
+      case "*":
+      case "(":
+      case ")":
+      case "-":
+      case "_":
+      case "=":
+      case "+":
+        return key
+
+      // 'Alt' modifiers
+      case "AltGraph":
+      case "Fn":
+      case "FnLock":
+      case "Alt":
+        // key = "Alt" // Modifiers are not available in this release
+        return undefined
+
+      // 'Control' modifiers
+      case "Hyper":
+      case "Meta":
+      case "Symbol":
+      case "SymbolLock":
+      case "Control":
+        // key = "Control" // Modifiers are not available in this release
+        return undefined
+
+      // 'Shift' modifiers
+      case "Super":
+      case "Shift":
+        // key = "Shift" // Modifiers are not available in this release
+        return undefined
+
+      // Uncommon keys
+      case "Clear":
+      case "Cut":
+      case "Undo":
+        return "Delete"
+
+      case "Copy":
+      case "CrSel":
+      case "Paste":
+      case "Redo":
+        return "Insert"
+
+      // Convert all UI keys to the escape key
+      case "Accept":
+      case "Again":
+      case "Attn":
+      case "Cancel":
+      case "ContextMenu":
+      case "Execute":
+      case "Find":
+      case "Finish":
+      case "Help":
+      case "Pause":
+      case "Play":
+      case "Props":
+      case "Select":
+      case "ZoomIn":
+      case "ZoomOut":
+        return "Escape"
+
+      // There are too many possible keys so I am not going to produce an exhaustive list
+      default:
+        return undefined
+    }
+  }
+
 }
