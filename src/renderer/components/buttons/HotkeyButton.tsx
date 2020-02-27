@@ -38,7 +38,7 @@ export class HotkeyButton extends React.PureComponent<HotkeyButtonProps, HotkeyB
     this.div = React.createRef()
   }
 
-  private div: React.RefObject<HTMLDivElement>
+  private readonly div: React.RefObject<HTMLDivElement>
 
   componentDidUpdate (prevProps: HotkeyButtonProps) {
     const { hotkey } = this.props
