@@ -34,7 +34,9 @@ const APP_SAVE_DATA: ElectronSaveData = {
     8: [], // Sonic
     9: [], // Knuckles
     10: [], // Goomba
-    11: [] // Kirby
+    11: [], // Kirby
+    nextCharacter: [],
+    previousCharacter: []
   },
   characterCylingOrder: [
     { characterId: 0, on: true }, // Mario

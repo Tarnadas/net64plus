@@ -1,6 +1,7 @@
 import { Action } from 'redux'
 
 import { ElectronServerSaveData } from '../../../models/State.model'
+import { HotkeyShortcut } from '../../../main/HotkeyManager'
 
 export interface SetUsernameAction extends Action {
   username: string
@@ -19,7 +20,7 @@ export interface SetGlobalHotkeysEnabledAction extends Action {
 }
 
 export interface SetHotkeyBindingsAction extends Action {
-  hotkeyBindings: { [shortcut: string]: string[] }
+  hotkeyBindings: { [shortcut in HotkeyShortcut]: string[] }
 }
 
 export interface SetCharacterCyclingOrderAction extends Action {

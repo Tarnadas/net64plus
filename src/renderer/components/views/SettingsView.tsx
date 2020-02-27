@@ -18,6 +18,7 @@ import {
 } from '../../actions/save'
 import { State, ElectronSaveData } from '../../../models/State.model'
 import { showSnackbar } from '../../actions/snackbar'
+import { HotkeyShortcut } from '../../../main/HotkeyManager'
 
 interface SettingsViewProps {
   dispatch: Dispatch<State>
@@ -30,7 +31,7 @@ interface SettingsViewState {
   characterId: number
   emuChat: boolean
   globalHotkeysEnabled: boolean
-  hotkeyBindings: { [shortcut: string]: string[] }
+  hotkeyBindings: { [shortcut in HotkeyShortcut]: string[] }
   characterCyclingOrder: Array<{characterId: number, on: boolean}>
   gamepadId: string | undefined
   warning: string
@@ -132,7 +133,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     })
   }
 
-  onHotkeyBindingChange (shortcut: string, hotkey?: string) {
+  onHotkeyBindingChange (shortcut: HotkeyShortcut, hotkey?: string) {
     const { hotkeyBindings } = this.state
     hotkeyBindings[shortcut] = hotkey ? [hotkey] : []
     this.setState({ hotkeyBindings })
@@ -179,9 +180,9 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     for (let i = 0; i < 12; i++) {
       buttons.push(<HotkeyButton
         key={i}
-        shortcut={`${i}`}
+        shortcut={`${i}` as HotkeyShortcut}
         iconSrc={CHARACTER_ICONS[i]}
-        hotkey={this.state.hotkeyBindings[`${i}`]?.[0]}
+        hotkey={this.state.hotkeyBindings[`${i}` as HotkeyShortcut]?.[0]}
         onClick={this.onHotkeyBindingChange}
         onRightClick={this.onHotkeyBindingChange}
       />)
@@ -214,9 +215,6 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
         alignItems: 'center',
         justifyContent: 'center'
       },
-      gap: {
-        flex: '1 0 10px'
-      },
       label: {
         width: '30%'
       },
@@ -235,7 +233,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     return (
       <div style={styles.view}>
 
-        <div style={styles.gap}></div>
+        <div className='gap'></div>
         {
           warning &&
           <WarningPanel warning={warning} />
@@ -245,13 +243,13 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
           <WarningPanel warning={connectionError} />
         }
 
-        <div style={styles.gap}></div>
+        <div className='gap'></div>
         <div style={styles.setting}>
           <div style={styles.label}>Username:</div>
           <input style={styles.input} value={this.state.username} onChange={this.onUsernameChange} />
         </div>
 
-        <div style={styles.gap}></div>
+        <div className='gap'></div>
         <div style={styles.setting}>
           <div style={styles.label}>Character:</div>
           <select style={styles.input} value={this.state.characterId} onChange={this.onCharacterChange}>
@@ -270,7 +268,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
           </select>
         </div>
 
-        <div style={styles.gap}></div>
+        <div className='gap'></div>
         <div style={styles.setting}>
           <div style={styles.label}>Gamepad:</div>
           <select style={styles.input} value={gamepadId ?? undefined} onChange={(e) => {
@@ -291,7 +289,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
           </select>
         </div>
 
-        <div style={styles.gap}></div>
+        <div className='gap'></div>
         <div style={styles.setting}>
           <div style={styles.label}>In-Game Chat View:</div>
           <input
@@ -309,20 +307,20 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
           />
         </div>
 
-        <div style={styles.gap}></div>
+        <div className='gap'></div>
         <div>Character Hotkeys (right click to unassign):</div>
 
-        <div style={styles.gap}></div>
+        <div className='gap'></div>
         <div>
           {this.renderCharacterHotkeyButtons()}
         </div>
 
-        <div style={styles.gap}></div>
+        <div className='gap'></div>
         <div style={Object.assign({}, styles.setting, styles.flexCenter)}>
           <div style={Object.assign({}, styles.setting, styles.flexCenter, { flexDirection: 'column' })}>
             <div>Previous Character</div>
             <HotkeyButton
-              shortcut={'previousCharacter'}
+              shortcut={HotkeyShortcut.PREVIOUS_CHARACTER}
               hotkey={this.state.hotkeyBindings.previousCharacter?.[0]}
               onClick={this.onHotkeyBindingChange}
               onRightClick={this.onHotkeyBindingChange}
@@ -331,7 +329,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
           <div style={Object.assign({}, styles.setting, styles.flexCenter, { flexDirection: 'column' })}>
             <div>Next Character</div>
             <HotkeyButton
-              shortcut={'nextCharacter'}
+              shortcut={HotkeyShortcut.NEXT_CHARACTER}
               hotkey={this.state.hotkeyBindings.nextCharacter?.[0]}
               onClick={this.onHotkeyBindingChange}
               onRightClick={this.onHotkeyBindingChange}
@@ -339,21 +337,38 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
           </div>
         </div>
 
-        <div style={styles.gap}></div>
+        <div className='gap'></div>
         <div>Character Cycling Order (click to toggle, drag to reorder)</div>
 
-        <div style={styles.gap}></div>
+        <div className='gap'></div>
         <this.SortableList
           useDragHandle
           characterCyclingOrder={this.state.characterCyclingOrder}
           onSortEnd={this.onCharacterCyclingOrderChange}
         />
 
-        <div style={styles.gap}></div>
+        <div className='gap'></div>
         <SMMButton
           text='Unbind all'
           onClick={() => {
-            this.setState({ hotkeyBindings: {} })
+            this.setState({
+              hotkeyBindings: {
+                [HotkeyShortcut.MARIO]: [],
+                [HotkeyShortcut.LUIGI]: [],
+                [HotkeyShortcut.YOSHI]: [],
+                [HotkeyShortcut.WARIO]: [],
+                [HotkeyShortcut.PEACH]: [],
+                [HotkeyShortcut.TOAD]: [],
+                [HotkeyShortcut.WALUIGI]: [],
+                [HotkeyShortcut.ROSALINA]: [],
+                [HotkeyShortcut.SONIC]: [],
+                [HotkeyShortcut.KNUCKLES]: [],
+                [HotkeyShortcut.GOOMBA]: [],
+                [HotkeyShortcut.KIRBY]: [],
+                [HotkeyShortcut.NEXT_CHARACTER]: [],
+                [HotkeyShortcut.PREVIOUS_CHARACTER]: []
+              }
+            })
           }}
           styles={{
             subButton: {

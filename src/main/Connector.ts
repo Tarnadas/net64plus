@@ -2,7 +2,7 @@ import { ipcMain } from 'electron'
 
 import { emulator, createEmulator, deleteEmulator, connection, createConnection, deleteConnection } from '.'
 import { Emulator } from './Emulator'
-import { HotkeyManager } from './HotkeyManager'
+import { HotkeyManager, HotkeyShortcut } from './HotkeyManager'
 import { FilteredEmulator, Position } from '../models/Emulator.model'
 import { MainMessage, RendererMessage } from '../models/Message.model'
 import { Server } from '../models/Server.model'
@@ -84,7 +84,7 @@ export class Connector {
   private readonly onHotkeysChanged = (
     _: Electron.Event,
     { hotkeyBindings, globalHotkeysEnabled, username }:
-    { hotkeyBindings: { [shortcut: string]: string[] }, globalHotkeysEnabled: boolean, username: string }
+    { hotkeyBindings: { [shortcut in HotkeyShortcut]: string[] }, globalHotkeysEnabled: boolean, username: string }
   ) => {
     if (username) { this.hotkeyManager.username = username }
     this.hotkeyManager.setHotkeys(hotkeyBindings, globalHotkeysEnabled, this, this.window)

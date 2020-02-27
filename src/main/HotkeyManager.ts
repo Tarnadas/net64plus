@@ -6,10 +6,25 @@ import { ButtonState } from '../renderer/GamepadManager'
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const electronLocalshortcut = require('electron-localshortcut')
 
+export enum HotkeyShortcut {
+  MARIO = '0',
+  LUIGI = '1',
+  YOSHI = '2',
+  WARIO = '3',
+  PEACH = '4',
+  TOAD = '5',
+  WALUIGI = '6',
+  ROSALINA = '7',
+  SONIC = '8',
+  KNUCKLES = '9',
+  GOOMBA = '10',
+  KIRBY = '11',
+  NEXT_CHARACTER = 'nextCharacter',
+  PREVIOUS_CHARACTER = 'previousCharacter'
+}
+
 export class HotkeyManager {
-  private _username = ''
-  public set username (value: string) { this._username = value }
-  public get username (): string { return this._username }
+  public username = ''
 
   private _hotkeysEnabled = true
   public set hotkeysEnabled (value: boolean) { this._hotkeysEnabled = value }
@@ -18,14 +33,14 @@ export class HotkeyManager {
   private _characterCyclingOrder: Array<{characterId: number, on: boolean}> = []
   private _characterCyclingIndex = 0;
 
-  private _hotkeyBindings: { [shortcut: string]: string[] } = {}
+  private _hotkeyBindings: { [shortcut in HotkeyShortcut]?: string[] } = {}
 
   public hotkeyIsButton (hotkey: string): boolean {
     return new RegExp(/^button\d+$/).test(hotkey)
   }
 
   public setHotkeys (
-    hotkeyBindings: { [shortcut: string]: string[] },
+    hotkeyBindings: { [shortcut in HotkeyShortcut]: string[] },
     globalHotkeysEnabled: boolean,
     connector: Connector,
     window: BrowserWindow
@@ -33,58 +48,61 @@ export class HotkeyManager {
     this._hotkeyBindings = hotkeyBindings
     electronLocalshortcut.unregisterAll(window)
     globalShortcut.unregisterAll()
+
     Object.entries(hotkeyBindings).forEach(([characterIdString, hotkeys]) => {
       const username = this.username
-      for (const hotkey of hotkeys) {
-        if (this.isNumeric(characterIdString)) {
-          const callback = () => {
-            const characterId = parseInt(characterIdString, 10)
-            this.changeCharacter({ username, characterId, connector })
-          }
-
-          if (!this.hotkeyIsButton(hotkey)) {
-            if (globalHotkeysEnabled) {
-              globalShortcut.register(hotkey.toLocaleUpperCase(), callback)
-            } else {
-              electronLocalshortcut.register(window, hotkey.toLocaleUpperCase(), callback)
+      if (hotkeys) {
+        for (const hotkey of hotkeys) {
+          if (this.isNumeric(characterIdString)) {
+            const callback = () => {
+              const characterId = parseInt(characterIdString, 10)
+              this.changeCharacter({ username, characterId, connector })
             }
-          }
-        } else if (characterIdString === 'nextCharacter') {
-          const callback = () => {
-            if (this._characterCyclingOrder.length > 0 && this._characterCyclingOrder.some((value) => value.on)) {
-              const nextIndex = this.getNextCharacterId(this._characterCyclingOrder, this._characterCyclingIndex)
-              if (nextIndex !== undefined) {
-                this._characterCyclingIndex = nextIndex
-                const characterId = this._characterCyclingOrder[this._characterCyclingIndex].characterId
-                this.changeCharacter({ username, characterId, connector })
+
+            if (!this.hotkeyIsButton(hotkey)) {
+              if (globalHotkeysEnabled) {
+                globalShortcut.register(hotkey.toLocaleUpperCase(), callback)
+              } else {
+                electronLocalshortcut.register(window, hotkey.toLocaleUpperCase(), callback)
               }
             }
-          }
-
-          if (!this.hotkeyIsButton(hotkey)) {
-            if (globalHotkeysEnabled) {
-              globalShortcut.register(hotkey.toLocaleUpperCase(), callback)
-            } else {
-              electronLocalshortcut.register(window, hotkey.toLocaleUpperCase(), callback)
-            }
-          }
-        } else if (characterIdString === 'previousCharacter') {
-          const callback = () => {
-            if (this._characterCyclingOrder.length > 0 && this._characterCyclingOrder.some((value) => value.on)) {
-              const prevIndex = this.getPreviousCharacterId(this._characterCyclingOrder, this._characterCyclingIndex)
-              if (prevIndex !== undefined) {
-                this._characterCyclingIndex = prevIndex
-                const characterId = this._characterCyclingOrder[this._characterCyclingIndex].characterId
-                this.changeCharacter({ username, characterId, connector })
+          } else if (characterIdString === HotkeyShortcut.NEXT_CHARACTER) {
+            const callback = () => {
+              if (this._characterCyclingOrder.length > 0 && this._characterCyclingOrder.some((value) => value.on)) {
+                const nextIndex = this.getNextCharacterId(this._characterCyclingOrder, this._characterCyclingIndex)
+                if (nextIndex !== undefined) {
+                  this._characterCyclingIndex = nextIndex
+                  const characterId = this._characterCyclingOrder[this._characterCyclingIndex].characterId
+                  this.changeCharacter({ username, characterId, connector })
+                }
               }
             }
-          }
 
-          if (!this.hotkeyIsButton(hotkey)) {
-            if (globalHotkeysEnabled) {
-              globalShortcut.register(hotkey.toLocaleUpperCase(), callback)
-            } else {
-              electronLocalshortcut.register(window, hotkey.toLocaleUpperCase(), callback)
+            if (!this.hotkeyIsButton(hotkey)) {
+              if (globalHotkeysEnabled) {
+                globalShortcut.register(hotkey.toLocaleUpperCase(), callback)
+              } else {
+                electronLocalshortcut.register(window, hotkey.toLocaleUpperCase(), callback)
+              }
+            }
+          } else if (characterIdString === HotkeyShortcut.PREVIOUS_CHARACTER) {
+            const callback = () => {
+              if (this._characterCyclingOrder.length > 0 && this._characterCyclingOrder.some((value) => value.on)) {
+                const prevIndex = this.getPreviousCharacterId(this._characterCyclingOrder, this._characterCyclingIndex)
+                if (prevIndex !== undefined) {
+                  this._characterCyclingIndex = prevIndex
+                  const characterId = this._characterCyclingOrder[this._characterCyclingIndex].characterId
+                  this.changeCharacter({ username, characterId, connector })
+                }
+              }
+            }
+
+            if (!this.hotkeyIsButton(hotkey)) {
+              if (globalHotkeysEnabled) {
+                globalShortcut.register(hotkey.toLocaleUpperCase(), callback)
+              } else {
+                electronLocalshortcut.register(window, hotkey.toLocaleUpperCase(), callback)
+              }
             }
           }
         }
@@ -102,24 +120,24 @@ export class HotkeyManager {
       const username = this.username
       Object.entries(this._hotkeyBindings)
         // Filter out any bindings that don't have any button hotkeys
-        .filter(([_, hotkeys]) => hotkeys.some((hotkey) => hotkey.includes('button')))
+        .filter(([_, hotkeys]) => hotkeys?.some((hotkey) => hotkey.includes('button')))
         .forEach(([characterIdString, hotkeys]) => {
           // Filter out any hotkeys that are not button hotkeys
-          hotkeys = hotkeys.filter((hotkey) => hotkey.includes('button'))
+          hotkeys = hotkeys ? hotkeys.filter((hotkey) => hotkey.includes('button')) : []
           for (const hotkey of hotkeys) {
             // Check if button was pressed
             if (buttonState.some((button) => hotkey === `button${button.key}` && button.pressed)) {
               if (this.isNumeric(characterIdString)) { // Character hotkey
                 const characterId = parseInt(characterIdString, 10)
                 this.changeCharacter({ username, characterId, connector })
-              } else if (characterIdString === 'nextCharacter') {
+              } else if (characterIdString === HotkeyShortcut.NEXT_CHARACTER) {
                 const nextIndex = this.getNextCharacterId(this._characterCyclingOrder, this._characterCyclingIndex)
                 if (nextIndex !== undefined) {
                   this._characterCyclingIndex = nextIndex
                   const characterId = this._characterCyclingOrder[this._characterCyclingIndex].characterId
                   this.changeCharacter({ username, characterId, connector })
                 }
-              } else if (characterIdString === 'previousCharacter') {
+              } else if (characterIdString === HotkeyShortcut.PREVIOUS_CHARACTER) {
                 const prevIndex = this.getPreviousCharacterId(this._characterCyclingOrder, this._characterCyclingIndex)
                 if (prevIndex !== undefined) {
                   this._characterCyclingIndex = prevIndex

@@ -24,6 +24,7 @@ import { FilteredEmulator, Position } from '../models/Emulator.model'
 import { setCharacter } from './actions/save'
 import { ButtonState } from './GamepadManager'
 import { testEmulator } from '../models/Emulator.mock'
+import { HotkeyShortcut } from '../main/HotkeyManager'
 
 export class Connector {
   constructor () {
@@ -225,7 +226,7 @@ is incompatible with your client API version (${process.env.MAJOR}.${process.env
 
   public changeHotkeyBindings (
     { hotkeyBindings, globalHotkeysEnabled, username }:
-    { hotkeyBindings: { [shortcut: string]: string[] }, globalHotkeysEnabled: boolean, username?: string }
+    { hotkeyBindings: { [shortcut in HotkeyShortcut]: string[] }, globalHotkeysEnabled: boolean, username?: string }
   ) {
     ipcRenderer.send(RendererMessage.HOTKEYS_CHANGED, { hotkeyBindings, globalHotkeysEnabled, username })
   }

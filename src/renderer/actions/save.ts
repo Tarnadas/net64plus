@@ -11,6 +11,7 @@ import {
   SetGamepadIdAction
 } from './models/save.model'
 import { ElectronServerSaveData } from '../../models/State.model'
+import { HotkeyShortcut } from '../../main/HotkeyManager'
 
 export function setUsername (username: string): SetUsernameAction {
   return {
@@ -37,7 +38,7 @@ export function setGlobalHotkeysEnabled (globalHotkeysEnabled: boolean): SetGlob
     globalHotkeysEnabled
   }
 }
-export function setHotkeyBindings (hotkeyBindings: { [shortcut: string]: string[] }) {
+export function setHotkeyBindings (hotkeyBindings: { [shortcut in HotkeyShortcut]: string[] }) {
   return {
     type: 'SET_HOTKEY_BINDINGS',
     hotkeyBindings

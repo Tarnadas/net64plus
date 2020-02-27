@@ -1,19 +1,19 @@
 import './HotkeyButton.scss'
 
-import * as React from 'react' // @types/react-dom is out of date
+import * as React from 'react'
 
 import { GamepadManager, ButtonState } from '../../GamepadManager'
 import { gamepadManager } from '../..'
-import * as ReactDOM from 'react-dom'
+import { HotkeyShortcut } from '../../../main/HotkeyManager'
 
 interface HotkeyButtonProps {
-  shortcut: string
+  shortcut: HotkeyShortcut
   hotkey?: string
   className?: string
   iconSrc?: string
   gamepadManager?: GamepadManager
-  onClick?: (shortcut: string, hotkey?: string) => void
-  onRightClick?: (shortcut: string) => void
+  onClick?: (shortcut: HotkeyShortcut, hotkey?: string) => void
+  onRightClick?: (shortcut: HotkeyShortcut) => void
 }
 
 interface HotkeyButtonState {
@@ -34,13 +34,11 @@ export class HotkeyButton extends React.PureComponent<HotkeyButtonProps, HotkeyB
     this.buttonDownListener = this.buttonDownListener.bind(this)
     this.clickOutsideListener = this.clickOutsideListener.bind(this)
     this.removeListeners = this.removeListeners.bind(this)
+
+    this.div = React.createRef()
   }
 
-  private node: Node | undefined
-
-  componentDidMount () {
-    this.node = ReactDOM.findDOMNode(this) as Node
-  }
+  private div: React.RefObject<HTMLDivElement>
 
   componentDidUpdate (prevProps: HotkeyButtonProps) {
     const { hotkey } = this.props
@@ -86,7 +84,7 @@ export class HotkeyButton extends React.PureComponent<HotkeyButtonProps, HotkeyB
   }
 
   clickOutsideListener (event: MouseEvent) {
-    if (!!this.node && !this.node.contains(event.target as Node)) {
+    if (!!this.div.current && !this.div.current.contains(event.target as Node)) {
       this.removeListeners()
     }
   }
@@ -131,6 +129,7 @@ export class HotkeyButton extends React.PureComponent<HotkeyButtonProps, HotkeyB
     } as const
     return (
       <div
+        ref={this.div}
         className={`hotkey-button${listening ? ' hotkey-button-listening' : ''} ${className ?? ''}`.trim()}
         style={styles.button}
         onClick={this.onClick}

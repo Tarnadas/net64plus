@@ -15,14 +15,7 @@ export class GamepadManager {
   private _buttonState: ButtonState | undefined = undefined
   private readonly _buttonStateListeners: Array<(buttonState: ButtonState) => void> = []
 
-  private _selectedGamepad: Gamepad | undefined = undefined
-  public set selectedGamepad (value: Gamepad | undefined) {
-    this._selectedGamepad = value
-  }
-
-  public get selectedGamepad (): Gamepad | undefined {
-    return this._selectedGamepad
-  }
+  public selectedGamepad: Gamepad | undefined = undefined
 
   constructor (window: Window, connector: Connector, defaultGamepadId?: string) {
     this.window = window
