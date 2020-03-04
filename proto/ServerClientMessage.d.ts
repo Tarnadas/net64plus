@@ -1,5 +1,4 @@
 import * as $protobuf from "protobufjs";
-
 /** Properties of a ServerClientMessage. */
 export interface IServerClientMessage {
 

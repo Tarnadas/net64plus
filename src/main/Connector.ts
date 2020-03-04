@@ -2,10 +2,12 @@ import { ipcMain } from 'electron'
 
 import { emulator, createEmulator, deleteEmulator, connection, createConnection, deleteConnection } from '.'
 import { Emulator } from './Emulator'
+import { HotkeyManager, HotkeyShortcut } from './HotkeyManager'
 import { FilteredEmulator, Position } from '../models/Emulator.model'
 import { MainMessage, RendererMessage } from '../models/Message.model'
 import { Server } from '../models/Server.model'
 import { IPlayerUpdate, IPlayer } from '../../proto/ServerClientMessage'
+import { ButtonState } from '../renderer/GamepadManager'
 
 export class Connector {
   constructor (private readonly window: Electron.BrowserWindow) {
@@ -18,7 +20,12 @@ export class Connector {
     ipcMain.on(RendererMessage.PASSWORD, this.onSendPassword)
     ipcMain.on(RendererMessage.CHAT_GLOBAL, this.onSendGlobalChatMessage)
     ipcMain.on(RendererMessage.CHAT_COMMAND, this.onSendCommandMessage)
+    ipcMain.on(RendererMessage.HOTKEYS_CHANGED, this.onHotkeysChanged)
+    ipcMain.on(RendererMessage.CHARACTER_CYCLING_ORDER_CHANGED, this.onCharacterCyclingOrderChanged)
+    ipcMain.on(RendererMessage.GAMEPAD_BUTTON_STATE_CHANGED, this.onGamepadButtonStateChanged)
   }
+
+  private hotkeyManager = new HotkeyManager()
 
   private readonly onCreateConnection = (
     _: Electron.Event,
@@ -35,7 +42,10 @@ export class Connector {
   }
 
   private readonly onUpdateEmulators = () => {
-    Emulator.updateEmulators()
+    Emulator.updateEmulators().catch((error) => {
+      console.error(error)
+      throw error
+    })
   }
 
   private readonly onCreateEmulatorConnection = (
@@ -55,10 +65,45 @@ export class Connector {
     { username, characterId }:
     { username: string, characterId: number }
   ) => {
+    this.hotkeyManager.username = username
     if (!emulator) return
     emulator.changeCharacter(characterId)
     if (!connection) return
     connection.sendPlayerUpdate({ username, characterId })
+  }
+
+  public sendPlayerUpdate (
+    { username, characterId }:
+    { username: string, characterId: number }
+  ) {
+    // This relies on a mock unconsumed event to pass through the same workflow so we cast as any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.onPlayerUpdate({} as any, { username, characterId })
+  }
+
+  private readonly onHotkeysChanged = (
+    _: Electron.Event,
+    { hotkeyBindings, globalHotkeysEnabled, username }:
+    { hotkeyBindings: { [shortcut in HotkeyShortcut]: string[] }, globalHotkeysEnabled: boolean, username: string }
+  ) => {
+    if (username) { this.hotkeyManager.username = username }
+    this.hotkeyManager.setHotkeys(hotkeyBindings, globalHotkeysEnabled, this, this.window)
+  }
+
+  public onCharacterCyclingOrderChanged = (
+    _: Electron.Event,
+    { characterCyclingOrder }:
+    { characterCyclingOrder: Array<{characterId: number, on: boolean}> }
+  ) => {
+    this.hotkeyManager.setCharacterCyclingOrder(characterCyclingOrder)
+  }
+
+  public onGamepadButtonStateChanged = (
+    _: Electron.Event,
+    { buttonState }:
+    { buttonState: ButtonState }
+  ) => {
+    this.hotkeyManager.onGamepadButtonStateChanged(buttonState, this)
   }
 
   private readonly onSendPassword = (_: Electron.Event, password: string) => {
@@ -157,5 +202,9 @@ export class Connector {
 
   public consoleInfo (...messages: string[]): void {
     this.window.webContents.send(MainMessage.CONSOLE_INFO, messages)
+  }
+
+  public setCharacter (characterId: number): void {
+    this.window.webContents.send(MainMessage.SET_CHARACTER, characterId)
   }
 }

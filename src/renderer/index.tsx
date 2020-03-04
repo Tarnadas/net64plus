@@ -17,13 +17,22 @@ import { initReducer } from './reducers'
 import { Connector } from './Connector'
 import { AppView } from './components/views/AppView'
 import { State, SaveState, SaveStateDraft, ElectronSaveData } from '../models/State.model'
+import { GamepadManager } from './GamepadManager'
 
 export let store: Store<State>
 export const connector = new Connector()
+export let gamepadManager: GamepadManager
 
 ;(async () => {
   const history: History = createHistory()
   const save: SaveState = await loadSaveData()
+  connector.changeHotkeyBindings({
+    hotkeyBindings: save.appSaveData.hotkeyBindings || {},
+    globalHotkeysEnabled: !!save.appSaveData.globalHotkeysEnabled,
+    username: save.appSaveData.username
+  })
+  connector.changeCharacterCyclingOrder({ characterCyclingOrder: save.appSaveData.characterCylingOrder })
+  gamepadManager = new GamepadManager(window, connector, save.appSaveData.gamepadId)
   store = initReducer(history, save)
 
   render(

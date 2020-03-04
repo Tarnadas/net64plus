@@ -1,6 +1,7 @@
 import { Action } from 'redux'
 
 import { ElectronServerSaveData } from '../../../models/State.model'
+import { HotkeyShortcut } from '../../../main/HotkeyManager'
 
 export interface SetUsernameAction extends Action {
   username: string
@@ -12,6 +13,22 @@ export interface SetCharacterAction extends Action {
 
 export interface SetEmuChatAction extends Action {
   emuChat: boolean
+}
+
+export interface SetGlobalHotkeysEnabledAction extends Action {
+  globalHotkeysEnabled: boolean
+}
+
+export interface SetHotkeyBindingsAction extends Action {
+  hotkeyBindings: { [shortcut in HotkeyShortcut]: string[] }
+}
+
+export interface SetCharacterCyclingOrderAction extends Action {
+  characterCyclingOrder: Array<{characterId: number, on: boolean}>
+}
+
+export interface SetGamepadIdAction extends Action {
+  gamepadId: string | undefined
 }
 
 export interface AddApiKeyAction extends Action {
@@ -31,6 +48,10 @@ export type SaveAction =
   SetUsernameAction
   & SetCharacterAction
   & SetEmuChatAction
+  & SetGlobalHotkeysEnabledAction
+  & SetHotkeyBindingsAction
+  & SetCharacterCyclingOrderAction
+  & SetGamepadIdAction
   & AddApiKeyAction
   & SetVersionAction
   & SetServerOptionsAction

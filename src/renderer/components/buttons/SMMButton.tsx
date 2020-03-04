@@ -13,10 +13,14 @@ export type IconStyle = 'dark' | 'bright'
 
 interface SMMButtonProps {
   text: string
-  iconSrc: string
+  iconSrc?: string
   iconSrcHover?: string
   link?: string
-  styles?: Record<string, React.CSSProperties>
+  styles?: {
+    button?: React.CSSProperties,
+    icon?: React.CSSProperties,
+    subButton?: { [key: string]: React.CSSProperties },
+  }
   colorScheme?: ColorScheme
   iconStyle?: IconStyle
   // @deprecated
@@ -65,9 +69,12 @@ export class SMMButton extends React.PureComponent<SMMButtonProps, SMMButtonStat
   renderSubButton (styles: Record<string, React.CSSProperties>, iconStyle: React.CSSProperties) {
     return (
       <div>
-        <div style={iconStyle}>
-          <img style={styles.img} src={this.props.iconSrc} />
-        </div>
+        {
+          this.props.iconSrc &&
+          <div style={iconStyle}>
+            <img style={styles.img} src={this.props.iconSrc} />
+          </div>
+        }
         {
           this.props.text &&
           <div style={styles.text}>{this.props.text}</div>
@@ -83,7 +90,7 @@ export class SMMButton extends React.PureComponent<SMMButtonProps, SMMButtonStat
     const enabled = this.props.enabled == null
       ? true
       : this.props.enabled
-    let styles: any = {
+    let styles = {
       button: {
         flex: '0 0 auto',
         margin: '0 10px 10px 10px',
@@ -132,11 +139,11 @@ export class SMMButton extends React.PureComponent<SMMButtonProps, SMMButtonStat
           padding: '0 5px'
         }
       }
-    }
+    } as const
     if (this.props.styles) {
       styles = deepMerge(styles, this.props.styles)
     }
-    const iconStyle: any = Object.assign({},
+    const iconStyle = Object.assign({},
       styles.icon,
       this.props.iconStyle === 'dark'
         ? { backgroundColor: 'rgb(50, 50, 69)' }

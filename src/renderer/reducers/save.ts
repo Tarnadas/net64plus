@@ -19,6 +19,18 @@ export const save = (state: SaveState = initialState.save, action: SaveAction) =
       case 'SET_EMU_CHAT':
         draft.appSaveData.emuChat = action.emuChat
         break
+      case 'SET_GLOBAL_HOTKEYS':
+        draft.appSaveData.globalHotkeysEnabled = action.globalHotkeysEnabled
+        break
+      case 'SET_HOTKEY_BINDINGS':
+        draft.appSaveData.hotkeyBindings = action.hotkeyBindings
+        break
+      case 'SET_CHARACTER_CYCLING_ORDER':
+        draft.appSaveData.characterCylingOrder = action.characterCyclingOrder
+        break
+      case 'SET_GAMEPAD_ID':
+        draft.appSaveData.gamepadId = action.gamepadId
+        break
       case 'ADD_API_KEY':
         draft.appSaveData.apiKey = action.apiKey
         break

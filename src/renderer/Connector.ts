@@ -21,7 +21,10 @@ import { MainMessage, RendererMessage } from '../models/Message.model'
 import { Server } from '../models/Server.model'
 import { IPlayer, IPlayerUpdate } from '../../proto/ServerClientMessage'
 import { FilteredEmulator, Position } from '../models/Emulator.model'
+import { setCharacter } from './actions/save'
+import { ButtonState } from './GamepadManager'
 import { testEmulator } from '../models/Emulator.mock'
+import { HotkeyShortcut } from '../main/HotkeyManager'
 
 export class Connector {
   constructor () {
@@ -44,6 +47,7 @@ export class Connector {
     ipcRenderer.on(MainMessage.SET_CONNECTION_ERROR, this.onConnectionError)
     ipcRenderer.on(MainMessage.SET_EMULATOR_ERROR, this.onEmulatorError)
     ipcRenderer.on(MainMessage.CONSOLE_INFO, this.onConsoleInfo)
+    ipcRenderer.on(MainMessage.SET_CHARACTER, this.onSetCharacter)
   }
 
   private readonly onWebSocketClose = (
@@ -165,6 +169,10 @@ is incompatible with your client API version (${process.env.MAJOR}.${process.env
     console.info(...messages)
   }
 
+  private readonly onSetCharacter = (_: Electron.Event, characterId: number) => {
+    store.dispatch(setCharacter(characterId))
+  }
+
   public createConnection (
     { domain, ip, port, username, characterId }:
     {
@@ -214,5 +222,26 @@ is incompatible with your client API version (${process.env.MAJOR}.${process.env
 
   public sendCommandMessage (message: string, args: string[]): void {
     ipcRenderer.send(RendererMessage.CHAT_COMMAND, { message, args })
+  }
+
+  public changeHotkeyBindings (
+    { hotkeyBindings, globalHotkeysEnabled, username }:
+    { hotkeyBindings: { [shortcut in HotkeyShortcut]: string[] }, globalHotkeysEnabled: boolean, username?: string }
+  ) {
+    ipcRenderer.send(RendererMessage.HOTKEYS_CHANGED, { hotkeyBindings, globalHotkeysEnabled, username })
+  }
+
+  public changeCharacterCyclingOrder (
+    { characterCyclingOrder }:
+    { characterCyclingOrder: Array<{characterId: number, on: boolean}> }
+  ) {
+    ipcRenderer.send(RendererMessage.CHARACTER_CYCLING_ORDER_CHANGED, { characterCyclingOrder })
+  }
+
+  public emitButtonState (
+    { buttonState }:
+    { buttonState: ButtonState }
+  ): void {
+    ipcRenderer.send(RendererMessage.GAMEPAD_BUTTON_STATE_CHANGED, { buttonState })
   }
 }

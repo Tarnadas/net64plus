@@ -3,6 +3,7 @@ import { RouterState as ReactRouterState } from 'react-router-redux'
 import { Server } from './Server.model'
 import { FilteredEmulator, Position } from './Emulator.model'
 import { ChildProcess } from 'child_process'
+import { HotkeyShortcut } from '../main/HotkeyManager'
 
 export interface ElectronServerSaveDataDraft {
   name: string
@@ -21,6 +22,10 @@ export interface ElectronSaveDataDraft {
   username: string
   character: number
   emuChat: boolean
+  globalHotkeysEnabled: boolean
+  hotkeyBindings: { [shortcut in HotkeyShortcut]: string[] }
+  characterCylingOrder: Array<{characterId: number, on: boolean}>
+  gamepadId: string | undefined
   lastIp: string
   lastPort: number
   version: string

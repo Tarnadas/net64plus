@@ -21,6 +21,38 @@ const APP_SAVE_DATA: ElectronSaveData = {
   username: '',
   character: 0,
   emuChat: false,
+  globalHotkeysEnabled: false,
+  hotkeyBindings: {
+    0: [], // Mario
+    1: [], // Luigi
+    2: [], // Yoshi
+    3: [], // Wario
+    4: [], // Peach
+    5: [], // Toad
+    6: [], // Waluigi
+    7: [], // Rosalina
+    8: [], // Sonic
+    9: [], // Knuckles
+    10: [], // Goomba
+    11: [], // Kirby
+    nextCharacter: [],
+    previousCharacter: []
+  },
+  characterCylingOrder: [
+    { characterId: 0, on: true }, // Mario
+    { characterId: 1, on: true }, // Luigi
+    { characterId: 2, on: true }, // Yoshi
+    { characterId: 3, on: true }, // Wario
+    { characterId: 4, on: true }, // Peach
+    { characterId: 5, on: true }, // Toad
+    { characterId: 6, on: true }, // Waluigi
+    { characterId: 7, on: true }, // Rosalina
+    { characterId: 8, on: true }, // Sonic
+    { characterId: 9, on: true }, // Knuckles
+    { characterId: 10, on: true }, // Goomba
+    { characterId: 11, on: true } // Kirby
+  ],
+  gamepadId: undefined,
   lastIp: 'smmdb.net',
   lastPort: 3678,
   version: '',
