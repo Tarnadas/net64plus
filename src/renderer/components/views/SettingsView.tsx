@@ -1,3 +1,5 @@
+import './SettingsView.scss'
+
 import * as React from 'react'
 import { connect, Dispatch } from 'react-redux'
 import { SortableContainer, SortableHandle, SortableElement } from 'react-sortable-hoc'
@@ -195,18 +197,6 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     const connectionError = this.props.connectionError
     const gamepads = gamepadManager.getConnectedGamepads()
     const styles: Record<string, React.CSSProperties> = {
-      view: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'space-around',
-        flex: '1 0 auto',
-        padding: '40px',
-        backgroundColor: '#24997e',
-        fontSize: '18px',
-        overflow: 'auto',
-        color: '#000'
-      },
       setting: {
         width: '100%',
         display: 'flex'
@@ -231,9 +221,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
       }
     }
     return (
-      <div style={styles.view}>
-
-        <div className='gap'></div>
+      <div className='settings-view'>
         {
           warning &&
           <WarningPanel warning={warning} />
@@ -243,13 +231,11 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
           <WarningPanel warning={connectionError} />
         }
 
-        <div className='gap'></div>
         <div style={styles.setting}>
           <div style={styles.label}>Username:</div>
           <input style={styles.input} value={this.state.username} onChange={this.onUsernameChange} />
         </div>
 
-        <div className='gap'></div>
         <div style={styles.setting}>
           <div style={styles.label}>Character:</div>
           <select style={styles.input} value={this.state.characterId} onChange={this.onCharacterChange}>
@@ -268,7 +254,6 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
           </select>
         </div>
 
-        <div className='gap'></div>
         <div style={styles.setting}>
           <div style={styles.label}>Gamepad:</div>
           <select style={styles.input} value={gamepadId ?? undefined} onChange={(e) => {
@@ -289,7 +274,6 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
           </select>
         </div>
 
-        <div className='gap'></div>
         <div style={styles.setting}>
           <div style={styles.label}>In-Game Chat View:</div>
           <input
@@ -307,15 +291,12 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
           />
         </div>
 
-        <div className='gap'></div>
         <div>Character Hotkeys (right click to unassign):</div>
 
-        <div className='gap'></div>
-        <div>
+        <div className='settings-view-hotkeys'>
           {this.renderCharacterHotkeyButtons()}
         </div>
 
-        <div className='gap'></div>
         <div style={Object.assign({}, styles.setting, styles.flexCenter)}>
           <div style={Object.assign({}, styles.setting, styles.flexCenter, { flexDirection: 'column' })}>
             <div>Previous Character</div>
@@ -337,17 +318,14 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
           </div>
         </div>
 
-        <div className='gap'></div>
         <div>Character Cycling Order (click to toggle, drag to reorder)</div>
 
-        <div className='gap'></div>
         <this.SortableList
           useDragHandle
           characterCyclingOrder={this.state.characterCyclingOrder}
           onSortEnd={this.onCharacterCyclingOrderChange}
         />
 
-        <div className='gap'></div>
         <SMMButton
           text='Unbind all'
           onClick={() => {
@@ -462,7 +440,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     { characterCyclingOrder }: {characterCyclingOrder: Array<{characterId: number, on: boolean}>}
   ) => {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <div className='settings-view-sortable-list'>
         {characterCyclingOrder.map(({ characterId, on }, index) => (
           <this.SortableItem
             key={index} index={index}
