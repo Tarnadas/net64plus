@@ -23,9 +23,11 @@ export let store: Store<State>
 export const connector = new Connector()
 export let gamepadManager: GamepadManager
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 ;(async () => {
   const history: History = createHistory()
   const save: SaveState = await loadSaveData()
+  connector.changeEmuChat(save.appSaveData.emuChat)
   connector.changeHotkeyBindings({
     hotkeyBindings: save.appSaveData.hotkeyBindings || {},
     globalHotkeysEnabled: !!save.appSaveData.globalHotkeysEnabled,

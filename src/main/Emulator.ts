@@ -31,8 +31,6 @@ enum ConnectionFlag {
 export class Emulator {
   public baseAddress: number
 
-  public inGameChatEnabled = false
-
   private readonly process: Process
 
   public static async updateEmulators () {
@@ -115,10 +113,8 @@ export class Emulator {
    *
    * @param {number} processId - Process ID to load
    * @param {number} characterId - Character ID from settings
-   * @param {boolean} [inGameChatEnabled=false] - Whether in game chat should be enabled
    */
-  constructor (processId: number, characterId: number, inGameChatEnabled = false) {
-    this.inGameChatEnabled = inGameChatEnabled
+  constructor (processId: number, characterId: number) {
     this.process = processId === testEmulatorPid ? new TestProcess() : winProcess.Process(processId)
     this.process.open()
     this.baseAddress = -1

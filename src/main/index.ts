@@ -21,11 +21,11 @@ export let emulator: Emulator | undefined
 export let connection: Connection | undefined
 
 export const createEmulator = (
-  { processId, characterId, inGameChatEnabled }:
-  { processId: number, characterId: number, inGameChatEnabled: boolean }
+  { processId, characterId }:
+  { processId: number, characterId: number }
 ) => {
   try {
-    emulator = new Emulator(processId, characterId, inGameChatEnabled)
+    emulator = new Emulator(processId, characterId)
     emulator.displayChatMessage('- Net64 connected -')
   } catch (err) {
     console.warn(err)

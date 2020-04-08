@@ -15,6 +15,11 @@
     flex: 0
   }
 
+  &-setting {
+    width: 100%;
+    display: flex;
+  }
+
   &-hotkeys {
     display: flex;
     flex-wrap: wrap;

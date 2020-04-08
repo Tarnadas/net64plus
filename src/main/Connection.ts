@@ -545,7 +545,7 @@ export class Connection {
     if (!message || senderId == null) return
     switch (chat.chatType) {
       case Chat.ChatType.GLOBAL:
-        if (emulator!.inGameChatEnabled) {
+        if (connector.inGameChatEnabled) {
           emulator!.displayChatMessage(message)
         }
         connector.globalChatMessage(message, senderId)

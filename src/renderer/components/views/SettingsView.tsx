@@ -164,6 +164,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     } else {
       const { dispatch } = this.props
       connector.playerUpdate({ username, characterId: this.state.characterId })
+      connector.changeEmuChat(this.state.emuChat)
       connector.changeHotkeyBindings({ hotkeyBindings, globalHotkeysEnabled })
       connector.changeCharacterCyclingOrder({ characterCyclingOrder })
       dispatch(setUsername(username))
@@ -197,10 +198,6 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     const connectionError = this.props.connectionError
     const gamepads = gamepadManager.getConnectedGamepads()
     const styles: Record<string, React.CSSProperties> = {
-      setting: {
-        width: '100%',
-        display: 'flex'
-      },
       flexCenter: {
         alignItems: 'center',
         justifyContent: 'center'
@@ -231,12 +228,12 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
           <WarningPanel warning={connectionError} />
         }
 
-        <div style={styles.setting}>
+        <div className='settings-view-setting'>
           <div style={styles.label}>Username:</div>
           <input style={styles.input} value={this.state.username} onChange={this.onUsernameChange} />
         </div>
 
-        <div style={styles.setting}>
+        <div className='settings-view-setting'>
           <div style={styles.label}>Character:</div>
           <select style={styles.input} value={this.state.characterId} onChange={this.onCharacterChange}>
             <option value='0'>Mario</option>
@@ -254,7 +251,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
           </select>
         </div>
 
-        <div style={styles.setting}>
+        <div className='settings-view-setting'>
           <div style={styles.label}>Gamepad:</div>
           <select style={styles.input} value={gamepadId ?? undefined} onChange={(e) => {
             gamepadManager.selectedGamepad = gamepadManager.getConnectedGamepads().find((gamepad) =>
@@ -274,7 +271,7 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
           </select>
         </div>
 
-        <div style={styles.setting}>
+        <div className='settings-view-setting'>
           <div style={styles.label}>In-Game Chat View:</div>
           <input
             style={styles.checkBox}
@@ -282,6 +279,9 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
             checked={this.state.emuChat}
             onChange={this.onEmuChatChange}
           />
+        </div>
+
+        <div className='settings-view-setting'>
           <div style={styles.label}>Enable global character keyboard shortcuts:</div>
           <input
             style={styles.checkBox}

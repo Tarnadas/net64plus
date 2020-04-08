@@ -20,10 +20,13 @@ export class Connector {
     ipcMain.on(RendererMessage.PASSWORD, this.onSendPassword)
     ipcMain.on(RendererMessage.CHAT_GLOBAL, this.onSendGlobalChatMessage)
     ipcMain.on(RendererMessage.CHAT_COMMAND, this.onSendCommandMessage)
+    ipcMain.on(RendererMessage.EMU_CHAT, this.onEmuChatChanged)
     ipcMain.on(RendererMessage.HOTKEYS_CHANGED, this.onHotkeysChanged)
     ipcMain.on(RendererMessage.CHARACTER_CYCLING_ORDER_CHANGED, this.onCharacterCyclingOrderChanged)
     ipcMain.on(RendererMessage.GAMEPAD_BUTTON_STATE_CHANGED, this.onGamepadButtonStateChanged)
   }
+
+  public inGameChatEnabled = false
 
   private hotkeyManager = new HotkeyManager()
 
@@ -50,10 +53,10 @@ export class Connector {
 
   private readonly onCreateEmulatorConnection = (
     _: Electron.Event,
-    { processId, characterId, inGameChatEnabled }:
-    { processId: number, characterId: number, inGameChatEnabled: boolean }
+    { processId, characterId }:
+    { processId: number, characterId: number }
   ) => {
-    createEmulator({ processId, characterId, inGameChatEnabled })
+    createEmulator({ processId, characterId })
   }
 
   private readonly onDisconnectEmulator = () => {
@@ -79,6 +82,12 @@ export class Connector {
     // This relies on a mock unconsumed event to pass through the same workflow so we cast as any
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.onPlayerUpdate({} as any, { username, characterId })
+  }
+
+  private readonly onEmuChatChanged = (
+    _: Electron.Event,
+    { emuChat }: { emuChat: boolean}) => {
+    this.inGameChatEnabled = emuChat
   }
 
   private readonly onHotkeysChanged = (

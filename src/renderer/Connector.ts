@@ -198,10 +198,10 @@ is incompatible with your client API version (${process.env.MAJOR}.${process.env
   }
 
   public createEmulatorConnection (
-    { processId, characterId, inGameChatEnabled }:
-    { processId: number, characterId: number, inGameChatEnabled: boolean }
+    { processId, characterId }:
+    { processId: number, characterId: number }
   ): void {
-    ipcRenderer.send(RendererMessage.CREATE_EMULATOR_CONNECTION, { processId, characterId, inGameChatEnabled })
+    ipcRenderer.send(RendererMessage.CREATE_EMULATOR_CONNECTION, { processId, characterId })
   }
 
   public disconnectEmulator (): void {
@@ -222,6 +222,10 @@ is incompatible with your client API version (${process.env.MAJOR}.${process.env
 
   public sendCommandMessage (message: string, args: string[]): void {
     ipcRenderer.send(RendererMessage.CHAT_COMMAND, { message, args })
+  }
+
+  public changeEmuChat (emuChat: boolean): void {
+    ipcRenderer.send(RendererMessage.EMU_CHAT, { emuChat })
   }
 
   public changeHotkeyBindings (

@@ -96,8 +96,7 @@ class View extends React.PureComponent<EmulatorViewProps, EmulatorViewState> {
     setTimeout(() => {
       connector.createEmulatorConnection({
         processId: emulator.pid,
-        characterId: this.props.characterId,
-        inGameChatEnabled: false
+        characterId: this.props.characterId
       })
     }, 50)
     this.timerTimeout = setTimeout(() => {
