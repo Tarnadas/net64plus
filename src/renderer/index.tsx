@@ -27,15 +27,17 @@ export let gamepadManager: GamepadManager
 ;(async () => {
   const history: History = createHistory()
   const save: SaveState = await loadSaveData()
-  connector.changeEmuChat(save.appSaveData.emuChat)
-  connector.changeHotkeyBindings({
-    hotkeyBindings: save.appSaveData.hotkeyBindings || {},
-    globalHotkeysEnabled: !!save.appSaveData.globalHotkeysEnabled,
-    username: save.appSaveData.username
-  })
-  connector.changeCharacterCyclingOrder({ characterCyclingOrder: save.appSaveData.characterCylingOrder })
-  gamepadManager = new GamepadManager(window, connector, save.appSaveData.gamepadId)
   store = initReducer(history, save)
+
+  const saveState = store.getState().save
+  connector.changeEmuChat(saveState.appSaveData.emuChat)
+  connector.changeHotkeyBindings({
+    hotkeyBindings: saveState.appSaveData.hotkeyBindings,
+    globalHotkeysEnabled: saveState.appSaveData.globalHotkeysEnabled,
+    username: saveState.appSaveData.username
+  })
+  connector.changeCharacterCyclingOrder({ characterCyclingOrder: saveState.appSaveData.characterCylingOrder })
+  gamepadManager = new GamepadManager(window, connector, saveState.appSaveData.gamepadId)
 
   render(
     <Provider store={store}>
@@ -64,20 +66,26 @@ async function loadSaveData (): Promise<SaveStateDraft<ElectronSaveData>> {
         encoding: 'utf8'
       }))
       if (appSaveData == null) {
-        await new Promise(resolve => {
-          rimraf(appSavePath, err => {
-            if (err) {
-              console.error(err)
-            } else {
-              fs.mkdirSync(appSavePath)
-            }
-            resolve()
-          })
-        })
+        await clearAppData(appSavePath)
       } else {
         save.appSaveData = appSaveData
       }
-    } catch (err) {}
+    } catch (err) {
+      await clearAppData(appSavePath)
+    }
   }
   return save
+}
+
+function clearAppData (appSavePath: string): Promise<void> {
+  return new Promise(resolve => {
+    rimraf(appSavePath, err => {
+      if (err) {
+        console.error(err)
+      } else {
+        fs.mkdirSync(appSavePath)
+      }
+      resolve()
+    })
+  })
 }
