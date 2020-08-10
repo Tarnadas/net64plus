@@ -219,178 +219,182 @@ class View extends React.PureComponent<SettingsViewProps, SettingsViewState> {
     }
     return (
       <div className='settings-view'>
-        {
-          warning &&
+        <div className='settings-view-content'>
+          {
+            warning &&
           <WarningPanel warning={warning} />
-        }
-        {
-          connectionError &&
+          }
+          {
+            connectionError &&
           <WarningPanel warning={connectionError} />
-        }
+          }
 
-        <div className='settings-view-setting'>
-          <div style={styles.label}>Username:</div>
-          <input style={styles.input} value={this.state.username} onChange={this.onUsernameChange} />
-        </div>
+          <div className='settings-view-setting'>
+            <div style={styles.label}>Username:</div>
+            <input style={styles.input} value={this.state.username} onChange={this.onUsernameChange} />
+          </div>
 
-        <div className='settings-view-setting'>
-          <div style={styles.label}>Character:</div>
-          <select style={styles.input} value={this.state.characterId} onChange={this.onCharacterChange}>
-            <option value='0'>Mario</option>
-            <option value='1'>Luigi</option>
-            <option value='2'>Yoshi</option>
-            <option value='3'>Wario</option>
-            <option value='4'>Peach</option>
-            <option value='5'>Toad</option>
-            <option value='6'>Waluigi</option>
-            <option value='7'>Rosalina</option>
-            <option value='8'>Sonic</option>
-            <option value='9'>Knuckles</option>
-            <option value='10'>Goomba</option>
-            <option value='11'>Kirby</option>
-          </select>
-        </div>
+          <div className='settings-view-setting'>
+            <div style={styles.label}>Character:</div>
+            <select style={styles.input} value={this.state.characterId} onChange={this.onCharacterChange}>
+              <option value='0'>Mario</option>
+              <option value='1'>Luigi</option>
+              <option value='2'>Yoshi</option>
+              <option value='3'>Wario</option>
+              <option value='4'>Peach</option>
+              <option value='5'>Toad</option>
+              <option value='6'>Waluigi</option>
+              <option value='7'>Rosalina</option>
+              <option value='8'>Sonic</option>
+              <option value='9'>Knuckles</option>
+              <option value='10'>Goomba</option>
+              <option value='11'>Kirby</option>
+            </select>
+          </div>
 
-        <div className='settings-view-setting'>
-          <div style={styles.label}>Gamepad:</div>
-          <select style={styles.input} value={gamepadId ?? undefined} onChange={(e) => {
-            gamepadManager.selectedGamepad = gamepadManager.getConnectedGamepads().find((gamepad) =>
-              (gamepad ? gamepad.id : undefined) === e.target.value
-            ) ?? undefined
-            this.setState({ gamepadId: e.target.value })
-          }}>
-            {
-              gamepads && [
-                <option key={-1} value={undefined}>None</option>
-              ].concat(gamepads.filter(function nonNull<Gamepad> (gamepad: Gamepad | null): gamepad is Gamepad {
-                return !!gamepad
-              }).map((gamepad, index) => (
-                <option key={index} value={gamepad.id}>{gamepad.id}</option>
-              )))
-            }
-          </select>
-        </div>
+          <div className='settings-view-setting'>
+            <div style={styles.label}>Gamepad:</div>
+            <select style={styles.input} value={gamepadId ?? undefined} onChange={(e) => {
+              gamepadManager.selectedGamepad = gamepadManager.getConnectedGamepads().find((gamepad) =>
+                (gamepad ? gamepad.id : undefined) === e.target.value
+              ) ?? undefined
+              this.setState({ gamepadId: e.target.value })
+            }}>
+              {
+                gamepads && [
+                  <option key={-1} value={undefined}>None</option>
+                ].concat(gamepads.filter(function nonNull<Gamepad> (gamepad: Gamepad | null): gamepad is Gamepad {
+                  return !!gamepad
+                }).map((gamepad, index) => (
+                  <option key={index} value={gamepad.id}>{gamepad.id}</option>
+                )))
+              }
+            </select>
+          </div>
 
-        <div className='settings-view-setting'>
-          <div style={styles.label}>In-Game Chat View:</div>
-          <input
-            style={styles.checkBox}
-            type='checkbox'
-            checked={this.state.emuChat}
-            onChange={this.onEmuChatChange}
+          <div className='settings-view-setting'>
+            <div style={styles.label}>In-Game Chat View:</div>
+            <input
+              style={styles.checkBox}
+              type='checkbox'
+              checked={this.state.emuChat}
+              onChange={this.onEmuChatChange}
+            />
+          </div>
+
+          <div className='settings-view-setting'>
+            <div style={styles.label}>Enable global character keyboard shortcuts:</div>
+            <input
+              style={styles.checkBox}
+              type='checkbox'
+              checked={this.state.globalHotkeysEnabled}
+              onChange={this.onGlobalHotkeysChange}
+            />
+          </div>
+
+          <div>Character Hotkeys (right click to unassign):</div>
+
+          <div className='settings-view-hotkeys'>
+            {this.renderCharacterHotkeyButtons()}
+          </div>
+
+          <div style={Object.assign({}, styles.setting, styles.flexCenter)}>
+            <div style={Object.assign({}, styles.setting, styles.flexCenter, { flexDirection: 'column' })}>
+              <div>Previous Character</div>
+              <HotkeyButton
+                shortcut={HotkeyShortcut.PREVIOUS_CHARACTER}
+                hotkey={this.state.hotkeyBindings.previousCharacter?.[0]}
+                onClick={this.onHotkeyBindingChange}
+                onRightClick={this.onHotkeyBindingChange}
+              />
+            </div>
+            <div style={Object.assign({}, styles.setting, styles.flexCenter, { flexDirection: 'column' })}>
+              <div>Next Character</div>
+              <HotkeyButton
+                shortcut={HotkeyShortcut.NEXT_CHARACTER}
+                hotkey={this.state.hotkeyBindings.nextCharacter?.[0]}
+                onClick={this.onHotkeyBindingChange}
+                onRightClick={this.onHotkeyBindingChange}
+              />
+            </div>
+          </div>
+
+          <div>Character Cycling Order (click to toggle, drag to reorder)</div>
+
+          <this.SortableList
+            useDragHandle
+            characterCyclingOrder={this.state.characterCyclingOrder}
+            onSortEnd={this.onCharacterCyclingOrderChange}
+          />
+
+          <SMMButton
+            text='Unbind all'
+            onClick={() => {
+              this.setState({
+                hotkeyBindings: {
+                  [HotkeyShortcut.MARIO]: [],
+                  [HotkeyShortcut.LUIGI]: [],
+                  [HotkeyShortcut.YOSHI]: [],
+                  [HotkeyShortcut.WARIO]: [],
+                  [HotkeyShortcut.PEACH]: [],
+                  [HotkeyShortcut.TOAD]: [],
+                  [HotkeyShortcut.WALUIGI]: [],
+                  [HotkeyShortcut.ROSALINA]: [],
+                  [HotkeyShortcut.SONIC]: [],
+                  [HotkeyShortcut.KNUCKLES]: [],
+                  [HotkeyShortcut.GOOMBA]: [],
+                  [HotkeyShortcut.KIRBY]: [],
+                  [HotkeyShortcut.NEXT_CHARACTER]: [],
+                  [HotkeyShortcut.PREVIOUS_CHARACTER]: []
+                }
+              })
+            }}
+            styles={{
+              subButton: {
+                text: {
+                  textAlign: 'center',
+                  width: '100%'
+                }
+              }
+            }}
+          />
+          <SMMButton
+            text='Enable all'
+            onClick={() => {
+              const { characterCyclingOrder } = this.state
+              characterCyclingOrder.forEach((_, index) => { characterCyclingOrder[index].on = true })
+              this.setState({ characterCyclingOrder: characterCyclingOrder.slice() })
+            }}
+            styles={{
+              subButton: {
+                text: {
+                  textAlign: 'center',
+                  width: '100%'
+                }
+              }
+            }}
+          />
+          <SMMButton
+            text='Disable all'
+            onClick={() => {
+              const { characterCyclingOrder } = this.state
+              characterCyclingOrder.forEach((_, index) => { characterCyclingOrder[index].on = false })
+              this.setState({ characterCyclingOrder: characterCyclingOrder.slice() })
+            }}
+            styles={{
+              subButton: {
+                text: {
+                  textAlign: 'center',
+                  width: '100%'
+                }
+              }
+            }}
           />
         </div>
 
-        <div className='settings-view-setting'>
-          <div style={styles.label}>Enable global character keyboard shortcuts:</div>
-          <input
-            style={styles.checkBox}
-            type='checkbox'
-            checked={this.state.globalHotkeysEnabled}
-            onChange={this.onGlobalHotkeysChange}
-          />
-        </div>
-
-        <div>Character Hotkeys (right click to unassign):</div>
-
-        <div className='settings-view-hotkeys'>
-          {this.renderCharacterHotkeyButtons()}
-        </div>
-
-        <div style={Object.assign({}, styles.setting, styles.flexCenter)}>
-          <div style={Object.assign({}, styles.setting, styles.flexCenter, { flexDirection: 'column' })}>
-            <div>Previous Character</div>
-            <HotkeyButton
-              shortcut={HotkeyShortcut.PREVIOUS_CHARACTER}
-              hotkey={this.state.hotkeyBindings.previousCharacter?.[0]}
-              onClick={this.onHotkeyBindingChange}
-              onRightClick={this.onHotkeyBindingChange}
-            />
-          </div>
-          <div style={Object.assign({}, styles.setting, styles.flexCenter, { flexDirection: 'column' })}>
-            <div>Next Character</div>
-            <HotkeyButton
-              shortcut={HotkeyShortcut.NEXT_CHARACTER}
-              hotkey={this.state.hotkeyBindings.nextCharacter?.[0]}
-              onClick={this.onHotkeyBindingChange}
-              onRightClick={this.onHotkeyBindingChange}
-            />
-          </div>
-        </div>
-
-        <div>Character Cycling Order (click to toggle, drag to reorder)</div>
-
-        <this.SortableList
-          useDragHandle
-          characterCyclingOrder={this.state.characterCyclingOrder}
-          onSortEnd={this.onCharacterCyclingOrderChange}
-        />
-
+        <div style={{ margin: '10px 0' }}></div>
         <SMMButton
-          text='Unbind all'
-          onClick={() => {
-            this.setState({
-              hotkeyBindings: {
-                [HotkeyShortcut.MARIO]: [],
-                [HotkeyShortcut.LUIGI]: [],
-                [HotkeyShortcut.YOSHI]: [],
-                [HotkeyShortcut.WARIO]: [],
-                [HotkeyShortcut.PEACH]: [],
-                [HotkeyShortcut.TOAD]: [],
-                [HotkeyShortcut.WALUIGI]: [],
-                [HotkeyShortcut.ROSALINA]: [],
-                [HotkeyShortcut.SONIC]: [],
-                [HotkeyShortcut.KNUCKLES]: [],
-                [HotkeyShortcut.GOOMBA]: [],
-                [HotkeyShortcut.KIRBY]: [],
-                [HotkeyShortcut.NEXT_CHARACTER]: [],
-                [HotkeyShortcut.PREVIOUS_CHARACTER]: []
-              }
-            })
-          }}
-          styles={{
-            subButton: {
-              text: {
-                textAlign: 'center',
-                width: '100%'
-              }
-            }
-          }}
-        />
-        <SMMButton
-          text='Enable all'
-          onClick={() => {
-            const { characterCyclingOrder } = this.state
-            characterCyclingOrder.forEach((_, index) => { characterCyclingOrder[index].on = true })
-            this.setState({ characterCyclingOrder: characterCyclingOrder.slice() })
-          }}
-          styles={{
-            subButton: {
-              text: {
-                textAlign: 'center',
-                width: '100%'
-              }
-            }
-          }}
-        />
-        <SMMButton
-          text='Disable all'
-          onClick={() => {
-            const { characterCyclingOrder } = this.state
-            characterCyclingOrder.forEach((_, index) => { characterCyclingOrder[index].on = false })
-            this.setState({ characterCyclingOrder: characterCyclingOrder.slice() })
-          }}
-          styles={{
-            subButton: {
-              text: {
-                textAlign: 'center',
-                width: '100%'
-              }
-            }
-          }}
-        />
-
-        <SMMButton
+          className='settings-view-save'
           text='Save'
           iconSrc='img/submit.png'
           iconStyle='dark'
