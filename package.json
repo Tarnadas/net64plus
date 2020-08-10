@@ -58,7 +58,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "bufferutil": "^4.0.1",
-    "csv-parse": "3",
+    "csv-parse": "4",
     "deepmerge": "^2.0.1",
     "discord-rich-presence": "0.0.8",
     "dompurify": "^2",
