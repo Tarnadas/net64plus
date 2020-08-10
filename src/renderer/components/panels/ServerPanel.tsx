@@ -460,7 +460,7 @@ class Panel extends React.PureComponent<ServerPanelProps, ServerPanelState> {
                 className={`server-panel-description${!displayDescription ? ' server-panel-description-inactive' : ''}`}
               >
                 <div style={styles.el}>
-                  { server.domain ?? server.ip }:{ server.port }
+                  { server.domain ? server.domain : server.ip }:{ server.port }
                 </div>
                 {
                   gameMode &&

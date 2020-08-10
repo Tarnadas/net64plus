@@ -112,10 +112,14 @@ export class Connection {
   }: {
     domain: string | undefined, ip: string | undefined, port: number | undefined, username: string, characterId: number,
   }) {
+    let address = domain
+    if (!domain) {
+      address = ip
+    }
     this.disconnect = this.disconnect.bind(this)
     this.sendAll = this.sendAll.bind(this)
     this.updatePlayerPositions = this.updatePlayerPositions.bind(this)
-    this.ws = new WS(`ws://${(domain ?? ip) || '127.0.0.1'}:${port || 3678}`)
+    this.ws = new WS(`ws://${address}:${port}`)
     this.ws.on('open', this.onOpen.bind(this, characterId, username))
     this.ws.on('error', this.onError.bind(this))
     this.ws.on('close', this.onClose.bind(this))
