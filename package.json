@@ -18,7 +18,9 @@
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
     "test": "jest spec",
     "tsc": "tsc --noEmit",
-    "clean": "git clean -x -f build"
+    "clean": "git clean -x -f build",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -81,7 +83,8 @@
     "rimraf": "^2.6.2",
     "tar": "^4.4.8",
     "utf-8-validate": "^5.0.2",
-    "ws": "^3.2.0"
+    "ws": "^3.2.0",
+    "snyk": "^1.161.1"
   },
   "devDependencies": {
     "@babel/core": "^7",
@@ -143,5 +146,6 @@
   },
   "optionalDependencies": {
     "winprocess": "0.0.2"
-  }
+  },
+  "snyk": true
 }
