@@ -62,7 +62,7 @@
     "deepmerge": "^2.0.1",
     "discord-rich-presence": "0.0.8",
     "dompurify": "^2",
-    "electron": "2",
+    "electron": "11",
     "electron-localshortcut": "^3.2.1",
     "history": "^4.7.2",
     "immer": "^2.0.0",
