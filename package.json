@@ -69,7 +69,7 @@
     "marked": "^0.4.0",
     "node-emoji": "^1.8.1",
     "process-list": "^1.2.3",
-    "protobufjs": "^6.8.4",
+    "protobufjs": "^6.10.3",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
     "react-redux": "5",
