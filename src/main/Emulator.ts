@@ -1,9 +1,9 @@
-import { snapshot } from 'process-list'
+import * as psList from 'ps-list'
+import { ProcessDescriptor } from 'ps-list'
 import * as parse from 'csv-parse'
 
 import * as fs from 'fs'
 import * as path from 'path'
-import { promisify } from 'util'
 import { spawn } from 'child_process'
 
 import { connector, deleteEmulator } from '.'
@@ -12,7 +12,6 @@ import { testEmulatorPid, TestProcess } from '../models/Emulator.mock'
 import { buf2hex } from '../utils/Buffer.util'
 import winprocess, { Process } from '../declarations/winprocess'
 
-const tasklist = promisify(snapshot)
 let winProcess: winprocess
 if (process.platform === 'win32') {
   winProcess = require('winprocess')
@@ -100,12 +99,9 @@ export class Emulator {
       }))
   }
 
-  private static async getEmulatorsFromNativeNodeBinaries (): Promise<FilteredEmulator[]> {
-    return (await tasklist({
-      name: true,
-      pid: true
-    }))
-      .filter(({ name }: FilteredEmulator) => name.match(/project64/i))
+  private static async getEmulatorsFromNativeNodeBinaries (): Promise<ProcessDescriptor[]> {
+    return (await psList())
+      .filter(({ name }) => name.match(/project64/i))
   }
 
   /**
