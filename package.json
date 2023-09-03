@@ -64,7 +64,7 @@
     "electron-localshortcut": "^3.2.1",
     "history": "^4.7.2",
     "immer": "^2.0.0",
-    "marked": "^0.4.0",
+    "marked": "^4.0.10",
     "node-emoji": "^1.8.1",
     "protobufjs": "^6.8.4",
     "ps-list": "6",
